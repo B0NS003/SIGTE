@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIGTE - Iniciar sesion</title>
+  <link rel="stylesheet" href="assets/sigte.css">
+</head>
+<body>
+  <div class="auth">
+    <section class="auth-form">
+      <p class="auth-brand">SIGTE</p>
+      <p class="auth-sub">Sistema Integral de Gestion y Trazabilidad de Esterilizacion · Hospital San Jose de Melipilla</p>
+      <h1>Iniciar sesion</h1>
+      <p class="hint">Ingresa con tu cuenta institucional.</p>
+      <form action="panel.html" method="get">
+        <label class="field">
+          <span class="icon" aria-hidden="true">*</span>
+          <input type="email" name="email" placeholder="Correo electronico">
+        </label>
+        <label class="field">
+          <span class="icon" aria-hidden="true">*</span>
+          <input type="password" name="password" placeholder="Contrasena">
+        </label>
+        <button class="btn btn-primary" type="submit">INICIAR SESION</button>
+      </form>
+      <div class="auth-links">
+        <a href="#">Olvidaste tu contrasena?</a>
+        <p style="margin:0.75rem 0 0;color:var(--muted);font-size:0.85rem;">Mockup - sin backend. El boton abre el panel.</p>
+      </div>
+    </section>
+    <aside class="auth-visual" role="img" aria-label="Hospital San Jose de Melipilla">
+      <div class="auth-visual-caption">
+        <strong>Hospital San Jose de Melipilla</strong>
+        <span>Trazabilidad del material desde recepcion hasta entrega, en un solo lugar.</span>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>

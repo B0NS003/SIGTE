@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIGTE - Panel supervision</title>
+  <link rel="stylesheet" href="assets/sigte.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="logo">SIGTE</div>
+      <div class="nav-label">Operacion</div>
+      <nav class="nav">
+        <a class="active" href="panel.html">Resumen</a>
+        <a href="#">Recepcion</a>
+        <a href="#">Lavado</a>
+        <a href="#">Preparacion</a>
+        <a href="#">Esterilizacion</a>
+        <a href="#">Almacen</a>
+        <a href="#">Entrega</a>
+      </nav>
+      <div class="nav-label">Gestion</div>
+      <nav class="nav">
+        <a href="#">Inventario</a>
+        <a href="#">Reportes</a>
+        <a href="#">Usuarios</a>
+      </nav>
+      <div class="sidebar-foot">
+        <a href="login.html">Cerrar sesion</a>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="main-top">
+        <div>
+          <p class="eyebrow">Hospital San Jose · Melipilla</p>
+          <h1>Resumen operativo</h1>
+        </div>
+        <div class="user-chip">
+          <div class="avatar">S</div>
+          <div>
+            <strong>Supervision</strong>
+            <small>Jefatura esterilizacion</small>
+          </div>
+        </div>
+      </div>
+      <div class="filters">
+        <select><option>Hoy</option><option>Esta semana</option><option>Este mes</option></select>
+        <select><option>Todas las areas</option><option>Pabellon</option><option>Urgencia</option></select>
+        <select><option>Todos los metodos</option><option>Autoclave</option><option>Peroxido</option></select>
+        <button class="btn btn-dark" type="button">Aplicar</button>
+      </div>
+      <p class="section-title">Prioridad operativa</p>
+      <div class="kpi-row">
+        <div class="kpi"><div class="l">Cajas en proceso</div><div class="n">28</div></div>
+        <div class="kpi ok"><div class="l">Listas para entrega</div><div class="n">12</div></div>
+        <div class="kpi"><div class="l">Entregadas hoy</div><div class="n">19</div></div>
+        <div class="kpi warn"><div class="l">Retrasos / alertas</div><div class="n">3</div></div>
+      </div>
+      <p class="section-title">Flujo (6 fases)</p>
+      <div class="phases">
+        <div class="phase"><div class="n">5</div><div class="l">Recepcion</div></div>
+        <div class="phase"><div class="n">4</div><div class="l">Lavado</div></div>
+        <div class="phase"><div class="n">6</div><div class="l">Preparacion</div></div>
+        <div class="phase"><div class="n">7</div><div class="l">Esterilizacion</div></div>
+        <div class="phase"><div class="n">6</div><div class="l">Almacen</div></div>
+        <div class="phase"><div class="n">12</div><div class="l">Entrega</div></div>
+      </div>
+      <div class="grid-2">
+        <section class="panel">
+          <h2>Ciclos por dia (mock)</h2>
+          <div class="bars">
+            <div class="bar" style="height:40%"><span>L</span></div>
+            <div class="bar" style="height:55%"><span>M</span></div>
+            <div class="bar fill" style="height:80%"><span>X</span></div>
+            <div class="bar" style="height:60%"><span>J</span></div>
+            <div class="bar fill" style="height:95%"><span>V</span></div>
+            <div class="bar" style="height:35%"><span>S</span></div>
+            <div class="bar" style="height:20%"><span>D</span></div>
+          </div>
+        </section>
+        <section class="panel list">
+          <h2>Ultimos movimientos</h2>
+          <table>
+            <thead><tr><th>Caja / set</th><th>Fase</th><th>Area</th></tr></thead>
+            <tbody>
+              <tr><td>SET-042</td><td><span class="badge">Esterilizacion</span></td><td>Pabellon</td></tr>
+              <tr><td>CAJA-118</td><td><span class="badge">Lavado</span></td><td>Urgencia</td></tr>
+              <tr><td>SET-007</td><td><span class="badge">Entrega</span></td><td>Maternidad</td></tr>
+              <tr><td>CAJA-091</td><td><span class="badge">Recepcion</span></td><td>Pabellon</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
