@@ -12,10 +12,10 @@ class AuthController extends Controller
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('panel.resumen');
+            return redirect()->route('mockups.panel', Auth::user()->nombreRol());
         }
 
-        return view('auth.login');
+        return view('mockups.login');
     }
 
     public function login(Request $request): RedirectResponse
@@ -23,16 +23,26 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Escribe tu correo.',
+            'email.email' => 'El correo no tiene un formato válido. Ejemplo: nombre@hospital.cl',
+            'password.required' => 'Escribe tu contraseña.',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $ingreso = Auth::attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'activo' => true,
+        ], $request->boolean('remember'));
+
+        if ($ingreso) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('panel.resumen'));
+            return redirect()->route('mockups.panel', Auth::user()->nombreRol());
         }
 
         return back()->withErrors([
-            'email' => 'Credenciales incorrectas.',
+            'login' => 'No pudimos iniciar sesión. El correo o la contraseña no coinciden.',
         ])->onlyInput('email');
     }
 

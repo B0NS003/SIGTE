@@ -12,19 +12,8 @@
                 <div class="logo-sub">Turno</div>
             </div>
         </div>
-        <div class="nav-label">Operación</div>
-        <nav class="nav">
-            <a href="{{ route('mockups.panel', 'enfermera') }}">Resumen turno</a>
-            <a href="{{ route('mockups.panel', 'operador') }}">Flujo de cajas</a>
-            <a href="{{ route('mockups.recepcion') }}">Recepción</a>
-            <a href="{{ route('mockups.entrega') }}">Entrega</a>
-        </nav>
-        <div class="nav-label">Gestión de turno</div>
-        <nav class="nav">
-            <a href="{{ route('mockups.inventario') }}">Inventario</a>
-            <a href="{{ route('mockups.alertas') }}">Alertas <span class="nav-badge">3</span></a>
-            <a class="active" href="{{ route('mockups.cierre_turno') }}">Cierre / traspaso</a>
-        </nav>
+                @include('partials.menu-rol')
+
         <div class="sidebar-foot">
             <div class="side-user">
                 <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
@@ -33,7 +22,7 @@
                     <small>{{ $usuario['rol'] }}</small>
                 </div>
             </div>
-            <a class="side-logout" href="{{ route('mockups.login') }}">Cambiar rol</a>
+            @include('partials.logout')
         </div>
     </aside>
 

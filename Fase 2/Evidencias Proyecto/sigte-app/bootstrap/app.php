@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AsegurarAccesoPorRol;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -11,8 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'acceso' => AsegurarAccesoPorRol::class,
+        ]);
         $middleware->redirectGuestsTo('/login');
-        $middleware->redirectUsersTo('/panel');
+        $middleware->redirectUsersTo(function () {
+            $rol = auth()->user()?->nombreRol() ?? 'operador';
+
+            return '/panel/'.$rol;
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -13,25 +13,7 @@
             </div>
         </div>
 
-        <div class="nav-label">Operacion</div>
-        <nav class="nav">
-            <a class="active" href="{{ route('mockups.panel') }}">Resumen</a>
-            <a href="#">Recepcion</a>
-            <a href="#">Lavado</a>
-            <a href="#">Preparacion</a>
-            <a href="#">Esterilizacion</a>
-            <a href="#">Almacen</a>
-            <a href="#">Entrega</a>
-        </nav>
-
-        <div class="nav-label">Gestion</div>
-        <nav class="nav">
-            <a href="#">Inventario</a>
-            <a href="#">Custodia</a>
-            <a href="#">Alertas <span class="nav-badge">3</span></a>
-            <a href="#">Reportes</a>
-            <a href="#">Usuarios</a>
-        </nav>
+                @include('partials.menu-rol')
 
         <div class="sidebar-foot">
             <div class="side-user">
@@ -41,7 +23,7 @@
                     <small>{{ $usuario['rol'] }}</small>
                 </div>
             </div>
-            <a class="side-logout" href="{{ route('mockups.login') }}">Cerrar sesion</a>
+            @include('partials.logout')
         </div>
     </aside>
 

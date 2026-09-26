@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rol;
+use App\Support\AccesoPorRol;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class MockupController extends Controller
@@ -247,34 +251,62 @@ class MockupController extends Controller
     }
 
 
+    private function usuarioSesion(): array
+    {
+        $user = Auth::user();
+        $etiqueta = [
+            Rol::ADMINISTRADORA => 'Administradora',
+            Rol::ENFERMERA => 'Enfermera de turno',
+            Rol::OPERADOR => 'Operadora',
+        ][$user->nombreRol()] ?? 'Sin rol';
+
+        return [
+            'nombre' => $user->name,
+            'rol' => $etiqueta,
+        ];
+    }
+
     public function login(): View
     {
         return view('mockups.login');
     }
 
-    public function panel(string $rol): View
+    public function panel(string $rol): View|RedirectResponse
     {
+        $user = Auth::user();
+        $rolReal = $user->nombreRol();
+
+        if ($rolReal === null || ! in_array($rolReal, [Rol::ADMINISTRADORA, Rol::ENFERMERA, Rol::OPERADOR], true)) {
+            Auth::logout();
+
+            return redirect()->route('login')->withErrors([
+                'email' => 'Tu cuenta no tiene un rol válido.',
+            ]);
+        }
+
+        if (! AccesoPorRol::puedeVerPanel($user, $rol)) {
+            return redirect()->route('mockups.panel', $rolReal);
+        }
+
         $roles = [
-            'administradora' => [
-                'nombre' => 'Natalia Sanchez',
+            Rol::ADMINISTRADORA => [
                 'rol' => 'Administradora',
                 'vista' => 'mockups.panel-admin',
             ],
-            'enfermera' => [
-                'nombre' => 'Alejandra Riquelme',
+            Rol::ENFERMERA => [
                 'rol' => 'Enfermera de turno',
                 'vista' => 'mockups.panel-enfermera',
             ],
-            'operador' => [
-                'nombre' => 'Yamilet Maureira',
+            Rol::OPERADOR => [
                 'rol' => 'Operadora',
                 'vista' => 'mockups.panel-operador',
             ],
         ];
 
-        $usuario = $roles[$rol];
+        $vista = $roles[$rol]['vista'];
+        $usuario = $this->usuarioSesion();
 
-        return view($usuario['vista'], [
+        return view($vista, [
             'usuario' => $usuario,
             'rol_key' => $rol,
             'fases' => $this->fases(),
@@ -296,10 +328,7 @@ class MockupController extends Controller
     public function recepcion(): View
     {
         return view('mockups.recepcion', [
-            'usuario' => [
-                'nombre' => 'Yamilet Maureira',
-                'rol' => 'Operadora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'servicios' => ['Pabellon', 'Urgencia', 'Maternidad', 'UCI', 'Curaciones', 'Otro servicio'],
             'tipos' => ['Set quirurgico', 'Caja de curacion', 'Contenedor', 'Paquete grado medico'],
         ]);
@@ -315,10 +344,7 @@ class MockupController extends Controller
         $siguiente = $idx < count($fases) - 1 ? $fases[$idx + 1] : null;
 
         return view('mockups.avanzar', [
-            'usuario' => [
-                'nombre' => 'Yamilet Maureira',
-                'rol' => 'Operadora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'fases' => $fases,
             'cajas' => $cajas,
             'caja' => $caja,
@@ -335,10 +361,7 @@ class MockupController extends Controller
         $caja = collect($listas)->firstWhere('id', $selectedId) ?? ($listas[0] ?? null);
 
         return view('mockups.entrega', [
-            'usuario' => [
-                'nombre' => 'Yamilet Maureira',
-                'rol' => 'Operadora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'fases' => $fases,
             'listas' => $listas,
             'caja' => $caja,
@@ -349,10 +372,7 @@ class MockupController extends Controller
     public function catalogo(): View
     {
         return view('mockups.catalogo', [
-            'usuario' => [
-                'nombre' => 'Yamilet Maureira',
-                'rol' => 'Operadora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'items' => $this->catalogoItems(),
         ]);
     }
@@ -368,10 +388,7 @@ class MockupController extends Controller
         $alertas = collect($filtrados)->whereIn('estado', ['bajo', 'critico'])->count();
 
         return view('mockups.inventario', [
-            'usuario' => [
-                'nombre' => 'Yamilet Maureira',
-                'rol' => 'Operadora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'sala' => $sala,
             'salas' => [
                 'lavado' => 'Sala lavado',
@@ -429,10 +446,7 @@ class MockupController extends Controller
         ];
 
         return view('mockups.usuarios', [
-            'usuario' => [
-                'nombre' => 'Natalia Sanchez',
-                'rol' => 'Administradora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'usuarios' => $usuarios,
             'roles' => ['Administradora', 'Enfermera de turno', 'Operadora'],
             'resumen' => [
@@ -447,10 +461,7 @@ class MockupController extends Controller
     public function reportes(): View
     {
         return view('mockups.reportes', [
-            'usuario' => [
-                'nombre' => 'Natalia Sanchez',
-                'rol' => 'Administradora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'periodo' => '15–21 sep 2026',
             'kpis' => [
                 ['label' => 'Recepciones', 'value' => 86, 'hint' => 'Ingresos al ciclo', 'tone' => ''],
@@ -485,10 +496,7 @@ class MockupController extends Controller
     public function custodia(): View
     {
         return view('mockups.custodia', [
-            'usuario' => [
-                'nombre' => 'Natalia Sanchez',
-                'rol' => 'Administradora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'cadenas' => [
                 [
                     'caja' => 'SET-007',
@@ -602,10 +610,7 @@ class MockupController extends Controller
         ];
 
         return view('mockups.alertas', [
-            'usuario' => [
-                'nombre' => 'Natalia Sanchez',
-                'rol' => 'Administradora',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'alertas' => $lista,
             'resumen' => [
                 'abiertas' => collect($lista)->where('estado', 'abierta')->count(),
@@ -619,10 +624,7 @@ class MockupController extends Controller
     public function cierreTurno(): View
     {
         return view('mockups.cierre-turno', [
-            'usuario' => [
-                'nombre' => 'Alejandra Riquelme',
-                'rol' => 'Enfermera de turno',
-            ],
+            'usuario' => $this->usuarioSesion(),
             'turno' => [
                 'fecha' => '15 sep 2026',
                 'bloque' => 'Mañana · 08:00–16:00',

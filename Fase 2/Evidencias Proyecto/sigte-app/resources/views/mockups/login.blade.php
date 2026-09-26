@@ -2,6 +2,10 @@
 
 @section('title', 'SIGTE — Iniciar sesión')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+@endpush
+
 @section('content')
 <div class="auth">
     <section class="auth-form">
@@ -16,32 +20,43 @@
             <h1 class="auth-login-title">Iniciar sesión</h1>
             <p class="hint">Usa tu cuenta institucional del hospital.</p>
 
-            <label class="field-label" for="email">Correo</label>
-            <label class="field">
-                <span class="icon" aria-hidden="true">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 7 9-7"/></svg>
-                </span>
-                <input id="email" name="email" type="email" placeholder="nombre@hospital.cl" value="demo@sigte.local" autocomplete="username">
-            </label>
+            @if ($errors->has('login'))
+                <p class="auth-error" role="alert">{{ $errors->first('login') }}</p>
+            @endif
 
-            <label class="field-label" for="password">Contraseña</label>
-            <label class="field">
-                <span class="icon" aria-hidden="true">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                </span>
-                <input id="password" name="password" type="password" placeholder="••••••••" value="demo" autocomplete="current-password">
-            </label>
+            <form method="POST" action="{{ route('login') }}" id="form-login" novalidate>
+                @csrf
 
-            <label class="field-label" for="rol">Rol</label>
-            <label class="field field-select">
-                <select id="rol" name="rol">
-                    <option value="administradora">Administradora</option>
-                    <option value="enfermera">Enfermera de turno</option>
-                    <option value="operador" selected>Operadora</option>
-                </select>
-            </label>
+                <label class="field-label" for="email">Correo</label>
+                <label class="field {{ $errors->hasAny(['email', 'login']) ? 'is-invalid' : '' }}">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 7 9-7"/></svg>
+                    </span>
+                    <input id="email" name="email" type="email" placeholder="nombre@hospital.cl" value="{{ old('email') }}" autocomplete="username" required @if($errors->hasAny(['email', 'login'])) aria-invalid="true" @endif @if($errors->has('email')) aria-describedby="email-error" @endif>
+                </label>
+                <p class="field-error" id="email-error" @unless($errors->has('email')) hidden @endunless>{{ $errors->first('email') }}</p>
 
-            <button class="btn btn-primary" type="button" id="btn-ingresar">Ingresar</button>
+                <label class="field-label" for="password">Contraseña</label>
+                <label class="field {{ $errors->hasAny(['password', 'login']) ? 'is-invalid' : '' }}">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    </span>
+                    <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required @if($errors->hasAny(['password', 'login'])) aria-invalid="true" @endif @if($errors->has('password')) aria-describedby="password-error" @endif>
+                    <button class="btn-ver-clave" type="button" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false">
+                        <svg class="icono-ojo" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path class="parpado" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                            <path class="cerrado" d="M4 12.5h16"/>
+                            <circle class="pupila" cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </label>
+                <p class="field-error" id="password-error" @unless($errors->has('password')) hidden @endunless>{{ $errors->first('password') }}</p>
+
+                <button class="btn btn-primary" type="submit" id="btn-ingresar">
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span class="btn-label">Ingresar</span>
+                </button>
+            </form>
         </div>
     </section>
 
@@ -55,10 +70,5 @@
 @endsection
 
 @push('scripts')
-<script>
-document.getElementById('btn-ingresar')?.addEventListener('click', function () {
-  var rol = document.getElementById('rol')?.value || 'operador';
-  window.location.href = @json(url('/panel')) + '/' + rol;
-});
-</script>
+    <script src="{{ asset('js/login.js') }}"></script>
 @endpush

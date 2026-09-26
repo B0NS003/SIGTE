@@ -1,0 +1,66 @@
+.btn-ver-clave {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.btn-ver-clave:hover { color: var(--navy); }
+
+.btn-ver-clave .icono-ojo {
+  transform-origin: center;
+  overflow: visible;
+}
+
+.btn-ver-clave .pupila,
+.btn-ver-clave .cerrado {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-ver-clave .pupila {
+  opacity: 0;
+  transform: scale(0.2);
+}
+
+.btn-ver-clave.is-abierto {
+  color: var(--naranja);
+}
+
+.btn-ver-clave.is-abierto .pupila {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.btn-ver-clave.is-abierto .cerrado {
+  opacity: 0;
+}
+
+.btn-ver-clave.is-parpadeo .icono-ojo {
+  animation: sigte-parpadeo 0.35s ease;
+}
+
+@keyframes sigte-parpadeo {
+  0% { transform: scaleY(1); }
+  45% { transform: scaleY(0.12); }
+  100% { transform: scaleY(1); }
+}
+
+.auth-card.is-shaking {
+  animation: sigte-sacudida 0.42s ease;
+}
+
+@keyframes sigte-sacudida {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}

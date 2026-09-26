@@ -12,18 +12,8 @@
                 <div class="logo-sub">Operación</div>
             </div>
         </div>
-        <div class="nav-label">Mi trabajo</div>
-        <nav class="nav">
-            <a href="{{ route('mockups.panel', 'operador') }}">Flujo de cajas</a>
-            <a href="{{ route('mockups.recepcion') }}">Nueva recepción</a>
-            <a href="{{ route('mockups.avanzar') }}">Avanzar etapa</a>
-            <a href="{{ route('mockups.entrega') }}">Registrar entrega</a>
-        </nav>
-        <div class="nav-label">Consulta</div>
-        <nav class="nav">
-            <a class="active" href="{{ route('mockups.catalogo') }}">Catálogo</a>
-            <a href="{{ route('mockups.inventario') }}">Inventario</a>
-        </nav>
+                @include('partials.menu-rol')
+
         <div class="sidebar-foot">
             <div class="side-user">
                 <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
@@ -32,7 +22,7 @@
                     <small>{{ $usuario['rol'] }}</small>
                 </div>
             </div>
-            <a class="side-logout" href="{{ route('mockups.login') }}">Cambiar rol</a>
+            @include('partials.logout')
         </div>
     </aside>
 

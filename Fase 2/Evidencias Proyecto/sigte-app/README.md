@@ -1,32 +1,38 @@
-# SIGTE — mockup preliminar (Fase 2)
+# SIGTE — Laravel 11
 
-> **Importante:** esto es un **mockup visual super preliminar** del Capstone.
-> No hay lógica de negocio real, ni autenticación verdadera, ni base de datos operativa.
-> Sirve como evidencia de avance de interfaz (Blade) para alinear roles, flujo de cajas y pantallas de gestión.
+Sistema Integral de Gestión y Trazabilidad de Esterilización  
+Hospital San José de Melipilla
 
-## Qué es
-
-Prototipo frontend en **Laravel 11 + Blade** para el sistema de trazabilidad de esterilización del Hospital San José de Melipilla (SIGTE).
-
-## Qué NO es (aún)
-
-- No valida usuarios ni contraseñas
-- No guarda datos en BD al confirmar formularios
-- No implementa reglas de negocio completas (solo la idea visual)
-
-## Cómo correrlo
+## Arranque local (cuando `vendor/` esté instalado)
 
 ```bash
-cd "Fase 2/Evidencias Proyecto/sigte-app"
-composer install
-copy .env.example .env
+cd C:\xampp\htdocs\sigte-app
 php artisan key:generate
+# crea database/database.sqlite si no existe
+php artisan migrate --seed
 php artisan serve
 ```
 
 Abrir: http://127.0.0.1:8000/login
 
-## Equipo / Capstone
+### Usuarios demo
+| Email | Password | Rol |
+|-------|----------|-----|
+| tecnico@sigte.local | password | técnico |
+| jefatura@sigte.local | password | jefatura |
 
-Proyecto académico Duoc UC — Capstone 2026.
-Estado: **mockup preliminar de Fase 2 (evidencia de desarrollo)**.
+## Stack
+- Laravel 11 + PHP 8.2+
+- Blade (vistas reales; ya no HTML suelto)
+- Auth sesión + columna `role` (tecnico / jefatura; secretaria después)
+- SQLite para empezar; PostgreSQL 16 vía Docker
+- Feature test: login
+
+## Docker (cuando tengas Docker Desktop)
+```bash
+docker compose up -d --build
+```
+App: http://localhost:8080
+
+## Nota
+La carpeta `public/mockups/` es referencia visual antigua. La app usa `resources/views/` (Blade).
