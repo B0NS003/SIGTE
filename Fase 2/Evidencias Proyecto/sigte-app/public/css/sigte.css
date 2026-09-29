@@ -428,22 +428,146 @@ button.side-logout {
   display: grid; place-items: center; font-size: 0.65rem; font-weight: 800;
 }
 .ops-board { display: flex; flex-direction: column; gap: 0.85rem; }
+.ops-consulta { margin: 0 0 0.85rem; }
+.ops-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+.ops-search input[type="search"] {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  color: var(--navy);
+  background: #fff;
+}
+.ops-search input[type="search"]:focus {
+  outline: 2px solid rgba(232, 90, 28, 0.35);
+  border-color: var(--naranja);
+}
+.ops-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+.ops-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--borde);
+  background: #fff;
+  color: var(--navy);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.ops-filter em {
+  font-style: normal;
+  color: var(--muted);
+  font-weight: 600;
+}
+.ops-filter.is-active {
+  background: var(--naranja);
+  border-color: var(--naranja);
+  color: #fff;
+}
+.ops-filter.is-active em { color: rgba(255,255,255,.85); }
+.ops-filter:hover { border-color: #fdba74; text-decoration: none; color: var(--navy); }
+.ops-filter.is-active:hover { color: #fff; }
+.ops-result-meta {
+  margin: 0 0 0.85rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.ops-etapa-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+.ops-etapa-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.15rem 0.15rem 0;
+}
+.ops-etapa-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--navy);
+}
+.ops-etapa-head span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.ops-etapa-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ops-empty {
+  margin: 0;
+  padding: 1.35rem 1.1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  background: #fff;
+  border: 1px dashed var(--borde);
+  border-radius: 14px;
+  text-align: center;
+}
+.ops-empty strong {
+  display: block;
+  color: var(--navy);
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+}
+.ops-empty p { margin: 0; }
+.ops-empty a { color: var(--naranja-oscuro); font-weight: 700; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .track-card {
   background: #fff; border: 1px solid var(--borde); border-radius: 18px;
   padding: 1rem 1.1rem 0.95rem; box-shadow: 0 8px 24px rgba(11,31,75,.05);
 }
 .track-card.is-urgent { border-color: #fecaca; box-shadow: 0 8px 24px rgba(185,28,28,.08); }
-.track-head { display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.95rem; }
+.track-head { display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.85rem; }
 .track-head h2 { margin: 0; font-family: var(--font-display); font-size: 1.15rem; color: var(--navy); }
 .track-head p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.82rem; }
 .track-pipe {
   display: flex; align-items: flex-start; gap: 0; margin: 0.25rem 0 1rem; overflow-x: auto; padding-bottom: 0.25rem;
 }
+.track-pipe-compact {
+  align-items: center;
+  margin: 0.15rem 0 0.85rem;
+  max-width: 22rem;
+  padding-bottom: 0;
+}
 .track-step { flex: 0 0 auto; width: 4.6rem; text-align: center; }
+.track-pipe-compact .track-step { width: auto; }
 .track-node {
   width: 14px; height: 14px; border-radius: 50%; margin: 0 auto 0.4rem;
   background: #e2e8f0; border: 2px solid #cbd5e1;
 }
+.track-pipe-compact .track-node { margin: 0; }
 .track-step.done .track-node { background: var(--naranja); border-color: var(--naranja); }
 .track-step.current .track-node {
   background: #fff; border-color: var(--naranja);
@@ -453,6 +577,11 @@ button.side-logout {
 .track-step.current .track-label { color: var(--naranja-oscuro); }
 .track-line {
   flex: 1 1 18px; height: 3px; background: #e2e8f0; margin-top: 6px; min-width: 12px; border-radius: 99px;
+}
+.track-pipe-compact .track-line {
+  margin-top: 0;
+  flex: 1 1 28px;
+  min-width: 20px;
 }
 .track-line.done { background: var(--naranja); }
 .track-foot {

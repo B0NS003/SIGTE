@@ -4,16 +4,19 @@
 
 @section('content')
 @php
-    $salaDe = function (int $i): string {
-        if ($i <= 1) return 'lavado';
-        if ($i <= 3) return 'armado';
-        return 'esteril';
+    $totalTodas = array_sum($conteo_etapas ?? []);
+    $urlConsulta = function (?int $etapa = null, ?string $q = null) {
+        $params = [];
+        $texto = $q ?? ($busqueda ?? '');
+        if ($texto !== '') {
+            $params['q'] = $texto;
+        }
+        if ($etapa !== null) {
+            $params['etapa'] = $etapa;
+        }
+
+        return route('mockups.panel', array_merge(['rol' => 'operador'], $params));
     };
-    $salaLabel = [
-        'lavado' => 'Sala lavado',
-        'armado' => 'Sala armado',
-        'esteril' => 'Material estéril',
-    ];
 @endphp
 <div class="shell shell-ops">
     <aside class="sidebar">
@@ -24,7 +27,7 @@
                 <div class="logo-sub">Operación</div>
             </div>
         </div>
-                @include('partials.menu-rol')
+        @include('partials.menu-rol')
 
         <div class="sidebar-foot">
             <div class="side-user">
@@ -41,9 +44,8 @@
     <main class="main">
         <div class="main-top">
             <div>
-                <p class="eyebrow">Turno · tres salas · trazabilidad</p>
+                <p class="eyebrow">Operación · consulta de cajas</p>
                 <h1>Flujo de cajas</h1>
-                <p class="main-sub">Unidireccional por salas (cada una con su “libro”): lavado → armado → material estéril. Las etiquetas de color marcan la sala; el tracker sigue en naranja.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-dark" href="{{ route('mockups.recepcion') }}">+ Nueva recepción</a>
@@ -51,60 +53,94 @@
         </div>
 
         <div class="sala-legend">
-            <div class="sala-chip sala-lavado"><span></span>Sala lavado <small>Recepción · Lavado</small></div>
-            <div class="sala-chip sala-armado"><span></span>Sala armado <small>Preparación · Esterilización</small></div>
-            <div class="sala-chip sala-esteril"><span></span>Material estéril <small>Almacén · Entrega</small></div>
+            <div class="sala-chip sala-lavado"><span></span>Sala lavado</div>
+            <div class="sala-chip sala-armado"><span></span>Sala armado</div>
+            <div class="sala-chip sala-esteril"><span></span>Material estéril</div>
         </div>
 
-        <div class="ops-lane-legend">
+        <form class="ops-consulta" method="get" action="{{ route('mockups.panel', 'operador') }}" role="search">
+            <div class="ops-search">
+                <label class="sr-only" for="busqueda-caja">Buscar caja quirúrgica</label>
+                <input
+                    id="busqueda-caja"
+                    type="search"
+                    name="q"
+                    value="{{ $busqueda }}"
+                    placeholder="Buscar por código, servicio, ubicación o responsable…"
+                    autocomplete="off"
+                >
+                @if ($etapa_filtro !== null)
+                    <input type="hidden" name="etapa" value="{{ $etapa_filtro }}">
+                @endif
+                <button class="btn btn-dark" type="submit">Buscar</button>
+                @if ($hay_filtros)
+                    <a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">Limpiar</a>
+                @endif
+            </div>
+        </form>
+
+        <div class="ops-filters" aria-label="Filtrar por etapa">
+            <a
+                class="ops-filter {{ $etapa_filtro === null ? 'is-active' : '' }}"
+                href="{{ $urlConsulta(null, $busqueda) }}"
+            >
+                Todas <em>{{ $totalTodas }}</em>
+            </a>
             @foreach ($fases as $i => $fase)
-                <div class="ops-legend-item">
-                    <span class="ops-dot">{{ $i + 1 }}</span>
-                    {{ $fase }}
-                </div>
+                <a
+                    class="ops-filter {{ $etapa_filtro === $i ? 'is-active' : '' }}"
+                    href="{{ $urlConsulta($i, $busqueda) }}"
+                >
+                    {{ $fase }} <em>{{ $conteo_etapas[$i] ?? 0 }}</em>
+                </a>
             @endforeach
         </div>
+
+        <p class="ops-result-meta">
+            @if ($hay_filtros)
+                {{ $total_consulta }} {{ $total_consulta === 1 ? 'caja encontrada' : 'cajas encontradas' }}
+                @if ($busqueda !== '')
+                    para “{{ $busqueda }}”
+                @endif
+                @if ($etapa_filtro !== null)
+                    en {{ $fases[$etapa_filtro] }}
+                @endif
+            @else
+                {{ $total_consulta }} {{ $total_consulta === 1 ? 'caja en flujo' : 'cajas en flujo' }}, agrupadas por etapa
+            @endif
+        </p>
 
         <div class="ops-board">
-            @foreach ($cajas as $caja)
-                @php $sala = $salaDe($caja['fase_idx']); @endphp
-                <article class="track-card {{ $caja['urgente'] ? 'is-urgent' : '' }}">
-                    <header class="track-head">
-                        <div>
-                            <h2>{{ $caja['id'] }}</h2>
-                            <p>{{ $caja['servicio'] }} · {{ $caja['hora'] }} · {{ $caja['operadora'] }}</p>
-                        </div>
-                        <div class="track-head-badges">
-                            <span class="badge badge-sala badge-{{ $sala }}">{{ $salaLabel[$sala] }}</span>
-                            <span class="badge">{{ $fases[$caja['fase_idx']] }}</span>
-                        </div>
-                    </header>
-
-                    <div class="track-pipe" aria-label="Progreso del ciclo">
-                        @foreach ($fases as $i => $fase)
-                            @php
-                                $done = $i < $caja['fase_idx'];
-                                $current = $i === $caja['fase_idx'];
-                            @endphp
-                            <div class="track-step {{ $done ? 'done' : '' }} {{ $current ? 'current' : '' }}">
-                                <div class="track-node"></div>
-                                <div class="track-label">{{ $fase }}</div>
-                            </div>
-                            @if (!$loop->last)
-                                <div class="track-line {{ $i < $caja['fase_idx'] ? 'done' : '' }}"></div>
+            @if ($total_consulta === 0)
+                <div class="ops-empty" role="status">
+                    @if ($hay_filtros)
+                        <strong>No se encontraron cajas coincidentes</strong>
+                        <p>
+                            Prueba con otro código o quita el filtro de etapa.
+                            @if ($busqueda !== '' || $etapa_filtro !== null)
+                                <a href="{{ route('mockups.panel', 'operador') }}">Ver todas las cajas</a>
                             @endif
-                        @endforeach
-                    </div>
-
-                    <footer class="track-foot">
-                        <span>{{ $caja['estado'] }}</span>
-                        <div class="track-actions">
-                            <button class="btn btn-ghost" type="button" disabled title="Detalle después">Modificar</button>
-                            <a class="btn btn-dark" href="{{ route('mockups.avanzar', ['caja' => $caja['id']]) }}">Aceptar avance</a>
+                        </p>
+                    @else
+                        <strong>No hay cajas en el flujo</strong>
+                        <p>Cuando se registren recepciones, aparecerán aquí por etapa.</p>
+                    @endif
+                </div>
+            @else
+                @foreach ($cajas_por_etapa as $grupo)
+                    <section class="ops-etapa-group" aria-labelledby="etapa-{{ $grupo['indice'] }}">
+                        <header class="ops-etapa-head">
+                            <h2 id="etapa-{{ $grupo['indice'] }}">{{ $grupo['nombre'] }}</h2>
+                            <span>{{ count($grupo['cajas']) }} {{ count($grupo['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
+                        </header>
+                        <div class="ops-etapa-list">
+                            @foreach ($grupo['cajas'] as $caja)
+                                @include('mockups.partials.tarjeta-caja', ['caja' => $caja, 'fases' => $fases])
+                            @endforeach
                         </div>
-                    </footer>
-                </article>
-            @endforeach
+                    </section>
+                @endforeach
+            @endif
         </div>
     </main>
 </div>

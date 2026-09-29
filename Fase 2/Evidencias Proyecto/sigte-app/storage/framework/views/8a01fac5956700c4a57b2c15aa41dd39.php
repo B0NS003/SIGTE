@@ -4,16 +4,19 @@
 
 <?php $__env->startSection('content'); ?>
 <?php
-    $salaDe = function (int $i): string {
-        if ($i <= 1) return 'lavado';
-        if ($i <= 3) return 'armado';
-        return 'esteril';
+    $totalTodas = array_sum($conteo_etapas ?? []);
+    $urlConsulta = function (?int $etapa = null, ?string $q = null) {
+        $params = [];
+        $texto = $q ?? ($busqueda ?? '');
+        if ($texto !== '') {
+            $params['q'] = $texto;
+        }
+        if ($etapa !== null) {
+            $params['etapa'] = $etapa;
+        }
+
+        return route('mockups.panel', array_merge(['rol' => 'operador'], $params));
     };
-    $salaLabel = [
-        'lavado' => 'Sala lavado',
-        'armado' => 'Sala armado',
-        'esteril' => 'Material estéril',
-    ];
 ?>
 <div class="shell shell-ops">
     <aside class="sidebar">
@@ -24,7 +27,7 @@
                 <div class="logo-sub">Operación</div>
             </div>
         </div>
-                <?php echo $__env->make('partials.menu-rol', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php echo $__env->make('partials.menu-rol', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <div class="sidebar-foot">
             <div class="side-user">
@@ -41,9 +44,8 @@
     <main class="main">
         <div class="main-top">
             <div>
-                <p class="eyebrow">Turno · tres salas · trazabilidad</p>
+                <p class="eyebrow">Operación · consulta de cajas</p>
                 <h1>Flujo de cajas</h1>
-                <p class="main-sub">Unidireccional por salas (cada una con su “libro”): lavado → armado → material estéril. Las etiquetas de color marcan la sala; el tracker sigue en naranja.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-dark" href="<?php echo e(route('mockups.recepcion')); ?>">+ Nueva recepción</a>
@@ -51,61 +53,96 @@
         </div>
 
         <div class="sala-legend">
-            <div class="sala-chip sala-lavado"><span></span>Sala lavado <small>Recepción · Lavado</small></div>
-            <div class="sala-chip sala-armado"><span></span>Sala armado <small>Preparación · Esterilización</small></div>
-            <div class="sala-chip sala-esteril"><span></span>Material estéril <small>Almacén · Entrega</small></div>
+            <div class="sala-chip sala-lavado"><span></span>Sala lavado</div>
+            <div class="sala-chip sala-armado"><span></span>Sala armado</div>
+            <div class="sala-chip sala-esteril"><span></span>Material estéril</div>
         </div>
 
-        <div class="ops-lane-legend">
-            <?php $__currentLoopData = $fases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $fase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="ops-legend-item">
-                    <span class="ops-dot"><?php echo e($i + 1); ?></span>
-                    <?php echo e($fase); ?>
+        <form class="ops-consulta" method="get" action="<?php echo e(route('mockups.panel', 'operador')); ?>" role="search">
+            <div class="ops-search">
+                <label class="sr-only" for="busqueda-caja">Buscar caja quirúrgica</label>
+                <input
+                    id="busqueda-caja"
+                    type="search"
+                    name="q"
+                    value="<?php echo e($busqueda); ?>"
+                    placeholder="Buscar por código, servicio, ubicación o responsable…"
+                    autocomplete="off"
+                >
+                <?php if($etapa_filtro !== null): ?>
+                    <input type="hidden" name="etapa" value="<?php echo e($etapa_filtro); ?>">
+                <?php endif; ?>
+                <button class="btn btn-dark" type="submit">Buscar</button>
+                <?php if($hay_filtros): ?>
+                    <a class="btn btn-ghost" href="<?php echo e(route('mockups.panel', 'operador')); ?>">Limpiar</a>
+                <?php endif; ?>
+            </div>
+        </form>
 
-                </div>
+        <div class="ops-filters" aria-label="Filtrar por etapa">
+            <a
+                class="ops-filter <?php echo e($etapa_filtro === null ? 'is-active' : ''); ?>"
+                href="<?php echo e($urlConsulta(null, $busqueda)); ?>"
+            >
+                Todas <em><?php echo e($totalTodas); ?></em>
+            </a>
+            <?php $__currentLoopData = $fases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $fase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <a
+                    class="ops-filter <?php echo e($etapa_filtro === $i ? 'is-active' : ''); ?>"
+                    href="<?php echo e($urlConsulta($i, $busqueda)); ?>"
+                >
+                    <?php echo e($fase); ?> <em><?php echo e($conteo_etapas[$i] ?? 0); ?></em>
+                </a>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
+
+        <p class="ops-result-meta">
+            <?php if($hay_filtros): ?>
+                <?php echo e($total_consulta); ?> <?php echo e($total_consulta === 1 ? 'caja encontrada' : 'cajas encontradas'); ?>
+
+                <?php if($busqueda !== ''): ?>
+                    para “<?php echo e($busqueda); ?>”
+                <?php endif; ?>
+                <?php if($etapa_filtro !== null): ?>
+                    en <?php echo e($fases[$etapa_filtro]); ?>
+
+                <?php endif; ?>
+            <?php else: ?>
+                <?php echo e($total_consulta); ?> <?php echo e($total_consulta === 1 ? 'caja en flujo' : 'cajas en flujo'); ?>, agrupadas por etapa
+            <?php endif; ?>
+        </p>
 
         <div class="ops-board">
-            <?php $__currentLoopData = $cajas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caja): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <?php $sala = $salaDe($caja['fase_idx']); ?>
-                <article class="track-card <?php echo e($caja['urgente'] ? 'is-urgent' : ''); ?>">
-                    <header class="track-head">
-                        <div>
-                            <h2><?php echo e($caja['id']); ?></h2>
-                            <p><?php echo e($caja['servicio']); ?> · <?php echo e($caja['hora']); ?> · <?php echo e($caja['operadora']); ?></p>
-                        </div>
-                        <div class="track-head-badges">
-                            <span class="badge badge-sala badge-<?php echo e($sala); ?>"><?php echo e($salaLabel[$sala]); ?></span>
-                            <span class="badge"><?php echo e($fases[$caja['fase_idx']]); ?></span>
-                        </div>
-                    </header>
-
-                    <div class="track-pipe" aria-label="Progreso del ciclo">
-                        <?php $__currentLoopData = $fases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $fase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php
-                                $done = $i < $caja['fase_idx'];
-                                $current = $i === $caja['fase_idx'];
-                            ?>
-                            <div class="track-step <?php echo e($done ? 'done' : ''); ?> <?php echo e($current ? 'current' : ''); ?>">
-                                <div class="track-node"></div>
-                                <div class="track-label"><?php echo e($fase); ?></div>
-                            </div>
-                            <?php if(!$loop->last): ?>
-                                <div class="track-line <?php echo e($i < $caja['fase_idx'] ? 'done' : ''); ?>"></div>
+            <?php if($total_consulta === 0): ?>
+                <div class="ops-empty" role="status">
+                    <?php if($hay_filtros): ?>
+                        <strong>No se encontraron cajas coincidentes</strong>
+                        <p>
+                            Prueba con otro código o quita el filtro de etapa.
+                            <?php if($busqueda !== '' || $etapa_filtro !== null): ?>
+                                <a href="<?php echo e(route('mockups.panel', 'operador')); ?>">Ver todas las cajas</a>
                             <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </div>
-
-                    <footer class="track-foot">
-                        <span><?php echo e($caja['estado']); ?></span>
-                        <div class="track-actions">
-                            <button class="btn btn-ghost" type="button" disabled title="Detalle después">Modificar</button>
-                            <a class="btn btn-dark" href="<?php echo e(route('mockups.avanzar', ['caja' => $caja['id']])); ?>">Aceptar avance</a>
+                        </p>
+                    <?php else: ?>
+                        <strong>No hay cajas en el flujo</strong>
+                        <p>Cuando se registren recepciones, aparecerán aquí por etapa.</p>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <?php $__currentLoopData = $cajas_por_etapa; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $grupo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <section class="ops-etapa-group" aria-labelledby="etapa-<?php echo e($grupo['indice']); ?>">
+                        <header class="ops-etapa-head">
+                            <h2 id="etapa-<?php echo e($grupo['indice']); ?>"><?php echo e($grupo['nombre']); ?></h2>
+                            <span><?php echo e(count($grupo['cajas'])); ?> <?php echo e(count($grupo['cajas']) === 1 ? 'caja' : 'cajas'); ?></span>
+                        </header>
+                        <div class="ops-etapa-list">
+                            <?php $__currentLoopData = $grupo['cajas']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caja): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php echo $__env->make('mockups.partials.tarjeta-caja', ['caja' => $caja, 'fases' => $fases], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    </footer>
-                </article>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </section>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php endif; ?>
         </div>
     </main>
 </div>

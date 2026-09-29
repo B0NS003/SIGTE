@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Caja;
 use App\Models\Rol;
 use App\Support\AccesoPorRol;
 use Illuminate\Http\RedirectResponse;
@@ -13,75 +14,120 @@ class MockupController extends Controller
 {
     private function fases(): array
     {
-        return ['Recepcion', 'Lavado', 'Preparacion', 'Esterilizacion', 'Almacen', 'Entrega'];
+        return array_map(
+            fn (string $etapa) => Caja::etiquetaEtapa($etapa),
+            Caja::etapas()
+        );
     }
 
+    /**
+     * Cajas desde PostgreSQL, en el formato que usan las vistas del mockup.
+     *
+     * @return list<array{id: string, servicio: string, fase_idx: int, estado: string, ubicacion: string, operadora: string, hora: string, tiempo: string, urgente: bool}>
+     */
     private function cajas(): array
     {
+        return Caja::query()
+            ->with('responsable')
+            ->orderByDesc('urgente')
+            ->orderBy('etapa_desde')
+            ->get()
+            ->map(function (Caja $caja) {
+                return [
+                    'id' => $caja->codigo,
+                    'servicio' => $caja->servicio,
+                    'fase_idx' => $caja->indiceEtapa(),
+                    'estado' => $caja->estado ?? Caja::etiquetaEtapa($caja->etapa),
+                    'ubicacion' => $caja->ubicacion ?? 'Sin ubicacion',
+                    'operadora' => $caja->nombreResponsable(),
+                    'hora' => optional($caja->etapa_desde)->format('H:i') ?? '—',
+                    'tiempo' => $caja->tiempoEnEtapa(),
+                    'urgente' => $caja->urgente,
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Consulta de cajas para HIU-EP2-001: búsqueda, filtro por etapa y agrupación.
+     *
+     * @return array{
+     *   busqueda: string,
+     *   etapa_filtro: int|null,
+     *   cajas: list<array>,
+     *   cajas_por_etapa: list<array{indice: int, nombre: string, cajas: list<array>}>,
+     *   conteo_etapas: list<int>,
+     *   total: int,
+     *   hay_filtros: bool
+     * }
+     */
+    private function consultaCajas(Request $request): array
+    {
+        $fases = $this->fases();
+        $todas = $this->cajas();
+        $busqueda = trim((string) $request->query('q', ''));
+        $etapaRaw = $request->query('etapa');
+        $etapaFiltro = is_numeric($etapaRaw) ? (int) $etapaRaw : null;
+
+        if ($etapaFiltro !== null && ($etapaFiltro < 0 || $etapaFiltro >= count($fases))) {
+            $etapaFiltro = null;
+        }
+
+        $filtradas = $todas;
+
+        if ($busqueda !== '') {
+            $needle = mb_strtolower($busqueda);
+            $filtradas = array_values(array_filter($filtradas, function (array $caja) use ($needle) {
+                $haystack = mb_strtolower(implode(' ', [
+                    $caja['id'],
+                    $caja['servicio'],
+                    $caja['ubicacion'],
+                    $caja['estado'],
+                    $caja['operadora'],
+                ]));
+
+                return str_contains($haystack, $needle);
+            }));
+        }
+
+        $conteoEtapas = array_fill(0, count($fases), 0);
+        foreach ($filtradas as $caja) {
+            $conteoEtapas[$caja['fase_idx']]++;
+        }
+
+        if ($etapaFiltro !== null) {
+            $filtradas = array_values(array_filter(
+                $filtradas,
+                fn (array $caja) => $caja['fase_idx'] === $etapaFiltro
+            ));
+        }
+
+        $cajasPorEtapa = [];
+        foreach ($fases as $indice => $nombre) {
+            $delGrupo = array_values(array_filter(
+                $filtradas,
+                fn (array $caja) => $caja['fase_idx'] === $indice
+            ));
+
+            if ($delGrupo === []) {
+                continue;
+            }
+
+            $cajasPorEtapa[] = [
+                'indice' => $indice,
+                'nombre' => $nombre,
+                'cajas' => $delGrupo,
+            ];
+        }
+
         return [
-            [
-                'id' => 'SET-042',
-                'servicio' => 'Pabellon',
-                'fase_idx' => 3,
-                'estado' => 'En autoclave 2',
-                'operadora' => 'Y. Maureira',
-                'hora' => '14:12',
-                'urgente' => true,
-            ],
-            [
-                'id' => 'CAJA-118',
-                'servicio' => 'Urgencia',
-                'fase_idx' => 1,
-                'estado' => 'En lavado (ciclo ~1h)',
-                'operadora' => 'A. Riquelme',
-                'hora' => '13:58',
-                'urgente' => false,
-            ],
-            [
-                'id' => 'SET-007',
-                'servicio' => 'Maternidad',
-                'fase_idx' => 4,
-                'estado' => 'Lista en almacen esteril',
-                'operadora' => 'Y. Maureira',
-                'hora' => '13:41',
-                'urgente' => false,
-            ],
-            [
-                'id' => 'CAJA-091',
-                'servicio' => 'Pabellon',
-                'fase_idx' => 0,
-                'estado' => 'Area sucia · ficha de servicio',
-                'operadora' => 'A. Riquelme',
-                'hora' => '13:20',
-                'urgente' => false,
-            ],
-            [
-                'id' => 'SET-055',
-                'servicio' => 'UCI',
-                'fase_idx' => 2,
-                'estado' => 'Armado / reconteo',
-                'operadora' => 'Y. Maureira',
-                'hora' => '12:55',
-                'urgente' => false,
-            ],
-            [
-                'id' => 'SET-033',
-                'servicio' => 'Pabellon',
-                'fase_idx' => 4,
-                'estado' => 'Lista en almacen esteril',
-                'operadora' => 'Y. Maureira',
-                'hora' => '12:10',
-                'urgente' => true,
-            ],
-            [
-                'id' => 'CAJA-200',
-                'servicio' => 'Curaciones',
-                'fase_idx' => 4,
-                'estado' => 'Lista en almacen esteril',
-                'operadora' => 'A. Riquelme',
-                'hora' => '11:48',
-                'urgente' => false,
-            ],
+            'busqueda' => $busqueda,
+            'etapa_filtro' => $etapaFiltro,
+            'cajas' => $filtradas,
+            'cajas_por_etapa' => $cajasPorEtapa,
+            'conteo_etapas' => $conteoEtapas,
+            'total' => count($filtradas),
+            'hay_filtros' => $busqueda !== '' || $etapaFiltro !== null,
         ];
     }
 
@@ -271,7 +317,7 @@ class MockupController extends Controller
         return view('mockups.login');
     }
 
-    public function panel(string $rol): View|RedirectResponse
+    public function panel(Request $request, string $rol): View|RedirectResponse
     {
         $user = Auth::user();
         $rolReal = $user->nombreRol();
@@ -305,14 +351,36 @@ class MockupController extends Controller
 
         $vista = $roles[$rol]['vista'];
         $usuario = $this->usuarioSesion();
+        $fases = $this->fases();
+
+        if ($rol === Rol::OPERADOR) {
+            $consulta = $this->consultaCajas($request);
+        } else {
+            $todas = $this->cajas();
+            $consulta = [
+                'busqueda' => '',
+                'etapa_filtro' => null,
+                'cajas' => $todas,
+                'cajas_por_etapa' => [],
+                'conteo_etapas' => [],
+                'total' => count($todas),
+                'hay_filtros' => false,
+            ];
+        }
 
         return view($vista, [
             'usuario' => $usuario,
             'rol_key' => $rol,
-            'fases' => $this->fases(),
-            'cajas' => $this->cajas(),
+            'fases' => $fases,
+            'cajas' => $consulta['cajas'],
+            'cajas_por_etapa' => $consulta['cajas_por_etapa'],
+            'busqueda' => $consulta['busqueda'],
+            'etapa_filtro' => $consulta['etapa_filtro'],
+            'conteo_etapas' => $consulta['conteo_etapas'],
+            'total_consulta' => $consulta['total'],
+            'hay_filtros' => $consulta['hay_filtros'],
             'kpis' => [
-                ['label' => 'En proceso', 'value' => 28, 'hint' => 'Cajas/sets activos', 'tone' => ''],
+                ['label' => 'En flujo', 'value' => 28, 'hint' => 'Cajas/sets activos', 'tone' => ''],
                 ['label' => 'Listas para entrega', 'value' => 12, 'hint' => 'En almacen esteril', 'tone' => 'ok'],
                 ['label' => 'Entregadas hoy', 'value' => 19, 'hint' => 'Con custodia', 'tone' => ''],
                 ['label' => 'Requieren atencion', 'value' => 3, 'hint' => 'Retraso o faltante', 'tone' => 'warn'],
@@ -324,7 +392,6 @@ class MockupController extends Controller
             ],
         ]);
     }
-
     public function recepcion(): View
     {
         return view('mockups.recepcion', [
