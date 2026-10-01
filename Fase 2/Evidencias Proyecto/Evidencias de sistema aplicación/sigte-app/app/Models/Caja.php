@@ -55,11 +55,11 @@ class Caja extends Model
     public static function etiquetaEtapa(string $etapa): string
     {
         return [
-            self::ETAPA_RECEPCION => 'Recepcion',
+            self::ETAPA_RECEPCION => 'Recepción',
             self::ETAPA_LAVADO => 'Lavado',
-            self::ETAPA_PREPARACION => 'Preparacion',
-            self::ETAPA_ESTERILIZACION => 'Esterilizacion',
-            self::ETAPA_ALMACEN => 'Almacen',
+            self::ETAPA_PREPARACION => 'Preparación',
+            self::ETAPA_ESTERILIZACION => 'Esterilización',
+            self::ETAPA_ALMACEN => 'Almacén',
             self::ETAPA_ENTREGA => 'Entrega',
         ][$etapa] ?? $etapa;
     }

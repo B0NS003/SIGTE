@@ -1,3 +1,4 @@
+<div class="sidebar-nav">
 @foreach (\App\Support\AccesoPorRol::menu(auth()->user()) as $grupo)
     <div class="nav-label">{{ $grupo['titulo'] }}</div>
     <nav class="nav">
@@ -11,3 +12,4 @@
         @endforeach
     </nav>
 @endforeach
+</div>

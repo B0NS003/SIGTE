@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     git unzip libpq-dev libzip-dev \
@@ -16,7 +16,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN if [ -f composer.json ]; then composer install --no-interaction --prefer-dist --optimize-autoloader || true; fi \
+RUN if [ -f composer.json ]; then composer install --no-interaction --prefer-dist --optimize-autoloader; fi \
     && chown -R www-data:www-data storage bootstrap/cache || true
 
 COPY docker/php/performance.ini /usr/local/etc/php/conf.d/zz-performance.ini

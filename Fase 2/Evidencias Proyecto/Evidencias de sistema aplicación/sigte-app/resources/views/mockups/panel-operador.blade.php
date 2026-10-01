@@ -128,17 +128,17 @@
                 </div>
             @else
                 @foreach ($cajas_por_etapa as $grupo)
-                    <section class="ops-etapa-group" aria-labelledby="etapa-{{ $grupo['indice'] }}">
-                        <header class="ops-etapa-head">
-                            <h2 id="etapa-{{ $grupo['indice'] }}">{{ $grupo['nombre'] }}</h2>
+                    <details class="ops-etapa" open>
+                        <summary class="ops-etapa-head">
+                            <h2>{{ $grupo['nombre'] }}</h2>
                             <span>{{ count($grupo['cajas']) }} {{ count($grupo['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
-                        </header>
+                        </summary>
                         <div class="ops-etapa-list">
                             @foreach ($grupo['cajas'] as $caja)
                                 @include('mockups.partials.tarjeta-caja', ['caja' => $caja, 'fases' => $fases])
                             @endforeach
                         </div>
-                    </section>
+                    </details>
                 @endforeach
             @endif
         </div>

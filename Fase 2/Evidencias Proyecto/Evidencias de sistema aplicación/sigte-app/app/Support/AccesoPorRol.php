@@ -14,15 +14,15 @@ class AccesoPorRol
      * @var array<string, list<string>>
      */
     private const RUTAS = [
-        'mockups.recepcion' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
-        'mockups.avanzar' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
-        'mockups.entrega' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.recepcion' => [Rol::OPERADOR],
+        'mockups.avanzar' => [Rol::OPERADOR],
+        'mockups.entrega' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
-        'mockups.cierre_turno' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
-        'mockups.reportes' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
-        'mockups.custodia' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.cierre_turno' => [Rol::ENFERMERA],
+        'mockups.reportes' => [Rol::ADMINISTRADORA],
+        'mockups.custodia' => [Rol::ADMINISTRADORA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
     ];
 
@@ -69,7 +69,8 @@ class AccesoPorRol
                 $params = ['rol' => $rol];
             }
 
-            $grupos[$enlace['grupo']][] = [
+            $titulo = $enlace['grupos'][$rol] ?? $enlace['grupo'];
+            $grupos[$titulo][] = [
                 'url' => route($enlace['ruta'], $params),
                 'texto' => self::texto($enlace, $rol),
                 'activo' => self::activo($enlace, $rol),
@@ -90,17 +91,18 @@ class AccesoPorRol
      */
     private static function enlaces(): array
     {
-        $todos = [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA];
-        $turno = [Rol::ENFERMERA, Rol::ADMINISTRADORA];
+        $operacion = [Rol::OPERADOR];
+        $consulta = [Rol::OPERADOR, Rol::ENFERMERA];
 
         return [
             [
                 'grupo' => 'Mi trabajo',
+                'grupos' => [Rol::ADMINISTRADORA => 'Gestión'],
                 'ruta' => 'mockups.panel',
                 'texto' => 'Inicio',
                 'propio' => true,
                 'params' => [],
-                'roles' => $todos,
+                'roles' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
                 'textos' => [
                     Rol::OPERADOR => 'Flujo de cajas',
                     Rol::ENFERMERA => 'Resumen turno',
@@ -109,52 +111,31 @@ class AccesoPorRol
             ],
             [
                 'grupo' => 'Mi trabajo',
-                'ruta' => 'mockups.panel',
-                'texto' => 'Flujo de cajas',
-                'params' => ['rol' => Rol::OPERADOR],
-                'roles' => $turno,
-            ],
-            [
-                'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.recepcion',
                 'texto' => 'Recepción',
                 'params' => [],
-                'roles' => $todos,
+                'roles' => $operacion,
             ],
             [
                 'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.avanzar',
                 'texto' => 'Avanzar etapa',
                 'params' => [],
-                'roles' => $todos,
+                'roles' => $operacion,
             ],
             [
                 'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.entrega',
                 'texto' => 'Entrega',
                 'params' => [],
-                'roles' => $todos,
-            ],
-            [
-                'grupo' => 'Consulta',
-                'ruta' => 'mockups.catalogo',
-                'texto' => 'Catálogo',
-                'params' => [],
-                'roles' => $todos,
-            ],
-            [
-                'grupo' => 'Consulta',
-                'ruta' => 'mockups.inventario',
-                'texto' => 'Inventario',
-                'params' => [],
-                'roles' => $todos,
+                'roles' => $operacion,
             ],
             [
                 'grupo' => 'Turno',
                 'ruta' => 'mockups.alertas',
                 'texto' => 'Alertas',
                 'params' => [],
-                'roles' => $turno,
+                'roles' => [Rol::ENFERMERA],
                 'badge' => '3',
             ],
             [
@@ -162,27 +143,77 @@ class AccesoPorRol
                 'ruta' => 'mockups.cierre_turno',
                 'texto' => 'Cierre de turno',
                 'params' => [],
-                'roles' => $turno,
+                'roles' => [Rol::ENFERMERA],
             ],
             [
-                'grupo' => 'Turno',
-                'ruta' => 'mockups.reportes',
-                'texto' => 'Reportes',
-                'params' => [],
-                'roles' => $turno,
+                'grupo' => 'Consulta',
+                'ruta' => 'mockups.panel',
+                'texto' => 'Flujo de cajas',
+                'params' => ['rol' => Rol::OPERADOR],
+                'roles' => [Rol::ENFERMERA],
             ],
             [
-                'grupo' => 'Turno',
-                'ruta' => 'mockups.custodia',
-                'texto' => 'Custodia',
+                'grupo' => 'Consulta',
+                'ruta' => 'mockups.catalogo',
+                'texto' => 'Catálogo',
                 'params' => [],
-                'roles' => $turno,
+                'roles' => $consulta,
+            ],
+            [
+                'grupo' => 'Consulta',
+                'ruta' => 'mockups.inventario',
+                'texto' => 'Inventario',
+                'params' => [],
+                'roles' => $consulta,
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.catalogo',
+                'texto' => 'Catálogo',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.inventario',
+                'texto' => 'Inventario',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
             ],
             [
                 'grupo' => 'Gestión',
                 'ruta' => 'mockups.usuarios',
                 'texto' => 'Usuarios',
                 'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.reportes',
+                'texto' => 'Reportes',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.custodia',
+                'texto' => 'Custodia',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.alertas',
+                'texto' => 'Alertas',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+                'badge' => '3',
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.panel',
+                'texto' => 'Ver flujo operadora',
+                'params' => ['rol' => Rol::OPERADOR],
                 'roles' => [Rol::ADMINISTRADORA],
             ],
         ];
