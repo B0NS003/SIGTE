@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Caja;
+use App\Models\ConsumoServicio;
+use App\Models\Insumo;
 use App\Models\Rol;
 use App\Support\AccesoPorRol;
 use Illuminate\Http\RedirectResponse;
@@ -304,6 +306,7 @@ class MockupController extends Controller
             Rol::ADMINISTRADORA => 'Administradora',
             Rol::ENFERMERA => 'Enfermera de turno',
             Rol::OPERADOR => 'Operadora',
+            Rol::SECRETARIA => 'Secretaria',
         ][$user->nombreRol()] ?? 'Sin rol';
 
         return [
@@ -312,17 +315,12 @@ class MockupController extends Controller
         ];
     }
 
-    public function login(): View
-    {
-        return view('mockups.login');
-    }
-
     public function panel(Request $request, string $rol): View|RedirectResponse
     {
         $user = Auth::user();
         $rolReal = $user->nombreRol();
 
-        if ($rolReal === null || ! in_array($rolReal, [Rol::ADMINISTRADORA, Rol::ENFERMERA, Rol::OPERADOR], true)) {
+        if ($rolReal === null || ! in_array($rolReal, [Rol::ADMINISTRADORA, Rol::ENFERMERA, Rol::OPERADOR, Rol::SECRETARIA], true)) {
             Auth::logout();
 
             return redirect()->route('login')->withErrors([
@@ -332,6 +330,25 @@ class MockupController extends Controller
 
         if (! AccesoPorRol::puedeVerPanel($user, $rol)) {
             return redirect()->route('mockups.panel', $rolReal);
+        }
+
+        $usuario = $this->usuarioSesion();
+
+        if ($rol === Rol::SECRETARIA) {
+            $inicio = now()->startOfMonth()->toDateString();
+            $delMes = ConsumoServicio::query()->whereDate('periodo', $inicio)->get();
+            $insumos = Insumo::query()->get();
+
+            return view('mockups.panel-secretaria', [
+                'usuario' => $usuario,
+                'resumen' => [
+                    'periodo' => ConsumoServicio::etiquetaPeriodo($inicio),
+                    'servicios' => $delMes->count(),
+                    'consumo' => (int) $delMes->sum('consumo'),
+                    'litros' => (float) $delMes->sum('litros'),
+                    'bajo_minimo' => $insumos->filter(fn (Insumo $insumo) => $insumo->estadoStock() !== 'ok')->count(),
+                ],
+            ]);
         }
 
         $roles = [
@@ -350,7 +367,6 @@ class MockupController extends Controller
         ];
 
         $vista = $roles[$rol]['vista'];
-        $usuario = $this->usuarioSesion();
         $fases = $this->fases();
 
         if ($rol === Rol::OPERADOR) {

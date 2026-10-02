@@ -65,6 +65,11 @@ class User extends Authenticatable
         return $this->hasRole(Rol::OPERADOR);
     }
 
+    public function isSecretaria(): bool
+    {
+        return $this->hasRole(Rol::SECRETARIA);
+    }
+
     public function isActivo(): bool
     {
         return (bool) $this->activo;

@@ -33,6 +33,3 @@ Abrir: http://127.0.0.1:8000/login
 docker compose up -d --build
 ```
 App: http://localhost:8080
-
-## Nota
-La carpeta `public/mockups/` es referencia visual antigua. La app usa `resources/views/` (Blade).

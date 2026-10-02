@@ -29,6 +29,11 @@ class UserSeeder extends Seeder
                 'name' => 'Operador Demo',
                 'rol' => Rol::OPERADOR,
             ],
+            [
+                'email' => 'secretaria@sigte.local',
+                'name' => 'Secretaria Demo',
+                'rol' => Rol::SECRETARIA,
+            ],
         ];
 
         foreach ($demos as $demo) {

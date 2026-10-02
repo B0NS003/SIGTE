@@ -10,6 +10,7 @@ class Rol extends Model
     public const ADMINISTRADORA = 'administradora';
     public const ENFERMERA = 'enfermera';
     public const OPERADOR = 'operador';
+    public const SECRETARIA = 'secretaria';
 
     protected $table = 'roles';
 

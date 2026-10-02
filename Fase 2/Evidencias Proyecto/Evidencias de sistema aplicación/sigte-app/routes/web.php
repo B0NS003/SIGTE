@@ -2,20 +2,24 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MockupController;
+use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 
+
+# si no esta autenticado, se redirige a la pagina de login
 Route::middleware('guest')->group(function () {
     Route::get('/', fn () => redirect()->route('login'));
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
 
+# si esta autenticado, se redirige a la pagina de panel
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::middleware('acceso')->group(function () {
     Route::get('/panel/{rol}', [MockupController::class, 'panel'])
-        ->whereIn('rol', ['administradora', 'enfermera', 'operador'])
+        ->whereIn('rol', ['administradora', 'enfermera', 'operador', 'secretaria'])
         ->name('mockups.panel');
     Route::get('/operador/recepcion', [MockupController::class, 'recepcion'])->name('mockups.recepcion');
     Route::get('/operador/avanzar', [MockupController::class, 'avanzar'])->name('mockups.avanzar');
@@ -27,5 +31,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/custodia', [MockupController::class, 'custodia'])->name('mockups.custodia');
     Route::get('/admin/alertas', [MockupController::class, 'alertas'])->name('mockups.alertas');
     Route::get('/enfermera/cierre-turno', [MockupController::class, 'cierreTurno'])->name('mockups.cierre_turno');
+
+    Route::get('/secretaria/produccion', [SecretariaController::class, 'produccion'])->name('secretaria.produccion');
+    Route::post('/secretaria/produccion', [SecretariaController::class, 'guardarProduccion'])->name('secretaria.produccion.guardar');
+    Route::get('/secretaria/insumos', [SecretariaController::class, 'insumos'])->name('secretaria.insumos');
+    Route::post('/secretaria/insumos/movimientos', [SecretariaController::class, 'guardarMovimiento'])->name('secretaria.insumos.movimiento');
+    Route::get('/secretaria/reportes', [SecretariaController::class, 'reportes'])->name('secretaria.reportes');
+    Route::get('/secretaria/reportes/exportar', [SecretariaController::class, 'exportarReportes'])->name('secretaria.reportes.exportar');
     });
 });

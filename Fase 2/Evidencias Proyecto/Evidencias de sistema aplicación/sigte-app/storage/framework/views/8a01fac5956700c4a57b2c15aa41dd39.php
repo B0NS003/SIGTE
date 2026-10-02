@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'SIGTE — Operadora'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -52,12 +50,6 @@
             </div>
         </div>
 
-        <div class="sala-legend">
-            <div class="sala-chip sala-lavado"><span></span>Sala lavado</div>
-            <div class="sala-chip sala-armado"><span></span>Sala armado</div>
-            <div class="sala-chip sala-esteril"><span></span>Material estéril</div>
-        </div>
-
         <form class="ops-consulta" method="get" action="<?php echo e(route('mockups.panel', 'operador')); ?>" role="search">
             <div class="ops-search">
                 <label class="sr-only" for="busqueda-caja">Buscar caja quirúrgica</label>
@@ -107,8 +99,7 @@
                     en <?php echo e($fases[$etapa_filtro]); ?>
 
                 <?php endif; ?>
-            <?php else: ?>
-                <?php echo e($total_consulta); ?> <?php echo e($total_consulta === 1 ? 'caja en flujo' : 'cajas en flujo'); ?>, agrupadas por etapa
+            
             <?php endif; ?>
         </p>
 
@@ -130,17 +121,17 @@
                 </div>
             <?php else: ?>
                 <?php $__currentLoopData = $cajas_por_etapa; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $grupo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <section class="ops-etapa-group" aria-labelledby="etapa-<?php echo e($grupo['indice']); ?>">
-                        <header class="ops-etapa-head">
-                            <h2 id="etapa-<?php echo e($grupo['indice']); ?>"><?php echo e($grupo['nombre']); ?></h2>
+                    <details class="ops-etapa" open>
+                        <summary class="ops-etapa-head">
+                            <h2><?php echo e($grupo['nombre']); ?></h2>
                             <span><?php echo e(count($grupo['cajas'])); ?> <?php echo e(count($grupo['cajas']) === 1 ? 'caja' : 'cajas'); ?></span>
-                        </header>
+                        </summary>
                         <div class="ops-etapa-list">
                             <?php $__currentLoopData = $grupo['cajas']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $caja): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php echo $__env->make('mockups.partials.tarjeta-caja', ['caja' => $caja, 'fases' => $fases], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    </section>
+                    </details>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             <?php endif; ?>
         </div>

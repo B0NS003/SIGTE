@@ -22,6 +22,10 @@ class RolSeeder extends Seeder
                 'nombre' => Rol::OPERADOR,
                 'descripcion' => 'Operación diaria del ciclo de esterilización.',
             ],
+            [
+                'nombre' => Rol::SECRETARIA,
+                'descripcion' => 'Gestión de datos de consumo, producción, insumos y reportes estadísticos. Sin tareas clínicas ni administración de usuarios.',
+            ],
         ];
 
         foreach ($roles as $rol) {

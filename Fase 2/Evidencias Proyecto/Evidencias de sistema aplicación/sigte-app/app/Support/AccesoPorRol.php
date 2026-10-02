@@ -24,6 +24,12 @@ class AccesoPorRol
         'mockups.reportes' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
+        'secretaria.produccion' => [Rol::SECRETARIA],
+        'secretaria.produccion.guardar' => [Rol::SECRETARIA],
+        'secretaria.insumos' => [Rol::SECRETARIA],
+        'secretaria.insumos.movimiento' => [Rol::SECRETARIA],
+        'secretaria.reportes' => [Rol::SECRETARIA],
+        'secretaria.reportes.exportar' => [Rol::SECRETARIA],
     ];
 
     public static function puedeVerPanel(User $user, string $rolEnUrl): bool
@@ -102,11 +108,12 @@ class AccesoPorRol
                 'texto' => 'Inicio',
                 'propio' => true,
                 'params' => [],
-                'roles' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+                'roles' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA, Rol::SECRETARIA],
                 'textos' => [
                     Rol::OPERADOR => 'Flujo de cajas',
                     Rol::ENFERMERA => 'Resumen turno',
                     Rol::ADMINISTRADORA => 'Resumen',
+                    Rol::SECRETARIA => 'Inicio',
                 ],
             ],
             [
@@ -215,6 +222,27 @@ class AccesoPorRol
                 'texto' => 'Ver flujo operadora',
                 'params' => ['rol' => Rol::OPERADOR],
                 'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Datos',
+                'ruta' => 'secretaria.produccion',
+                'texto' => 'Producción y litros',
+                'params' => [],
+                'roles' => [Rol::SECRETARIA],
+            ],
+            [
+                'grupo' => 'Datos',
+                'ruta' => 'secretaria.insumos',
+                'texto' => 'Insumos',
+                'params' => [],
+                'roles' => [Rol::SECRETARIA],
+            ],
+            [
+                'grupo' => 'Datos',
+                'ruta' => 'secretaria.reportes',
+                'texto' => 'Reportes',
+                'params' => [],
+                'roles' => [Rol::SECRETARIA],
             ],
         ];
     }

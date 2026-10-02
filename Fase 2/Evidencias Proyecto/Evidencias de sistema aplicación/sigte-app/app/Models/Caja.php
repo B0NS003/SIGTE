@@ -77,7 +77,7 @@ class Caja extends Model
             return 'Sin registro';
         }
 
-        $minutos = $this->etapa_desde->diffInMinutes(Carbon::now());
+        $minutos = (int) abs($this->etapa_desde->diffInMinutes(Carbon::now()));
 
         if ($minutos < 60) {
             return $minutos.' min';

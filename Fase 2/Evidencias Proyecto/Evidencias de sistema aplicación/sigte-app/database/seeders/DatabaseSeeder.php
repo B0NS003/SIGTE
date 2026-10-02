@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             UserSeeder::class,
             CajaSeeder::class,
+            ConsumoServicioSeeder::class,
+            InsumoSeeder::class,
         ]);
     }
 }

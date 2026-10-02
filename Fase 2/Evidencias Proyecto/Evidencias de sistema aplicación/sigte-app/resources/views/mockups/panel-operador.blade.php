@@ -52,12 +52,6 @@
             </div>
         </div>
 
-        <div class="sala-legend">
-            <div class="sala-chip sala-lavado"><span></span>Sala lavado</div>
-            <div class="sala-chip sala-armado"><span></span>Sala armado</div>
-            <div class="sala-chip sala-esteril"><span></span>Material estéril</div>
-        </div>
-
         <form class="ops-consulta" method="get" action="{{ route('mockups.panel', 'operador') }}" role="search">
             <div class="ops-search">
                 <label class="sr-only" for="busqueda-caja">Buscar caja quirúrgica</label>
@@ -105,8 +99,7 @@
                 @if ($etapa_filtro !== null)
                     en {{ $fases[$etapa_filtro] }}
                 @endif
-            @else
-                {{ $total_consulta }} {{ $total_consulta === 1 ? 'caja en flujo' : 'cajas en flujo' }}, agrupadas por etapa
+            
             @endif
         </p>
 
