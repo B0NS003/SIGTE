@@ -136,56 +136,94 @@ class MockupController extends Controller
 
     private function catalogoItems(): array
     {
-        return [
+        $items = [
             [
                 'codigo' => 'SET-LAP-01',
-                'nombre' => 'Set laparoscopia basico',
-                'tipo' => 'Set quirurgico',
-                'piezas' => 18,
-                'servicio' => 'Pabellon',
-                'contenido' => 'Trocares, pinzas, tijera, aspiracion',
+                'nombre' => 'Set laparoscopia básico',
+                'tipo' => 'Set quirúrgico',
+                'servicio' => 'Pabellón',
+                'guia' => true,
+                'instrumentos' => [
+                    ['nombre' => 'Trocar 5 mm', 'cantidad' => 4, 'imagen' => true],
+                    ['nombre' => 'Trocar 10 mm', 'cantidad' => 2, 'imagen' => true],
+                    ['nombre' => 'Pinza grasper', 'cantidad' => 4, 'imagen' => true],
+                    ['nombre' => 'Pinza Maryland', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Tijera', 'cantidad' => 2, 'imagen' => true],
+                    ['nombre' => 'Cánula de aspiración', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Óptica', 'cantidad' => 1, 'imagen' => true],
+                    ['nombre' => 'Cable de luz', 'cantidad' => 1, 'imagen' => false],
+                ],
             ],
             [
                 'codigo' => 'SET-CES-02',
-                'nombre' => 'Set cesarea',
-                'tipo' => 'Set quirurgico',
-                'piezas' => 24,
+                'nombre' => 'Set cesárea',
+                'tipo' => 'Set quirúrgico',
                 'servicio' => 'Maternidad',
-                'contenido' => 'Bisturis, pinzas, retractores, portaagujas',
+                'guia' => true,
+                'instrumentos' => [
+                    ['nombre' => 'Bisturí', 'cantidad' => 2, 'imagen' => true],
+                    ['nombre' => 'Pinza Kocher', 'cantidad' => 6, 'imagen' => true],
+                    ['nombre' => 'Pinza anatómica', 'cantidad' => 4, 'imagen' => true],
+                    ['nombre' => 'Retractor', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Portaagujas', 'cantidad' => 4, 'imagen' => true],
+                    ['nombre' => 'Tijera Mayo', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Separador', 'cantidad' => 4, 'imagen' => false],
+                ],
             ],
             [
                 'codigo' => 'CAJ-CUR-10',
-                'nombre' => 'Caja curacion general',
-                'tipo' => 'Caja de curacion',
-                'piezas' => 12,
+                'nombre' => 'Caja curación general',
+                'tipo' => 'Caja de curación',
                 'servicio' => 'Curaciones',
-                'contenido' => 'Pinzas anatomicas, tijera, riñonera',
+                'guia' => true,
+                'instrumentos' => [
+                    ['nombre' => 'Pinza anatómica', 'cantidad' => 4, 'imagen' => true],
+                    ['nombre' => 'Tijera', 'cantidad' => 2, 'imagen' => true],
+                    ['nombre' => 'Riñonera', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Gasas', 'cantidad' => 4, 'imagen' => false],
+                ],
             ],
             [
                 'codigo' => 'SET-UCI-03',
-                'nombre' => 'Set via aerea UCI',
-                'tipo' => 'Set quirurgico',
-                'piezas' => 9,
+                'nombre' => 'Set vía aérea UCI',
+                'tipo' => 'Set quirúrgico',
                 'servicio' => 'UCI',
-                'contenido' => 'Laringoscopio, pinzas Magill, guia',
+                'guia' => false,
+                'instrumentos' => [
+                    ['nombre' => 'Laringoscopio', 'cantidad' => 1, 'imagen' => true],
+                    ['nombre' => 'Pinza Magill', 'cantidad' => 2, 'imagen' => true],
+                    ['nombre' => 'Guía', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Jeringa', 'cantidad' => 2, 'imagen' => false],
+                    ['nombre' => 'Cánula', 'cantidad' => 2, 'imagen' => false],
+                ],
             ],
             [
                 'codigo' => 'CNT-EST-01',
-                'nombre' => 'Contenedor rigidó 1/1',
+                'nombre' => 'Contenedor rígido 1/1',
                 'tipo' => 'Contenedor',
-                'piezas' => 1,
                 'servicio' => 'General',
-                'contenido' => 'Contenedor con filtro e indicadores',
+                'guia' => true,
+                'instrumentos' => [
+                    ['nombre' => 'Contenedor con filtro', 'cantidad' => 1, 'imagen' => true],
+                ],
             ],
             [
                 'codigo' => 'PKG-GM-05',
-                'nombre' => 'Paquete grado medico pequeño',
-                'tipo' => 'Paquete grado medico',
-                'piezas' => 1,
+                'nombre' => 'Paquete grado médico pequeño',
+                'tipo' => 'Paquete grado médico',
                 'servicio' => 'Urgencia',
-                'contenido' => 'Instrumental suelto empacado',
+                'guia' => false,
+                'instrumentos' => [
+                    ['nombre' => 'Instrumental suelto empacado', 'cantidad' => 1, 'imagen' => false],
+                ],
             ],
         ];
+
+        return array_map(function (array $item): array {
+            $item['piezas'] = array_sum(array_column($item['instrumentos'], 'cantidad'));
+
+            return $item;
+        }, $items);
     }
 
 
@@ -436,6 +474,33 @@ class MockupController extends Controller
         ]);
     }
 
+    /**
+     * HIU-EP2-004: elegir la caja del flujo y mostrar la etapa en la que ya está.
+     * La actividad dentro de esa etapa se agrega en las tareas siguientes.
+     */
+    public function actividad(Request $request): View
+    {
+        $fases = $this->fases();
+        $cajas = $this->cajas();
+        $pedido = trim((string) $request->query('caja', ''));
+        $caja = null;
+
+        if ($pedido !== '') {
+            $caja = collect($cajas)->firstWhere('id', $pedido);
+        } elseif ($cajas !== []) {
+            $caja = $cajas[0];
+        }
+
+        return view('mockups.actividad', [
+            'usuario' => $this->usuarioSesion(),
+            'fases' => $fases,
+            'cajas' => $cajas,
+            'caja' => $caja,
+            'etapa_actual' => $caja ? $fases[$caja['fase_idx']] : null,
+            'codigo_no_encontrado' => $pedido !== '' && $caja === null,
+        ]);
+    }
+
     public function entrega(Request $request): View
     {
         $fases = $this->fases();
@@ -452,12 +517,69 @@ class MockupController extends Controller
         ]);
     }
 
-    public function catalogo(): View
+    public function catalogo(Request $request): View
     {
+        $items = $this->catalogoItems();
+        $busqueda = trim((string) $request->query('q', ''));
+        $servicio = trim((string) $request->query('servicio', ''));
+        $servicios = collect($items)->pluck('servicio')->unique()->sort()->values()->all();
+        $needle = mb_strtolower($busqueda);
+
+        $filtrados = array_values(array_filter($items, function (array $item) use ($needle, $servicio): bool {
+            if ($servicio !== '' && $item['servicio'] !== $servicio) {
+                return false;
+            }
+
+            if ($needle === '') {
+                return true;
+            }
+
+            $texto = mb_strtolower($item['codigo'].' '.$item['nombre'].' '.$item['servicio'].' '.$item['tipo']);
+
+            return str_contains($texto, $needle);
+        }));
+
+        $filtrados = array_map(fn (array $item) => $this->conEtapaActual($item), $filtrados);
+
         return view('mockups.catalogo', [
             'usuario' => $this->usuarioSesion(),
-            'items' => $this->catalogoItems(),
+            'items' => $filtrados,
+            'busqueda' => $busqueda,
+            'servicio' => $servicio,
+            'servicios' => $servicios,
+            'hay_filtros' => $busqueda !== '' || $servicio !== '',
         ]);
+    }
+
+    public function ficha(string $codigo): View
+    {
+        $item = collect($this->catalogoItems())->first(
+            fn (array $caja) => strcasecmp($caja['codigo'], $codigo) === 0
+        );
+
+        if ($item !== null) {
+            $item = $this->conEtapaActual($item);
+        }
+
+        return view('mockups.ficha-caja', [
+            'usuario' => $this->usuarioSesion(),
+            'item' => $item,
+            'codigo' => $codigo,
+        ]);
+    }
+
+    /**
+     * La etapa pertenece al ejemplar en proceso, no a la definición del set.
+     *
+     * @param  array<string, mixed>  $item
+     * @return array<string, mixed>
+     */
+    private function conEtapaActual(array $item): array
+    {
+        $caja = Caja::query()->where('codigo', $item['codigo'])->first();
+        $item['etapa_actual'] = $caja ? Caja::etiquetaEtapa($caja->etapa) : null;
+
+        return $item;
     }
 
     public function inventario(): View

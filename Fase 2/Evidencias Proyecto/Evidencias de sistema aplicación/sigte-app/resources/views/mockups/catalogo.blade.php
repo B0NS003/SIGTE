@@ -31,62 +31,49 @@
             <div>
                 <p class="eyebrow">Consulta · fichas maestras</p>
                 <h1>Catálogo</h1>
-                <p class="main-sub">Base de qué es cada set/caja: código, tipo, piezas y contenido típico. No es stock (eso va en Inventario).</p>
-            </div>
-            <div class="main-actions">
-                <a class="btn btn-ghost" href="{{ route('mockups.inventario') }}">Ver inventario</a>
+                <p class="main-sub">Elige una caja para ver qué debe llevar. El stock está en Inventario.</p>
             </div>
         </div>
 
-        <div class="query-toolbar panel">
+        <form class="query-toolbar panel" method="get" action="{{ route('mockups.catalogo') }}">
             <label class="field" style="margin:0; flex:1;">
                 <span class="icon" aria-hidden="true">⌕</span>
-                <input type="search" placeholder="Buscar por código, nombre o servicio…" value="">
+                <input type="search" name="q" value="{{ $busqueda }}" placeholder="Buscar por código, nombre o servicio…">
             </label>
             <label class="field field-select" style="margin:0; min-width:12rem;">
-                <select>
-                    <option>Todos los tipos</option>
-                    <option>Set quirurgico</option>
-                    <option>Caja de curacion</option>
-                    <option>Contenedor</option>
-                    <option>Paquete grado medico</option>
+                <select name="servicio" onchange="this.form.submit()">
+                    <option value="">Todos los servicios</option>
+                    @foreach ($servicios as $opcion)
+                        <option value="{{ $opcion }}" @selected($servicio === $opcion)>{{ $opcion }}</option>
+                    @endforeach
                 </select>
             </label>
-        </div>
+            <button class="btn btn-dark" type="submit">Buscar</button>
+        </form>
 
-        <section class="panel list">
-            <div class="panel-head">
-                <h2>Fichas del catálogo</h2>
-                <span class="badge">{{ count($items) }} ítems</span>
+        @if (count($items) === 0)
+            <div class="ops-empty">
+                <strong>No hay cajas coincidentes</strong>
+                <p>Prueba con otro código, nombre o servicio.</p>
             </div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Tipo</th>
-                            <th>Piezas</th>
-                            <th>Servicio típico</th>
-                            <th>Contenido</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($items as $item)
-                            <tr>
-                                <td><strong>{{ $item['codigo'] }}</strong></td>
-                                <td>{{ $item['nombre'] }}</td>
-                                <td>{{ $item['tipo'] }}</td>
-                                <td>{{ $item['piezas'] }}</td>
-                                <td>{{ $item['servicio'] }}</td>
-                                <td class="muted-cell">{{ $item['contenido'] }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        @else
+            <p class="ops-result-meta">{{ count($items) }} {{ count($items) === 1 ? 'caja' : 'cajas' }} en el catálogo</p>
+            <div class="cat-grid">
+                @foreach ($items as $item)
+                    <a class="cat-card" href="{{ route('mockups.ficha', $item['codigo']) }}">
+                        <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
+                            <span>{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
+                        </div>
+                        <div class="cat-body">
+                            <strong>{{ $item['codigo'] }}</strong>
+                            <h2>{{ $item['nombre'] }}</h2>
+                            <p>{{ $item['servicio'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
+                            <p class="cat-etapa">{{ $item['etapa_actual'] ?? 'Sin caja en el flujo' }}</p>
+                        </div>
+                    </a>
+                @endforeach
             </div>
-            <div class="panel-note">Mockup: esta lista es la “base” de datos de ejemplo. Después se convierte en tabla <code>catalogo_items</code>.</div>
-        </section>
+        @endif
     </main>
 </div>
 @endsection

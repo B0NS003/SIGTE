@@ -16,8 +16,10 @@ class AccesoPorRol
     private const RUTAS = [
         'mockups.recepcion' => [Rol::OPERADOR],
         'mockups.avanzar' => [Rol::OPERADOR],
+        'mockups.actividad' => [Rol::OPERADOR],
         'mockups.entrega' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
@@ -127,6 +129,13 @@ class AccesoPorRol
                 'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.avanzar',
                 'texto' => 'Avanzar etapa',
+                'params' => [],
+                'roles' => $operacion,
+            ],
+            [
+                'grupo' => 'Mi trabajo',
+                'ruta' => 'mockups.actividad',
+                'texto' => 'Actividad en la etapa',
                 'params' => [],
                 'roles' => $operacion,
             ],
@@ -260,6 +269,10 @@ class AccesoPorRol
      */
     private static function activo(array $enlace, ?string $rol): bool
     {
+        if ($enlace['ruta'] === 'mockups.catalogo' && request()->routeIs('mockups.ficha')) {
+            return true;
+        }
+
         if (! request()->routeIs($enlace['ruta'])) {
             return false;
         }

@@ -23,8 +23,10 @@ Route::middleware('auth')->group(function () {
         ->name('mockups.panel');
     Route::get('/operador/recepcion', [MockupController::class, 'recepcion'])->name('mockups.recepcion');
     Route::get('/operador/avanzar', [MockupController::class, 'avanzar'])->name('mockups.avanzar');
+    Route::get('/operador/actividad', [MockupController::class, 'actividad'])->name('mockups.actividad');
     Route::get('/operador/entrega', [MockupController::class, 'entrega'])->name('mockups.entrega');
     Route::get('/consulta/catalogo', [MockupController::class, 'catalogo'])->name('mockups.catalogo');
+    Route::get('/consulta/catalogo/{codigo}', [MockupController::class, 'ficha'])->name('mockups.ficha');
     Route::get('/consulta/inventario', [MockupController::class, 'inventario'])->name('mockups.inventario');
     Route::get('/admin/usuarios', [MockupController::class, 'usuarios'])->name('mockups.usuarios');
     Route::get('/admin/reportes', [MockupController::class, 'reportes'])->name('mockups.reportes');
