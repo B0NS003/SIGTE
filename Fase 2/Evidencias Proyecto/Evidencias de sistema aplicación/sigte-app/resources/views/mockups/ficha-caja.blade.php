@@ -51,22 +51,28 @@
                 <section class="ficha-guia {{ $item['guia'] ? '' : 'is-empty' }}" aria-label="Guía visual">
                     @if ($item['guia'])
                         <span class="ficha-kicker">Guía visual</span>
-                        <strong>Set armado</strong>
-                        <p>Referencia para identificar la caja completa.</p>
+                        <strong>Cómo se reconoce el set</strong>
+                        <p>Referencia de los instrumentos que tienen foto.</p>
+                        <div class="ficha-mosaico">
+                            @foreach ($item['instrumentos'] as $instrumento)
+                                @if ($instrumento['imagen'])
+                                    <figure>
+                                        <span class="ficha-thumb" aria-hidden="true">{{ mb_strtoupper(mb_substr($instrumento['nombre'], 0, 1)) }}</span>
+                                        <figcaption>{{ $instrumento['nombre'] }}</figcaption>
+                                    </figure>
+                                @endif
+                            @endforeach
+                        </div>
                     @else
                         <span class="ficha-kicker">Sin guía visual</span>
                         <strong>Esta caja no tiene imagen del set</strong>
-                        <p>Igual puedes revisar el contenido de abajo.</p>
+                        <p>Se puede armar igual con la lista de abajo. Las fotos de cada pieza aparecen solo si están registradas.</p>
                     @endif
                 </section>
 
                 <section class="panel ficha-datos">
                     <h2>Datos generales</h2>
                     <dl class="ficha-facts">
-                        <div>
-                            <dt>Etapa actual</dt>
-                            <dd>{{ $item['etapa_actual'] ?? 'Sin caja en el flujo' }}</dd>
-                        </div>
                         <div>
                             <dt>Código</dt>
                             <dd>{{ $item['codigo'] }}</dd>
@@ -80,8 +86,8 @@
                             <dd>{{ $item['servicio'] }}</dd>
                         </div>
                         <div>
-                            <dt>Piezas</dt>
-                            <dd>{{ $item['piezas'] }}</dd>
+                            <dt>Debe llevar</dt>
+                            <dd>{{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</dd>
                         </div>
                     </dl>
                 </section>
@@ -89,17 +95,22 @@
 
             <section class="panel ficha-lista">
                 <div class="panel-head">
-                    <h2>Contenido</h2>
+                    <h2>Qué debe contener</h2>
                     <span class="badge">{{ count($item['instrumentos']) }} {{ count($item['instrumentos']) === 1 ? 'ítem' : 'ítems' }}</span>
                 </div>
                 <ul class="ficha-items">
                     @foreach ($item['instrumentos'] as $instrumento)
                         <li>
                             <span class="ficha-thumb {{ $instrumento['imagen'] ? '' : 'is-empty' }}" aria-hidden="true">
-                                {{ $instrumento['imagen'] ? 'Foto' : '—' }}
+                                {{ $instrumento['imagen'] ? mb_strtoupper(mb_substr($instrumento['nombre'], 0, 1)) : '—' }}
                             </span>
-                            <span class="ficha-nombre">{{ $instrumento['nombre'] }}</span>
-                            <span class="ficha-cant">{{ $instrumento['cantidad'] }}</span>
+                            <span class="ficha-nombre">
+                                {{ $instrumento['nombre'] }}
+                                @unless ($instrumento['imagen'])
+                                    <small>Sin foto</small>
+                                @endunless
+                            </span>
+                            <span class="ficha-cant">× {{ $instrumento['cantidad'] }}</span>
                         </li>
                     @endforeach
                 </ul>

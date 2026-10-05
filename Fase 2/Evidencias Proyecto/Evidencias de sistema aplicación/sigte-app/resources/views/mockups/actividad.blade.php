@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'SIGTE — Actividad en la etapa')
+@section('title', 'SIGTE — Anotar la actividad')
 
 @section('content')
 <div class="shell shell-ops">
@@ -29,55 +29,48 @@
     <main class="main">
         <div class="main-top">
             <div>
-                <p class="eyebrow">Trazabilidad · actividad dentro de la etapa</p>
-                <h1>Actividad en la etapa</h1>
-                <p class="main-sub">La caja no cambia de etapa. Primero se elige cuál es y el sistema muestra en qué etapa del flujo ya está.</p>
+                <p class="eyebrow">Trazabilidad · dentro de la etapa</p>
+                <h1>Anotar la actividad</h1>
+                <p class="main-sub">La caja sigue en su etapa. Se ve cuánto lleva el ciclo y cada nota se suma en esa caja.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">Volver al flujo</a>
             </div>
         </div>
 
-        <div class="recv-layout">
-            <section class="recv-form panel">
-                <div class="panel-head">
-                    <h2>Seleccionar caja</h2>
-                    @if ($etapa_actual)
-                        <span class="badge">Etapa actual: {{ $etapa_actual }}</span>
-                    @endif
-                </div>
+        @if ($codigo_no_encontrado)
+            <p class="auth-error" role="alert">Esa caja no está en el flujo. Elige una de la lista.</p>
+        @endif
 
-                @if ($cajas === [])
-                    <p class="recv-help">No hay cajas en el flujo. Cuando una caja entre a recepción, se podrá elegir aquí.</p>
-                @else
-                    <label class="field-label" for="caja">Caja / set en proceso</label>
-                    <label class="field field-select">
-                        <select id="caja" name="caja" onchange="window.location='{{ url('/operador/actividad') }}?caja='+encodeURIComponent(this.value)">
-                            @if ($codigo_no_encontrado)
-                                <option value="" selected>Elige una caja del flujo</option>
-                            @endif
-                            @foreach ($cajas as $c)
-                                <option value="{{ $c['id'] }}" {{ $caja && $c['id'] === $caja['id'] ? 'selected' : '' }}>
-                                    {{ $c['id'] }} · {{ $fases[$c['fase_idx']] }} · {{ $c['servicio'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </label>
+        <form class="recv-form panel entrega-panel" action="{{ route('mockups.actividad') }}" method="get" onsubmit="return false">
+            @if ($cajas === [])
+                <p class="recv-help">No hay cajas en el flujo. Cuando una caja entre a recepción, se puede anotar aquí.</p>
+            @elseif ($caja)
+                <div class="entrega-cuerpo">
+                    <section>
+                        <h2>{{ $caja['servicio'] }} · {{ $caja['id'] }}</h2>
+                        <p class="adv-movimiento">Está en <strong>{{ $etapa_actual }}</strong>. {{ $caja['ubicacion'] }}.</p>
 
-                    @if ($codigo_no_encontrado)
-                        <div class="panel-note">Esa caja no está en el flujo. Elige una de la lista.</div>
-                    @endif
-
-                    @if ($caja)
-                        <div class="adv-summary act-etapa">
-                            <div>
-                                <span class="adv-k">Etapa actual</span>
-                                <strong>{{ $etapa_actual }}</strong>
-                                <small>{{ $caja['estado'] }}</small>
+                        @if ($ciclo)
+                            <div class="act-ciclo">
+                                <div class="entrega-datos">
+                                    <div class="entrega-dato">
+                                        <span>Lleva</span>
+                                        <strong>{{ $caja['tiempo'] }}</strong>
+                                    </div>
+                                    <div class="entrega-dato">
+                                        <span>Falta</span>
+                                        <strong>{{ $ciclo['falta'] }}</strong>
+                                    </div>
+                                </div>
+                                <div class="act-barra" role="progressbar" aria-valuenow="{{ $ciclo['porcentaje'] }}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance del ciclo">
+                                    <span style="width: {{ $ciclo['porcentaje'] }}%"></span>
+                                </div>
+                                <p class="recv-help">{{ $ciclo['ayuda'] }}</p>
                             </div>
-                        </div>
+                        @endif
 
-                        <div class="track-pipe adv-pipe" aria-label="Etapa actual en el flujo">
+                        <div class="track-pipe adv-pipe" aria-label="Etapa actual: {{ $etapa_actual }}">
                             @foreach ($fases as $i => $fase)
                                 @php
                                     $done = $i < $caja['fase_idx'];
@@ -93,28 +86,91 @@
                             @endforeach
                         </div>
 
-                        <p class="recv-help">La lista de actividades válidas para {{ $etapa_actual }} se elige en el siguiente paso. Todavía no se guarda nada.</p>
-                    @endif
-                @endif
-            </section>
+                        <label class="field-label" for="caja">Cambiar caja</label>
+                        <label class="field field-select">
+                            <select id="caja" onchange="window.location='{{ url('/operador/actividad') }}?caja='+encodeURIComponent(this.value)">
+                                @foreach (collect($cajas)->sortBy('servicio') as $c)
+                                    <option value="{{ $c['id'] }}" @selected($c['id'] === $caja['id'])>
+                                        {{ $c['servicio'] }} · {{ $c['id'] }} · {{ $fases[$c['fase_idx']] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </label>
+                    </section>
 
-            <aside class="recv-side">
-                <section class="panel">
-                    <div class="panel-head"><h2>Detalle</h2></div>
-                    @if ($caja)
-                        <ul class="why-list">
-                            <li><strong>{{ $caja['id'] }}</strong> — {{ $caja['servicio'] }}</li>
-                            <li><strong>Etapa actual:</strong> {{ $etapa_actual }}</li>
-                            <li><strong>Ubicación:</strong> {{ $caja['ubicacion'] }}</li>
-                            <li><strong>Responsable:</strong> {{ $caja['operadora'] }}</li>
-                            <li><strong>Tiempo en la etapa:</strong> {{ $caja['tiempo'] }}</li>
-                        </ul>
-                    @else
-                        <p class="recv-help">Al elegir una caja aparece su etapa, servicio y responsable.</p>
-                    @endif
+                    <section>
+                        <h2>Qué se está haciendo</h2>
+                        <label class="field-label" for="actividad">Actividad de {{ $etapa_actual }}</label>
+                        <label class="field field-select">
+                            <select id="actividad" name="actividad">
+                                <option value="">Elige la actividad</option>
+                                @foreach ($actividades as $actividad)
+                                    <option value="{{ $actividad }}">{{ $actividad }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <div class="entrega-datos">
+                            <div class="entrega-dato entrega-dato-ancho">
+                                <span>Quién anota</span>
+                                <strong>{{ $usuario['nombre'] }}</strong>
+                            </div>
+                            <div class="entrega-dato">
+                                <span>Fecha</span>
+                                <strong>{{ $fecha }}</strong>
+                            </div>
+                            <div class="entrega-dato">
+                                <span>Hora</span>
+                                <strong>{{ $hora }}</strong>
+                            </div>
+                        </div>
+
+                        <details class="entrega-obs">
+                            <summary>Agregar un dato</summary>
+                            <label class="field-label" for="complemento">Cuánto falta, equipo u otro antecedente</label>
+                            <textarea id="complemento" class="recv-textarea" name="complemento" rows="2" placeholder="Faltan 20 min, autoclave 2…"></textarea>
+                        </details>
+
+                        <p class="auth-error act-aviso" id="act-aviso" role="alert" hidden>Elige la actividad de esta etapa.</p>
+                        <button class="btn btn-primary" id="anotar" type="button" style="width:auto; min-width:12rem;">Anotar en la caja</button>
+                    </section>
+                </div>
+
+                <section class="act-suma">
+                    <h2>En esta caja</h2>
+                    <ol class="act-lista" id="anotaciones">
+                        <li>
+                            <strong>Entró a {{ $etapa_actual }}</strong>
+                            <span>{{ $caja['fecha'] }} · {{ $caja['hora'] }}</span>
+                        </li>
+                    </ol>
                 </section>
-            </aside>
-        </div>
+            @endif
+        </form>
     </main>
 </div>
+@if ($caja)
+<script>
+    document.getElementById('anotar').addEventListener('click', function () {
+        var actividad = document.getElementById('actividad');
+        var aviso = document.getElementById('act-aviso');
+        if (!actividad.value) {
+            aviso.hidden = false;
+            actividad.focus();
+            return;
+        }
+        aviso.hidden = true;
+        var extra = document.getElementById('complemento').value.trim();
+        var li = document.createElement('li');
+        var titulo = document.createElement('strong');
+        var meta = document.createElement('span');
+        titulo.textContent = extra ? actividad.value + ' · ' + extra : actividad.value;
+        meta.textContent = @json($fecha.' · '.$hora.' · '.$usuario['nombre']);
+        li.append(titulo, meta);
+        document.getElementById('anotaciones').prepend(li);
+        actividad.value = '';
+        document.getElementById('complemento').value = '';
+    });
+</script>
+@endif
 @endsection

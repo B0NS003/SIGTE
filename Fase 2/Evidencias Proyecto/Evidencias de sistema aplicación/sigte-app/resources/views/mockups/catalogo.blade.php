@@ -25,7 +25,7 @@
             @include('partials.logout')
         </div>
     </aside>
-
+    
     <main class="main">
         <div class="main-top">
             <div>
@@ -34,7 +34,7 @@
                 <p class="main-sub">Elige una caja para ver qué debe llevar. El stock está en Inventario.</p>
             </div>
         </div>
-
+        
         <form class="query-toolbar panel" method="get" action="{{ route('mockups.catalogo') }}">
             <label class="field" style="margin:0; flex:1;">
                 <span class="icon" aria-hidden="true">⌕</span>
@@ -50,7 +50,7 @@
             </label>
             <button class="btn btn-dark" type="submit">Buscar</button>
         </form>
-
+        
         @if (count($items) === 0)
             <div class="ops-empty">
                 <strong>No hay cajas coincidentes</strong>
@@ -67,8 +67,7 @@
                         <div class="cat-body">
                             <strong>{{ $item['codigo'] }}</strong>
                             <h2>{{ $item['nombre'] }}</h2>
-                            <p>{{ $item['servicio'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
-                            <p class="cat-etapa">{{ $item['etapa_actual'] ?? 'Sin caja en el flujo' }}</p>
+                            <p>{{ $item['servicio'] }} · {{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
                         </div>
                     </a>
                 @endforeach

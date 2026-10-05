@@ -53,7 +53,7 @@
     <details class="track-more">
         <summary>
             <span class="track-summary-label">Más información</span>
-            <a class="btn btn-dark" href="{{ route('mockups.avanzar', ['caja' => $caja['id']]) }}" onclick="event.stopPropagation()">Aceptar avance</a>
+            <a class="btn btn-dark" href="{{ route('mockups.avanzar', ['caja' => $caja['id']]) }}" onclick="event.stopPropagation()">Pasar de etapa</a>
         </summary>
 
             <dl class="track-facts">

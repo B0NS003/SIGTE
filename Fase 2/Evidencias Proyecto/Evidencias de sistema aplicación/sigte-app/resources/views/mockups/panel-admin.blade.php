@@ -26,7 +26,7 @@
             @include('partials.logout')
         </div>
     </aside>
-
+    <!-- Contenido principal de la página -->
     <main class="main">
         <div class="main-top">
             <div>

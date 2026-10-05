@@ -8,6 +8,7 @@
 
     if (!form || !correo || !clave) return;
 
+    // Mostrar y ocultar la contraseña
     verClave?.addEventListener('click', function () {
         var abrir = clave.type === 'password';
         clave.type = abrir ? 'text' : 'password';
@@ -19,6 +20,7 @@
         verClave.classList.add('is-parpadeo');
     });
 
+    // Validación del formulario de login
     form.addEventListener('submit', function (event) {
         var errores = validar();
 
@@ -36,6 +38,7 @@
         if (texto) texto.textContent = 'Ingresando…';
     });
 
+    // Validación de los campos del formulario
     function validar() {
         var errores = { email: '', password: '' };
         var valorCorreo = correo.value.trim();
@@ -53,12 +56,14 @@
         return errores;
     }
 
+    // Mostrar los errores de validación
     function mostrar(errores) {
         document.querySelector('.auth-error')?.setAttribute('hidden', '');
         pintar('email', errores.email);
         pintar('password', errores.password);
     }
 
+    // Pintar los errores de validación
     function pintar(campo, mensaje) {
         var input = document.getElementById(campo);
         var aviso = document.getElementById(campo + '-error');
@@ -78,6 +83,7 @@
         }
     }
 
+    // Sacudir la tarjeta de login
     function sacudir() {
         if (!tarjeta) return;
         tarjeta.classList.remove('is-shaking');

@@ -16,6 +16,7 @@ class AccesoPorRol
     private const RUTAS = [
         'mockups.recepcion' => [Rol::OPERADOR],
         'mockups.avanzar' => [Rol::OPERADOR],
+        'mockups.avanzar.guardar' => [Rol::OPERADOR],
         'mockups.actividad' => [Rol::OPERADOR],
         'mockups.entrega' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
@@ -128,14 +129,14 @@ class AccesoPorRol
             [
                 'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.avanzar',
-                'texto' => 'Avanzar etapa',
+                'texto' => 'Pasar de etapa',
                 'params' => [],
                 'roles' => $operacion,
             ],
             [
                 'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.actividad',
-                'texto' => 'Actividad en la etapa',
+                'texto' => 'Anotar la actividad',
                 'params' => [],
                 'roles' => $operacion,
             ],

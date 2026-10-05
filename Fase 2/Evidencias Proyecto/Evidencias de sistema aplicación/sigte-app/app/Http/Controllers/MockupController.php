@@ -25,7 +25,7 @@ class MockupController extends Controller
     /**
      * Cajas desde PostgreSQL, en el formato que usan las vistas del mockup.
      *
-     * @return list<array{id: string, servicio: string, fase_idx: int, estado: string, ubicacion: string, operadora: string, hora: string, tiempo: string, urgente: bool}>
+     * @return list<array{id: string, servicio: string, fase_idx: int, estado: string, ubicacion: string, operadora: string, fecha: string, hora: string, tiempo: string, minutos: int|null, urgente: bool}>
      */
     private function cajas(): array
     {
@@ -42,8 +42,12 @@ class MockupController extends Controller
                     'estado' => $caja->estado ?? Caja::etiquetaEtapa($caja->etapa),
                     'ubicacion' => $caja->ubicacion ?? 'Sin ubicacion',
                     'operadora' => $caja->nombreResponsable(),
+                    'fecha' => optional($caja->etapa_desde)->format('d/m/Y') ?? '—',
                     'hora' => optional($caja->etapa_desde)->format('H:i') ?? '—',
                     'tiempo' => $caja->tiempoEnEtapa(),
+                    'minutos' => $caja->etapa_desde === null
+                        ? null
+                        : (int) abs($caja->etapa_desde->diffInMinutes(now())),
                     'urgente' => $caja->urgente,
                 ];
             })
@@ -471,7 +475,48 @@ class MockupController extends Controller
             'caja' => $caja,
             'fase_actual' => $fases[$idx],
             'fase_siguiente' => $siguiente,
+            'etapa_destino' => $idx < count(Caja::etapas()) - 1 ? Caja::etapas()[$idx + 1] : null,
         ]);
+    }
+
+    /**
+     * HIU-EP2-002: avanza una sola etapa y deja fecha, hora y usuario.
+     */
+    public function guardarAvance(Request $request): RedirectResponse
+    {
+        $codigo = trim((string) $request->input('caja', ''));
+        $destino = trim((string) $request->input('etapa_destino', ''));
+        $volver = redirect()->route('mockups.avanzar', ['caja' => $codigo !== '' ? $codigo : null]);
+
+        if ($codigo === '') {
+            return $volver->withErrors(['caja' => 'Elige la caja que vas a pasar.']);
+        }
+
+        $caja = Caja::query()->where('codigo', $codigo)->first();
+        if ($caja === null) {
+            return $volver->withErrors(['caja' => 'Esa caja no está en el flujo.']);
+        }
+
+        $etapas = Caja::etapas();
+        $indice = $caja->indiceEtapa();
+        $siguiente = $etapas[$indice + 1] ?? null;
+        $etiquetaActual = Caja::etiquetaEtapa($caja->etapa);
+
+        if ($siguiente === null || $destino !== $siguiente) {
+            return $volver->withErrors([
+                'etapa_destino' => 'No se puede saltar etapas. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
+            ]);
+        }
+
+        $caja->etapa = $siguiente;
+        $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
+        $caja->etapa_desde = now();
+        $caja->responsable_id = Auth::id();
+        $caja->save();
+
+        return redirect()
+            ->route('mockups.avanzar', ['caja' => $caja->codigo])
+            ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.');
     }
 
     /**
@@ -497,23 +542,98 @@ class MockupController extends Controller
             'cajas' => $cajas,
             'caja' => $caja,
             'etapa_actual' => $caja ? $fases[$caja['fase_idx']] : null,
+            'actividades' => $caja ? $this->actividadesDeEtapa(Caja::etapas()[$caja['fase_idx']]) : [],
             'codigo_no_encontrado' => $pedido !== '' && $caja === null,
+            'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
+            'hora' => now()->timezone('America/Santiago')->format('H:i'),
+            'ciclo' => $this->cicloVisual($caja),
         ]);
+    }
+
+    /**
+     * Lavado usa la hora que ya está en los datos de prueba.
+     * Esterilización usa 45 min solo para mostrar, en pantalla, cuánto falta.
+     *
+     * @param  array{fase_idx: int, minutos: int|null}|null  $caja
+     * @return array{falta: string, porcentaje: int, ayuda: string}|null
+     */
+    private function cicloVisual(?array $caja): ?array
+    {
+        if ($caja === null) {
+            return null;
+        }
+
+        $etapa = Caja::etapas()[$caja['fase_idx']] ?? Caja::ETAPA_RECEPCION;
+        $referencia = [
+            Caja::ETAPA_LAVADO => 60,
+            Caja::ETAPA_ESTERILIZACION => 45,
+        ][$etapa] ?? null;
+        $lleva = $caja['minutos'];
+
+        if ($referencia === null || $lleva === null) {
+            return [
+                'falta' => 'Sin ciclo fijo',
+                'porcentaje' => 0,
+                'ayuda' => 'En esta etapa se anota lo que va pasando. No hay una hora de término.',
+            ];
+        }
+
+        $resta = $referencia - $lleva;
+
+        if ($resta <= 0) {
+            return [
+                'falta' => 'Tiempo cumplido',
+                'porcentaje' => 100,
+                'ayuda' => 'Referencia visual del ciclo: '.$referencia.' min. Ya se cumplió.',
+            ];
+        }
+
+        return [
+            'falta' => $this->textoMinutos($resta),
+            'porcentaje' => (int) min(100, round($lleva / $referencia * 100)),
+            'ayuda' => 'Referencia visual del ciclo: '.$referencia.' min.',
+        ];
+    }
+
+    private function textoMinutos(int $minutos): string
+    {
+        if ($minutos < 60) {
+            return $minutos.' min';
+        }
+
+        $horas = intdiv($minutos, 60);
+        $resto = $minutos % 60;
+
+        return $resto === 0 ? $horas.' h' : $horas.' h '.$resto.' min';
+    }
+
+    /** @return list<string> */
+    private function actividadesDeEtapa(string $etapa): array
+    {
+        return [
+            Caja::ETAPA_RECEPCION => ['Recepción del material', 'Revisión de lo que llega'],
+            Caja::ETAPA_LAVADO => ['Remojo', 'Lavado', 'Secado'],
+            Caja::ETAPA_PREPARACION => ['Control visual', 'Reconteo', 'Armado'],
+            Caja::ETAPA_ESTERILIZACION => ['Carga del autoclave', 'Ciclo en curso', 'Descarga'],
+            Caja::ETAPA_ALMACEN => ['Ubicar en estante', 'Espera de retiro'],
+            Caja::ETAPA_ENTREGA => ['Entrega al servicio'],
+        ][$etapa] ?? [];
     }
 
     public function entrega(Request $request): View
     {
-        $fases = $this->fases();
         $listas = collect($this->cajas())->where('fase_idx', 4)->values()->all();
-        $selectedId = $request->query('caja', $listas[0]['id'] ?? 'SET-007');
-        $caja = collect($listas)->firstWhere('id', $selectedId) ?? ($listas[0] ?? null);
+        $marcada = trim((string) $request->query('caja', ''));
+        $caja = collect($listas)->firstWhere('id', $marcada);
 
         return view('mockups.entrega', [
             'usuario' => $this->usuarioSesion(),
-            'fases' => $fases,
             'listas' => $listas,
             'caja' => $caja,
             'servicios' => ['Pabellon', 'Urgencia', 'Maternidad', 'UCI', 'Curaciones', 'Otro servicio'],
+            'materiales' => ['Paquete de ropa', 'Material de curación', 'Instrumental suelto'],
+            'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
+            'hora' => now()->timezone('America/Santiago')->format('H:i'),
         ]);
     }
 
@@ -585,28 +705,56 @@ class MockupController extends Controller
     public function inventario(): View
     {
         $items = $this->inventarioItems();
-        $sala = request()->query('sala', 'esteril');
-        if (! in_array($sala, ['lavado', 'armado', 'esteril'], true)) {
-            $sala = 'esteril';
+        $salas = [
+            'lavado' => 'Sala lavado',
+            'armado' => 'Sala armado',
+            'esteril' => 'Material estéril',
+        ];
+        $sala = request()->query('sala', 'todos');
+        if ($sala !== 'todos' && ! isset($salas[$sala])) {
+            $sala = 'todos';
         }
-        $filtrados = collect($items)->where('sala', $sala)->values()->all();
-        $alertas = collect($filtrados)->whereIn('estado', ['bajo', 'critico'])->count();
+
+        $libros = [];
+        foreach ($salas as $clave => $nombre) {
+            $delLibro = collect($items)->where('sala', $clave);
+            $libros[] = [
+                'clave' => $clave,
+                'nombre' => $nombre,
+                'tipos' => $delLibro->count(),
+                'stock' => (int) $delLibro->sum('stock'),
+                'bajo' => $delLibro->whereIn('estado', ['bajo', 'critico'])->count(),
+                'en_proceso' => (int) $delLibro->sum('en_proceso'),
+            ];
+        }
+
+        $filtrados = $sala === 'todos'
+            ? []
+            : collect($items)
+                ->where('sala', $sala)
+                ->sortBy(fn (array $item) => ['critico' => 0, 'bajo' => 1, 'ok' => 2][$item['estado']] ?? 9)
+                ->values()
+                ->all();
+        $atencion = collect($items)->whereIn('estado', ['bajo', 'critico'])->values()->all();
+        $rol = Auth::user()->nombreRol();
 
         return view('mockups.inventario', [
             'usuario' => $this->usuarioSesion(),
+            'puedeReponer' => in_array($rol, [Rol::ENFERMERA, Rol::ADMINISTRADORA], true),
+            'elemento' => trim((string) request()->query('elemento', '')),
             'sala' => $sala,
-            'salas' => [
-                'lavado' => 'Sala lavado',
-                'armado' => 'Sala armado',
-                'esteril' => 'Material estéril',
-            ],
+            'salas' => $salas,
+            'libros' => $libros,
             'items' => $filtrados,
+            'atencion' => $atencion,
             'resumen' => [
                 'tipos' => count($filtrados),
-                'bajo_minimo' => $alertas,
+                'bajo_minimo' => collect($filtrados)->whereIn('estado', ['bajo', 'critico'])->count(),
                 'en_almacen' => collect($filtrados)->sum('stock'),
                 'en_proceso' => collect($filtrados)->sum('en_proceso'),
             ],
+            'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
+            'hora' => now()->timezone('America/Santiago')->format('H:i'),
         ]);
     }
 

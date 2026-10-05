@@ -1,32 +1,30 @@
-@extends('layouts.app')
-
-@section('title', 'SIGTE — Usuarios')
+<?php $__env->startSection('title', 'SIGTE — Usuarios'); ?>
 
 <!-- Sección de contenido de la página de usuarios -->
-@section('content')
+<?php $__env->startSection('content'); ?>
 <!-- Contenedor principal de la página -->
 <div class="shell">
     <!-- Barra lateral de navegación -->
     <aside class="sidebar">
         <div class="logo-wrap">
-            <img src="{{ asset('images/logo-hospital-circular.png') }}" alt="Logo hospital">
+            <img src="<?php echo e(asset('images/logo-hospital-circular.png')); ?>" alt="Logo hospital">
             <div>
                 <div class="logo">SIG<span>TE</span></div>
                 <div class="logo-sub">Administración</div>
             </div>
         </div>
 
-                @include('partials.menu-rol')
+                <?php echo $__env->make('partials.menu-rol', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         
         <div class="sidebar-foot">
             <div class="side-user">
-                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
+                <div class="avatar"><?php echo e(strtoupper(substr($usuario['nombre'], 0, 1))); ?></div>
                 <div>
-                    <strong>{{ $usuario['nombre'] }}</strong>
-                    <small>{{ $usuario['rol'] }}</small>
+                    <strong><?php echo e($usuario['nombre']); ?></strong>
+                    <small><?php echo e($usuario['rol']); ?></small>
                 </div>
             </div>
-            @include('partials.logout')
+            <?php echo $__env->make('partials.logout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </div>
     </aside>
 
@@ -40,29 +38,29 @@
                 <p class="main-sub">La jefatura crea las cuentas, asigna el rol y puede desactivarlas. La enfermera y la operadora no entran aquí.</p>
             </div>
             <div class="main-actions">
-                <a class="btn btn-ghost" href="{{ route('mockups.panel', 'administradora') }}">Volver al resumen</a>
+                <a class="btn btn-ghost" href="<?php echo e(route('mockups.panel', 'administradora')); ?>">Volver al resumen</a>
             </div>
         </div>
 
         <div class="kpi-row">
             <div class="kpi">
                 <div class="l">Total</div>
-                <div class="n">{{ $resumen['total'] }}</div>
+                <div class="n"><?php echo e($resumen['total']); ?></div>
                 <div class="h">Cuentas registradas</div>
             </div>
             <div class="kpi ok">
                 <div class="l">Activos</div>
-                <div class="n">{{ $resumen['activos'] }}</div>
+                <div class="n"><?php echo e($resumen['activos']); ?></div>
                 <div class="h">Pueden iniciar sesión</div>
             </div>
             <div class="kpi">
                 <div class="l">Inactivos</div>
-                <div class="n">{{ $resumen['inactivos'] }}</div>
+                <div class="n"><?php echo e($resumen['inactivos']); ?></div>
                 <div class="h">Desactivados</div>
             </div>
             <div class="kpi">
                 <div class="l">Administradoras</div>
-                <div class="n">{{ $resumen['admin'] }}</div>
+                <div class="n"><?php echo e($resumen['admin']); ?></div>
                 <div class="h">Con gestión de usuarios</div>
             </div>
         </div>
@@ -72,7 +70,7 @@
                 <!-- Encabezado de la lista de usuarios -->
                 <div class="panel-head">
                     <h2>Cuentas</h2>
-                    <span class="badge">{{ count($usuarios) }}</span>
+                    <span class="badge"><?php echo e(count($usuarios)); ?></span>
                 </div>
                 <!-- Tabla de usuarios -->
                 <div class="table-wrap">
@@ -88,29 +86,29 @@
                         </thead>
                         <tbody>
                             <!-- Iteración sobre los usuarios -->
-                            @foreach ($usuarios as $u)
-                                <tr class="{{ $u['estado'] === 'inactivo' ? 'user-inactive' : '' }}" data-estado="{{ $u['estado'] }}">
+                            <?php $__currentLoopData = $usuarios; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr class="<?php echo e($u['estado'] === 'inactivo' ? 'user-inactive' : ''); ?>" data-estado="<?php echo e($u['estado']); ?>">
                                     <td>
-                                        <strong class="js-nombre">{{ $u['nombre'] }}</strong>
-                                        <div class="muted-cell js-email">{{ $u['email'] }}</div>
+                                        <strong class="js-nombre"><?php echo e($u['nombre']); ?></strong>
+                                        <div class="muted-cell js-email"><?php echo e($u['email']); ?></div>
                                     </td>
-                                    <td><span class="badge rol-pill js-rol {{ $u['rol'] === 'Administradora' ? 'rol-admin' : ($u['rol'] === 'Operadora' ? 'rol-operadora' : 'rol-enfermera') }}">{{ $u['rol'] }}</span></td>
+                                    <td><span class="badge rol-pill js-rol <?php echo e($u['rol'] === 'Administradora' ? 'rol-admin' : ($u['rol'] === 'Operadora' ? 'rol-operadora' : 'rol-enfermera')); ?>"><?php echo e($u['rol']); ?></span></td>
                                     <td>
-                                        <span class="pill js-estado {{ $u['estado'] === 'activo' ? 'pill-ok' : 'pill-warn' }}">{{ $u['estado'] === 'activo' ? 'Activo' : 'Inactivo' }}</span>
+                                        <span class="pill js-estado <?php echo e($u['estado'] === 'activo' ? 'pill-ok' : 'pill-warn'); ?>"><?php echo e($u['estado'] === 'activo' ? 'Activo' : 'Inactivo'); ?></span>
                                     </td>
-                                    <td>{{ $u['ultimo'] }}</td>
+                                    <td><?php echo e($u['ultimo']); ?></td>
                                     <td class="user-actions">
                                         <button class="btn btn-ghost js-editar" type="button">Editar</button>
-                                        <button class="btn {{ $u['estado'] === 'activo' ? 'btn-ghost' : 'btn-dark' }} js-estado-btn" type="button">{{ $u['estado'] === 'activo' ? 'Desactivar' : 'Reactivar' }}</button>
+                                        <button class="btn <?php echo e($u['estado'] === 'activo' ? 'btn-ghost' : 'btn-dark'); ?> js-estado-btn" type="button"><?php echo e($u['estado'] === 'activo' ? 'Desactivar' : 'Reactivar'); ?></button>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <form class="panel cuenta-alta" id="cuenta-form" action="{{ route('mockups.usuarios') }}" method="get" onsubmit="return false">
+            <form class="panel cuenta-alta" id="cuenta-form" action="<?php echo e(route('mockups.usuarios')); ?>" method="get" onsubmit="return false">
                 <div class="panel-head">
                     <h2 id="cuenta-titulo">Nueva cuenta</h2>
                     <span class="badge" id="cuenta-modo">Alta</span>
@@ -135,9 +133,9 @@
                         <label class="field field-select">
                             <select id="rol" name="rol">
                                 <option value="">Elige el rol</option>
-                                @foreach ($roles as $r)
-                                    <option value="{{ $r }}">{{ $r }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </label>
                     </div>
@@ -273,4 +271,6 @@
         limpiarAlta();
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/html/resources/views/mockups/usuarios.blade.php ENDPATH**/ ?>
