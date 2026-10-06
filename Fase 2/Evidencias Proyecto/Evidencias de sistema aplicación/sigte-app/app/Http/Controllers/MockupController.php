@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Caja;
+use App\Models\CajaAnotacion;
 use App\Models\ConsumoServicio;
 use App\Models\Insumo;
 use App\Models\Rol;
 use App\Support\AccesoPorRol;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,16 +44,111 @@ class MockupController extends Controller
                     'estado' => $caja->estado ?? Caja::etiquetaEtapa($caja->etapa),
                     'ubicacion' => $caja->ubicacion ?? 'Sin ubicacion',
                     'operadora' => $caja->nombreResponsable(),
-                    'fecha' => optional($caja->etapa_desde)->format('d/m/Y') ?? '—',
-                    'hora' => optional($caja->etapa_desde)->format('H:i') ?? '—',
+                    'fecha' => $caja->etapa_desde?->timezone('America/Santiago')->format('d/m/Y') ?? '—',
+                    'hora' => $caja->etapa_desde?->timezone('America/Santiago')->format('H:i') ?? '—',
                     'tiempo' => $caja->tiempoEnEtapa(),
+                    'etapa_iso' => $caja->etapa_desde?->toIso8601String(),
                     'minutos' => $caja->etapa_desde === null
                         ? null
                         : (int) abs($caja->etapa_desde->diffInMinutes(now())),
                     'urgente' => $caja->urgente,
+                    'proceso_desde' => $caja->proceso_desde?->toIso8601String(),
+                    'proceso_hasta' => $caja->proceso_hasta?->toIso8601String(),
+                    'proceso_listo' => $caja->procesoListo(),
                 ];
             })
             ->all();
+    }
+
+    /**
+     * Lo que la jefatura puede ver con la etapa actual. No hay historial de pasos.
+     *
+     * @param  list<array{id: string, servicio: string, fase_idx: int, tiempo: string, minutos: int|null}>  $cajas
+     * @return array{total: int, en_almacen: int, en_entrega: int, conteo: list<int>, detenidas: list<array{id: string, servicio: string, etapa: string, lleva: string, limite: int}>}
+     */
+    private function panorama(array $cajas): array
+    {
+        $fases = $this->fases();
+        $etapas = Caja::etapas();
+        $guia = [
+            Caja::ETAPA_RECEPCION => 60,
+            Caja::ETAPA_LAVADO => 60,
+            Caja::ETAPA_PREPARACION => 90,
+            Caja::ETAPA_ESTERILIZACION => 45,
+            Caja::ETAPA_ALMACEN => 240,
+            Caja::ETAPA_ENTREGA => 60,
+        ];
+        $porEtapa = [];
+        $detenidas = [];
+        foreach ($etapas as $indice => $clave) {
+            $porEtapa[$indice] = [
+                'indice' => $indice,
+                'nombre' => $fases[$indice],
+                'clave' => $clave,
+                'cantidad' => 0,
+                'tarde' => 0,
+                'cajas' => [],
+            ];
+        }
+
+        foreach ($cajas as $caja) {
+            $indice = $caja['fase_idx'];
+            $etapa = $etapas[$indice] ?? Caja::ETAPA_RECEPCION;
+            $limite = $guia[$etapa] ?? 60;
+            $tarde = $caja['minutos'] !== null && $caja['minutos'] > $limite;
+            $porEtapa[$indice]['cantidad']++;
+            if ($tarde) {
+                $porEtapa[$indice]['tarde']++;
+                $detenidas[] = [
+                    'id' => $caja['id'],
+                    'servicio' => $caja['servicio'],
+                    'etapa' => $fases[$indice],
+                    'clave' => $etapa,
+                    'espera' => $this->etiquetaEspera($caja['minutos']),
+                    'minutos' => $caja['minutos'],
+                ];
+            }
+            $porEtapa[$indice]['cajas'][] = [
+                'id' => $caja['id'],
+                'servicio' => $caja['servicio'],
+                'espera' => $caja['minutos'] === null ? 'Sin registro' : $this->etiquetaEspera($caja['minutos']),
+                'tarde' => $tarde,
+                'minutos' => $caja['minutos'] ?? -1,
+            ];
+        }
+
+        foreach ($porEtapa as &$grupo) {
+            usort($grupo['cajas'], fn (array $a, array $b) => $b['minutos'] <=> $a['minutos']);
+        }
+        unset($grupo);
+
+        usort($detenidas, fn (array $a, array $b) => $b['minutos'] <=> $a['minutos']);
+
+        return [
+            'total' => count($cajas),
+            'en_almacen' => $porEtapa[array_search(Caja::ETAPA_ALMACEN, $etapas, true)]['cantidad'] ?? 0,
+            'en_entrega' => $porEtapa[array_search(Caja::ETAPA_ENTREGA, $etapas, true)]['cantidad'] ?? 0,
+            'conteo' => array_column($porEtapa, 'cantidad'),
+            'detenidas' => $detenidas,
+            'etapas' => array_values($porEtapa),
+        ];
+    }
+
+    private function etiquetaEspera(int $minutos): string
+    {
+        if ($minutos < 60) {
+            return $minutos.' min';
+        }
+
+        if ($minutos < 60 * 24) {
+            $horas = intdiv($minutos, 60);
+
+            return $horas === 1 ? '1 hora' : $horas.' horas';
+        }
+
+        $dias = intdiv($minutos, 60 * 24);
+
+        return $dias === 1 ? '1 día' : $dias.' días';
     }
 
     /**
@@ -448,6 +545,22 @@ class MockupController extends Controller
                 ['nivel' => 'media', 'titulo' => 'CAJA-118 sin custodia al salir de lavado', 'detalle' => 'Urgencia'],
                 ['nivel' => 'media', 'titulo' => 'Faltante en SET-007 (1 pinza)', 'detalle' => 'Detectado en preparacion'],
             ],
+            'etiquetas_etapa' => array_map(
+                fn (string $etapa) => Caja::etiquetaEtapa($etapa),
+                Caja::etapas()
+            ),
+            'panorama' => $this->panorama($consulta['cajas']),
+            'falla_produccion' => $request->boolean('falla'),
+            'accion_modal' => in_array($request->query('accion'), ['etapa', 'actividad'], true)
+                ? 'etapa'
+                : null,
+            'caja_modal' => trim((string) $request->query('caja', '')),
+            'pasos_etapa' => $this->pasosPorEtapa(),
+            'anotaciones_por_caja' => $rol === Rol::OPERADOR ? $this->anotacionesPorCaja() : [],
+            'ahora_modal' => [
+                'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
+                'hora' => now()->timezone('America/Santiago')->format('H:i'),
+            ],
         ]);
     }
     public function recepcion(): View
@@ -459,24 +572,13 @@ class MockupController extends Controller
         ]);
     }
 
-    public function avanzar(Request $request): View
+    public function avanzar(Request $request): RedirectResponse
     {
-        $fases = $this->fases();
-        $cajas = $this->cajas();
-        $selectedId = $request->query('caja', 'CAJA-118');
-        $caja = collect($cajas)->firstWhere('id', $selectedId) ?? $cajas[1];
-        $idx = $caja['fase_idx'];
-        $siguiente = $idx < count($fases) - 1 ? $fases[$idx + 1] : null;
-
-        return view('mockups.avanzar', [
-            'usuario' => $this->usuarioSesion(),
-            'fases' => $fases,
-            'cajas' => $cajas,
-            'caja' => $caja,
-            'fase_actual' => $fases[$idx],
-            'fase_siguiente' => $siguiente,
-            'etapa_destino' => $idx < count(Caja::etapas()) - 1 ? Caja::etapas()[$idx + 1] : null,
-        ]);
+        return redirect()->route('mockups.panel', array_filter([
+            'rol' => Rol::OPERADOR,
+            'accion' => 'etapa',
+            'caja' => trim((string) $request->query('caja', '')) ?: null,
+        ]));
     }
 
     /**
@@ -486,7 +588,7 @@ class MockupController extends Controller
     {
         $codigo = trim((string) $request->input('caja', ''));
         $destino = trim((string) $request->input('etapa_destino', ''));
-        $volver = redirect()->route('mockups.avanzar', ['caja' => $codigo !== '' ? $codigo : null]);
+        $volver = $this->volverAlFlujo($request, $codigo);
 
         if ($codigo === '') {
             return $volver->withErrors(['caja' => 'Elige la caja que vas a pasar.']);
@@ -502,7 +604,19 @@ class MockupController extends Controller
         $siguiente = $etapas[$indice + 1] ?? null;
         $etiquetaActual = Caja::etiquetaEtapa($caja->etapa);
 
-        if ($siguiente === null || $destino !== $siguiente) {
+        if ($destino === '') {
+            return $volver->withErrors([
+                'etapa_destino' => 'Falta la etapa a la que pasa la caja.',
+            ]);
+        }
+
+        if ($siguiente === null) {
+            return $volver->withErrors([
+                'etapa_destino' => $caja->codigo.' ya está en '.$etiquetaActual.'. El paso que sigue es registrar la entrega.',
+            ]);
+        }
+
+        if ($destino !== $siguiente) {
             return $volver->withErrors([
                 'etapa_destino' => 'No se puede saltar etapas. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
             ]);
@@ -511,113 +625,199 @@ class MockupController extends Controller
         $caja->etapa = $siguiente;
         $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
         $caja->etapa_desde = now();
+        $caja->proceso_desde = null;
+        $caja->proceso_hasta = null;
         $caja->responsable_id = Auth::id();
         $caja->save();
 
-        return redirect()
-            ->route('mockups.avanzar', ['caja' => $caja->codigo])
+        $caja->anotaciones()->create([
+            'user_id' => Auth::id(),
+            'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
+        ]);
+
+        return $this->volverAlFlujo($request, $caja->codigo, false)
             ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.');
+    }
+
+    private function volverAlFlujo(Request $request, string $codigo, bool $conservarEtapa = true): RedirectResponse
+    {
+        $params = [
+            'rol' => Rol::OPERADOR,
+            'accion' => 'etapa',
+        ];
+
+        if ($codigo !== '') {
+            $params['caja'] = $codigo;
+        }
+
+        $busqueda = trim((string) $request->input('q', ''));
+        if ($busqueda !== '') {
+            $params['q'] = $busqueda;
+        }
+
+        $etapa = $request->input('etapa');
+        if ($conservarEtapa && $etapa !== null && $etapa !== '') {
+            $params['etapa'] = $etapa;
+        }
+
+        return redirect()->route('mockups.panel', $params);
     }
 
     /**
      * HIU-EP2-004: elegir la caja del flujo y mostrar la etapa en la que ya está.
      * La actividad dentro de esa etapa se agrega en las tareas siguientes.
      */
-    public function actividad(Request $request): View
+    public function actividad(Request $request): RedirectResponse
     {
-        $fases = $this->fases();
-        $cajas = $this->cajas();
-        $pedido = trim((string) $request->query('caja', ''));
-        $caja = null;
+        return redirect()->route('mockups.panel', array_filter([
+            'rol' => Rol::OPERADOR,
+            'accion' => 'etapa',
+            'caja' => trim((string) $request->query('caja', '')) ?: null,
+        ]));
+    }
 
-        if ($pedido !== '') {
-            $caja = collect($cajas)->firstWhere('id', $pedido);
-        } elseif ($cajas !== []) {
-            $caja = $cajas[0];
+    public function guardarAnotacion(Request $request): JsonResponse
+    {
+        $codigo = trim((string) $request->input('caja', ''));
+        $texto = trim((string) $request->input('texto', ''));
+        $caja = Caja::query()->where('codigo', $codigo)->first();
+
+        if ($caja === null) {
+            return response()->json(['mensaje' => 'Esa caja no está en el flujo.'], 422);
         }
 
-        return view('mockups.actividad', [
-            'usuario' => $this->usuarioSesion(),
-            'fases' => $fases,
-            'cajas' => $cajas,
-            'caja' => $caja,
-            'etapa_actual' => $caja ? $fases[$caja['fase_idx']] : null,
-            'actividades' => $caja ? $this->actividadesDeEtapa(Caja::etapas()[$caja['fase_idx']]) : [],
-            'codigo_no_encontrado' => $pedido !== '' && $caja === null,
-            'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
-            'hora' => now()->timezone('America/Santiago')->format('H:i'),
-            'ciclo' => $this->cicloVisual($caja),
+        if (! in_array($texto, $this->textosAnotables($caja->etapa), true)) {
+            return response()->json(['mensaje' => 'Esa anotación no corresponde a esta etapa.'], 422);
+        }
+
+        $nota = $caja->anotaciones()->create([
+            'user_id' => Auth::id(),
+            'texto' => $texto,
+        ]);
+        $nota->load('autor');
+
+        $minutos = $this->minutosDeTexto($caja->etapa, $texto);
+        if ($minutos !== null) {
+            $caja->sumarProceso($minutos);
+            $caja->save();
+        }
+
+        return response()->json([
+            'texto' => $nota->texto,
+            'cuando' => $nota->created_at->timezone('America/Santiago')->format('d/m/Y · H:i'),
+            'quien' => $nota->autor?->name ?? '',
+            'proceso_desde' => $caja->proceso_desde?->toIso8601String(),
+            'proceso_hasta' => $caja->proceso_hasta?->toIso8601String(),
         ]);
     }
 
     /**
-     * Lavado usa la hora que ya está en los datos de prueba.
-     * Esterilización usa 45 min solo para mostrar, en pantalla, cuánto falta.
-     *
-     * @param  array{fase_idx: int, minutos: int|null}|null  $caja
-     * @return array{falta: string, porcentaje: int, ayuda: string}|null
+     * @return array<string, list<array{texto: string, cuando: string, quien: string}>>
      */
-    private function cicloVisual(?array $caja): ?array
+    private function anotacionesPorCaja(): array
     {
-        if ($caja === null) {
-            return null;
-        }
+        $grupos = [];
 
-        $etapa = Caja::etapas()[$caja['fase_idx']] ?? Caja::ETAPA_RECEPCION;
-        $referencia = [
-            Caja::ETAPA_LAVADO => 60,
-            Caja::ETAPA_ESTERILIZACION => 45,
-        ][$etapa] ?? null;
-        $lleva = $caja['minutos'];
+        CajaAnotacion::query()
+            ->with(['caja:id,codigo', 'autor:id,name'])
+            ->orderBy('id')
+            ->get()
+            ->each(function (CajaAnotacion $nota) use (&$grupos): void {
+                $codigo = $nota->caja?->codigo;
+                if ($codigo === null) {
+                    return;
+                }
 
-        if ($referencia === null || $lleva === null) {
-            return [
-                'falta' => 'Sin ciclo fijo',
-                'porcentaje' => 0,
-                'ayuda' => 'En esta etapa se anota lo que va pasando. No hay una hora de término.',
-            ];
-        }
+                $grupos[$codigo][] = [
+                    'texto' => $nota->texto,
+                    'cuando' => $nota->created_at->timezone('America/Santiago')->format('d/m/Y · H:i'),
+                    'quien' => $nota->autor?->name ?? '',
+                ];
+            });
 
-        $resta = $referencia - $lleva;
-
-        if ($resta <= 0) {
-            return [
-                'falta' => 'Tiempo cumplido',
-                'porcentaje' => 100,
-                'ayuda' => 'Referencia visual del ciclo: '.$referencia.' min. Ya se cumplió.',
-            ];
-        }
-
-        return [
-            'falta' => $this->textoMinutos($resta),
-            'porcentaje' => (int) min(100, round($lleva / $referencia * 100)),
-            'ayuda' => 'Referencia visual del ciclo: '.$referencia.' min.',
-        ];
-    }
-
-    private function textoMinutos(int $minutos): string
-    {
-        if ($minutos < 60) {
-            return $minutos.' min';
-        }
-
-        $horas = intdiv($minutos, 60);
-        $resto = $minutos % 60;
-
-        return $resto === 0 ? $horas.' h' : $horas.' h '.$resto.' min';
+        return $grupos;
     }
 
     /** @return list<string> */
-    private function actividadesDeEtapa(string $etapa): array
+    private function textosAnotables(string $etapa): array
+    {
+        $paso = $this->pasosPorEtapa()[$etapa] ?? ['opciones' => [], 'tiempos' => []];
+
+        return array_merge(
+            $paso['opciones'],
+            array_column($paso['tiempos'], 'texto')
+        );
+    }
+
+    private function minutosDeTexto(string $etapa, string $texto): ?int
+    {
+        foreach ($this->pasosPorEtapa()[$etapa]['tiempos'] ?? [] as $tiempo) {
+            if ($tiempo['texto'] === $texto) {
+                return (int) $tiempo['minutos'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Cada tramo anota otra cosa. El tiempo solo aparece donde la central lo escribe a mano.
+     *
+     * @return array<string, array{tramo: string, ayuda: string, opciones: list<string>, tiempos: list<array{texto: string, etiqueta: string}>}>
+     */
+    private function pasosPorEtapa(): array
     {
         return [
-            Caja::ETAPA_RECEPCION => ['Recepción del material', 'Revisión de lo que llega'],
-            Caja::ETAPA_LAVADO => ['Remojo', 'Lavado', 'Secado'],
-            Caja::ETAPA_PREPARACION => ['Control visual', 'Reconteo', 'Armado'],
-            Caja::ETAPA_ESTERILIZACION => ['Carga del autoclave', 'Ciclo en curso', 'Descarga'],
-            Caja::ETAPA_ALMACEN => ['Ubicar en estante', 'Espera de retiro'],
-            Caja::ETAPA_ENTREGA => ['Entrega al servicio'],
-        ][$etapa] ?? [];
+            Caja::ETAPA_RECEPCION => [
+                'tramo' => 'Recepción a lavado',
+                'resumen' => 'De dónde llega y si ya quedó en remojo.',
+                'ayuda' => 'Se anota de qué servicio llega y si ya quedó en remojo. En este paso no hay ciclo de máquina.',
+                'opciones' => ['Recepción del servicio', 'Remojo'],
+                'tiempos' => [],
+            ],
+            Caja::ETAPA_LAVADO => [
+                'tramo' => 'Lavado a preparación',
+                'resumen' => 'Lavado, secado y la hora de la lavadora.',
+                'ayuda' => 'La lavadora, en el ciclo estándar, se demora una hora. Si falla, ese tiempo se anota de nuevo.',
+                'opciones' => ['Lavado', 'Secado'],
+                'tiempos' => [
+                    ['texto' => 'Ciclo de lavadora: 60 min', 'etiqueta' => 'Lavadora · 60 min', 'minutos' => 60],
+                ],
+            ],
+            Caja::ETAPA_PREPARACION => [
+                'tramo' => 'Preparación a esterilización',
+                'resumen' => 'Inspección, reconteo y quién lo armó.',
+                'ayuda' => 'Inspección, reconteo y rotulado de quien armó. Todavía no entra al autoclave.',
+                'opciones' => ['Inspección', 'Reconteo', 'Armado y rotulado'],
+                'tiempos' => [],
+            ],
+            Caja::ETAPA_ESTERILIZACION => [
+                'tramo' => 'Esterilización a almacén',
+                'resumen' => 'La carga, el voucher y la espera para abrir.',
+                'ayuda' => 'En el voucher van la temperatura, el tiempo y quién lo tiró. Se copia a mano. Antes de abrir la puerta se esperan 20 minutos.',
+                'opciones' => ['Carga del autoclave', 'Voucher de la carga'],
+                'tiempos' => [
+                    ['texto' => 'Espera para abrir: 20 min', 'etiqueta' => 'Abrir puerta · 20 min', 'minutos' => 20],
+                ],
+            ],
+            Caja::ETAPA_ALMACEN => [
+                'tramo' => 'Almacén a entrega',
+                'resumen' => 'La descarga y cuánto se dejó enfriar.',
+                'ayuda' => 'Al descargar se espera que enfríe: media hora el material chico y una hora el contenedor.',
+                'opciones' => ['Descarga', 'Enfriamiento'],
+                'tiempos' => [
+                    ['texto' => 'Enfriamiento material chico: 30 min', 'etiqueta' => 'Material chico · 30 min', 'minutos' => 30],
+                    ['texto' => 'Enfriamiento contenedor: 60 min', 'etiqueta' => 'Contenedor · 60 min', 'minutos' => 60],
+                ],
+            ],
+            Caja::ETAPA_ENTREGA => [
+                'tramo' => 'Entrega',
+                'resumen' => 'El servicio, la hora y quién retira.',
+                'ayuda' => 'En el libro de salida van el servicio, la hora y quién entrega.',
+                'opciones' => ['Entrega al servicio'],
+                'tiempos' => [],
+            ],
+        ];
     }
 
     public function entrega(Request $request): View
@@ -668,6 +868,16 @@ class MockupController extends Controller
             'servicio' => $servicio,
             'servicios' => $servicios,
             'hay_filtros' => $busqueda !== '' || $servicio !== '',
+        ]);
+    }
+
+    public function catalogoAdmin(): View
+    {
+        return view('mockups.catalogo-admin', [
+            'usuario' => $this->usuarioSesion(),
+            'items' => $this->catalogoItems(),
+            'tipos' => ['Set quirúrgico', 'Caja de curación', 'Contenedor', 'Paquete grado médico'],
+            'servicios' => ['Pabellón', 'Maternidad', 'Curaciones', 'UCI', 'General', 'Urgencia'],
         ]);
     }
 
@@ -811,78 +1021,174 @@ class MockupController extends Controller
         ]);
     }
 
-    public function reportes(): View
+    public function reportes(Request $request): View
     {
+        $cajas = $this->cajas();
+        $fases = $this->fases();
+        $momento = now()->timezone('America/Santiago');
+        $filas = array_map(fn (array $caja) => [
+            'id' => $caja['id'],
+            'servicio' => $caja['servicio'],
+            'indice' => $caja['fase_idx'],
+            'etapa' => $fases[$caja['fase_idx']] ?? '',
+        ], $cajas);
+
         return view('mockups.reportes', [
             'usuario' => $this->usuarioSesion(),
-            'periodo' => '15–21 sep 2026',
-            'kpis' => [
-                ['label' => 'Recepciones', 'value' => 86, 'hint' => 'Ingresos al ciclo', 'tone' => ''],
-                ['label' => 'Esterilizaciones', 'value' => 71, 'hint' => 'Ciclos cerrados OK', 'tone' => 'ok'],
-                ['label' => 'Entregas', 'value' => 64, 'hint' => 'Con custodia', 'tone' => ''],
-                ['label' => 'Incidencias', 'value' => 7, 'hint' => 'Faltantes / retrasos', 'tone' => 'warn'],
-            ],
-            'por_servicio' => [
-                ['servicio' => 'Pabellon', 'recepciones' => 28, 'entregas' => 22, 'incidencias' => 3],
-                ['servicio' => 'Urgencia', 'recepciones' => 18, 'entregas' => 15, 'incidencias' => 2],
-                ['servicio' => 'Maternidad', 'recepciones' => 16, 'entregas' => 14, 'incidencias' => 1],
-                ['servicio' => 'UCI', 'recepciones' => 12, 'entregas' => 9, 'incidencias' => 1],
-                ['servicio' => 'Curaciones', 'recepciones' => 12, 'entregas' => 4, 'incidencias' => 0],
-            ],
-            'por_fase' => [
-                ['fase' => 'Recepcion', 'promedio_h' => 0.4, 'max_h' => 1.2],
-                ['fase' => 'Lavado', 'promedio_h' => 1.1, 'max_h' => 2.5],
-                ['fase' => 'Preparacion', 'promedio_h' => 0.9, 'max_h' => 2.0],
-                ['fase' => 'Esterilizacion', 'promedio_h' => 2.4, 'max_h' => 4.0],
-                ['fase' => 'Almacen', 'promedio_h' => 6.5, 'max_h' => 18.0],
-                ['fase' => 'Entrega', 'promedio_h' => 0.3, 'max_h' => 1.0],
-            ],
-            'top_sets' => [
-                ['codigo' => 'SET-CES-02', 'nombre' => 'Set cesarea', 'ciclos' => 14],
-                ['codigo' => 'SET-LAP-01', 'nombre' => 'Set laparoscopia basico', 'ciclos' => 11],
-                ['codigo' => 'CAJ-CUR-10', 'nombre' => 'Caja curacion general', 'ciclos' => 9],
-                ['codigo' => 'SET-UCI-03', 'nombre' => 'Set via aerea UCI', 'ciclos' => 6],
-            ],
+            'falla' => $request->boolean('falla'),
+            'fecha' => $momento->format('d/m/Y'),
+            'hora' => $momento->format('H:i'),
+            'fases' => $fases,
+            'filas' => $filas,
         ]);
     }
 
-    public function custodia(): View
+    public function historialEntregas(Request $request): View
+    {
+        $entregas = [
+            [
+                'id' => 'ENT-241',
+                'fecha' => '06/10/2026',
+                'hora' => '11:40',
+                'cuando' => 'hoy',
+                'servicio' => 'Pabellón',
+                'entrega' => 'Yamilet Maureira',
+                'entrega_rol' => 'Operadora',
+                'recibe' => 'Daniela Soto',
+                'recibe_rol' => 'Enfermera de pabellón',
+                'cajas' => [
+                    ['codigo' => 'SET-033', 'nombre' => 'Set de pabellón'],
+                    ['codigo' => 'CAJA-091', 'nombre' => 'Caja instrumental'],
+                ],
+                'materiales' => ['Paquete de ropa'],
+            ],
+            [
+                'id' => 'ENT-240',
+                'fecha' => '06/10/2026',
+                'hora' => '10:20',
+                'cuando' => 'hoy',
+                'servicio' => 'Dental',
+                'entrega' => 'Carla Muñoz',
+                'entrega_rol' => 'Operadora',
+                'recibe' => 'Daniela Soto',
+                'recibe_rol' => 'Enfermera de dental',
+                'cajas' => [
+                    ['codigo' => 'SET-DEN-04', 'nombre' => 'Set dental'],
+                ],
+                'materiales' => ['Instrumental suelto'],
+            ],
+            [
+                'id' => 'ENT-238',
+                'fecha' => '06/10/2026',
+                'hora' => '09:15',
+                'cuando' => 'hoy',
+                'servicio' => 'UCI',
+                'entrega' => 'Carla Muñoz',
+                'entrega_rol' => 'Operadora',
+                'recibe' => 'Alejandra Riquelme',
+                'recibe_rol' => 'Enfermera de turno',
+                'cajas' => [
+                    ['codigo' => 'SET-055', 'nombre' => 'Set de UCI'],
+                ],
+                'materiales' => ['Material de curación'],
+            ],
+            [
+                'id' => 'ENT-230',
+                'fecha' => '05/10/2026',
+                'hora' => '18:02',
+                'cuando' => 'ayer',
+                'servicio' => 'Urgencia',
+                'entrega' => 'Yamilet Maureira',
+                'entrega_rol' => 'Operadora',
+                'recibe' => 'Patricia Vega',
+                'recibe_rol' => 'Enfermera de urgencia',
+                'cajas' => [
+                    ['codigo' => 'CAJA-118', 'nombre' => 'Caja de urgencia'],
+                ],
+                'materiales' => [],
+            ],
+            [
+                'id' => 'ENT-226',
+                'fecha' => '05/10/2026',
+                'hora' => '16:20',
+                'cuando' => 'ayer',
+                'servicio' => 'Maternidad',
+                'entrega' => 'Carla Muñoz',
+                'entrega_rol' => 'Operadora',
+                'recibe' => 'Natalia Sánchez',
+                'recibe_rol' => 'Jefatura de maternidad',
+                'cajas' => [
+                    ['codigo' => 'SET-007', 'nombre' => 'Set de maternidad'],
+                ],
+                'materiales' => ['Instrumental suelto'],
+            ],
+            [
+                'id' => 'ENT-214',
+                'fecha' => '04/10/2026',
+                'hora' => '12:05',
+                'cuando' => 'anterior',
+                'servicio' => 'Curaciones',
+                'entrega' => 'Yamilet Maureira',
+                'entrega_rol' => 'Operadora',
+                'recibe' => 'Daniela Soto',
+                'recibe_rol' => 'Enfermera de curaciones',
+                'cajas' => [
+                    ['codigo' => 'CAJA-200', 'nombre' => 'Caja de curación'],
+                ],
+                'materiales' => ['Material de curación'],
+            ],
+        ];
+
+        return view('mockups.historial-entregas', [
+            'usuario' => $this->usuarioSesion(),
+            'entregas' => $entregas,
+            'servicios' => collect($entregas)->pluck('servicio')->unique()->values()->all(),
+            'falla' => $request->boolean('falla'),
+        ]);
+    }
+
+    public function custodia(Request $request): View
     {
         return view('mockups.custodia', [
             'usuario' => $this->usuarioSesion(),
+            'falla' => $request->boolean('falla'),
             'cadenas' => [
                 [
                     'caja' => 'SET-007',
                     'servicio' => 'Maternidad',
-                    'estado' => 'En almacen',
+                    'estado' => 'En almacén',
+                    'alerta' => false,
+                    'cuando' => 'hoy',
                     'eventos' => [
-                        ['hora' => '08:10', 'tipo' => 'Recepcion', 'de' => 'Enf. Carla Muñoz', 'a' => 'Y. Maureira', 'nota' => 'Area sucia'],
-                        ['hora' => '09:05', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Recepcion → Lavado'],
-                        ['hora' => '10:20', 'tipo' => 'Avance', 'de' => 'A. Riquelme', 'a' => '—', 'nota' => 'Lavado → Preparacion'],
-                        ['hora' => '11:40', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Preparacion → Esterilizacion'],
-                        ['hora' => '13:41', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Esterilizacion → Almacen'],
+                        ['hora' => '08:10', 'tipo' => 'Recepción', 'de' => 'Enf. Carla Muñoz', 'a' => 'Y. Maureira', 'nota' => 'Área sucia'],
+                        ['hora' => '09:05', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Recepción → Lavado'],
+                        ['hora' => '10:20', 'tipo' => 'Avance', 'de' => 'A. Riquelme', 'a' => '—', 'nota' => 'Lavado → Preparación'],
+                        ['hora' => '11:40', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Preparación → Esterilización'],
+                        ['hora' => '13:41', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Esterilización → Almacén'],
                     ],
                 ],
                 [
                     'caja' => 'CAJA-118',
                     'servicio' => 'Urgencia',
                     'estado' => 'Incidencia',
+                    'alerta' => true,
+                    'cuando' => 'hoy',
                     'eventos' => [
-                        ['hora' => '12:40', 'tipo' => 'Recepcion', 'de' => 'Enf. Luis Perez', 'a' => 'A. Riquelme', 'nota' => 'Ingreso urgencia'],
-                        ['hora' => '13:58', 'tipo' => 'Avance', 'de' => 'A. Riquelme', 'a' => '—', 'nota' => 'Recepcion → Lavado'],
+                        ['hora' => '12:40', 'tipo' => 'Recepción', 'de' => 'Enf. Luis Perez', 'a' => 'A. Riquelme', 'nota' => 'Ingreso urgencia'],
+                        ['hora' => '13:58', 'tipo' => 'Avance', 'de' => 'A. Riquelme', 'a' => '—', 'nota' => 'Recepción → Lavado'],
                         ['hora' => '14:05', 'tipo' => 'Alerta', 'de' => 'Sistema', 'a' => '—', 'nota' => 'Sin custodia al salir de lavado'],
                     ],
                 ],
             ],
             'auditoria' => [
-                ['hora' => '14:12', 'actor' => 'Y. Maureira', 'accion' => 'Avanzó etapa', 'objeto' => 'SET-042', 'detalle' => 'Preparacion → Esterilizacion'],
-                ['hora' => '13:58', 'actor' => 'A. Riquelme', 'accion' => 'Avanzó etapa', 'objeto' => 'CAJA-118', 'detalle' => 'Recepcion → Lavado'],
-                ['hora' => '13:41', 'actor' => 'Y. Maureira', 'accion' => 'Avanzó etapa', 'objeto' => 'SET-007', 'detalle' => 'Esterilizacion → Almacen'],
-                ['hora' => '12:10', 'actor' => 'N. Sanchez', 'accion' => 'Actualizó stock mínimo', 'objeto' => 'SET-CES-02', 'detalle' => 'Mínimo 2 → 3'],
-                ['hora' => '11:55', 'actor' => 'N. Sanchez', 'accion' => 'Creó usuario', 'objeto' => 'C. Muñoz', 'detalle' => 'Rol Operadora'],
-                ['hora' => '11:20', 'actor' => 'Y. Maureira', 'accion' => 'Registró recepción', 'objeto' => 'CAJA-091', 'detalle' => 'Desde Pabellon'],
-                ['hora' => '10:45', 'actor' => 'A. Riquelme', 'accion' => 'Registró entrega', 'objeto' => 'SET-019', 'detalle' => 'Retira Enf. D. Soto · UCI'],
-                ['hora' => '09:30', 'actor' => 'N. Sanchez', 'accion' => 'Desactivó usuario', 'objeto' => 'P. Vega', 'detalle' => 'Cuenta inactiva'],
+                ['fecha' => '06/10', 'hora' => '14:12', 'cuando' => 'hoy', 'actor' => 'Y. Maureira', 'accion' => 'Avanzó etapa', 'tipo' => 'etapa', 'objeto' => 'SET-042', 'detalle' => 'Preparación → Esterilización'],
+                ['fecha' => '06/10', 'hora' => '13:58', 'cuando' => 'hoy', 'actor' => 'A. Riquelme', 'accion' => 'Avanzó etapa', 'tipo' => 'etapa', 'objeto' => 'CAJA-118', 'detalle' => 'Recepción → Lavado'],
+                ['fecha' => '06/10', 'hora' => '13:41', 'cuando' => 'hoy', 'actor' => 'Y. Maureira', 'accion' => 'Avanzó etapa', 'tipo' => 'etapa', 'objeto' => 'SET-007', 'detalle' => 'Esterilización → Almacén'],
+                ['fecha' => '06/10', 'hora' => '12:10', 'cuando' => 'hoy', 'actor' => 'N. Sánchez', 'accion' => 'Actualizó stock mínimo', 'tipo' => 'inventario', 'objeto' => 'SET-CES-02', 'detalle' => 'Mínimo 2 → 3'],
+                ['fecha' => '06/10', 'hora' => '11:55', 'cuando' => 'hoy', 'actor' => 'N. Sánchez', 'accion' => 'Creó usuario', 'tipo' => 'usuarios', 'objeto' => 'C. Muñoz', 'detalle' => 'Rol Operadora'],
+                ['fecha' => '06/10', 'hora' => '11:20', 'cuando' => 'hoy', 'actor' => 'Y. Maureira', 'accion' => 'Registró recepción', 'tipo' => 'etapa', 'objeto' => 'CAJA-091', 'detalle' => 'Desde Pabellón'],
+                ['fecha' => '05/10', 'hora' => '10:45', 'cuando' => 'ayer', 'actor' => 'A. Riquelme', 'accion' => 'Registró entrega', 'tipo' => 'entrega', 'objeto' => 'SET-019', 'detalle' => 'Retira Enf. D. Soto · UCI'],
+                ['fecha' => '01/10', 'hora' => '09:30', 'cuando' => 'mes', 'actor' => 'N. Sánchez', 'accion' => 'Desactivó usuario', 'tipo' => 'usuarios', 'objeto' => 'P. Vega', 'detalle' => 'Cuenta inactiva'],
             ],
         ]);
     }

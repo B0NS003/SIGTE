@@ -17,15 +17,18 @@ class AccesoPorRol
         'mockups.recepcion' => [Rol::OPERADOR],
         'mockups.avanzar' => [Rol::OPERADOR],
         'mockups.avanzar.guardar' => [Rol::OPERADOR],
+        'mockups.anotar' => [Rol::OPERADOR],
         'mockups.actividad' => [Rol::OPERADOR],
         'mockups.entrega' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],
+        'mockups.historial_entregas' => [Rol::ADMINISTRADORA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
         'secretaria.produccion' => [Rol::SECRETARIA],
         'secretaria.produccion.guardar' => [Rol::SECRETARIA],
@@ -128,20 +131,6 @@ class AccesoPorRol
             ],
             [
                 'grupo' => 'Mi trabajo',
-                'ruta' => 'mockups.avanzar',
-                'texto' => 'Pasar de etapa',
-                'params' => [],
-                'roles' => $operacion,
-            ],
-            [
-                'grupo' => 'Mi trabajo',
-                'ruta' => 'mockups.actividad',
-                'texto' => 'Anotar la actividad',
-                'params' => [],
-                'roles' => $operacion,
-            ],
-            [
-                'grupo' => 'Mi trabajo',
                 'ruta' => 'mockups.entrega',
                 'texto' => 'Entrega',
                 'params' => [],
@@ -185,8 +174,8 @@ class AccesoPorRol
             ],
             [
                 'grupo' => 'Gestión',
-                'ruta' => 'mockups.catalogo',
-                'texto' => 'Catálogo',
+                'ruta' => 'mockups.catalogo.admin',
+                'texto' => 'Mantener catálogo',
                 'params' => [],
                 'roles' => [Rol::ADMINISTRADORA],
             ],
@@ -208,6 +197,13 @@ class AccesoPorRol
                 'grupo' => 'Gestión',
                 'ruta' => 'mockups.reportes',
                 'texto' => 'Reportes',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.historial_entregas',
+                'texto' => 'Historial de entregas',
                 'params' => [],
                 'roles' => [Rol::ADMINISTRADORA],
             ],
@@ -285,6 +281,17 @@ class AccesoPorRol
         $rolUrl = request()->route('rol');
         $rolEsperado = ($enlace['propio'] ?? false) ? $rol : ($enlace['params']['rol'] ?? null);
 
-        return $rolUrl === $rolEsperado;
+        if ($rolUrl !== $rolEsperado) {
+            return false;
+        }
+
+        $accionEnlace = $enlace['params']['accion'] ?? null;
+        $accionUrl = request()->query('accion');
+
+        if ($accionEnlace !== null) {
+            return $accionUrl === $accionEnlace;
+        }
+
+        return ! in_array($accionUrl, ['etapa', 'actividad'], true);
     }
 }

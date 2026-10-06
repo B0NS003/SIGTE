@@ -139,4 +139,5 @@
         </div>
     </main>
 </div>
+@include('mockups.partials.track-anim')
 @endsection

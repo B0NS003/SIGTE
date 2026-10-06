@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'SIGTE — Reportes')
+@section('title', 'SIGTE — Reportes de producción')
 
 @section('content')
 <div class="shell">
@@ -13,7 +13,7 @@
             </div>
         </div>
 
-                @include('partials.menu-rol')
+        @include('partials.menu-rol')
 
         <div class="sidebar-foot">
             <div class="side-user">
@@ -30,166 +30,216 @@
     <main class="main">
         <div class="main-top">
             <div>
-                <p class="eyebrow">Gestión · producción y trazabilidad</p>
-                <h1>Reportes</h1>
-                <p class="main-sub">Resumen del período: volumen del ciclo, tiempos por etapa, carga por servicio e incidencias. Lectura de gestión, no operación del día.</p>
+                <p class="eyebrow">Hospital San José de Melipilla</p>
+                <h1>Reportes de producción</h1>
+                <p class="main-sub">Arma el consolidado de la central, revísalo en pantalla y elige el formato para entregarlo.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'administradora') }}">Volver al resumen</a>
-                <button class="btn btn-dark" type="button">Exportar CSV</button>
             </div>
         </div>
 
-        <div class="query-toolbar panel">
-            <label class="field field-select" style="margin:0; min-width:11rem;">
-                <select>
-                    <option>Esta semana</option>
-                    <option selected>Últimos 7 días</option>
-                    <option>Este mes</option>
-                    <option>Personalizado…</option>
-                </select>
-            </label>
-            <label class="field field-select" style="margin:0; min-width:11rem;">
-                <select>
-                    <option selected>Todos los servicios</option>
-                    <option>Pabellon</option>
-                    <option>Urgencia</option>
-                    <option>Maternidad</option>
-                    <option>UCI</option>
-                    <option>Curaciones</option>
-                </select>
-            </label>
-            <label class="field field-select" style="margin:0; min-width:11rem;">
-                <select>
-                    <option selected>Todos los tipos</option>
-                    <option>Set quirurgico</option>
-                    <option>Caja de curacion</option>
-                    <option>Contenedor</option>
-                </select>
-            </label>
-            <span class="report-period">Período: <strong>{{ $periodo }}</strong></span>
-        </div>
-
-        <div class="kpi-row">
-            @foreach ($kpis as $kpi)
-                <div class="kpi {{ $kpi['tone'] }}">
-                    <div class="l">{{ $kpi['label'] }}</div>
-                    <div class="n">{{ $kpi['value'] }}</div>
-                    <div class="h">{{ $kpi['hint'] }}</div>
-                </div>
-            @endforeach
-        </div>
-
-        <div class="grid-2">
-            <section class="panel list">
+        @if ($falla)
+            <div class="ops-empty">
+                <strong>No se pudo armar el reporte</strong>
+                <p>La consulta no está disponible en este momento.</p>
+                <p><a href="{{ route('mockups.reportes') }}">Intentar de nuevo</a></p>
+            </div>
+        @else
+            <form class="panel rep-armar" id="rep-armar" action="#" onsubmit="return false;">
                 <div class="panel-head">
-                    <h2>Por servicio</h2>
-                    <span class="badge">Volumen</span>
+                    <h2>Qué va en el reporte</h2>
                 </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Servicio</th>
-                                <th>Recepciones</th>
-                                <th>Entregas</th>
-                                <th>Incidencias</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($por_servicio as $row)
-                                <tr>
-                                    <td><strong>{{ $row['servicio'] }}</strong></td>
-                                    <td>{{ $row['recepciones'] }}</td>
-                                    <td>{{ $row['entregas'] }}</td>
-                                    <td>
-                                        @if ($row['incidencias'] > 0)
-                                            <span class="pill pill-warn">{{ $row['incidencias'] }}</span>
-                                        @else
-                                            <span class="pill pill-ok">0</span>
-                                        @endif
-                                    </td>
-                                </tr>
+                <div class="rep-filtros">
+                    <label class="field field-select">
+                        <span>Período</span>
+                        <select id="rep-periodo" name="periodo">
+                            <option value="ahora" selected>Ahora</option>
+                            <option value="hoy">Hoy</option>
+                            <option value="semana">Esta semana</option>
+                            <option value="mes">Este mes</option>
+                        </select>
+                    </label>
+                    <label class="field field-select">
+                        <span>Etapa</span>
+                        <select id="rep-etapa" name="etapa">
+                            <option value="" selected>Todas</option>
+                            @foreach ($fases as $indice => $fase)
+                                <option value="{{ $indice }}">{{ $fase }}</option>
                             @endforeach
-                        </tbody>
-                    </table>
+                        </select>
+                    </label>
                 </div>
-            </section>
+                <div class="rep-incluye">
+                    <p>Incluir</p>
+                    <label><input type="checkbox" id="rep-inc-etapa" checked> Resumen por etapa</label>
+                    <label><input type="checkbox" id="rep-inc-cajas" checked> Listado de cajas</label>
+                </div>
+                <button class="btn btn-dark" type="submit">Ver vista previa</button>
+            </form>
 
-            <section class="panel list">
-                <div class="panel-head">
-                    <h2>Tiempo promedio por etapa</h2>
-                    <span class="badge">Horas</span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Etapa</th>
-                                <th>Promedio</th>
-                                <th>Máximo</th>
-                                <th>Carga visual</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($por_fase as $row)
-                                @php $pct = min(100, (int) round(($row['promedio_h'] / 8) * 100)); @endphp
-                                <tr>
-                                    <td><strong>{{ $row['fase'] }}</strong></td>
-                                    <td>{{ number_format($row['promedio_h'], 1) }} h</td>
-                                    <td>{{ number_format($row['max_h'], 1) }} h</td>
-                                    <td>
-                                        <div class="bar-track" aria-hidden="true">
-                                            <div class="bar-fill" style="width: {{ $pct }}%"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
+            <article class="panel list rep-hoja" id="rep-hoja" aria-label="Vista previa del reporte">
+                <header class="rep-hoja-top">
+                    <div>
+                        <p>Hospital San José de Melipilla</p>
+                        <h2>Producción de la central</h2>
+                        <p id="rep-periodo-txt">Etapa actual de cada caja</p>
+                    </div>
+                    <div class="rep-formatos">
+                        <button class="btn rep-excel" type="button">Excel</button>
+                        <button class="btn rep-pdf" type="button">PDF</button>
+                    </div>
+                </header>
 
-        <div class="grid-2" style="margin-top:1rem;">
-            <section class="panel list">
-                <div class="panel-head">
-                    <h2>Sets más usados</h2>
-                    <span class="badge">Ciclos del período</span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Nombre</th>
-                                <th>Ciclos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($top_sets as $s)
-                                <tr>
-                                    <td><strong>{{ $s['codigo'] }}</strong></td>
-                                    <td>{{ $s['nombre'] }}</td>
-                                    <td>{{ $s['ciclos'] }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                <dl class="rep-firma">
+                    <div>
+                        <dt>Fecha</dt>
+                        <dd id="rep-fecha">{{ $fecha }}</dd>
+                    </div>
+                    <div>
+                        <dt>Hora</dt>
+                        <dd id="rep-hora">{{ $hora }}</dd>
+                    </div>
+                    <div>
+                        <dt>Generó</dt>
+                        <dd>{{ $usuario['nombre'] }} · {{ $usuario['rol'] }}</dd>
+                    </div>
+                </dl>
 
-            <section class="panel">
-                <div class="panel-head"><h2>Qué responde este reporte</h2></div>
-                <ul class="why-list">
-                    <li><strong>Volumen</strong> — cuánto entró / salió en el período.</li>
-                    <li><strong>Cuellos de botella</strong> — etapas con mayor tiempo (ej. esterilización / almacén).</li>
-                    <li><strong>Servicios</strong> — quién genera más carga e incidencias.</li>
-                    <li><strong>Catálogo</strong> — qué sets circulan más (apoya inventario y stock mínimo).</li>
-                </ul>
-                <div class="panel-note">Mockup: filtros y exportar no calculan datos reales. Enfermera vería un “reporte de turno” más corto; admin ve el período completo.</div>
-            </section>
-        </div>
+                <div id="rep-vacio" class="ops-empty" hidden>
+                    <strong id="rep-vacio-titulo">Sin datos para ese período</strong>
+                    <p id="rep-vacio-texto">El reporte del período se arma cuando cada paso queda registrado. Hoy solo se ve la etapa actual.</p>
+                </div>
+
+                <div id="rep-cuerpo">
+                    <p class="rep-total">Cajas en el reporte <strong id="rep-total">{{ count($filas) }}</strong></p>
+
+                    <section id="rep-bloque-etapa">
+                        <h3>Por etapa</h3>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>Etapa</th><th>Cajas</th></tr>
+                                </thead>
+                                <tbody id="rep-etapas">
+                                    @foreach ($fases as $indice => $fase)
+                                        <tr data-indice="{{ $indice }}">
+                                            <td>{{ $fase }}</td>
+                                            <td>{{ collect($filas)->where('indice', $indice)->count() }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="rep-bloque-cajas">
+                        <h3>Cajas</h3>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>Caja</th><th>Etapa</th></tr>
+                                </thead>
+                                <tbody id="rep-cajas">
+                                    @foreach ($filas as $fila)
+                                        <tr>
+                                            <td><strong>{{ $fila['id'] }}</strong></td>
+                                            <td>{{ $fila['etapa'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </article>
+        @endif
     </main>
 </div>
+@unless ($falla)
+<script>
+(function () {
+    var filas = @json($filas);
+    var fases = @json($fases);
+    var periodo = document.getElementById('rep-periodo');
+    var etapa = document.getElementById('rep-etapa');
+    var incEtapa = document.getElementById('rep-inc-etapa');
+    var incCajas = document.getElementById('rep-inc-cajas');
+    var cuerpo = document.getElementById('rep-cuerpo');
+    var vacio = document.getElementById('rep-vacio');
+    var vacioTitulo = document.getElementById('rep-vacio-titulo');
+    var vacioTexto = document.getElementById('rep-vacio-texto');
+    var total = document.getElementById('rep-total');
+    var cuerpoEtapas = document.getElementById('rep-etapas');
+    var cuerpoCajas = document.getElementById('rep-cajas');
+    var bloqueEtapa = document.getElementById('rep-bloque-etapa');
+    var bloqueCajas = document.getElementById('rep-bloque-cajas');
+    var periodoTxt = document.getElementById('rep-periodo-txt');
+    var etiquetas = {
+        ahora: 'Etapa actual de cada caja',
+        hoy: 'Hoy',
+        semana: 'Esta semana',
+        mes: 'Este mes'
+    };
+
+    function pintar() {
+        var esAhora = periodo.value === 'ahora';
+        periodoTxt.textContent = etiquetas[periodo.value] || etiquetas.ahora;
+        var ahora = new Date();
+        document.getElementById('rep-fecha').textContent = ahora.toLocaleDateString('es-CL');
+        document.getElementById('rep-hora').textContent = ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+
+        if (!esAhora) {
+            cuerpo.hidden = true;
+            vacio.hidden = false;
+            vacioTitulo.textContent = 'Sin datos para ese período';
+            vacioTexto.textContent = 'El reporte del período se arma cuando cada paso queda registrado. Hoy solo se ve la etapa actual.';
+            return;
+        }
+
+        var elegidas = filas.filter(function (fila) {
+            if (etapa.value !== '' && String(fila.indice) !== etapa.value) {
+                return false;
+            }
+            return true;
+        });
+
+        if (elegidas.length === 0) {
+            cuerpo.hidden = true;
+            vacio.hidden = false;
+            vacioTitulo.textContent = 'Ninguna caja coincide';
+            vacioTexto.textContent = 'Prueba con otra etapa.';
+            return;
+        }
+
+        vacio.hidden = true;
+        cuerpo.hidden = false;
+        total.textContent = String(elegidas.length);
+        bloqueEtapa.hidden = !incEtapa.checked;
+        bloqueCajas.hidden = !incCajas.checked;
+
+        cuerpoEtapas.innerHTML = fases.map(function (nombre, indice) {
+            var cantidad = elegidas.filter(function (fila) { return fila.indice === indice; }).length;
+            if (etapa.value !== '' && String(indice) !== etapa.value) {
+                return '';
+            }
+            return '<tr><td>' + nombre + '</td><td>' + cantidad + '</td></tr>';
+        }).join('');
+
+        cuerpoCajas.innerHTML = elegidas.map(function (fila) {
+            return '<tr><td><strong>' + fila.id + '</strong></td><td>' + fila.etapa + '</td></tr>';
+        }).join('');
+    }
+
+    document.getElementById('rep-armar').addEventListener('submit', function (evento) {
+        evento.preventDefault();
+        pintar();
+        document.getElementById('rep-hoja').scrollIntoView({ block: 'nearest' });
+    });
+    [periodo, etapa, incEtapa, incCajas].forEach(function (campo) {
+        campo.addEventListener('change', pintar);
+    });
+})();
+</script>
+@endunless
 @endsection

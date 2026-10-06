@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 class Caja extends Model
@@ -24,6 +25,8 @@ class Caja extends Model
         'urgente',
         'responsable_id',
         'etapa_desde',
+        'proceso_desde',
+        'proceso_hasta',
     ];
 
     protected function casts(): array
@@ -31,12 +34,19 @@ class Caja extends Model
         return [
             'urgente' => 'boolean',
             'etapa_desde' => 'datetime',
+            'proceso_desde' => 'datetime',
+            'proceso_hasta' => 'datetime',
         ];
     }
 
     public function responsable(): BelongsTo
     {
         return $this->belongsTo(User::class, 'responsable_id');
+    }
+
+    public function anotaciones(): HasMany
+    {
+        return $this->hasMany(CajaAnotacion::class);
     }
 
     /** @return list<string> */
@@ -92,5 +102,25 @@ class Caja extends Model
     public function nombreResponsable(): string
     {
         return $this->responsable?->name ?? 'Sin responsable';
+    }
+
+    public function sumarProceso(int $minutos): void
+    {
+        $ahora = Carbon::now();
+        $sigue = $this->proceso_hasta !== null && $this->proceso_hasta->greaterThan($ahora);
+
+        if ($sigue) {
+            $this->proceso_hasta = $this->proceso_hasta->copy()->addMinutes($minutos);
+
+            return;
+        }
+
+        $this->proceso_desde = $ahora;
+        $this->proceso_hasta = $ahora->copy()->addMinutes($minutos);
+    }
+
+    public function procesoListo(): bool
+    {
+        return $this->proceso_hasta !== null && $this->proceso_hasta->lessThanOrEqualTo(Carbon::now());
     }
 }

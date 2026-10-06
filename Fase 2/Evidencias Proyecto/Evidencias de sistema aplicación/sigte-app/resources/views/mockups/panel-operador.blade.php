@@ -137,4 +137,9 @@
         </div>
     </main>
 </div>
+
+@if (($usuario['rol'] ?? '') === 'Operadora')
+    @include('mockups.partials.modales-flujo')
+@endif
+@include('mockups.partials.proceso-reloj')
 @endsection

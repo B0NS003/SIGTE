@@ -173,4 +173,5 @@
     });
 </script>
 @endif
+@include('mockups.partials.track-anim')
 @endsection
