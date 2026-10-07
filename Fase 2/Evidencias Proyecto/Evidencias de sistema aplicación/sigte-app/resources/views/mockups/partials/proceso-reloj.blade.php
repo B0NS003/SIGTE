@@ -31,6 +31,7 @@
                     var barra = bloque.querySelector('.proceso-barra');
                     var card = bloque.closest('.track-card');
                     var aviso = card ? card.querySelector('[data-proceso-listo]') : null;
+                    bloque.classList.toggle('is-listo', queda === 0);
                     bloque.querySelector('.proceso-texto').textContent = texto(queda);
 
                     if (barra) {
@@ -67,6 +68,19 @@
                             duration: 420,
                             easing: 'easeOutCubic'
                         });
+                        var nodo = card.querySelector('.track-step.current .track-node');
+                        if (nodo) {
+                            anime.remove(nodo);
+                            anime({
+                                targets: nodo,
+                                boxShadow: card.classList.contains('is-urgent')
+                                    ? ['0 0 0 3px rgba(185,28,28,.28)', '0 0 0 6px rgba(185,28,28,0)']
+                                    : ['0 0 0 3px rgba(22,163,74,.28)', '0 0 0 6px rgba(22,163,74,0)'],
+                                loop: true,
+                                duration: 1100,
+                                easing: 'easeOutCubic'
+                            });
+                        }
                     }
                 }
 
@@ -82,12 +96,21 @@
                     bloque.dataset.desde = desde || '';
                     bloque.dataset.hasta = hasta || '';
                     bloque.hidden = !hasta;
-                    var lleva = card.querySelector('.track-lleva');
-                    if (lleva && hasta) {
-                        lleva.hidden = true;
-                    }
                     card.classList.remove('is-proceso-listo');
                     delete card.dataset.listoAnim;
+                    var nodo = card.querySelector('.track-step.current .track-node');
+                    if (nodo && !reduce && typeof anime === 'function') {
+                        anime.remove(nodo);
+                        anime({
+                            targets: nodo,
+                            boxShadow: card.classList.contains('is-urgent')
+                                ? ['0 0 0 3px rgba(185,28,28,.28)', '0 0 0 6px rgba(185,28,28,0)']
+                                : ['0 0 0 3px rgba(232,90,28,.28)', '0 0 0 6px rgba(232,90,28,0)'],
+                            loop: true,
+                            duration: 1100,
+                            easing: 'easeOutCubic'
+                        });
+                    }
                     var aviso = card.querySelector('[data-proceso-listo]');
                     if (aviso) {
                         aviso.hidden = true;
@@ -97,27 +120,6 @@
                     pintar(bloque, true);
                 }
 
-                function lleva(ms) {
-                    var total = Math.max(0, Math.floor(ms / 1000));
-                    var h = Math.floor(total / 3600);
-                    var m = Math.floor((total % 3600) / 60);
-                    var s = total % 60;
-                    if (h > 0) {
-                        return h + ':' + pad(m) + ':' + pad(s);
-                    }
-                    return m + ':' + pad(s);
-                }
-
-                function pintarLleva() {
-                    var ahora = Date.now();
-                    document.querySelectorAll('[data-lleva]').forEach(function (nodo) {
-                        var desde = Date.parse(nodo.dataset.lleva || '');
-                        if (!desde) {
-                            return;
-                        }
-                        nodo.textContent = lleva(ahora - desde);
-                    });
-                }
                 function tick(animar) {
                     document.querySelectorAll('.proceso').forEach(function (bloque) {
                         if (!bloque.dataset.hasta) {
@@ -128,10 +130,8 @@
                 }
 
                 window.sigteProceso = { marcar: marcar };
-                pintarLleva();
                 tick(true);
                 window.setInterval(function () {
-                    pintarLleva();
                     document.querySelectorAll('.proceso').forEach(function (bloque) {
                         if (!bloque.dataset.hasta) {
                             return;

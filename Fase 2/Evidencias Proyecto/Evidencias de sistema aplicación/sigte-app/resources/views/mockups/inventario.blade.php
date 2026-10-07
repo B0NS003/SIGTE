@@ -3,6 +3,10 @@
 @section('title', 'SIGTE — Inventario')
 
 @section('content')
+@php
+    $conteoSalas = collect($libros)->keyBy('clave');
+    $totalElementos = collect($libros)->sum('tipos');
+@endphp
 <div class="shell shell-ops">
     <aside class="sidebar">
         <div class="logo-wrap">
@@ -12,7 +16,7 @@
                 <div class="logo-sub">Operación</div>
             </div>
         </div>
-                @include('partials.menu-rol')
+        @include('partials.menu-rol')
 
         <div class="sidebar-foot">
             <div class="side-user">
@@ -34,16 +38,33 @@
                 <p class="main-sub">Cada sala tiene su libro. El conjunto muestra cómo están las tres.</p>
             </div>
             <div class="main-actions">
-                <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">Ver catálogo</a>
+                <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                        <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                    </svg>
+                    Ver catálogo
+                </a>
             </div>
         </div>
 
-        <div class="sala-tabs">
-            <a class="sala-tab sala-todos {{ $sala === 'todos' ? 'active' : '' }}"
-               href="{{ route('mockups.inventario', ['sala' => 'todos']) }}">Los tres</a>
+        <p class="ops-filter-label">
+            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4.5 6.5h15l-5.6 6.6V18l-3.8 1.8v-6.7L4.5 6.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+            </svg>
+            Filtrar por sala
+        </p>
+        <div class="ops-filters sala-tabs" aria-label="Filtrar por sala">
+            <a class="ops-filter sala-tab sala-todos {{ $sala === 'todos' ? 'is-active active' : '' }}"
+               href="{{ route('mockups.inventario', ['sala' => 'todos']) }}">
+                Los tres <em>{{ $totalElementos }}</em>
+            </a>
             @foreach ($salas as $key => $label)
-                <a class="sala-tab sala-{{ $key }} {{ $sala === $key ? 'active' : '' }}"
-                   href="{{ route('mockups.inventario', ['sala' => $key]) }}">{{ $label }}</a>
+                <a class="ops-filter sala-tab sala-{{ $key }} {{ $sala === $key ? 'is-active active' : '' }}"
+                   href="{{ route('mockups.inventario', ['sala' => $key]) }}">
+                    <span class="sala-dot" aria-hidden="true"></span>
+                    {{ $label }} <em>{{ $conteoSalas[$key]['tipos'] ?? 0 }}</em>
+                </a>
             @endforeach
         </div>
 
@@ -63,10 +84,17 @@
                 @endforeach
             </div>
 
-            <section class="panel">
+            <section class="panel inv-mira">
                 <div class="panel-head">
-                    <h2>Para mirar ahora</h2>
-                    <span class="badge">{{ count($atencion) }}</span>
+                    <h2 class="inv-titulo">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 4.5 20.5 19.5h-17L12 4.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                            <path d="M12 10v4.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                            <path d="M12 17.2h.01" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"/>
+                        </svg>
+                        Para mirar ahora
+                    </h2>
+                    <span class="badge badge-urgent">{{ count($atencion) }}</span>
                 </div>
                 @if ($atencion === [])
                     <p class="recv-help">Ningún elemento está bajo el mínimo.</p>
@@ -109,7 +137,13 @@
 
         <section class="panel list inv-book sala-{{ $sala }}">
             <div class="panel-head">
-                <h2>Libro · {{ $salas[$sala] }}</h2>
+                <h2 class="inv-titulo">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                        <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                    </svg>
+                    Libro · {{ $salas[$sala] }}
+                </h2>
                 <span class="badge badge-sala badge-{{ $sala }}">{{ $salas[$sala] }}</span>
             </div>
             <div class="table-wrap">
@@ -136,7 +170,12 @@
                                 <td>{{ $item['en_proceso'] }}</td>
                                 <td>
                                     @if ($item['estado'] === 'ok')
-                                        <span class="pill pill-ok">OK</span>
+                                        <span class="pill pill-ok">
+                                            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            OK
+                                        </span>
                                     @elseif ($item['estado'] === 'bajo')
                                         <span class="pill pill-warn">Bajo mínimo</span>
                                     @else
@@ -153,7 +192,12 @@
         <form class="recv-form panel entrega-panel inv-mov sala-{{ $sala }}" action="{{ route('mockups.inventario') }}" method="get" onsubmit="return false">
             <div class="entrega-cuerpo">
                 <section>
-                    <h2>Registrar reposición</h2>
+                    <h2 class="inv-titulo">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                        </svg>
+                        Registrar reposición
+                    </h2>
                     <label class="field-label" for="elemento">Elemento de {{ $salas[$sala] }}</label>
                     <label class="field field-select">
                         <select id="elemento" name="elemento">
@@ -174,7 +218,13 @@
                 </section>
 
                 <section>
-                    <h2>Quién y cuándo</h2>
+                    <h2 class="inv-titulo">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.75"/>
+                            <path d="M5.5 18.5c1.4-2.8 3.7-4.2 6.5-4.2s5.1 1.4 6.5 4.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                        </svg>
+                        Quién y cuándo
+                    </h2>
                     <div class="entrega-datos">
                         <div class="entrega-dato entrega-dato-ancho">
                             <span>Quién repone</span>
@@ -190,7 +240,12 @@
                         </div>
                     </div>
                     <p class="auth-error act-aviso" id="inv-aviso" role="alert" hidden></p>
-                    <button class="btn btn-primary" id="inv-anotar" type="button" style="width:auto; min-width:12rem;">Registrar reposición</button>
+                    <button class="btn btn-primary" id="inv-anotar" type="button" style="width:auto; min-width:12rem;">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Registrar reposición
+                    </button>
                 </section>
             </div>
 

@@ -36,7 +36,12 @@
                 @endif
             </div>
             <div class="main-actions">
-                <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">Volver al catálogo</a>
+                <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Volver al catálogo
+                </a>
             </div>
         </div>
 

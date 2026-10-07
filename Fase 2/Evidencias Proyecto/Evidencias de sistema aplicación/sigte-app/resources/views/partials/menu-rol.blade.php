@@ -4,7 +4,8 @@
     <nav class="nav">
         @foreach ($grupo['enlaces'] as $enlace)
             <a href="{{ $enlace['url'] }}" @class(['active' => $enlace['activo']])>
-                {{ $enlace['texto'] }}
+                @include('partials.nav-icon', ['icono' => $enlace['icono']])
+                <span class="nav-texto">{{ $enlace['texto'] }}</span>
                 @if ($enlace['badge'])
                     <span class="nav-badge">{{ $enlace['badge'] }}</span>
                 @endif

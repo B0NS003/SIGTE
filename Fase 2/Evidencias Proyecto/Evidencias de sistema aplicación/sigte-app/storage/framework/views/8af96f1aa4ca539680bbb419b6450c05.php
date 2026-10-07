@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'SIGTE')</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo $__env->yieldContent('title', 'SIGTE'); ?></title>
     <script>
         (function () {
             try {
@@ -20,8 +20,8 @@
             } catch (error) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/sigte.css') }}?v={{ @filemtime(public_path('css/sigte.css')) }}">
-    @stack('styles')
+    <link rel="stylesheet" href="<?php echo e(asset('css/sigte.css')); ?>?v=<?php echo e(@filemtime(public_path('css/sigte.css'))); ?>">
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
     <div id="sigte-carga" class="sigte-carga" role="status" aria-live="polite" aria-busy="false" hidden>
@@ -34,7 +34,7 @@
                     </svg>
                     <img
                         class="sigte-carga-logo"
-                        src="{{ asset('images/logo-hospital-circular.png') }}"
+                        src="<?php echo e(asset('images/logo-hospital-circular.png')); ?>"
                         alt=""
                         width="64"
                         height="64"
@@ -54,9 +54,9 @@
         </div>
     </div>
 
-    @yield('content')
-    @stack('scripts')
-    <script src="{{ asset('js/anime.min.js') }}"></script>
+    <?php echo $__env->yieldContent('content'); ?>
+    <?php echo $__env->yieldPushContent('scripts'); ?>
+    <script src="<?php echo e(asset('js/anime.min.js')); ?>"></script>
     <script>
         (function () {
             var capa = document.getElementById('sigte-carga');
@@ -255,3 +255,4 @@
     </script>
 </body>
 </html>
+<?php /**PATH /var/www/html/resources/views/layouts/app.blade.php ENDPATH**/ ?>

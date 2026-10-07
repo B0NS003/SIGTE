@@ -22,6 +22,7 @@ class Caja extends Model
         'etapa',
         'ubicacion',
         'estado',
+        'actividad',
         'urgente',
         'responsable_id',
         'etapa_desde',
@@ -47,6 +48,21 @@ class Caja extends Model
     public function anotaciones(): HasMany
     {
         return $this->hasMany(CajaAnotacion::class);
+    }
+
+    public function retrocesos(): HasMany
+    {
+        return $this->hasMany(CajaRetroceso::class);
+    }
+
+    /** Un paso atrás, y solo antes de que el material entre a esterilización. */
+    public function etapaAnteriorPermitida(): ?string
+    {
+        return match (trim((string) $this->etapa)) {
+            self::ETAPA_LAVADO => self::ETAPA_RECEPCION,
+            self::ETAPA_PREPARACION => self::ETAPA_LAVADO,
+            default => null,
+        };
     }
 
     /** @return list<string> */
@@ -76,7 +92,7 @@ class Caja extends Model
 
     public function indiceEtapa(): int
     {
-        $indice = array_search($this->etapa, self::etapas(), true);
+        $indice = array_search(trim($this->etapa), self::etapas(), true);
 
         return $indice === false ? 0 : $indice;
     }

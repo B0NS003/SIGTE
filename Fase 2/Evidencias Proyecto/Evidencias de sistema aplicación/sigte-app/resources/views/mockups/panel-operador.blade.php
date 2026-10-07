@@ -48,21 +48,34 @@
                 <h1>Flujo de cajas</h1>
             </div>
             <div class="main-actions">
-                <a class="btn btn-dark" href="{{ route('mockups.recepcion') }}">+ Nueva recepción</a>
+                <a class="btn btn-dark" href="{{ route('mockups.recepcion') }}">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 13.2V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-4.8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                        <path d="M4 13.2 6.3 7.2A1.6 1.6 0 0 1 7.8 6.2h8.4a1.6 1.6 0 0 1 1.5 1l2.3 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                        <path d="M4 13.2h4.1a2 2 0 0 0 1.9 1.3h4a2 2 0 0 0 1.9-1.3H20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                    </svg>
+                    Nueva recepción
+                </a>
             </div>
         </div>
 
         <form class="ops-consulta" method="get" action="{{ route('mockups.panel', 'operador') }}" role="search">
             <div class="ops-search">
                 <label class="sr-only" for="busqueda-caja">Buscar caja quirúrgica</label>
-                <input
-                    id="busqueda-caja"
-                    type="search"
-                    name="q"
-                    value="{{ $busqueda }}"
-                    placeholder="Buscar por código, servicio, ubicación o responsable…"
-                    autocomplete="off"
-                >
+                <div class="ops-search-field">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="6.25" fill="none" stroke="currentColor" stroke-width="1.75"/>
+                        <path d="M16 16.5 20 20.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                    </svg>
+                    <input
+                        id="busqueda-caja"
+                        type="search"
+                        name="q"
+                        value="{{ $busqueda }}"
+                        placeholder="Buscar por código, servicio, ubicación o responsable…"
+                        autocomplete="off"
+                    >
+                </div>
                 @if ($etapa_filtro !== null)
                     <input type="hidden" name="etapa" value="{{ $etapa_filtro }}">
                 @endif
@@ -73,6 +86,12 @@
             </div>
         </form>
 
+        <p class="ops-filter-label">
+            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4.5 6.5h15l-5.6 6.6V18l-3.8 1.8v-6.7L4.5 6.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+            </svg>
+            Filtrar por etapa
+        </p>
         <div class="ops-filters" aria-label="Filtrar por etapa">
             <a
                 class="ops-filter {{ $etapa_filtro === null ? 'is-active' : '' }}"

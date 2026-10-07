@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class MockupController extends Controller
@@ -42,6 +43,7 @@ class MockupController extends Controller
                     'servicio' => $caja->servicio,
                     'fase_idx' => $caja->indiceEtapa(),
                     'estado' => $caja->estado ?? Caja::etiquetaEtapa($caja->etapa),
+                    'actividad' => $caja->actividad,
                     'ubicacion' => $caja->ubicacion ?? 'Sin ubicacion',
                     'operadora' => $caja->nombreResponsable(),
                     'fecha' => $caja->etapa_desde?->timezone('America/Santiago')->format('d/m/Y') ?? '—',
@@ -551,9 +553,11 @@ class MockupController extends Controller
             ),
             'panorama' => $this->panorama($consulta['cajas']),
             'falla_produccion' => $request->boolean('falla'),
-            'accion_modal' => in_array($request->query('accion'), ['etapa', 'actividad'], true)
-                ? 'etapa'
-                : null,
+            'accion_modal' => match ($request->query('accion')) {
+                'retroceso' => 'retroceso',
+                'etapa', 'actividad' => 'etapa',
+                default => null,
+            },
             'caja_modal' => trim((string) $request->query('caja', '')),
             'pasos_etapa' => $this->pasosPorEtapa(),
             'anotaciones_por_caja' => $rol === Rol::OPERADOR ? $this->anotacionesPorCaja() : [],
@@ -624,6 +628,7 @@ class MockupController extends Controller
 
         $caja->etapa = $siguiente;
         $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
+        $caja->actividad = null;
         $caja->etapa_desde = now();
         $caja->proceso_desde = null;
         $caja->proceso_hasta = null;
@@ -639,11 +644,81 @@ class MockupController extends Controller
             ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.');
     }
 
-    private function volverAlFlujo(Request $request, string $codigo, bool $conservarEtapa = true): RedirectResponse
+    /**
+     * HIU-EP2-003: un paso atrás, con motivo, solo desde lavado o preparación.
+     */
+    public function guardarRetroceso(Request $request): RedirectResponse
+    {
+        $codigo = trim((string) $request->input('caja', ''));
+        $motivo = trim((string) $request->input('motivo', ''));
+        $volver = $this->volverAlFlujo($request, $codigo, true, 'retroceso');
+
+        if ($codigo === '') {
+            return $volver->withErrors(['caja' => 'Elige la caja que vas a corregir.']);
+        }
+
+        $caja = Caja::query()->where('codigo', $codigo)->first();
+        if ($caja === null) {
+            return $volver->withErrors(['caja' => 'Esa caja no está en el flujo.']);
+        }
+
+        $anterior = $caja->etapaAnteriorPermitida();
+        $etiquetaActual = Caja::etiquetaEtapa(trim((string) $caja->etapa));
+
+        if ($anterior === null) {
+            return $volver->withErrors([
+                'etapa' => 'El retroceso no está permitido. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
+            ]);
+        }
+
+        if ($motivo === '') {
+            return $volver->withErrors([
+                'motivo' => 'Registra el motivo del retroceso.',
+            ]);
+        }
+
+        $motivo = mb_substr($motivo, 0, 180);
+        $etiquetaAnterior = Caja::etiquetaEtapa($anterior);
+
+        try {
+            DB::transaction(function () use ($caja, $anterior, $motivo): void {
+                $origen = trim((string) $caja->etapa);
+                $caja->etapa = $anterior;
+                $caja->estado = 'En '.Caja::etiquetaEtapa($anterior);
+                $caja->actividad = null;
+                $caja->etapa_desde = now();
+                $caja->proceso_desde = null;
+                $caja->proceso_hasta = null;
+                $caja->responsable_id = Auth::id();
+                $caja->save();
+
+                $caja->retrocesos()->create([
+                    'user_id' => Auth::id(),
+                    'etapa_desde' => $origen,
+                    'etapa_hacia' => $anterior,
+                    'motivo' => $motivo,
+                ]);
+
+                $caja->anotaciones()->create([
+                    'user_id' => Auth::id(),
+                    'texto' => 'Volvió a '.Caja::etiquetaEtapa($anterior).'. '.$motivo,
+                ]);
+            });
+        } catch (\Throwable) {
+            return $volver->withErrors([
+                'etapa' => 'No fue posible completar el retroceso. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
+            ]);
+        }
+
+        return $this->volverAlFlujo($request, $caja->codigo, false, 'retroceso')
+            ->with('ok', 'Listo. '.$caja->codigo.' volvió a '.$etiquetaAnterior.'.');
+    }
+
+    private function volverAlFlujo(Request $request, string $codigo, bool $conservarEtapa = true, string $accion = 'etapa'): RedirectResponse
     {
         $params = [
             'rol' => Rol::OPERADOR,
-            'accion' => 'etapa',
+            'accion' => $accion,
         ];
 
         if ($codigo !== '') {
@@ -686,24 +761,58 @@ class MockupController extends Controller
             return response()->json(['mensaje' => 'Esa caja no está en el flujo.'], 422);
         }
 
-        if (! in_array($texto, $this->textosAnotables($caja->etapa), true)) {
+        $etapa = trim($caja->etapa);
+        $clave = trim((string) $request->input('clave', ''));
+        $detalle = trim((string) $request->input('detalle', ''));
+        $actividad = $texto;
+        $minutos = null;
+
+        if ($clave !== '') {
+            $definicion = $this->tiempoDeClave($etapa, $clave);
+            $minutos = filter_var($request->input('minutos'), FILTER_VALIDATE_INT);
+            if ($definicion === null) {
+                return response()->json(['mensaje' => 'Esa anotación no corresponde a esta etapa.'], 422);
+            }
+            if ($minutos === false || $minutos < 1 || $minutos > 1440) {
+                return response()->json(['mensaje' => 'Indica los minutos.'], 422);
+            }
+            $actividad = $definicion['etiqueta'];
+            $texto = $actividad.': '.$minutos.' min';
+        } elseif (! in_array($texto, $this->textosAnotables($etapa), true)) {
             return response()->json(['mensaje' => 'Esa anotación no corresponde a esta etapa.'], 422);
+        } else {
+            $complemento = $this->complementoDe($etapa, $texto);
+            if ($complemento !== null && $detalle === '') {
+                return response()->json(['mensaje' => $complemento['falta']], 422);
+            }
+            if ($detalle !== '') {
+                $texto = $actividad.'. '.mb_substr($detalle, 0, 120);
+            }
         }
 
-        $nota = $caja->anotaciones()->create([
-            'user_id' => Auth::id(),
-            'texto' => $texto,
-        ]);
+        try {
+            $nota = DB::transaction(function () use ($caja, $texto, $actividad, $minutos) {
+                $nota = $caja->anotaciones()->create([
+                    'user_id' => Auth::id(),
+                    'texto' => $texto,
+                ]);
+                $caja->actividad = mb_substr($actividad, 0, 80);
+                if ($minutos !== null) {
+                    $caja->sumarProceso((int) $minutos);
+                }
+                $caja->save();
+
+                return $nota;
+            });
+        } catch (\Throwable) {
+            return response()->json(['mensaje' => 'No fue posible completar el registro.'], 500);
+        }
+
         $nota->load('autor');
-
-        $minutos = $this->minutosDeTexto($caja->etapa, $texto);
-        if ($minutos !== null) {
-            $caja->sumarProceso($minutos);
-            $caja->save();
-        }
 
         return response()->json([
             'texto' => $nota->texto,
+            'actividad' => $caja->actividad,
             'cuando' => $nota->created_at->timezone('America/Santiago')->format('d/m/Y · H:i'),
             'quien' => $nota->autor?->name ?? '',
             'proceso_desde' => $caja->proceso_desde?->toIso8601String(),
@@ -743,21 +852,27 @@ class MockupController extends Controller
     {
         $paso = $this->pasosPorEtapa()[$etapa] ?? ['opciones' => [], 'tiempos' => []];
 
-        return array_merge(
-            $paso['opciones'],
-            array_column($paso['tiempos'], 'texto')
-        );
+        return $paso['opciones'];
     }
 
-    private function minutosDeTexto(string $etapa, string $texto): ?int
+    /** @return array{clave: string, etiqueta: string, sugerido: int|null}|null */
+    private function tiempoDeClave(string $etapa, string $clave): ?array
     {
         foreach ($this->pasosPorEtapa()[$etapa]['tiempos'] ?? [] as $tiempo) {
-            if ($tiempo['texto'] === $texto) {
-                return (int) $tiempo['minutos'];
+            if ($tiempo['clave'] === $clave) {
+                return $tiempo;
             }
         }
 
         return null;
+    }
+
+    /** @return array{etiqueta: string, falta: string, placeholder: string}|null */
+    private function complementoDe(string $etapa, string $texto): ?array
+    {
+        $complementos = $this->pasosPorEtapa()[$etapa]['complementos'] ?? [];
+
+        return $complementos[$texto] ?? null;
     }
 
     /**
@@ -770,18 +885,19 @@ class MockupController extends Controller
         return [
             Caja::ETAPA_RECEPCION => [
                 'tramo' => 'Recepción a lavado',
-                'resumen' => 'De dónde llega y si ya quedó en remojo.',
-                'ayuda' => 'Se anota de qué servicio llega y si ya quedó en remojo. En este paso no hay ciclo de máquina.',
-                'opciones' => ['Recepción del servicio', 'Remojo'],
+                'resumen' => 'El ingreso ya quedó en Nueva recepción.',
+                'ayuda' => 'Servicio, quién entrega y ficha se registran al recibir. Acá solo se confirma el paso a lavado.',
+                'opciones' => [],
                 'tiempos' => [],
             ],
             Caja::ETAPA_LAVADO => [
                 'tramo' => 'Lavado a preparación',
                 'resumen' => 'Lavado, secado y la hora de la lavadora.',
                 'ayuda' => 'La lavadora, en el ciclo estándar, se demora una hora. Si falla, ese tiempo se anota de nuevo.',
-                'opciones' => ['Lavado', 'Secado'],
+                'opciones' => [],
                 'tiempos' => [
-                    ['texto' => 'Ciclo de lavadora: 60 min', 'etiqueta' => 'Lavadora · 60 min', 'minutos' => 60],
+                    ['clave' => 'lavadora', 'etiqueta' => 'Lavadora', 'sugerido' => 60],
+                    ['clave' => 'secado', 'etiqueta' => 'Secado', 'sugerido' => null],
                 ],
             ],
             Caja::ETAPA_PREPARACION => [
@@ -796,18 +912,25 @@ class MockupController extends Controller
                 'resumen' => 'La carga, el voucher y la espera para abrir.',
                 'ayuda' => 'En el voucher van la temperatura, el tiempo y quién lo tiró. Se copia a mano. Antes de abrir la puerta se esperan 20 minutos.',
                 'opciones' => ['Carga del autoclave', 'Voucher de la carga'],
+                'complementos' => [
+                    'Voucher de la carga' => [
+                        'etiqueta' => 'Detalle del voucher',
+                        'falta' => 'Falta el detalle del voucher.',
+                        'placeholder' => 'Temperatura y tiempo del ciclo',
+                    ],
+                ],
                 'tiempos' => [
-                    ['texto' => 'Espera para abrir: 20 min', 'etiqueta' => 'Abrir puerta · 20 min', 'minutos' => 20],
+                    ['clave' => 'abrir', 'etiqueta' => 'Espera para abrir', 'sugerido' => 20],
                 ],
             ],
             Caja::ETAPA_ALMACEN => [
                 'tramo' => 'Almacén a entrega',
                 'resumen' => 'La descarga y cuánto se dejó enfriar.',
                 'ayuda' => 'Al descargar se espera que enfríe: media hora el material chico y una hora el contenedor.',
-                'opciones' => ['Descarga', 'Enfriamiento'],
+                'opciones' => ['Descarga'],
                 'tiempos' => [
-                    ['texto' => 'Enfriamiento material chico: 30 min', 'etiqueta' => 'Material chico · 30 min', 'minutos' => 30],
-                    ['texto' => 'Enfriamiento contenedor: 60 min', 'etiqueta' => 'Contenedor · 60 min', 'minutos' => 60],
+                    ['clave' => 'material_chico', 'etiqueta' => 'Material chico', 'sugerido' => 30],
+                    ['clave' => 'contenedor', 'etiqueta' => 'Contenedor', 'sugerido' => 60],
                 ],
             ],
             Caja::ETAPA_ENTREGA => [
@@ -845,11 +968,7 @@ class MockupController extends Controller
         $servicios = collect($items)->pluck('servicio')->unique()->sort()->values()->all();
         $needle = mb_strtolower($busqueda);
 
-        $filtrados = array_values(array_filter($items, function (array $item) use ($needle, $servicio): bool {
-            if ($servicio !== '' && $item['servicio'] !== $servicio) {
-                return false;
-            }
-
+        $porBusqueda = array_values(array_filter($items, function (array $item) use ($needle): bool {
             if ($needle === '') {
                 return true;
             }
@@ -859,6 +978,20 @@ class MockupController extends Controller
             return str_contains($texto, $needle);
         }));
 
+        $conteoServicios = [];
+        foreach ($porBusqueda as $item) {
+            $clave = $item['servicio'];
+            $conteoServicios[$clave] = ($conteoServicios[$clave] ?? 0) + 1;
+        }
+
+        $filtrados = $porBusqueda;
+        if ($servicio !== '') {
+            $filtrados = array_values(array_filter(
+                $porBusqueda,
+                fn (array $item) => $item['servicio'] === $servicio
+            ));
+        }
+
         $filtrados = array_map(fn (array $item) => $this->conEtapaActual($item), $filtrados);
 
         return view('mockups.catalogo', [
@@ -867,6 +1000,8 @@ class MockupController extends Controller
             'busqueda' => $busqueda,
             'servicio' => $servicio,
             'servicios' => $servicios,
+            'conteo_servicios' => $conteoServicios,
+            'total_servicios' => count($porBusqueda),
             'hay_filtros' => $busqueda !== '' || $servicio !== '',
         ]);
     }
