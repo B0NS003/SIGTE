@@ -142,8 +142,10 @@
                 @foreach ($cajas_por_etapa as $grupo)
                     <details class="ops-etapa" open>
                         <summary class="ops-etapa-head">
-                            <h2>{{ $grupo['nombre'] }}</h2>
-                            <span>{{ count($grupo['cajas']) }} {{ count($grupo['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
+                            <h2>
+                                {{ $grupo['nombre'] }}
+                                <span>{{ count($grupo['cajas']) }} {{ count($grupo['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
+                            </h2>
                         </summary>
                         <div class="ops-etapa-list">
                             @foreach ($grupo['cajas'] as $caja)

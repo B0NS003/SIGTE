@@ -69,20 +69,16 @@
         </div>
     </header>
 
-    <div class="track-pipe" aria-label="Etapa actual: {{ $etapaActual }}">
-            @foreach ($fases as $i => $fase)
-                @php
-                    $done = $i < $caja['fase_idx'];
-                    $current = $i === $caja['fase_idx'];
-                @endphp
-                <div class="track-step {{ $done ? 'done' : '' }} {{ $current ? 'current' : '' }}">
-                    <div class="track-node"></div>
-                    <div class="track-label">{{ $fase }}</div>
-                </div>
-                @if (! $loop->last)
-                    <div class="track-line {{ $i < $caja['fase_idx'] ? 'done' : '' }}"></div>
-                @endif
-            @endforeach
+    <div class="track-pipe track-pipe-mini" aria-label="Etapa actual: {{ $etapaActual }}">
+        @foreach ($fases as $i => $fase)
+            <div class="track-step {{ $i < $caja['fase_idx'] ? 'done' : '' }} {{ $i === $caja['fase_idx'] ? 'current' : '' }}">
+                <div class="track-node"></div>
+                <div class="track-label">{{ $fase }}</div>
+            </div>
+            @if (! $loop->last)
+                <div class="track-line {{ $i < $caja['fase_idx'] ? 'done' : '' }}"></div>
+            @endif
+        @endforeach
     </div>
 
     <div
@@ -95,31 +91,10 @@
         <p class="proceso-texto">{{ ! empty($caja['proceso_listo']) ? 'Listo para pasar' : 'En curso' }}</p>
     </div>
 
+    <div class="track-pie">
     <details class="track-more">
         <summary>
             <span class="track-summary-label">Más información</span>
-            @if (($usuario['rol'] ?? '') === 'Operadora')
-                <span class="track-card-actions" onclick="event.stopPropagation()">
-                    @if ($volverNombre !== '')
-                        <button class="btn btn-ghost btn-corregir" type="button" data-abrir="retroceso" data-caja="{{ $caja['id'] }}" data-volver="{{ $volverNombre }}">
-                            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Corregir etapa
-                        </button>
-                    @endif
-                    @if ($destinoNombre !== '')
-                        <button class="btn btn-dark" type="button" data-abrir="etapa" data-caja="{{ $caja['id'] }}">
-                            Pasar de etapa
-                            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    @else
-                        <a class="btn btn-dark" href="{{ route('mockups.entrega', ['caja' => $caja['id']]) }}">Registrar entrega</a>
-                    @endif
-                </span>
-            @endif
         </summary>
 
             <dl class="track-facts">
@@ -145,5 +120,28 @@
                 </div>
             </dl>
     </details>
+    @if (($usuario['rol'] ?? '') === 'Operadora')
+        <div class="track-card-actions">
+            @if ($volverNombre !== '')
+                <button class="btn btn-ghost btn-corregir" type="button" data-abrir="retroceso" data-caja="{{ $caja['id'] }}" data-volver="{{ $volverNombre }}">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Corregir etapa
+                </button>
+            @endif
+            @if ($destinoNombre !== '')
+                <button class="btn btn-dark" type="button" data-abrir="etapa" data-caja="{{ $caja['id'] }}">
+                    Pasar de etapa
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            @else
+                <a class="btn btn-dark" href="{{ route('mockups.entrega', ['caja' => $caja['id']]) }}">Registrar entrega</a>
+            @endif
+        </div>
+    @endif
+    </div>
 </article>
 @include('mockups.partials.track-anim')
