@@ -21,6 +21,7 @@ class AccesoPorRol
         'mockups.anotar' => [Rol::OPERADOR],
         'mockups.actividad' => [Rol::OPERADOR],
         'mockups.entrega' => [Rol::OPERADOR],
+        'mockups.entrega.registrar' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],

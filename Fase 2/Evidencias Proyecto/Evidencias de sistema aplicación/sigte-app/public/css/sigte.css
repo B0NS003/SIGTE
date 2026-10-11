@@ -2547,3 +2547,106 @@ button.prod-col.is-late.is-open { outline-color: var(--alerta); }
     transform: none;
   }
 }
+
+
+
+/* ==========================================
+   VISTA ENTREGA - CAMPOS OBLIGATORIOS
+   ========================================== */
+
+.entrega-panel .entrega-obligatorio {
+    color: #dc2626 !important;
+    font-weight: 800;
+    font-size: 16px;
+    margin-left: 3px;
+}
+
+/* Errores debajo de cada campo */
+.entrega-panel .entrega-error-campo {
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 6px 0 14px;
+}
+
+/* Borde rojo en campos incorrectos */
+.entrega-panel .entrega-campo-invalido {
+    border: 1.5px solid #dc2626 !important;
+    background-color: #fffafa;
+}
+
+/* Grupo de cajas con error */
+.entrega-panel .entrega-cajas-error {
+    border: 1.5px solid #dc2626;
+    background-color: #fffafa;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* Mensaje al lado del botón */
+.entrega-panel .entrega-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.entrega-panel .entrega-estado {
+    flex: 1;
+    min-width: 220px;
+}
+
+.entrega-panel .entrega-mensaje {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.entrega-panel .entrega-mensaje-icono {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    font-weight: bold;
+}
+
+.entrega-panel .entrega-mensaje strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.entrega-panel .entrega-mensaje p {
+    margin: 0;
+}
+
+/* Mensaje de error */
+.entrega-panel .entrega-mensaje-error {
+    background: #fff1f0;
+    border: 1px solid #f3b5ae;
+    color: #9f3027;
+}
+
+.entrega-panel .entrega-mensaje-error .entrega-mensaje-icono {
+    background: #dc2626;
+    color: white;
+}
+
+/* Mensaje de éxito */
+.entrega-panel .entrega-mensaje-exito {
+    background: #ecfdf3;
+    border: 1px solid #a7dfbc;
+    color: #166534;
+}
+
+.entrega-panel .entrega-mensaje-exito .entrega-mensaje-icono {
+    background: #16a34a;
+    color: white;
+}

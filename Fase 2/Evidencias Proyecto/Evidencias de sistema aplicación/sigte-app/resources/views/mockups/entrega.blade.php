@@ -55,14 +55,14 @@
                         </svg>
                         Qué sale
                     </h2>
-                    <p class="field-label">Cajas en almacén</p>
+                    <p class="field-label"> Cajas listas para entrega <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></p>
                     @if ($listas === [])
-                    <p class="recv-help">No hay cajas en almacén.</p>
+                    <p class="recv-help">No hay listas para entregar.</p>
                     @else
-                    <div class="entrega-opciones">
+                    <div class="entrega-opciones @error('cajas') entrega-cajas-error @enderror">
                         @foreach (collect($listas)->sortBy('servicio') as $c)
                         <label class="check">
-                            <input type="checkbox" name="cajas[]" value="{{ $c['id'] }}" @checked($caja && $c['id']===$caja['id'])>
+                            <input type="checkbox" name="cajas[]" value="{{ $c['id'] }}" @checked(in_array($c['id'], old('cajas', $caja ? [$caja['id']] : [])))>
                             <span>{{ $c['servicio'] }} · {{ $c['id'] }}@if ($c['urgente']) · requiere atención @endif</span>
                         </label>
                         @endforeach
@@ -70,11 +70,11 @@
                     @endif
 
                     @error('cajas')
-                    <p class="recv-help">{{ $message }}</p>
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
 
                     @error('cajas.*')
-                    <p class="recv-help">{{ $message }}</p>
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
 
                     <label class="field-label" for="material">Material que no es caja</label>
@@ -92,10 +92,10 @@
                     </label>
 
                     @error('material')
-                    <p class="recv-help">{{ $message }}</p>
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
 
-                    <div id="otro-wrap" hidden>
+                    <div id="otro-wrap" @if(old('material') !== 'otro') hidden @endif>
                         <label class="field-label" for="otro">Cuál</label>
                         <label class="field">
                             <input id="otro" name="otro" type="text" placeholder="Nombre del material" value="{{ old('otro') }}">
@@ -103,7 +103,7 @@
                     </div>
 
                     @error('otro')
-                    <p class="recv-help">{{ $message }}</p>
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
 
                 </section>
@@ -131,8 +131,8 @@
                         </div>
                     </div>
 
-                    <label class="field-label" for="servicio">Servicio que lo recibe</label>
-                    <label class="field field-select">
+                    <label class="field-label" for="servicio">Servicio que lo recibe <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></label>
+                    <label class="field field-select @error('servicio') entrega-campo-invalido @enderror">
                         <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M4.5 19.5v-9.2L12 4.8l7.5 5.5v9.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
                             <path d="M9.5 19.5v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
@@ -140,17 +140,17 @@
                         <select id="servicio" name="servicio">
                             <option value="">Elige el servicio</option>
                             @foreach ($servicios as $s)
-                            <option value="{{ $s }}" @selected($caja && $s===$caja['servicio'])>{{ $s }}</option>
+                            <option value="{{ $s }}" @selected(old('servicio', $caja['servicio'] ?? '') === $s)>{{ $s }}</option>
                             @endforeach
                         </select>
                     </label>
 
                     @error('servicio')
-                    <p class="recv-help">{{ $message }}</p>
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
 
-                    <label class="field-label" for="retira">Quién retira en el servicio</label>
-                    <label class="field">
+                    <label class="field-label" for="retira">Quién retira en el servicio <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></label>
+                    <label class="field @error('retira') entrega-campo-invalido @enderror">
                         <span class="icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <circle cx="12" cy="8" r="3.5" />
@@ -161,7 +161,7 @@
                     </label>
 
                     @error('retira')
-                    <p class="recv-help">{{ $message }}</p>
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
 
                 </section>
@@ -179,10 +179,23 @@
             </details>
 
             @error('obs')
-            <p class="recv-help">{{ $message }}</p>
+            <p class="entrega-error-campo" role="alert">{{ $message }}</p>
             @enderror
 
-            <div class="recv-actions">
+            <div class="recv-actions entrega-acciones">
+                <div class="entrega-estado" aria-live="polite">
+                    @if ($errors->any())
+                        <div class="entrega-mensaje entrega-mensaje-error" role="alert">
+                            <span class="entrega-mensaje-icono" aria-hidden="true">!</span>
+                            <div><strong>No se pudo validar la entrega</strong><p>Revisa los campos señalados en rojo.</p></div>
+                        </div>
+                    @elseif (session('ok'))
+                        <div class="entrega-mensaje entrega-mensaje-exito" role="status">
+                            <span class="entrega-mensaje-icono" aria-hidden="true">✓</span>
+                            <div><strong>Datos validados correctamente</strong><p>{{ session('ok') }}</p></div>
+                        </div>
+                    @endif
+                </div>
                 <button class="btn btn-primary" type="submit" style="width:auto; min-width:12rem;">
                     <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
@@ -191,20 +204,7 @@
                 </button>
             </div>
         </form>
-        @if (session('ok'))
-        <p class="recv-help">{{ session('ok') }}</p>
-        @endif
-
-        @if ($errors->any())
-        <div class="recv-help" role="alert">
-            <p>Revisa los datos ingresados:</p>
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
     </main>
 </div>
+
 @endsection

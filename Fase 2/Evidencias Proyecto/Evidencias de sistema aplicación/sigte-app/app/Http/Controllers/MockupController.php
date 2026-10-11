@@ -60,67 +60,40 @@ class MockupController extends Controller
 
      */
 
+
     private function cajas(): array
-
     {
-
         return Caja::query()
-
             ->with('responsable')
-
+            ->whereNull('entregado_at')
             ->orderByDesc('urgente')
-
             ->orderBy('etapa_desde')
-
             ->get()
-
             ->map(function (Caja $caja) {
-
                 return [
-
                     'id' => $caja->codigo,
-
                     'servicio' => $caja->servicio,
-
                     'fase_idx' => $caja->indiceEtapa(),
-
                     'estado' => $caja->estado ?? Caja::etiquetaEtapa($caja->etapa),
-
                     'actividad' => $caja->actividad,
-
                     'ubicacion' => $caja->ubicacion ?? 'Sin ubicacion',
-
                     'operadora' => $caja->nombreResponsable(),
-
                     'fecha' => $caja->etapa_desde?->timezone('America/Santiago')->format('d/m/Y') ?? '—',
-
                     'hora' => $caja->etapa_desde?->timezone('America/Santiago')->format('H:i') ?? '—',
-
                     'tiempo' => $caja->tiempoEnEtapa(),
-
                     'etapa_iso' => $caja->etapa_desde?->toIso8601String(),
-
                     'minutos' => $caja->etapa_desde === null
-
                         ? null
-
                         : (int) abs($caja->etapa_desde->diffInMinutes(now())),
-
                     'urgente' => $caja->urgente,
-
                     'proceso_desde' => $caja->proceso_desde?->toIso8601String(),
-
                     'proceso_hasta' => $caja->proceso_hasta?->toIso8601String(),
-
                     'proceso_listo' => $caja->procesoListo(),
-
                 ];
-
             })
-
             ->all();
-
     }
+
 
 
 
@@ -1886,83 +1859,125 @@ class MockupController extends Controller
 
 
 
+
     public function entrega(Request $request): View
-
     {
-
-        $listas = collect($this->cajas())->where('fase_idx', 4)->values()->all();
+        $listas = collect($this->cajas())
+            ->filter(fn (array $c) => (int) $c['fase_idx'] === 5)
+            ->values()
+            ->all();
 
         $marcada = trim((string) $request->query('caja', ''));
 
         $caja = collect($listas)->firstWhere('id', $marcada);
 
-
-
         return view('mockups.entrega', [
-
             'usuario' => $this->usuarioSesion(),
-
             'listas' => $listas,
-
             'caja' => $caja,
-
-            'servicios' => ['Pabellon', 'Urgencia', 'Maternidad', 'UCI', 'Curaciones', 'Otro servicio'],
-
-            'materiales' => ['Paquete de ropa', 'Material de curación', 'Instrumental suelto'],
-
+            'servicios' => [
+                'Pabellon',
+                'Urgencia',
+                'Maternidad',
+                'UCI',
+                'Curaciones',
+                'Otro servicio',
+            ],
+            'materiales' => [
+                'Paquete de ropa',
+                'Material de curación',
+                'Instrumental suelto',
+            ],
             'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
-
             'hora' => now()->timezone('America/Santiago')->format('H:i'),
-
         ]);
-
     }
+
+
 
     public function registrarEntrega(Request $request): RedirectResponse
     {
-        $datos = $request->validate([
-            'servicio' => ['required', 'string', 'in:Pabellon,Urgencia,Maternidad,UCI,Curaciones,Otro servicio'],
-            'retira' => ['required', 'string', 'max:150'],
-            'cajas' => ['nullable', 'array'],
-            'cajas.*' => ['required', 'string', 'distinct'],
-            'material' => ['nullable', 'string', 'max:100'],
-            'otro' => ['nullable', 'string', 'max:150'],
-            'obs' => ['nullable', 'string', 'max:1000'],
-        ], [
-            'servicio.required' => 'Debes seleccionar el servicio que recibe la entrega.',
-            'servicio.in' => 'El servicio seleccionado no es válido.',
-            'retira.required' => 'Debes indicar quién recibe la entrega.',
-            'cajas.array' => 'La selección de cajas no es válida.',
-            'cajas.*.distinct' => 'No puedes seleccionar una misma caja más de una vez.',
-        ]);
+        $validador = \Illuminate\Support\Facades\Validator::make(
+            $request->all(),
+            [
+                'servicio' => ['required', 'string', 'in:Pabellon,Urgencia,Maternidad,UCI,Curaciones,Otro servicio'],
+                'retira' => ['required', 'string', 'max:150'],
+                'cajas' => ['nullable', 'array'],
+                'cajas.*' => ['required', 'string', 'distinct'],
+                'material' => ['nullable', 'string', 'max:100'],
+                'otro' => ['nullable', 'string', 'max:150'],
+                'obs' => ['nullable', 'string', 'max:1000'],
+            ],
+            [
+                'servicio.required' => 'Debes seleccionar el servicio que recibe la entrega.',
+                'servicio.in' => 'El servicio seleccionado no es válido.',
+                'retira.required' => 'Debes indicar quién recibe la entrega.',
+                'cajas.array' => 'La selección de cajas no es válida.',
+                'cajas.*.distinct' => 'No puedes seleccionar una misma caja más de una vez.',
+            ]
+        );
 
-        // Comprobar que se seleccione al menos una caja o un material.
-        $cajasSeleccionadas = $datos['cajas'] ?? [];
-        $material = $datos['material'] ?? '';
+        $validador->after(function ($validador) use ($request) {
+            $cajas = $request->input('cajas', []);
+            $material = $request->input('material', '');
 
-        if (empty($cajasSeleccionadas) && $material === '') {
-            return back()
-                ->withErrors([
-                    'cajas' => 'Selecciona al menos una caja o un material.',
-                    'material' => 'Selecciona al menos una caja o un material.',
-                ])
-                ->withInput();
-        }
+            if (
+                (!is_array($cajas) || count($cajas) === 0)
+                && ($material === null || $material === '')
+            ) {
+                $validador->errors()->add(
+                    'cajas',
+                    'Selecciona al menos una caja o un material.'
+                );
+            }
 
-        // Si se elige "Otro", el nombre del material es obligatorio.
-        if ($material === 'otro' && trim($datos['otro'] ?? '') === '') {
-            return back()
-                ->withErrors([
-                    'otro' => 'Indica cuál es el material que deseas entregar.',
-                ])
-                ->withInput();
+            if (
+                $material === 'otro'
+                && trim((string) $request->input('otro', '')) === ''
+            ) {
+                $validador->errors()->add(
+                    'otro',
+                    'Indica cuál es el material que deseas entregar.'
+                );
+            }
+        });
+
+        $datos = $validador->validate();
+
+        $codigos = $datos['cajas'] ?? [];
+
+        // Comprobar que todas las cajas seleccionadas estén listas para entrega.
+        if (!empty($codigos)) {
+            $cantidadDisponibles = Caja::query()
+                ->whereIn('codigo', $codigos)
+                ->where('etapa', 'entrega')
+                ->whereNull('entregado_at')
+                ->count();
+
+            if ($cantidadDisponibles !== count($codigos)) {
+                return back()
+                    ->withErrors([
+                        'cajas' => 'Una o más cajas ya no están disponibles para entrega. Actualiza el formulario.',
+                    ])
+                    ->withInput();
+            }
+
+            // Registrar la fecha y hora de entrega de las cajas.
+            Caja::query()
+                ->whereIn('codigo', $codigos)
+                ->where('etapa', 'entrega')
+                ->whereNull('entregado_at')
+                ->update([
+                    'entregado_at' => now(),
+                ]);
         }
 
         return back()->with(
             'ok',
-            'Los datos de la entrega son válidos.'
+            'La entrega se registró correctamente.'
         );
     }
+
 
     public function catalogo(Request $request): View
 
