@@ -146,6 +146,38 @@
                 </h2>
                 <span class="badge badge-sala badge-{{ $sala }}">{{ $salas[$sala] }}</span>
             </div>
+
+            {{-- Buscador de inventario --}}
+            <form method="GET"
+                  action="{{ route('mockups.inventario') }}"
+                  class="inv-busqueda"
+                  style="display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin:16px 0;">
+                <input type="hidden" name="sala" value="{{ $sala }}">
+
+                <div style="flex:1; min-width:220px;">
+                    <label for="busqueda-inventario" class="field-label">
+                        Buscar por código, nombre o ubicación
+                    </label>
+                    <input
+                        type="search"
+                        id="busqueda-inventario"
+                        name="q"
+                        value="{{ $busqueda ?? '' }}"
+                        placeholder="Ej.: DET-ENZ o detergente"
+                        style="width:100%;"
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary">Buscar</button>
+
+                @if (($busqueda ?? '') !== '')
+                    <a class="btn btn-ghost"
+                       href="{{ route('mockups.inventario', ['sala' => $sala]) }}">
+                        Limpiar búsqueda
+                    </a>
+                @endif
+            </form>
+
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -160,7 +192,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($items as $item)
+                        @forelse ($items as $item)
                             <tr class="stock-{{ $item['estado'] }}">
                                 <td><strong>{{ $item['codigo'] }}</strong></td>
                                 <td>{{ $item['nombre'] }}</td>
@@ -183,7 +215,13 @@
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    No se encontraron elementos que coincidan con tu búsqueda.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/operador/anotar', [MockupController::class, 'guardarAnotacion'])->name('mockups.anotar');
     Route::get('/operador/actividad', [MockupController::class, 'actividad'])->name('mockups.actividad');
     Route::get('/operador/entrega', [MockupController::class, 'entrega'])->name('mockups.entrega');
+    Route::post('/operador/entrega', [MockupController::class, 'registrarEntrega'])->name('mockups.entrega.registrar');
     Route::get('/consulta/catalogo', [MockupController::class, 'catalogo'])->name('mockups.catalogo');
     Route::get('/admin/catalogo', [MockupController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
     Route::get('/consulta/catalogo/{codigo}', [MockupController::class, 'ficha'])->name('mockups.ficha');
