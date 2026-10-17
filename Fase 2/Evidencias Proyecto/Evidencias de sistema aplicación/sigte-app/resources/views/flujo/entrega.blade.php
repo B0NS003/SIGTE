@@ -1,0 +1,213 @@
+@extends('layouts.app')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/flujo.css') }}?v={{ @filemtime(public_path('css/flujo.css')) }}">
+@endpush
+
+@section('title', 'SIGTE — Entrega')
+
+@section('content')
+<div class="shell shell-ops">
+    <aside class="sidebar">
+        <div class="logo-wrap">
+            <img src="{{ asset('images/logo-hospital-circular.png') }}" alt="Logo hospital">
+            <div>
+                <div class="logo">SIG<span>TE</span></div>
+                <div class="logo-sub">Operación</div>
+            </div>
+        </div>
+        @include('partials.menu-rol')
+
+        <div class="sidebar-foot">
+            <div class="side-user">
+                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
+                <div>
+                    <strong>{{ $usuario['nombre'] }}</strong>
+                    <small>{{ $usuario['rol'] }}</small>
+                </div>
+            </div>
+            @include('partials.logout')
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="main-top">
+            <div>
+                <p class="eyebrow">Almacén estéril · salida</p>
+                <h1>Entrega</h1>
+                <p class="main-sub">Marca las cajas que salen y anota quién las retira en el servicio. Tú quedas como quien entrega.</p>
+            </div>
+            <div class="main-actions">
+                <a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Volver al flujo
+                </a>
+            </div>
+        </div>
+
+        <form class="recv-form panel entrega-panel" action="{{ route('mockups.entrega.registrar') }}" method="POST">
+            @csrf
+            <div class="entrega-cuerpo">
+                <section>
+                    <h2 class="entrega-titulo">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 13.2V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-4.8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                            <path d="M4 13.2 6.3 7.2A1.6 1.6 0 0 1 7.8 6.2h8.4a1.6 1.6 0 0 1 1.5 1l2.3 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                            <path d="M4 13.2h4.1a2 2 0 0 0 1.9 1.3h4a2 2 0 0 0 1.9-1.3H20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                        </svg>
+                        Qué sale
+                    </h2>
+                    <p class="field-label"> Cajas listas para entrega <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></p>
+                    @if ($listas === [])
+                    <p class="recv-help">No hay listas para entregar.</p>
+                    @else
+                    <div class="entrega-opciones @error('cajas') entrega-cajas-error @enderror">
+                        @foreach (collect($listas)->sortBy('servicio') as $c)
+                        <label class="check">
+                            <input type="checkbox" name="cajas[]" value="{{ $c['id'] }}" @checked(in_array($c['id'], old('cajas', $caja ? [$caja['id']] : [])))>
+                            <span>{{ $c['servicio'] }} · {{ $c['id'] }}@if ($c['urgente']) · requiere atención @endif</span>
+                        </label>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    @error('cajas')
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+
+                    @error('cajas.*')
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+
+                    <label class="field-label" for="material">Material que no es caja</label>
+                    <label class="field field-select">
+                        <select id="material" name="material" onchange="document.getElementById('otro-wrap').hidden = this.value !== 'otro'">
+                            <option value="">Sin material extra</option>
+                            @foreach ($materiales as $material)
+                            <option value="{{ $material }}"
+                                @selected(old('material')===$material)>
+                                {{ $material }}
+                            </option>
+                            @endforeach
+                            <option value="otro" @selected(old('material')==='otro' )>Otro</option>
+                        </select>
+                    </label>
+
+                    @error('material')
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+
+                    <div id="otro-wrap" @if(old('material') !== 'otro') hidden @endif>
+                        <label class="field-label" for="otro">Cuál</label>
+                        <label class="field">
+                            <input id="otro" name="otro" type="text" placeholder="Nombre del material" value="{{ old('otro') }}">
+                        </label>
+                    </div>
+
+                    @error('otro')
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+
+                </section>
+
+                <section>
+                    <h2 class="entrega-titulo">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.75" />
+                            <path d="M5.5 18.5c1.4-2.8 3.7-4.2 6.5-4.2s5.1 1.4 6.5 4.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                        </svg>
+                        Quién y cuándo
+                    </h2>
+                    <div class="entrega-datos">
+                        <div class="entrega-dato entrega-dato-ancho">
+                            <span>Quién entrega</span>
+                            <strong>{{ $usuario['nombre'] }}</strong>
+                        </div>
+                        <div class="entrega-dato">
+                            <span>Fecha</span>
+                            <strong>{{ $fecha }}</strong>
+                        </div>
+                        <div class="entrega-dato">
+                            <span>Hora</span>
+                            <strong>{{ $hora }}</strong>
+                        </div>
+                    </div>
+
+                    <label class="field-label" for="servicio">Servicio que lo recibe <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></label>
+                    <label class="field field-select @error('servicio') entrega-campo-invalido @enderror">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4.5 19.5v-9.2L12 4.8l7.5 5.5v9.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                            <path d="M9.5 19.5v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                        </svg>
+                        <select id="servicio" name="servicio">
+                            <option value="">Elige el servicio</option>
+                            @foreach ($servicios as $s)
+                            <option value="{{ $s }}" @selected(old('servicio', $caja['servicio'] ?? '') === $s)>{{ $s }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+
+                    @error('servicio')
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+
+                    <label class="field-label" for="retira">Quién retira en el servicio <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></label>
+                    <label class="field @error('retira') entrega-campo-invalido @enderror">
+                        <span class="icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <circle cx="12" cy="8" r="3.5" />
+                                <path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19" />
+                            </svg>
+                        </span>
+                        <input id="retira" name="retira" type="text" placeholder="Nombre de quien retira" value="{{ old('retira') }}">
+                    </label>
+
+                    @error('retira')
+                    <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+
+                </section>
+            </div>
+
+            <details class="entrega-obs">
+                <summary>
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.2l-3.2-2H6.5A1.5 1.5 0 0 1 5 15.7V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                        <path d="M9 10h6M9 13.2h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                    </svg>
+                    Agregar observación
+                </summary>
+                <textarea id="obs" class="recv-textarea" name="obs" rows="2" placeholder="Empaque, indicador, faltante…">{{ old('obs') }}</textarea>
+            </details>
+
+            @error('obs')
+            <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+            @enderror
+
+            <div class="recv-actions entrega-acciones">
+                <div class="entrega-estado" aria-live="polite">
+                    @if ($errors->any())
+                        <div class="entrega-mensaje entrega-mensaje-error" role="alert">
+                            <span class="entrega-mensaje-icono" aria-hidden="true">!</span>
+                            <div><strong>No se pudo validar la entrega</strong><p>Revisa los campos señalados en rojo.</p></div>
+                        </div>
+                    @elseif (session('ok'))
+                        <div class="entrega-mensaje entrega-mensaje-exito" role="status">
+                            <span class="entrega-mensaje-icono" aria-hidden="true">✓</span>
+                            <div><strong>Datos validados correctamente</strong><p>{{ session('ok') }}</p></div>
+                        </div>
+                    @endif
+                </div>
+                <button class="btn btn-primary" type="submit" style="width:auto; min-width:12rem;">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Registrar entrega
+                </button>
+            </div>
+        </form>
+    </main>
+</div>
+
+@endsection

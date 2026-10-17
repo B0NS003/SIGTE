@@ -33,7 +33,7 @@ class SecretariaController extends Controller
             ->orderBy('servicio')
             ->get();
 
-        return view('mockups.secretaria.produccion', [
+        return view('secretaria.produccion', [
             'usuario' => $this->usuarioSesion(),
             'servicios' => ConsumoServicio::servicios(),
             'consumos' => $consumos,
@@ -107,7 +107,7 @@ class SecretariaController extends Controller
             ->limit(12)
             ->get();
 
-        return view('mockups.secretaria.insumos', [
+        return view('secretaria.insumos', [
             'usuario' => $this->usuarioSesion(),
             'insumos' => $insumos,
             'movimientos' => $movimientos,
@@ -170,7 +170,7 @@ class SecretariaController extends Controller
             ?? now()->startOfMonth()->toDateString();
         $filas = $this->filasReporte($periodo);
 
-        return view('mockups.secretaria.reportes', [
+        return view('secretaria.reportes', [
             'usuario' => $this->usuarioSesion(),
             'periodo' => Carbon::parse($periodo)->format('Y-m'),
             'periodo_etiqueta' => ConsumoServicio::etiquetaPeriodo($periodo),
