@@ -46,6 +46,8 @@
             </div>
         </div>
 
+        @include('flujo.partials.puesto')
+
         <form class="recv-form panel entrega-panel" action="{{ route('mockups.entrega.registrar') }}" method="POST">
             @csrf
             <div class="entrega-cuerpo">
@@ -122,7 +124,7 @@
                     <div class="entrega-datos">
                         <div class="entrega-dato entrega-dato-ancho">
                             <span>Quién entrega</span>
-                            <strong>{{ $usuario['nombre'] }}</strong>
+                            <strong>{{ $puesto?->name ?? 'Elige la cuenta del puesto' }}</strong>
                         </div>
                         <div class="entrega-dato">
                             <span>Fecha</span>

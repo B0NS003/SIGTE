@@ -806,6 +806,7 @@ button.side-logout {
 .rol-admin { background: #fff7ed; color: #c2410c; }
 .rol-enfermera { background: #fff1f2; color: #be123c; }
 .rol-operadora { background: #eff6ff; color: #1d4ed8; }
+.rol-secretaria { background: #f5f3ff; color: #6d28d9; }
 .user-actions { white-space: nowrap; display: flex; gap: 0.35rem; justify-content: flex-end; }
 .user-actions .btn { padding: 0.35rem 0.65rem; font-size: 0.78rem; min-height: 0; }
 .user-inactive { opacity: 0.72; }
@@ -976,6 +977,144 @@ button.side-logout {
     font-size: 16px;
     margin-left: 3px;
 }
+
+.sigte-error,
+.entrega-error-campo {
+    color: #dc2626;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: -0.55rem 0 0.75rem;
+}
+.field.is-invalido { margin-bottom: 0.35rem; }
+
+.btn-ver-clave {
+    display: grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+.btn-ver-clave:hover { color: var(--navy); }
+.btn-ver-clave .icono-ojo { transform-origin: center; overflow: visible; }
+.btn-ver-clave .pupila,
+.btn-ver-clave .cerrado {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.btn-ver-clave .pupila { opacity: 0; transform: scale(0.2); }
+.btn-ver-clave.is-abierto { color: var(--naranja); }
+.btn-ver-clave.is-abierto .pupila { opacity: 1; transform: scale(1); }
+.btn-ver-clave.is-abierto .cerrado { opacity: 0; }
+.btn-ver-clave.is-parpadeo .icono-ojo { animation: sigte-parpadeo 0.35s ease; }
+@keyframes sigte-parpadeo {
+    0% { transform: scaleY(1); }
+    40% { transform: scaleY(0.15); }
+    100% { transform: scaleY(1); }
+}
+.field.is-invalido,
+.sigte-lista.is-invalido .sigte-lista-boton {
+    color: inherit;
+}
+.field.is-invalido {
+    border-color: #dc2626 !important;
+    background: #fffafa;
+}
+
+.sigte-lista { position: relative; flex: 1 1 auto; min-width: 0; }
+.sigte-lista-nativa {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.sigte-lista-boton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--texto);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.sigte-lista-boton.is-vacio { color: var(--muted); }
+.sigte-lista-boton svg { width: 0.9rem; height: 0.9rem; flex: 0 0 auto; color: var(--navy); }
+.sigte-lista-panel {
+    position: fixed;
+    z-index: 40;
+    margin: 0;
+    padding: 0.35rem;
+    list-style: none;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(11, 31, 75, 0.14);
+    max-height: 18rem;
+    overflow: auto;
+}
+.sigte-lista-busca {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0 0 0.25rem;
+    padding: 0.15rem 0.15rem 0.4rem;
+    background: #fff;
+    list-style: none;
+}
+.sigte-lista-busca-input {
+    width: 100%;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.5rem 0.7rem;
+    font: inherit;
+    color: var(--navy);
+    background: #fff;
+}
+.sigte-lista-busca-input:focus {
+    outline: none;
+    border-color: #fdba74;
+    box-shadow: 0 0 0 3px rgba(232, 90, 28, 0.15);
+}
+.sigte-lista-vacio {
+    padding: 0.55rem 0.7rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+.sigte-lista-opcion[hidden] { display: none; }
+.sigte-lista-opcion[aria-disabled="true"] {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: default;
+}
+.sigte-lista-opcion {
+    padding: 0.55rem 0.7rem;
+    border-radius: 10px;
+    color: var(--navy);
+    cursor: pointer;
+}
+.sigte-lista-opcion:hover,
+.sigte-lista-opcion.is-activa {
+    background: #fff7ed;
+    color: #c2410c;
+}
+.sigte-lista-opcion[aria-disabled="true"] { color: var(--muted); cursor: default; }
 
 /* Errores debajo de cada campo */
 .entrega-panel .entrega-error-campo {

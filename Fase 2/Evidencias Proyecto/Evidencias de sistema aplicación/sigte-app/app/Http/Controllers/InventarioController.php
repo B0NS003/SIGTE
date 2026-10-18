@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ResuelveUsuario;
-use App\Models\Caja;
+use App\Models\ElementoInventario;
+use App\Models\Reposicion;
 use App\Models\Rol;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Throwable;
 
 class InventarioController extends Controller
 {
@@ -15,111 +19,20 @@ class InventarioController extends Controller
 
     private function inventarioItems(): array
     {
-        return [
-            // Sala lavado
-            [
-                'sala' => 'lavado',
-                'codigo' => 'DET-ENZ',
-                'nombre' => 'Detergente enzimatico',
-                'ubicacion' => 'Area sucia / remojo',
-                'stock' => 8,
-                'minimo' => 5,
-                'en_proceso' => 0,
-                'estado' => 'ok',
-            ],
-            [
-                'sala' => 'lavado',
-                'codigo' => 'EPP-KIT',
-                'nombre' => 'Kit EPP (pechera/gorro/guantes)',
-                'ubicacion' => 'Bodega area sucia',
-                'stock' => 22,
-                'minimo' => 15,
-                'en_proceso' => 0,
-                'estado' => 'ok',
-            ],
-            [
-                'sala' => 'lavado',
-                'codigo' => 'ESP-SEC',
-                'nombre' => 'Esponjas / material secado',
-                'ubicacion' => 'Puesto lavado',
-                'stock' => 4,
-                'minimo' => 6,
-                'en_proceso' => 0,
-                'estado' => 'bajo',
-            ],
-            // Sala armado
-            [
-                'sala' => 'armado',
-                'codigo' => 'WRAP-SMS',
-                'nombre' => 'Envoltorio SMS 60x60',
-                'ubicacion' => 'Mesas de armado',
-                'stock' => 35,
-                'minimo' => 25,
-                'en_proceso' => 0,
-                'estado' => 'ok',
-            ],
-            [
-                'sala' => 'armado',
-                'codigo' => 'IND-CLASE5',
-                'nombre' => 'Indicadores clase 5',
-                'ubicacion' => 'Estante armado',
-                'stock' => 12,
-                'minimo' => 20,
-                'en_proceso' => 0,
-                'estado' => 'bajo',
-            ],
-            [
-                'sala' => 'armado',
-                'codigo' => 'CNT-EST-01',
-                'nombre' => 'Contenedor rigido 1/1',
-                'ubicacion' => 'Area preparacion',
-                'stock' => 6,
-                'minimo' => 4,
-                'en_proceso' => 2,
-                'estado' => 'ok',
-            ],
-            // Material esteril
-            [
-                'sala' => 'esteril',
-                'codigo' => 'SET-LAP-01',
-                'nombre' => 'Set laparoscopia basico',
-                'ubicacion' => 'Almacen esteril A1',
-                'stock' => 4,
-                'minimo' => 3,
-                'en_proceso' => 2,
-                'estado' => 'ok',
-            ],
-            [
-                'sala' => 'esteril',
-                'codigo' => 'SET-CES-02',
-                'nombre' => 'Set cesarea',
-                'ubicacion' => 'Almacen esteril A2',
-                'stock' => 2,
-                'minimo' => 3,
-                'en_proceso' => 1,
-                'estado' => 'bajo',
-            ],
-            [
-                'sala' => 'esteril',
-                'codigo' => 'SET-UCI-03',
-                'nombre' => 'Set via aerea UCI',
-                'ubicacion' => 'Almacen esteril A3',
-                'stock' => 1,
-                'minimo' => 2,
-                'en_proceso' => 1,
-                'estado' => 'critico',
-            ],
-            [
-                'sala' => 'esteril',
-                'codigo' => 'CAJ-CUR-10',
-                'nombre' => 'Caja curacion general',
-                'ubicacion' => 'Almacen esteril B1',
-                'stock' => 8,
-                'minimo' => 5,
-                'en_proceso' => 3,
-                'estado' => 'ok',
-            ],
-        ];
+        return ElementoInventario::query()
+            ->orderBy('nombre')
+            ->get()
+            ->map(fn (ElementoInventario $elemento) => [
+                'sala' => $elemento->sala,
+                'codigo' => $elemento->codigo,
+                'nombre' => $elemento->nombre,
+                'ubicacion' => $elemento->ubicacion,
+                'stock' => $elemento->stock,
+                'minimo' => $elemento->minimo,
+                'en_proceso' => $elemento->en_proceso,
+                'estado' => $elemento->estadoStock(),
+            ])
+            ->all();
     }
     public function inventario(): View
     {
@@ -176,6 +89,9 @@ class InventarioController extends Controller
             'salas' => $salas,
             'libros' => $libros,
             'items' => $filtrados,
+            'elementos' => $sala === 'todos'
+                ? []
+                : collect($items)->where('sala', $sala)->values()->all(),
             'atencion' => $atencion,
             'resumen' => [
                 'tipos' => count($filtrados),
@@ -185,6 +101,81 @@ class InventarioController extends Controller
             ],
             'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
             'hora' => now()->timezone('America/Santiago')->format('H:i'),
+            'reposiciones' => $sala === 'todos'
+                ? collect()
+                : Reposicion::query()
+                    ->with(['elemento', 'autor'])
+                    ->whereHas('elemento', fn ($consulta) => $consulta->where('sala', $sala))
+                    ->latest()
+                    ->limit(8)
+                    ->get(),
         ]);
+    }
+
+    public function registrarReposicion(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'sala' => ['required', 'in:lavado,armado,esteril'],
+            'elemento' => ['required', 'string'],
+            'cantidad' => ['required', 'integer', 'min:1', 'max:9999'],
+        ], [
+            'sala.required' => 'Elige la sala del elemento.',
+            'sala.in' => 'Elige la sala del elemento.',
+            'elemento.required' => 'Elige el elemento que se repone.',
+            'cantidad.required' => 'Ingresa una cantidad válida.',
+            'cantidad.integer' => 'Ingresa una cantidad válida.',
+            'cantidad.min' => 'Ingresa una cantidad válida.',
+            'cantidad.max' => 'Ingresa una cantidad válida.',
+        ]);
+
+        $elemento = ElementoInventario::query()
+            ->where('sala', $datos['sala'])
+            ->where('codigo', $datos['elemento'])
+            ->first();
+
+        if ($elemento === null) {
+            return back()
+                ->withInput()
+                ->withErrors(['elemento' => 'Elige el elemento que se repone.']);
+        }
+
+        $teniaAlerta = $elemento->tieneAlertaStock();
+
+        try {
+            DB::transaction(function () use ($elemento, $datos) {
+                $bloqueado = ElementoInventario::query()->whereKey($elemento->id)->lockForUpdate()->first();
+                $bloqueado->stock += $datos['cantidad'];
+                $bloqueado->save();
+
+                Reposicion::query()->create([
+                    'elemento_inventario_id' => $bloqueado->id,
+                    'cantidad' => $datos['cantidad'],
+                    'user_id' => Auth::id(),
+                ]);
+            });
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'reposicion' => 'No fue posible registrar la reposición. La cantidad disponible no cambió.',
+                ]);
+        }
+
+        $elemento->refresh();
+        $mensaje = 'Reposición registrada. '.$elemento->nombre.' quedó en '.$elemento->stock.' unidades.';
+        if ($teniaAlerta && ! $elemento->tieneAlertaStock()) {
+            $mensaje .= ' La alerta de stock quedó desactivada.';
+        } elseif ($teniaAlerta) {
+            $mensaje .= ' Sigue bajo el mínimo ('.$elemento->minimo.').';
+        }
+
+        return redirect()
+            ->route('mockups.inventario', [
+                'sala' => $elemento->sala,
+                'elemento' => $elemento->codigo,
+            ])
+            ->with('ok', $mensaje);
     }
 }

@@ -253,6 +253,7 @@
             });
         })();
     </script>
+    <script src="<?php echo e(asset('js/sigte-controles.js')); ?>?v=<?php echo e(@filemtime(public_path('js/sigte-controles.js'))); ?>"></script>
 </body>
 </html>
 <?php /**PATH /var/www/html/resources/views/layouts/app.blade.php ENDPATH**/ ?>

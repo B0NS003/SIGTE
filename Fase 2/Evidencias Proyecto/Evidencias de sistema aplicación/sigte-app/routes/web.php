@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/operador/avanzar', [FlujoController::class, 'guardarAvance'])->name('mockups.avanzar.guardar');
         Route::post('/operador/retroceder', [FlujoController::class, 'guardarRetroceso'])->name('mockups.retroceder');
         Route::post('/operador/anotar', [FlujoController::class, 'guardarAnotacion'])->name('mockups.anotar');
+        Route::post('/operador/puesto', [FlujoController::class, 'elegirPuesto'])->name('mockups.puesto');
         Route::get('/operador/actividad', [FlujoController::class, 'actividad'])->name('mockups.actividad');
         Route::get('/operador/entrega', [FlujoController::class, 'entrega'])->name('mockups.entrega');
         Route::post('/operador/entrega', [FlujoController::class, 'registrarEntrega'])->name('mockups.entrega.registrar');
@@ -36,7 +37,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/catalogo', [CatalogoController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
         Route::get('/consulta/catalogo/{codigo}', [CatalogoController::class, 'ficha'])->name('mockups.ficha');
         Route::get('/consulta/inventario', [InventarioController::class, 'inventario'])->name('mockups.inventario');
+        Route::post('/consulta/inventario/reposicion', [InventarioController::class, 'registrarReposicion'])->name('mockups.inventario.reponer');
         Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('mockups.usuarios');
+        Route::get('/admin/turnos', [AdminController::class, 'turnos'])->name('mockups.turnos');
+        Route::post('/admin/turnos', [AdminController::class, 'asignarTurno'])->name('mockups.turnos.asignar');
+        Route::post('/admin/usuarios', [AdminController::class, 'guardarUsuario'])->name('mockups.usuarios.guardar');
+        Route::post('/admin/usuarios/{user}', [AdminController::class, 'actualizarUsuario'])->name('mockups.usuarios.actualizar');
+        Route::post('/admin/usuarios/{user}/estado', [AdminController::class, 'cambiarEstadoUsuario'])->name('mockups.usuarios.estado');
         Route::get('/admin/reportes', [AdminController::class, 'reportes'])->name('mockups.reportes');
         Route::get('/admin/entregas', [AdminController::class, 'historialEntregas'])->name('mockups.historial_entregas');
         Route::get('/admin/custodia', [AdminController::class, 'custodia'])->name('mockups.custodia');

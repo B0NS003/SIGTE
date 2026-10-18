@@ -253,5 +253,6 @@
             });
         })();
     </script>
+    <script src="{{ asset('js/sigte-controles.js') }}?v={{ @filemtime(public_path('js/sigte-controles.js')) }}"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\ElementoInventario;
 use App\Models\Rol;
 use App\Models\User;
 
@@ -19,6 +20,7 @@ class AccesoPorRol
         'mockups.avanzar.guardar' => [Rol::OPERADOR],
         'mockups.retroceder' => [Rol::OPERADOR],
         'mockups.anotar' => [Rol::OPERADOR],
+        'mockups.puesto' => [Rol::OPERADOR],
         'mockups.actividad' => [Rol::OPERADOR],
         'mockups.entrega' => [Rol::OPERADOR],
         'mockups.entrega.registrar' => [Rol::OPERADOR],
@@ -26,12 +28,18 @@ class AccesoPorRol
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.inventario.reponer' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],
         'mockups.historial_entregas' => [Rol::ADMINISTRADORA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
+        'mockups.turnos' => [Rol::ADMINISTRADORA],
+        'mockups.turnos.asignar' => [Rol::ADMINISTRADORA],
+        'mockups.usuarios.guardar' => [Rol::ADMINISTRADORA],
+        'mockups.usuarios.actualizar' => [Rol::ADMINISTRADORA],
+        'mockups.usuarios.estado' => [Rol::ADMINISTRADORA],
         'secretaria.produccion' => [Rol::SECRETARIA],
         'secretaria.produccion.guardar' => [Rol::SECRETARIA],
         'secretaria.insumos' => [Rol::SECRETARIA],
@@ -88,7 +96,9 @@ class AccesoPorRol
                 'url' => route($enlace['ruta'], $params),
                 'texto' => self::texto($enlace, $rol),
                 'activo' => self::activo($enlace, $rol),
-                'badge' => $enlace['badge'] ?? null,
+                'badge' => $enlace['ruta'] === 'mockups.alertas'
+                    ? self::badgeAlertas()
+                    : ($enlace['badge'] ?? null),
                 'icono' => $enlace['iconos'][$rol] ?? ($enlace['icono'] ?? 'inicio'),
             ];
         }
@@ -99,6 +109,15 @@ class AccesoPorRol
         }
 
         return $menu;
+    }
+
+    private static function badgeAlertas(): string
+    {
+        $inventario = ElementoInventario::query()->get()->filter(
+            fn (ElementoInventario $elemento) => $elemento->tieneAlertaStock()
+        )->count();
+
+        return (string) (3 + $inventario);
     }
 
     /**
@@ -210,6 +229,14 @@ class AccesoPorRol
                 'ruta' => 'mockups.usuarios',
                 'texto' => 'Usuarios',
                 'icono' => 'usuarios',
+                'params' => [],
+                'roles' => [Rol::ADMINISTRADORA],
+            ],
+            [
+                'grupo' => 'Gestión',
+                'ruta' => 'mockups.turnos',
+                'texto' => 'Turnos',
+                'icono' => 'turnos',
                 'params' => [],
                 'roles' => [Rol::ADMINISTRADORA],
             ],

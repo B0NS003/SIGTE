@@ -62,6 +62,8 @@
             </div>
         </div>
 
+        @include('flujo.partials.puesto')
+
         <form class="ops-consulta" method="get" action="{{ route('mockups.panel', 'operador') }}" role="search">
             <div class="ops-search">
                 <label class="sr-only" for="busqueda-caja">Buscar caja quirúrgica</label>

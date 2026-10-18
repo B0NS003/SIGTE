@@ -38,16 +38,16 @@
         <!-- Encabezado de la página -->
         <div class="main-top">
             <div>
-                <p class="eyebrow">Gestión · solo administradora</p>
+                <p class="eyebrow">Gestión de cuentas</p>
                 <h1>Usuarios</h1>
-                <p class="main-sub">La jefatura crea las cuentas, asigna el rol y puede desactivarlas. La enfermera y la operadora no entran aquí.</p>
+                <p class="main-sub">Crea las cuentas del servicio, asigna el rol y desactiva el acceso cuando ya no corresponda.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'administradora') }}">Volver al resumen</a>
             </div>
         </div>
 
-        <div class="kpi-row">
+        <div class="kpi-row users-kpis">
             <div class="kpi">
                 <div class="l">Total</div>
                 <div class="n">{{ $resumen['total'] }}</div>
@@ -75,205 +75,219 @@
                 <!-- Encabezado de la lista de usuarios -->
                 <div class="panel-head">
                     <h2>Cuentas</h2>
-                    <span class="badge">{{ count($usuarios) }}</span>
+                    <span class="badge">{{ $usuarios->total() }}</span>
                 </div>
+                <form class="users-filtros" method="get" action="{{ route('mockups.usuarios') }}">
+                    <label class="field">
+                        <span>Nombre o correo</span>
+                        <input type="search" name="q" value="{{ $filtros['q'] }}" placeholder="Buscar cuenta">
+                    </label>
+                    <label class="field">
+                        <span>Estado</span>
+                        <select name="estado">
+                            <option value="">Todos</option>
+                            <option value="activo" @selected($filtros['estado'] === 'activo')>Activo</option>
+                            <option value="inactivo" @selected($filtros['estado'] === 'inactivo')>Inactivo</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>Rol</span>
+                        <select name="rol">
+                            <option value="">Todos</option>
+                            @foreach ($roles as $rol)
+                                <option value="{{ $rol->id }}" @selected($filtros['rol'] === $rol->id)>{{ $rol->etiqueta() }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <div class="users-filtros-acciones">
+                        <button class="btn btn-dark" type="submit">Filtrar</button>
+                        @if ($filtros['q'] !== '' || $filtros['estado'] || $filtros['rol'])
+                            <a class="btn btn-ghost" href="{{ route('mockups.usuarios') }}">Limpiar</a>
+                        @endif
+                    </div>
+                </form>
                 <!-- Tabla de usuarios -->
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
+                                <th>Id</th>
                                 <th>Nombre</th>
                                 <th>Rol</th>
                                 <th>Estado</th>
-                                <th>Último acceso</th>
+                                <th>Creada</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Iteración sobre los usuarios -->
-                            @foreach ($usuarios as $u)
-                                <tr class="{{ $u['estado'] === 'inactivo' ? 'user-inactive' : '' }}" data-estado="{{ $u['estado'] }}">
+                            @forelse ($usuarios as $cuenta)
+                                <tr class="{{ $cuenta->activo ? '' : 'user-inactive' }}">
+                                    <td class="user-id">{{ $cuenta->id }}</td>
                                     <td>
-                                        <strong class="js-nombre">{{ $u['nombre'] }}</strong>
-                                        <div class="muted-cell js-email">{{ $u['email'] }}</div>
+                                        <div class="user-quien">
+                                            <span class="user-icono {{ $cuenta->rol?->claseVisual() }}" aria-hidden="true">
+                                                @switch($cuenta->rol?->nombre)
+                                                    @case('administradora')
+                                                        <svg viewBox="0 0 24 24"><path d="M12 4.2 18.2 6.6v4.4c0 3.5-2.4 6-6.2 7.2-3.8-1.2-6.2-3.7-6.2-7.2V6.6L12 4.2z"/><path d="M9.4 12.1 11.2 13.9 14.8 10.2"/></svg>
+                                                        @break
+                                                    @case('enfermera')
+                                                        <svg viewBox="0 0 24 24"><path d="M12 5.2v13.6M7.2 9.2h9.6"/><circle cx="12" cy="12" r="7.2"/></svg>
+                                                        @break
+                                                    @case('secretaria')
+                                                        <svg viewBox="0 0 24 24"><path d="M7 4.8h7.2L18.2 9v10.2H7z"/><path d="M14.2 4.8V9H18.2M9.2 13h5.6M9.2 16.2h4"/></svg>
+                                                        @break
+                                                    @default
+                                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="2.7"/><path d="M6.2 18.2c1.2-2.6 3.2-3.8 5.8-3.8s4.6 1.2 5.8 3.8"/></svg>
+                                                @endswitch
+                                            </span>
+                                            <div>
+                                                <strong>{{ $cuenta->name }}</strong>
+                                                <div class="muted-cell">{{ $cuenta->email }}</div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td><span class="badge rol-pill js-rol {{ $u['rol'] === 'Administradora' ? 'rol-admin' : ($u['rol'] === 'Operadora' ? 'rol-operadora' : 'rol-enfermera') }}">{{ $u['rol'] }}</span></td>
+                                    <td><span class="badge rol-pill {{ $cuenta->rol?->claseVisual() }}">{{ $cuenta->rol?->etiqueta() ?? 'Sin rol' }}</span></td>
                                     <td>
-                                        <span class="pill js-estado {{ $u['estado'] === 'activo' ? 'pill-ok' : 'pill-warn' }}">{{ $u['estado'] === 'activo' ? 'Activo' : 'Inactivo' }}</span>
+                                        <span class="pill {{ $cuenta->activo ? 'pill-ok' : 'pill-warn' }}">{{ $cuenta->activo ? 'Activo' : 'Inactivo' }}</span>
                                     </td>
-                                    <td>{{ $u['ultimo'] }}</td>
+                                    <td>{{ $cuenta->created_at?->timezone('America/Santiago')->format('d/m/Y') }}</td>
                                     <td class="user-actions">
-                                        <button class="btn btn-ghost js-editar" type="button">Editar</button>
-                                        <button class="btn {{ $u['estado'] === 'activo' ? 'btn-ghost' : 'btn-dark' }} js-estado-btn" type="button">{{ $u['estado'] === 'activo' ? 'Desactivar' : 'Reactivar' }}</button>
+                                        <a class="btn btn-ghost" href="{{ route('mockups.usuarios', array_filter(['editar' => $cuenta->id, 'q' => $filtros['q'] !== '' ? $filtros['q'] : null, 'estado' => $filtros['estado'], 'rol' => $filtros['rol'], 'page' => $usuarios->currentPage() > 1 ? $usuarios->currentPage() : null])) }}">Editar</a>
+                                        <form method="post" action="{{ route('mockups.usuarios.estado', $cuenta) }}">
+                                            @csrf
+                                            @if ($filtros['q'] !== '')
+                                                <input type="hidden" name="q" value="{{ $filtros['q'] }}">
+                                            @endif
+                                            @if ($filtros['estado'])
+                                                <input type="hidden" name="estado" value="{{ $filtros['estado'] }}">
+                                            @endif
+                                            @if ($filtros['rol'])
+                                                <input type="hidden" name="rol" value="{{ $filtros['rol'] }}">
+                                            @endif
+                                            @if ($usuarios->currentPage() > 1)
+                                                <input type="hidden" name="page" value="{{ $usuarios->currentPage() }}">
+                                            @endif
+                                            <button class="btn {{ $cuenta->activo ? 'btn-ghost' : 'btn-dark' }}" type="submit">{{ $cuenta->activo ? 'Desactivar' : 'Reactivar' }}</button>
+                                        </form>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6">Ninguna cuenta coincide con ese filtro.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+                @if ($usuarios->hasPages())
+                    <nav class="users-paginas" aria-label="Páginas de cuentas">
+                        @if ($usuarios->onFirstPage())
+                            <span class="users-pagina is-off">Anterior</span>
+                        @else
+                            <a class="users-pagina" href="{{ $usuarios->previousPageUrl() }}">Anterior</a>
+                        @endif
+                        @foreach ($usuarios->getUrlRange(1, $usuarios->lastPage()) as $numero => $url)
+                            @if ($numero === $usuarios->currentPage())
+                                <span class="users-pagina is-on" aria-current="page">{{ $numero }}</span>
+                            @else
+                                <a class="users-pagina" href="{{ $url }}">{{ $numero }}</a>
+                            @endif
+                        @endforeach
+                        @if ($usuarios->hasMorePages())
+                            <a class="users-pagina" href="{{ $usuarios->nextPageUrl() }}">Siguiente</a>
+                        @else
+                            <span class="users-pagina is-off">Siguiente</span>
+                        @endif
+                        <span class="users-rango">{{ $usuarios->firstItem() }}–{{ $usuarios->lastItem() }} de {{ $usuarios->total() }}</span>
+                    </nav>
+                @endif
             </section>
 
-            <form class="panel cuenta-alta" id="cuenta-form" action="{{ route('mockups.usuarios') }}" method="get" onsubmit="return false">
+            <form class="panel cuenta-alta" method="post" action="{{ $editar ? route('mockups.usuarios.actualizar', $editar) : route('mockups.usuarios.guardar') }}">
+                @csrf
+                @if ($filtros['q'] !== '')
+                    <input type="hidden" name="q" value="{{ $filtros['q'] }}">
+                @endif
+                @if ($filtros['estado'])
+                    <input type="hidden" name="estado" value="{{ $filtros['estado'] }}">
+                @endif
+                @if ($filtros['rol'])
+                    <input type="hidden" name="rol" value="{{ $filtros['rol'] }}">
+                @endif
+                @if ($usuarios->currentPage() > 1)
+                    <input type="hidden" name="page" value="{{ $usuarios->currentPage() }}">
+                @endif
                 <div class="panel-head">
-                    <h2 id="cuenta-titulo">Nueva cuenta</h2>
-                    <span class="badge" id="cuenta-modo">Alta</span>
+                    <h2>{{ $editar ? 'Editar cuenta' : 'Nueva cuenta' }}</h2>
+                    <span class="badge">{{ $editar ? 'Cambio' : 'Alta' }}</span>
                 </div>
-                <p class="adv-ok" id="cuenta-ok" role="status" hidden></p>
-                <p class="auth-error" id="cuenta-error" role="alert" hidden></p>
+                @if (session('ok'))
+                    <p class="adv-ok" role="status">{{ session('ok') }}</p>
+                @endif
+                @error('estado')
+                    <p class="auth-error" role="alert">{{ $message }}</p>
+                @enderror
                 <div class="cuenta-grid">
                     <div>
                         <label class="field-label" for="nombre">Nombre completo</label>
-                        <label class="field">
-                            <input id="nombre" name="nombre" type="text" placeholder="Nombre y apellido" value="">
+                        <label class="field @error('nombre') is-invalido @enderror">
+                            <input id="nombre" name="nombre" type="text" required maxlength="120" placeholder="Nombre y apellido" value="{{ old('nombre', $editar->name ?? '') }}">
                         </label>
+                        @error('nombre')
+                            <p class="sigte-error" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="field-label" for="email">Correo institucional</label>
-                        <label class="field">
-                            <input id="email" name="email" type="email" placeholder="nombre@hsjmelipilla.cl" value="">
+                        <label class="field @error('email') is-invalido @enderror">
+                            <input id="email" name="email" type="email" required maxlength="255" placeholder="nombre@hsjmelipilla.cl" value="{{ old('email', $editar->email ?? '') }}">
                         </label>
+                        @error('email')
+                            <p class="sigte-error" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
-                        <label class="field-label" for="rol">Rol</label>
-                        <label class="field field-select">
-                            <select id="rol" name="rol">
+                        <label class="field-label" for="rol_id">Rol</label>
+                        <label class="field field-select @error('rol_id') is-invalido @enderror">
+                            <select id="rol_id" name="rol_id" required>
                                 <option value="">Elige el rol</option>
-                                @foreach ($roles as $r)
-                                    <option value="{{ $r }}">{{ $r }}</option>
+                                @foreach ($roles as $rol)
+                                    <option value="{{ $rol->id }}" @selected((string) old('rol_id', $editar->rol_id ?? '') === (string) $rol->id)>{{ $rol->etiqueta() }}</option>
                                 @endforeach
                             </select>
                         </label>
+                        @error('rol_id')
+                            <p class="sigte-error" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
-                        <label class="field-label" for="pass">Contraseña temporal</label>
-                        <label class="field">
-                            <input id="pass" name="pass" type="text" placeholder="La cambia al entrar" value="">
+                        <label class="field-label" for="password">{{ $editar ? 'Nueva contraseña' : 'Contraseña temporal' }}</label>
+                        <label class="field @error('password') is-invalido @enderror">
+                            <input id="password" name="password" type="password" @unless($editar) required @endunless minlength="8" maxlength="80" placeholder="{{ $editar ? 'Déjala vacía para no cambiarla' : 'Mínimo 8 caracteres' }}" autocomplete="new-password">
+                            <button class="btn-ver-clave" type="button" aria-label="Mostrar contraseña" aria-pressed="false">
+                                <svg class="icono-ojo" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                    <path class="parpado" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                                    <path class="cerrado" d="M4 12.5h16"/>
+                                    <circle class="pupila" cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
                         </label>
+                        @error('password')
+                            <p class="sigte-error" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
                 <div class="cuenta-pie">
-                    <label class="check">
-                        <input id="cambiar-clave" type="checkbox" checked>
-                        <span>Debe cambiar contraseña en el primer ingreso</span>
-                    </label>
                     <div class="recv-actions">
-                        <button class="btn btn-ghost" id="cuenta-cancelar" type="button" hidden>Cancelar</button>
-                        <button class="btn btn-primary" id="cuenta-guardar" type="button">Crear usuario</button>
+                        @if ($editar)
+                            <a class="btn btn-ghost" href="{{ route('mockups.usuarios', array_filter(['q' => $filtros['q'] !== '' ? $filtros['q'] : null, 'estado' => $filtros['estado'], 'rol' => $filtros['rol'], 'page' => $usuarios->currentPage() > 1 ? $usuarios->currentPage() : null])) }}">Cancelar</a>
+                        @endif
+                        <button class="btn btn-primary" type="submit">{{ $editar ? 'Guardar cambios' : 'Crear usuario' }}</button>
                     </div>
                 </div>
             </form>
         </div>
     </main>
 </div>
-<script>
-    var formFila = null;
-    var titulo = document.getElementById('cuenta-titulo');
-    var modo = document.getElementById('cuenta-modo');
-    var guardar = document.getElementById('cuenta-guardar');
-    var cancelar = document.getElementById('cuenta-cancelar');
-    var ok = document.getElementById('cuenta-ok');
-    var error = document.getElementById('cuenta-error');
-    var nombre = document.getElementById('nombre');
-    var email = document.getElementById('email');
-    var rol = document.getElementById('rol');
-    var pass = document.getElementById('pass');
-
-    function claseRol(valor) {
-        if (valor === 'Administradora') return 'rol-admin';
-        if (valor === 'Operadora') return 'rol-operadora';
-        return 'rol-enfermera';
-    }
-
-    function aviso(texto, esError) {
-        ok.hidden = esError || !texto;
-        error.hidden = !esError || !texto;
-        (esError ? error : ok).textContent = texto || '';
-    }
-
-    function limpiarAlta() {
-        formFila = null;
-        titulo.textContent = 'Nueva cuenta';
-        modo.textContent = 'Alta';
-        guardar.textContent = 'Crear usuario';
-        cancelar.hidden = true;
-        nombre.value = '';
-        email.value = '';
-        rol.value = '';
-        pass.value = '';
-    }
-
-    document.querySelector('.users-page tbody').addEventListener('click', function (evento) {
-        var editar = evento.target.closest('.js-editar');
-        var estadoBtn = evento.target.closest('.js-estado-btn');
-        if (editar) {
-            formFila = editar.closest('tr');
-            nombre.value = formFila.querySelector('.js-nombre').textContent;
-            email.value = formFila.querySelector('.js-email').textContent;
-            rol.value = formFila.querySelector('.js-rol').textContent;
-            pass.value = '';
-            titulo.textContent = 'Editar cuenta';
-            modo.textContent = 'Cambio';
-            guardar.textContent = 'Guardar cambios';
-            cancelar.hidden = false;
-            aviso('', false);
-            nombre.focus();
-        }
-        if (!estadoBtn) {
-            return;
-        }
-        var fila = estadoBtn.closest('tr');
-        var persona = fila.querySelector('.js-nombre').textContent;
-        var activo = fila.dataset.estado === 'activo';
-        var pill = fila.querySelector('.js-estado');
-        fila.dataset.estado = activo ? 'inactivo' : 'activo';
-        fila.classList.toggle('user-inactive', activo);
-        pill.textContent = activo ? 'Inactivo' : 'Activo';
-        pill.classList.toggle('pill-ok', !activo);
-        pill.classList.toggle('pill-warn', activo);
-        estadoBtn.textContent = activo ? 'Reactivar' : 'Desactivar';
-        estadoBtn.classList.toggle('btn-dark', activo);
-        estadoBtn.classList.toggle('btn-ghost', !activo);
-        aviso(activo
-            ? persona + ' quedó inactiva. No puede entrar. El historial se mantiene.'
-            : persona + ' puede volver a entrar.', false);
-    });
-
-    cancelar.addEventListener('click', function () {
-        limpiarAlta();
-        aviso('', false);
-    });
-
-    guardar.addEventListener('click', function () {
-        if (!nombre.value.trim() || !email.value.trim() || !rol.value || (formFila === null && !pass.value.trim())) {
-            aviso('Completa nombre, correo, rol' + (formFila === null ? ' y contraseña temporal.' : '.'), true);
-            return;
-        }
-        if (!email.value.includes('@')) {
-            aviso('El correo institucional no es válido.', true);
-            return;
-        }
-        if (formFila) {
-            formFila.querySelector('.js-nombre').textContent = nombre.value.trim();
-            formFila.querySelector('.js-email').textContent = email.value.trim();
-            var marca = formFila.querySelector('.js-rol');
-            marca.textContent = rol.value;
-            marca.classList.remove('rol-admin', 'rol-enfermera', 'rol-operadora');
-            marca.classList.add(claseRol(rol.value));
-            aviso('Listo. Quedaron los datos y el rol de ' + nombre.value.trim() + '.', false);
-            limpiarAlta();
-            return;
-        }
-        var cuerpo = document.querySelector('.users-page tbody');
-        var fila = document.createElement('tr');
-        fila.dataset.estado = 'activo';
-        fila.innerHTML = '<td><strong class="js-nombre"></strong><div class="muted-cell js-email"></div></td><td><span class="badge rol-pill js-rol"></span></td><td><span class="pill pill-ok js-estado">Activo</span></td><td>Hoy</td><td class="user-actions"><button class="btn btn-ghost js-editar" type="button">Editar</button><button class="btn btn-ghost js-estado-btn" type="button">Desactivar</button></td>';
-        fila.querySelector('.js-nombre').textContent = nombre.value.trim();
-        fila.querySelector('.js-email').textContent = email.value.trim();
-        fila.querySelector('.js-rol').textContent = rol.value;
-        fila.querySelector('.js-rol').classList.add(claseRol(rol.value));
-        cuerpo.prepend(fila);
-        aviso('Listo. ' + nombre.value.trim() + ' quedó como ' + rol.value + '.', false);
-        limpiarAlta();
-    });
-</script>
 @endsection

@@ -23,4 +23,25 @@ class Rol extends Model
     {
         return $this->hasMany(User::class, 'rol_id');
     }
+
+    public function etiqueta(): string
+    {
+        return match ($this->nombre) {
+            self::ADMINISTRADORA => 'Administradora',
+            self::ENFERMERA => 'Enfermera de turno',
+            self::OPERADOR => 'Operadora',
+            self::SECRETARIA => 'Secretaría',
+            default => $this->nombre,
+        };
+    }
+
+    public function claseVisual(): string
+    {
+        return match ($this->nombre) {
+            self::ADMINISTRADORA => 'rol-admin',
+            self::OPERADOR => 'rol-operadora',
+            self::SECRETARIA => 'rol-secretaria',
+            default => 'rol-enfermera',
+        };
+    }
 }

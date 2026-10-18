@@ -116,7 +116,7 @@
                         <div class="entrega-datos">
                             <div class="entrega-dato entrega-dato-ancho">
                                 <span>Quién anota</span>
-                                <strong>{{ $usuario['nombre'] }}</strong>
+                                <strong>{{ $puesto?->name ?? 'Elige la cuenta del puesto' }}</strong>
                             </div>
                             <div class="entrega-dato">
                                 <span>Fecha</span>
@@ -168,7 +168,7 @@
         var titulo = document.createElement('strong');
         var meta = document.createElement('span');
         titulo.textContent = extra ? actividad.value + ' · ' + extra : actividad.value;
-        meta.textContent = @json($fecha.' · '.$hora.' · '.$usuario['nombre']);
+        meta.textContent = @json($fecha.' · '.$hora.' · '.($puesto?->name ?? 'Elige la cuenta del puesto'));
         li.append(titulo, meta);
         document.getElementById('anotaciones').prepend(li);
         actividad.value = '';

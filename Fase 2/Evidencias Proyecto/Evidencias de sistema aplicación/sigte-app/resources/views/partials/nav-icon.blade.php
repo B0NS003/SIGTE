@@ -36,6 +36,10 @@
         <path d="M4.5 8.2 12 4.8l7.5 3.4v7.6L12 19.2 4.5 15.8V8.2z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
         <path d="M12 12.2v7M4.5 8.2 12 12.2l7.5-4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
         @break
+    @case('turnos')
+        <circle cx="12" cy="12" r="7.25" fill="none" stroke="currentColor" stroke-width="1.75"/>
+        <path d="M12 8.2V12l2.6 1.7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+        @break
     @case('usuarios')
         <circle cx="9" cy="9" r="2.6" fill="none" stroke="currentColor" stroke-width="1.75"/>
         <circle cx="16.2" cy="10" r="2.1" fill="none" stroke="currentColor" stroke-width="1.75"/>

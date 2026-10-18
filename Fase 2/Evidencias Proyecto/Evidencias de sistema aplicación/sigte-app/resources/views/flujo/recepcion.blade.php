@@ -85,7 +85,7 @@
                     <span class="icon" aria-hidden="true">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
                     </span>
-                    <input id="recibe" name="recibe" type="text" value="{{ $usuario['nombre'] }}" readonly>
+                    <input id="recibe" name="recibe" type="text" value="{{ $puesto?->name ?? 'Elige la cuenta del puesto' }}" readonly>
                 </label>
 
                 <label class="field-label" for="obs">Observación (opcional)</label>

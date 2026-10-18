@@ -4,21 +4,7 @@
     var tarjeta = document.querySelector('.auth-card');
     var correo = document.getElementById('email');
     var clave = document.getElementById('password');
-    var verClave = document.getElementById('toggle-password');
-
     if (!form || !correo || !clave) return;
-
-    // Mostrar y ocultar la contraseña
-    verClave?.addEventListener('click', function () {
-        var abrir = clave.type === 'password';
-        clave.type = abrir ? 'text' : 'password';
-        verClave.classList.toggle('is-abierto', abrir);
-        verClave.setAttribute('aria-pressed', abrir ? 'true' : 'false');
-        verClave.setAttribute('aria-label', abrir ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        verClave.classList.remove('is-parpadeo');
-        void verClave.offsetWidth;
-        verClave.classList.add('is-parpadeo');
-    });
 
     // Validación del formulario de login
     form.addEventListener('submit', function (event) {

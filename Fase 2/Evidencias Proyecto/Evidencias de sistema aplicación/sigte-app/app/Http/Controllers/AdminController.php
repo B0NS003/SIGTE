@@ -5,8 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\ConsultaDeCajas;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
+use App\Models\ElementoInventario;
+use App\Models\Personal;
 use App\Models\Rol;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -14,56 +21,200 @@ class AdminController extends Controller
     use ConsultaDeCajas;
     use ResuelveUsuario;
 
-    public function usuarios(): View
+    public function usuarios(Request $request): View
     {
-        $usuarios = [
-            [
-                'nombre' => 'Natalia Sanchez',
-                'email' => 'nsanchez@hsjmelipilla.cl',
-                'rol' => 'Administradora',
-                'estado' => 'activo',
-                'ultimo' => 'Hoy 11:40',
-            ],
-            [
-                'nombre' => 'Alejandra Riquelme',
-                'email' => 'ariquelme@hsjmelipilla.cl',
-                'rol' => 'Enfermera de turno',
-                'estado' => 'activo',
-                'ultimo' => 'Hoy 10:15',
-            ],
-            [
-                'nombre' => 'Yamilet Maureira',
-                'email' => 'ymaureira@hsjmelipilla.cl',
-                'rol' => 'Operadora',
-                'estado' => 'activo',
-                'ultimo' => 'Hoy 14:12',
-            ],
-            [
-                'nombre' => 'Carla Muñoz',
-                'email' => 'cmunoz@hsjmelipilla.cl',
-                'rol' => 'Operadora',
-                'estado' => 'activo',
-                'ultimo' => 'Ayer 18:02',
-            ],
-            [
-                'nombre' => 'Patricia Vega',
-                'email' => 'pvega@hsjmelipilla.cl',
-                'rol' => 'Enfermera de turno',
-                'estado' => 'inactivo',
-                'ultimo' => '12/08/2026',
-            ],
-        ];
+        $filtros = $this->filtrosCuentas($request);
+        $consulta = User::query()->with('rol')->orderBy('id');
+        if ($filtros['estado'] === 'activo') {
+            $consulta->where('activo', true);
+        }
+        if ($filtros['estado'] === 'inactivo') {
+            $consulta->where('activo', false);
+        }
+        if ($filtros['rol'] !== null) {
+            $consulta->where('rol_id', $filtros['rol']);
+        }
+        if ($filtros['q'] !== '') {
+            $buscar = $filtros['q'];
+            $consulta->where(function ($q) use ($buscar) {
+                $q->where('name', 'ilike', '%'.$buscar.'%')
+                    ->orWhere('email', 'ilike', '%'.$buscar.'%');
+            });
+        }
+
+        $usuarios = $consulta->paginate(8)->withQueryString();
+        $editar = $request->filled('editar')
+            ? User::query()->find((int) $request->query('editar'))
+            : null;
+
         return view('admin.usuarios', [
             'usuario' => $this->usuarioSesion(),
             'usuarios' => $usuarios,
-            'roles' => ['Administradora', 'Enfermera de turno', 'Operadora'],
+            'roles' => Rol::query()->orderBy('nombre')->get(),
+            'editar' => $editar,
+            'filtros' => $filtros,
             'resumen' => [
-                'total' => count($usuarios),
-                'activos' => collect($usuarios)->where('estado', 'activo')->count(),
-                'inactivos' => collect($usuarios)->where('estado', 'inactivo')->count(),
-                'admin' => collect($usuarios)->where('rol', 'Administradora')->count(),
+                'total' => User::query()->count(),
+                'activos' => User::query()->where('activo', true)->count(),
+                'inactivos' => User::query()->where('activo', false)->count(),
+                'admin' => User::query()->whereHas('rol', fn ($q) => $q->where('nombre', Rol::ADMINISTRADORA))->where('activo', true)->count(),
             ],
         ]);
+    }
+
+    public function turnos(): View
+    {
+        return view('admin.turnos', [
+            'usuario' => $this->usuarioSesion(),
+            'nomina' => Personal::query()->orderBy('grupo')->orderBy('nombre')->get(),
+            'turnoVigente' => Personal::turnoVigente(),
+        ]);
+    }
+
+    public function asignarTurno(Request $request): JsonResponse
+    {
+        $datos = $request->validate([
+            'personal_id' => ['required', 'integer', 'exists:personal,id'],
+            'turno' => ['nullable', Rule::in(array_keys(Personal::TURNOS))],
+        ]);
+
+        $persona = Personal::query()->findOrFail($datos['personal_id']);
+        $persona->turno = $datos['turno'] ?? null;
+        $persona->save();
+
+        return response()->json(['ok' => true, 'turno' => $persona->turno]);
+    }
+
+    public function guardarUsuario(Request $request): RedirectResponse
+    {
+        $datos = $this->validarCuenta($request);
+
+        $rol = Rol::query()->findOrFail($datos['rol_id']);
+        User::query()->create([
+            'name' => $datos['nombre'],
+            'email' => $datos['email'],
+            'password' => $datos['password'],
+            'rol_id' => $rol->id,
+            'role' => $rol->nombre,
+            'activo' => true,
+        ]);
+
+        return $this->volverACuentas($request)
+            ->with('ok', 'Cuenta creada. '.$datos['nombre'].' quedó como '.$rol->etiqueta().'.');
+    }
+
+    public function actualizarUsuario(Request $request, User $user): RedirectResponse
+    {
+        $datos = $this->validarCuenta($request, $user);
+        $rol = Rol::query()->findOrFail($datos['rol_id']);
+
+        if ($user->id === Auth::id() && $rol->nombre !== Rol::ADMINISTRADORA) {
+            return back()->withInput()->withErrors([
+                'rol_id' => 'No puedes quitarte el rol de administradora.',
+            ]);
+        }
+
+        if ($user->isAdministradora() && $rol->nombre !== Rol::ADMINISTRADORA && ! $this->hayOtraAdministradora($user)) {
+            return back()->withInput()->withErrors([
+                'rol_id' => 'Debe quedar al menos una administradora activa.',
+            ]);
+        }
+
+        $user->name = $datos['nombre'];
+        $user->email = $datos['email'];
+        $user->rol_id = $rol->id;
+        $user->role = $rol->nombre;
+        if (! empty($datos['password'])) {
+            $user->password = $datos['password'];
+        }
+        $user->save();
+
+        return $this->volverACuentas($request)
+            ->with('ok', 'Datos actualizados. '.$user->name.' quedó como '.$rol->etiqueta().'.');
+    }
+
+    public function cambiarEstadoUsuario(Request $request, User $user): RedirectResponse
+    {
+        if ($user->id === Auth::id()) {
+            return back()->withErrors([
+                'estado' => 'No puedes desactivar tu propia cuenta.',
+            ]);
+        }
+
+        if ($user->activo && $user->isAdministradora() && ! $this->hayOtraAdministradora($user)) {
+            return back()->withErrors([
+                'estado' => 'Debe quedar al menos una administradora activa.',
+            ]);
+        }
+
+        $user->activo = ! $user->activo;
+        $user->save();
+
+        $mensaje = $user->activo
+            ? $user->name.' puede volver a entrar.'
+            : $user->name.' quedó inactiva. No puede entrar. El historial se mantiene.';
+
+        return $this->volverACuentas($request)->with('ok', $mensaje);
+    }
+
+    /**
+     * @return array{estado: ?string, rol: ?int, q: string}
+     */
+    private function filtrosCuentas(Request $request): array
+    {
+        $estado = $request->input('estado');
+        $rol = $request->input('rol');
+
+        return [
+            'estado' => in_array($estado, ['activo', 'inactivo'], true) ? $estado : null,
+            'rol' => $rol !== null && $rol !== '' ? (int) $rol : null,
+            'q' => trim((string) $request->input('q', '')),
+        ];
+    }
+
+    private function volverACuentas(Request $request): RedirectResponse
+    {
+        $filtros = $this->filtrosCuentas($request);
+        $pagina = (int) $request->input('page');
+
+        return redirect()->route('mockups.usuarios', array_filter([
+            'estado' => $filtros['estado'],
+            'rol' => $filtros['rol'],
+            'q' => $filtros['q'] !== '' ? $filtros['q'] : null,
+            'page' => $pagina > 1 ? $pagina : null,
+        ]));
+    }
+
+    private function validarCuenta(Request $request, ?User $user = null): array
+    {
+        if ($user !== null && ! $request->filled('password')) {
+            $request->merge(['password' => null]);
+        }
+
+        return $request->validate([
+            'nombre' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user?->id)],
+            'rol_id' => ['required', 'integer', 'exists:roles,id'],
+            'password' => [$user === null ? 'required' : 'nullable', 'string', 'min:8', 'max:80'],
+        ], [
+            'nombre.required' => 'Escribe el nombre completo.',
+            'email.required' => 'Escribe el correo institucional.',
+            'email.email' => 'El correo institucional no es válido.',
+            'email.unique' => 'Ese correo ya tiene una cuenta.',
+            'rol_id.required' => 'Elige el rol.',
+            'rol_id.exists' => 'Elige un rol de la lista.',
+            'password.required' => 'Escribe una contraseña temporal.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+        ]);
+    }
+
+    private function hayOtraAdministradora(User $user): bool
+    {
+        return User::query()
+            ->where('activo', true)
+            ->where('id', '!=', $user->id)
+            ->whereHas('rol', fn ($consulta) => $consulta->where('nombre', Rol::ADMINISTRADORA))
+            ->exists();
     }
     public function reportes(Request $request): View
     {
@@ -232,6 +383,33 @@ class AdminController extends Controller
             ],
         ]);
     }
+    private function alertasDeInventario(): array
+    {
+        return ElementoInventario::query()
+            ->orderBy('codigo')
+            ->get()
+            ->filter(fn (ElementoInventario $elemento) => $elemento->tieneAlertaStock())
+            ->map(function (ElementoInventario $elemento) {
+                $critico = $elemento->estadoStock() === 'critico';
+
+                return [
+                    'id' => 'STK-'.$elemento->codigo,
+                    'nivel' => $critico ? 'alta' : 'baja',
+                    'titulo' => $critico
+                        ? $elemento->codigo.' stock crítico'
+                        : $elemento->nombre.' bajo stock mínimo',
+                    'detalle' => 'Stock '.$elemento->stock.' · mínimo '.$elemento->minimo.' · '.$elemento->ubicacion,
+                    'tipo' => 'Inventario',
+                    'caja' => $elemento->codigo,
+                    'sala' => $elemento->sala,
+                    'hora' => 'Ahora',
+                    'estado' => 'abierta',
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
     public function alertas(): View
     {
         $lista = [
@@ -265,36 +443,7 @@ class AdminController extends Controller
                 'hora' => '11:22',
                 'estado' => 'abierta',
             ],
-            [
-                'id' => 'AL-011',
-                'nivel' => 'baja',
-                'titulo' => 'SET-CES-02 bajo stock mínimo',
-                'detalle' => 'Stock 2 · mínimo 3 · Almacen A2',
-                'tipo' => 'Inventario',
-                'caja' => 'SET-CES-02',
-                'hora' => '09:40',
-                'estado' => 'abierta',
-            ],
-            [
-                'id' => 'AL-010',
-                'nivel' => 'alta',
-                'titulo' => 'SET-UCI-03 stock critico',
-                'detalle' => 'Stock 1 · mínimo 2 · UCI',
-                'tipo' => 'Inventario',
-                'caja' => 'SET-UCI-03',
-                'hora' => '08:15',
-                'estado' => 'abierta',
-            ],
-            [
-                'id' => 'AL-009',
-                'nivel' => 'media',
-                'titulo' => 'Indicador clase 5 bajo mínimo',
-                'detalle' => 'Bodega insumos · 12 / mín. 20',
-                'tipo' => 'Inventario',
-                'caja' => 'IND-CLASE5',
-                'hora' => 'Ayer',
-                'estado' => 'en_revision',
-            ],
+            ...$this->alertasDeInventario(),
             [
                 'id' => 'AL-008',
                 'nivel' => 'baja',

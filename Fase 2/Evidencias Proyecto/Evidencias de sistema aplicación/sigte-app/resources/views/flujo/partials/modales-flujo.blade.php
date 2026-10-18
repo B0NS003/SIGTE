@@ -59,6 +59,7 @@
 
                 <div class="flujo-pasar" id="etapa-pasar">
                     <p class="flujo-paso-titulo" id="etapa-pasar-titulo">Pasar de etapa</p>
+                    <p class="flujo-paso-resumen">@if ($puesto) Lo registra {{ $puesto->name }}. @else Elige la cuenta de operadora que está en el puesto antes de guardar. @endif</p>
                     <div class="flujo-modal-acciones">
                         <button class="btn btn-ghost" type="button" data-cerrar>
                             <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -129,7 +130,7 @@
 
                 <div class="flujo-paso">
                     <p class="flujo-paso-titulo" id="retro-movimiento"></p>
-                    <p class="flujo-paso-resumen">Esta corrección queda con la fecha, la hora y tu nombre.</p>
+                    <p class="flujo-paso-resumen">@if ($puesto) Lo registra {{ $puesto->name }}. @else Elige la cuenta de operadora que está en el puesto antes de guardar. @endif Esta corrección queda con la fecha y la hora.</p>
                     <label class="field-label" for="retro-motivo">Motivo</label>
                     <textarea class="flujo-motivo" id="retro-motivo" name="motivo" maxlength="180" required placeholder="Qué pasó con esta caja">{{ $accion_modal === 'retroceso' ? old('motivo') : '' }}</textarea>
                     <div class="flujo-modal-acciones">

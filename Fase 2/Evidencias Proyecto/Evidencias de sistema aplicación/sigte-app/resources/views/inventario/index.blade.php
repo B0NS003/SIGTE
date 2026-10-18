@@ -33,12 +33,12 @@
         </div>
     </aside>
 
-    <main class="main">
+    <main class="main inv-vista sala-{{ $sala }}">
         <div class="main-top">
             <div>
                 <p class="eyebrow">Consulta · tres libros</p>
                 <h1>Inventario</h1>
-                <p class="main-sub">Cada sala tiene su libro. El conjunto muestra cómo están las tres.</p>
+                <p class="main-sub">Elige un libro, revisa el stock y, si hace falta, registra la reposición debajo.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">
@@ -51,52 +51,43 @@
             </div>
         </div>
 
-        <p class="ops-filter-label">
-            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4.5 6.5h15l-5.6 6.6V18l-3.8 1.8v-6.7L4.5 6.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-            </svg>
-            Filtrar por sala
-        </p>
-        <div class="ops-filters sala-tabs" aria-label="Filtrar por sala">
-            <a class="ops-filter sala-tab sala-todos {{ $sala === 'todos' ? 'is-active active' : '' }}"
-               href="{{ route('mockups.inventario', ['sala' => 'todos']) }}">
-                Los tres <em>{{ $totalElementos }}</em>
-            </a>
-            @foreach ($salas as $key => $label)
-                <a class="ops-filter sala-tab sala-{{ $key }} {{ $sala === $key ? 'is-active active' : '' }}"
-                   href="{{ route('mockups.inventario', ['sala' => $key]) }}">
-                    <span class="sala-dot" aria-hidden="true"></span>
-                    {{ $label }} <em>{{ $conteoSalas[$key]['tipos'] ?? 0 }}</em>
+        <section class="inv-elige" aria-label="Elegir libro">
+            <p>1 · Elige el libro</p>
+            <div class="inv-switch">
+                <a class="inv-switch-item sala-todos {{ $sala === 'todos' ? 'is-active' : '' }}"
+                   href="{{ route('mockups.inventario', ['sala' => 'todos']) }}">
+                    <strong>Los tres</strong>
+                    <em>{{ $totalElementos }} elementos</em>
+                    <span>Vista general</span>
                 </a>
-            @endforeach
-        </div>
-
-        @if ($sala === 'todos')
-            <div class="inv-libros">
-                @foreach ($libros as $libro)
-                    <a class="inv-libro sala-{{ $libro['clave'] }}" href="{{ route('mockups.inventario', ['sala' => $libro['clave']]) }}">
-                        <span class="badge badge-sala badge-{{ $libro['clave'] }}">{{ $libro['nombre'] }}</span>
-                        <strong>{{ $libro['stock'] }}</strong>
-                        <em>unidades en sala</em>
-                        <ul>
-                            <li>{{ $libro['tipos'] }} {{ $libro['tipos'] === 1 ? 'elemento' : 'elementos' }}</li>
-                            <li>{{ $libro['en_proceso'] }} en proceso</li>
-                            <li class="{{ $libro['bajo'] > 0 ? 'is-alert' : '' }}">{{ $libro['bajo'] }} bajo mínimo</li>
-                        </ul>
+                @foreach ($salas as $key => $label)
+                    @php $libroNav = $conteoSalas[$key]; @endphp
+                    <a class="inv-switch-item sala-{{ $key }} {{ $sala === $key ? 'is-active' : '' }}"
+                       href="{{ route('mockups.inventario', ['sala' => $key]) }}">
+                        <strong>{{ $label }}</strong>
+                        <em>{{ $libroNav['tipos'] ?? 0 }} {{ ($libroNav['tipos'] ?? 0) === 1 ? 'elemento' : 'elementos' }} · {{ $libroNav['stock'] ?? 0 }} u.</em>
+                        <span class="{{ ($libroNav['bajo'] ?? 0) > 0 ? 'is-alert' : '' }}">
+                            {{ ($libroNav['bajo'] ?? 0) > 0 ? ($libroNav['bajo'].' bajo mínimo') : 'Stock en orden' }}
+                        </span>
                     </a>
                 @endforeach
             </div>
+        </section>
 
+        @if ($sala === 'todos')
             <section class="panel inv-mira">
                 <div class="panel-head">
-                    <h2 class="inv-titulo">
+                    <div>
+                        <p class="inv-paso">2 · Lo que hay que mirar</p>
+                        <h2 class="inv-titulo">
                         <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 4.5 20.5 19.5h-17L12 4.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
                             <path d="M12 10v4.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
                             <path d="M12 17.2h.01" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"/>
                         </svg>
                         Para mirar ahora
-                    </h2>
+                        </h2>
+                    </div>
                     <span class="badge badge-urgent">{{ count($atencion) }}</span>
                 </div>
                 @if ($atencion === [])
@@ -125,59 +116,34 @@
             </section>
         @else
 
-        <div class="inv-libro inv-sala-hero sala-{{ $sala }}">
-            <div>
-                <span class="badge badge-sala badge-{{ $sala }}">{{ $salas[$sala] }}</span>
-                <strong>{{ $resumen['en_almacen'] }}</strong>
-                <em>unidades en sala</em>
-            </div>
-            <ul>
-                <li>{{ $resumen['tipos'] }} {{ $resumen['tipos'] === 1 ? 'elemento' : 'elementos' }}</li>
-                <li>{{ $resumen['en_proceso'] }} en proceso</li>
-                <li class="{{ $resumen['bajo_minimo'] > 0 ? 'is-alert' : '' }}">{{ $resumen['bajo_minimo'] }} bajo mínimo</li>
-            </ul>
-        </div>
-
         <section class="panel list inv-book sala-{{ $sala }}">
             <div class="panel-head">
-                <h2 class="inv-titulo">
-                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-                        <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                    </svg>
-                    Libro · {{ $salas[$sala] }}
-                </h2>
-                <span class="badge badge-sala badge-{{ $sala }}">{{ $salas[$sala] }}</span>
+                <div>
+                    <p class="inv-paso">2 · Revisa el stock</p>
+                    <h2 class="inv-titulo">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                            <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                        </svg>
+                        {{ $salas[$sala] }}
+                    </h2>
+                </div>
+                <ul class="inv-resumen">
+                    <li><strong>{{ $resumen['en_almacen'] }}</strong> unidades</li>
+                    <li><strong>{{ $resumen['en_proceso'] }}</strong> en proceso</li>
+                    <li class="{{ $resumen['bajo_minimo'] > 0 ? 'is-alert' : '' }}"><strong>{{ $resumen['bajo_minimo'] }}</strong> bajo mínimo</li>
+                </ul>
             </div>
 
-            {{-- Buscador de inventario --}}
-            <form method="GET"
-                  action="{{ route('mockups.inventario') }}"
-                  class="inv-busqueda"
-                  style="display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin:16px 0;">
+            <form method="GET" action="{{ route('mockups.inventario') }}" class="inv-busqueda" role="search">
                 <input type="hidden" name="sala" value="{{ $sala }}">
-
-                <div style="flex:1; min-width:220px;">
-                    <label for="busqueda-inventario" class="field-label">
-                        Buscar por código, nombre o ubicación
-                    </label>
-                    <input
-                        type="search"
-                        id="busqueda-inventario"
-                        name="q"
-                        value="{{ $busqueda ?? '' }}"
-                        placeholder="Ej.: DET-ENZ o detergente"
-                        style="width:100%;"
-                    >
-                </div>
-
-                <button type="submit" class="btn btn-primary">Buscar</button>
-
+                <label class="field" for="busqueda-inventario">
+                    <span class="sr-only">Buscar por código, nombre o ubicación</span>
+                    <input type="search" id="busqueda-inventario" name="q" value="{{ $busqueda ?? '' }}" placeholder="Buscar por código, nombre o ubicación">
+                </label>
+                <button type="submit" class="btn btn-dark">Buscar</button>
                 @if (($busqueda ?? '') !== '')
-                    <a class="btn btn-ghost"
-                       href="{{ route('mockups.inventario', ['sala' => $sala]) }}">
-                        Limpiar búsqueda
-                    </a>
+                    <a class="btn btn-ghost" href="{{ route('mockups.inventario', ['sala' => $sala]) }}">Limpiar</a>
                 @endif
             </form>
 
@@ -230,70 +196,76 @@
             </div>
         </section>
         @if ($puedeReponer)
-        <form class="recv-form panel entrega-panel inv-mov sala-{{ $sala }}" action="{{ route('mockups.inventario') }}" method="get" onsubmit="return false">
-            <div class="entrega-cuerpo">
-                <section>
+        <form class="panel inv-reposicion sala-{{ $sala }}" action="{{ route('mockups.inventario.reponer') }}" method="post">
+            @csrf
+            <input type="hidden" name="sala" value="{{ $sala }}">
+            @if (session('ok'))
+                <p class="adv-ok" role="status">{{ session('ok') }}</p>
+            @endif
+            @error('reposicion')
+                <p class="auth-error" role="alert">{{ $message }}</p>
+            @enderror
+            <div class="panel-head">
+                <div>
+                    <p class="inv-paso">3 · Registra la entrada</p>
                     <h2 class="inv-titulo">
                         <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
                         </svg>
-                        Registrar reposición
+                        Reposición
                     </h2>
-                    <label class="field-label" for="elemento">Elemento de {{ $salas[$sala] }}</label>
-                    <label class="field field-select">
-                        <select id="elemento" name="elemento">
+                </div>
+                <p class="inv-quien">{{ $usuario['nombre'] }} · {{ $fecha }} · {{ $hora }}</p>
+            </div>
+            <div class="inv-reposicion-fila">
+                <div>
+                    <label class="field-label" for="elemento">Elemento</label>
+                    <label class="field field-select @error('elemento') entrega-campo-invalido @enderror">
+                        <select id="elemento" name="elemento" required>
                             <option value="">Elige el elemento</option>
-                            @foreach ($items as $item)
-                                <option value="{{ $item['codigo'] }}" data-stock="{{ $item['stock'] }}" data-minimo="{{ $item['minimo'] }}" data-nombre="{{ $item['nombre'] }}" @selected($elemento === $item['codigo'])>
+                            @foreach ($elementos as $item)
+                                <option value="{{ $item['codigo'] }}" data-stock="{{ $item['stock'] }}" data-minimo="{{ $item['minimo'] }}" data-nombre="{{ $item['nombre'] }}" @selected(old('elemento', $elemento) === $item['codigo'])>
                                     {{ $item['nombre'] }} · hay {{ $item['stock'] }}@if ($item['estado'] !== 'ok') · bajo mínimo @endif
                                 </option>
                             @endforeach
                         </select>
                     </label>
-
+                    @error('elemento')
+                        <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
                     <label class="field-label" for="cantidad">Cantidad que entra</label>
-                    <label class="field">
-                        <input id="cantidad" name="cantidad" type="number" min="1" step="1" placeholder="Cuántas unidades se reponen" value="">
+                    <label class="field @error('cantidad') entrega-campo-invalido @enderror">
+                        <input id="cantidad" name="cantidad" type="number" min="1" max="9999" step="1" required placeholder="Unidades" value="{{ old('cantidad') }}">
                     </label>
-                    <p class="recv-help" id="inv-queda" hidden></p>
-                </section>
-
-                <section>
-                    <h2 class="inv-titulo">
-                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.75"/>
-                            <path d="M5.5 18.5c1.4-2.8 3.7-4.2 6.5-4.2s5.1 1.4 6.5 4.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                        </svg>
-                        Quién y cuándo
-                    </h2>
-                    <div class="entrega-datos">
-                        <div class="entrega-dato entrega-dato-ancho">
-                            <span>Quién repone</span>
-                            <strong>{{ $usuario['nombre'] }}</strong>
-                        </div>
-                        <div class="entrega-dato">
-                            <span>Fecha</span>
-                            <strong>{{ $fecha }}</strong>
-                        </div>
-                        <div class="entrega-dato">
-                            <span>Hora</span>
-                            <strong>{{ $hora }}</strong>
-                        </div>
-                    </div>
-                    <p class="auth-error act-aviso" id="inv-aviso" role="alert" hidden></p>
-                    <button class="btn btn-primary" id="inv-anotar" type="button" style="width:auto; min-width:12rem;">
-                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Registrar reposición
-                    </button>
-                </section>
+                    @error('cantidad')
+                        <p class="entrega-error-campo" role="alert">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button class="btn btn-primary" id="inv-anotar" type="submit">
+                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Registrar
+                </button>
             </div>
+            <p class="recv-help" id="inv-queda" hidden></p>
 
-            <section class="act-suma">
-                <h2>Reposiciones de esta sala</h2>
-                <p class="recv-help" id="inv-vacio">Todavía no hay reposiciones en esta pantalla.</p>
-                <ol class="act-lista" id="inv-lista"></ol>
+            <section class="inv-historial">
+                <h2>Últimas reposiciones de esta sala</h2>
+                @if ($reposiciones->isEmpty())
+                    <p class="recv-help">Todavía no hay reposiciones en esta sala.</p>
+                @else
+                    <ol class="act-lista">
+                        @foreach ($reposiciones as $reposicion)
+                            <li>
+                                <strong>Reposición · {{ $reposicion->cantidad }} · {{ $reposicion->elemento->nombre }}</strong>
+                                <span>{{ $reposicion->created_at->timezone('America/Santiago')->format('d/m/Y · H:i') }} · {{ $reposicion->autor?->name ?? 'Sin usuario' }}</span>
+                            </li>
+                        @endforeach
+                    </ol>
+                @endif
             </section>
         </form>
         @endif
@@ -326,27 +298,6 @@
     cantidad.addEventListener('input', vistaReposicion);
     vistaReposicion();
 
-    document.getElementById('inv-anotar').addEventListener('click', function () {
-        var aviso = document.getElementById('inv-aviso');
-        var opcion = elemento.selectedOptions[0];
-        var unidades = Number(cantidad.value);
-        if (!elemento.value || !Number.isInteger(unidades) || unidades < 1) {
-            aviso.textContent = 'Elige el elemento e indica una cantidad mayor que cero.';
-            aviso.hidden = false;
-            return;
-        }
-        aviso.hidden = true;
-        var li = document.createElement('li');
-        var titulo = document.createElement('strong');
-        var meta = document.createElement('span');
-        titulo.textContent = 'Reposición · ' + unidades + ' · ' + opcion.dataset.nombre;
-        meta.textContent = @json($fecha.' · '.$hora.' · '.$usuario['nombre']);
-        li.append(titulo, meta);
-        document.getElementById('inv-lista').prepend(li);
-        document.getElementById('inv-vacio').hidden = true;
-        cantidad.value = '';
-        queda.hidden = true;
-    });
 </script>
 @endif
 @endsection

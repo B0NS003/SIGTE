@@ -130,7 +130,7 @@
                         </div>
                         <div class="alert-row-actions">
                             @if ($a['tipo'] === 'Inventario')
-                                <a class="btn btn-ghost" href="{{ route('mockups.inventario') }}">Ver inventario</a>
+                                <a class="btn btn-ghost" href="{{ route('mockups.inventario', array_filter(['sala' => $a['sala'] ?? null, 'elemento' => $a['caja']])) }}">Ver inventario</a>
                             @elseif ($a['tipo'] === 'Custodia')
                                 <a class="btn btn-ghost" href="{{ route('mockups.custodia') }}">Ver custodia</a>
                             @else
@@ -144,7 +144,7 @@
                 @endforeach
             </div>
 
-            <div class="panel-note">Mockup: el badge del menú usa alertas abiertas. En el sistema real, marcar atendida queda en la bitácora de auditoría.</div>
+            <div class="panel-note">Las alertas de inventario se apagan cuando una reposición deja el stock en el mínimo o por encima. El resto de la bandeja sigue siendo de demostración.</div>
         </section>
     </main>
 </div>

@@ -6,9 +6,11 @@ use App\Models\CajaAnotacion;
 use App\Models\Caja;
 use App\Models\ConsumoServicio;
 use App\Models\Insumo;
+use App\Models\Personal;
+use App\Models\Rol;
+use App\Models\User;
 use App\Http\Controllers\Concerns\ConsultaDeCajas;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
-use App\Models\Rol;
 use App\Support\AccesoPorRol;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -300,6 +302,9 @@ class FlujoController extends Controller
         $codigo = trim((string) $request->input('caja', ''));
         $destino = trim((string) $request->input('etapa_destino', ''));
         $volver = $this->volverAlFlujo($request, $codigo);
+        if ($aviso = $this->faltaPuesto()) {
+            return $volver->withErrors(['puesto' => $aviso]);
+        }
         if ($codigo === '') {
             return $volver->withErrors(['caja' => 'Elige la caja que vas a pasar.']);
         }
@@ -332,14 +337,17 @@ class FlujoController extends Controller
         $caja->etapa_desde = now();
         $caja->proceso_desde = null;
         $caja->proceso_hasta = null;
-        $caja->responsable_id = Auth::id();
+        $marca = $this->marca();
+        $caja->responsable_id = $marca['user_id'];
+        $caja->personal_id = $marca['personal_id'];
         $caja->save();
         $caja->anotaciones()->create([
-            'user_id' => Auth::id(),
+            'user_id' => $marca['user_id'],
+            'personal_id' => $marca['personal_id'],
             'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
         ]);
         return $this->volverAlFlujo($request, $caja->codigo, false)
-            ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.');
+            ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.'.$this->firmaPuesto());
     }
     /**
      * HIU-EP2-003: un paso atrás, con motivo, solo desde lavado o preparación.
@@ -349,6 +357,9 @@ class FlujoController extends Controller
         $codigo = trim((string) $request->input('caja', ''));
         $motivo = trim((string) $request->input('motivo', ''));
         $volver = $this->volverAlFlujo($request, $codigo, true, 'retroceso');
+        if ($aviso = $this->faltaPuesto()) {
+            return $volver->withErrors(['puesto' => $aviso]);
+        }
         if ($codigo === '') {
             return $volver->withErrors(['caja' => 'Elige la caja que vas a corregir.']);
         }
@@ -371,7 +382,8 @@ class FlujoController extends Controller
         $motivo = mb_substr($motivo, 0, 180);
         $etiquetaAnterior = Caja::etiquetaEtapa($anterior);
         try {
-            DB::transaction(function () use ($caja, $anterior, $motivo): void {
+            $marca = $this->marca();
+            DB::transaction(function () use ($caja, $anterior, $motivo, $marca): void {
                 $origen = trim((string) $caja->etapa);
                 $caja->etapa = $anterior;
                 $caja->estado = 'En '.Caja::etiquetaEtapa($anterior);
@@ -379,16 +391,19 @@ class FlujoController extends Controller
                 $caja->etapa_desde = now();
                 $caja->proceso_desde = null;
                 $caja->proceso_hasta = null;
-                $caja->responsable_id = Auth::id();
+                $caja->responsable_id = $marca['user_id'];
+                $caja->personal_id = $marca['personal_id'];
                 $caja->save();
                 $caja->retrocesos()->create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'],
                     'etapa_desde' => $origen,
                     'etapa_hacia' => $anterior,
                     'motivo' => $motivo,
                 ]);
                 $caja->anotaciones()->create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'],
                     'texto' => 'Volvió a '.Caja::etiquetaEtapa($anterior).'. '.$motivo,
                 ]);
             });
@@ -398,7 +413,7 @@ class FlujoController extends Controller
             ]);
         }
         return $this->volverAlFlujo($request, $caja->codigo, false, 'retroceso')
-            ->with('ok', 'Listo. '.$caja->codigo.' volvió a '.$etiquetaAnterior.'.');
+            ->with('ok', 'Listo. '.$caja->codigo.' volvió a '.$etiquetaAnterior.'.'.$this->firmaPuesto());
     }
     private function volverAlFlujo(Request $request, string $codigo, bool $conservarEtapa = true, string $accion = 'etapa'): RedirectResponse
     {
@@ -433,6 +448,9 @@ class FlujoController extends Controller
     }
     public function guardarAnotacion(Request $request): JsonResponse
     {
+        if ($aviso = $this->faltaPuesto()) {
+            return response()->json(['mensaje' => $aviso], 422);
+        }
         $codigo = trim((string) $request->input('caja', ''));
         $texto = trim((string) $request->input('texto', ''));
         $caja = Caja::query()->where('codigo', $codigo)->first();
@@ -467,11 +485,15 @@ class FlujoController extends Controller
             }
         }
         try {
-            $nota = DB::transaction(function () use ($caja, $texto, $actividad, $minutos) {
+            $marca = $this->marca();
+            $nota = DB::transaction(function () use ($caja, $texto, $actividad, $minutos, $marca) {
                 $nota = $caja->anotaciones()->create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'],
                     'texto' => $texto,
                 ]);
+                $caja->personal_id = $marca['personal_id'] ?? $caja->personal_id;
+                $caja->responsable_id = $marca['user_id'];
                 $caja->actividad = mb_substr($actividad, 0, 80);
                 if ($minutos !== null) {
                     $caja->sumarProceso((int) $minutos);
@@ -482,12 +504,12 @@ class FlujoController extends Controller
         } catch (\Throwable) {
             return response()->json(['mensaje' => 'No fue posible completar el registro.'], 500);
         }
-        $nota->load('autor');
+        $nota->load(['autor', 'persona']);
         return response()->json([
             'texto' => $nota->texto,
             'actividad' => $caja->actividad,
             'cuando' => $nota->created_at->timezone('America/Santiago')->format('d/m/Y · H:i'),
-            'quien' => $nota->autor?->name ?? '',
+            'quien' => $nota->nombreQuien(),
             'proceso_desde' => $caja->proceso_desde?->toIso8601String(),
             'proceso_hasta' => $caja->proceso_hasta?->toIso8601String(),
         ]);
@@ -499,7 +521,7 @@ class FlujoController extends Controller
     {
         $grupos = [];
         CajaAnotacion::query()
-            ->with(['caja:id,codigo', 'autor:id,name'])
+            ->with(['caja:id,codigo', 'autor:id,name', 'persona:id,nombre'])
             ->orderBy('id')
             ->get()
             ->each(function (CajaAnotacion $nota) use (&$grupos): void {
@@ -510,7 +532,7 @@ class FlujoController extends Controller
                 $grupos[$codigo][] = [
                     'texto' => $nota->texto,
                     'cuando' => $nota->created_at->timezone('America/Santiago')->format('d/m/Y · H:i'),
-                    'quien' => $nota->autor?->name ?? '',
+                    'quien' => $nota->nombreQuien(),
                 ];
             });
         return $grupos;
@@ -676,6 +698,9 @@ class FlujoController extends Controller
                 );
             }
         });
+        if ($aviso = $this->faltaPuesto()) {
+            return back()->withErrors(['puesto' => $aviso])->withInput();
+        }
         $datos = $validador->validate();
         $codigos = $datos['cajas'] ?? [];
         // Comprobar que todas las cajas seleccionadas estén listas para entrega.
@@ -693,17 +718,69 @@ class FlujoController extends Controller
                     ->withInput();
             }
             // Registrar la fecha y hora de entrega de las cajas.
+            $marca = $this->marca();
             Caja::query()
                 ->whereIn('codigo', $codigos)
                 ->where('etapa', 'entrega')
                 ->whereNull('entregado_at')
                 ->update([
                     'entregado_at' => now(),
+                    'responsable_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'],
                 ]);
         }
         return back()->with(
             'ok',
-            'La entrega se registró correctamente.'
+            'La entrega se registró correctamente.'.$this->firmaPuesto()
         );
+    }
+
+    public function elegirPuesto(Request $request): RedirectResponse
+    {
+        $cuenta = User::query()
+            ->where('activo', true)
+            ->where('email', '!=', User::CUENTA_PUESTO)
+            ->whereHas('rol', fn ($q) => $q->where('nombre', Rol::OPERADOR))
+            ->find($request->input('user_id'));
+        if ($cuenta === null) {
+            return back()->withErrors([
+                'user_id' => 'Elige una cuenta de operadora.',
+            ]);
+        }
+        session(['puesto_user_id' => $cuenta->id]);
+
+        return back();
+    }
+
+    private function faltaPuesto(): ?string
+    {
+        $user = Auth::user();
+        if ($user === null || $user->nombreRol() !== Rol::OPERADOR) {
+            return null;
+        }
+        if (User::quienRegistra() === null) {
+            return 'Elige qué cuenta de operadora está en el puesto antes de registrar.';
+        }
+
+        return null;
+    }
+
+    /** @return array{user_id: int|null, personal_id: int|null} */
+    private function marca(): array
+    {
+        $quien = User::quienRegistra();
+        $ficha = $quien === null ? null : Personal::query()->where('email', $quien->email)->first();
+
+        return [
+            'user_id' => $quien?->id ?? Auth::id(),
+            'personal_id' => $ficha?->id,
+        ];
+    }
+
+    private function firmaPuesto(): string
+    {
+        $quien = User::quienRegistra();
+
+        return $quien === null ? '' : ' Lo registró '.$quien->name.'.';
     }
 }

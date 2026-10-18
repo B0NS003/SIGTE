@@ -25,9 +25,11 @@ class Caja extends Model
         'actividad',
         'urgente',
         'responsable_id',
+        'personal_id',
         'etapa_desde',
         'proceso_desde',
         'proceso_hasta',
+        'entregado_at',
     ];
 
     protected function casts(): array
@@ -43,6 +45,11 @@ class Caja extends Model
     public function responsable(): BelongsTo
     {
         return $this->belongsTo(User::class, 'responsable_id');
+    }
+
+    public function persona(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 
     public function anotaciones(): HasMany
@@ -117,7 +124,21 @@ class Caja extends Model
 
     public function nombreResponsable(): string
     {
-        return $this->responsable?->name ?? 'Sin responsable';
+        if ($this->persona?->nombre) {
+            return $this->persona->nombre;
+        }
+
+        $responsable = $this->responsable;
+        if ($responsable !== null && $responsable->esCuentaDelPuesto()) {
+            $enPuesto = User::quienRegistra();
+            if ($enPuesto !== null && $enPuesto->isOperador() && ! $enPuesto->esCuentaDelPuesto()) {
+                return $enPuesto->name;
+            }
+
+            return 'Sin operadora en el puesto';
+        }
+
+        return $responsable?->name ?? 'Sin responsable';
     }
 
     public function sumarProceso(int $minutos): void
