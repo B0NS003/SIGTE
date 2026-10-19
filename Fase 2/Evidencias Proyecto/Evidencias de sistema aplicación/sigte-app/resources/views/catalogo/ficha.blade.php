@@ -35,7 +35,7 @@
                 <p class="eyebrow">Consulta · catálogo</p>
                 <h1>{{ $item['nombre'] ?? $codigo }}</h1>
                 @if ($item)
-                    <p class="main-sub">{{ $item['codigo'] }} · {{ $item['tipo'] }} · {{ $item['servicio'] }}</p>
+                    <p class="main-sub">{{ $item['codigo'] }}@if (!empty($item['codigo_referencia'])) · {{ $item['codigo_referencia'] }}@endif @if (!empty($item['numero'])) · Nº {{ $item['numero'] }}@endif · {{ $item['tipo'] }} · {{ $item['servicio'] }}</p>
                 @endif
             </div>
             <div class="main-actions">
@@ -83,8 +83,14 @@
                     <dl class="ficha-facts">
                         <div>
                             <dt>Código</dt>
-                            <dd>{{ $item['codigo'] }}</dd>
+                            <dd>{{ $item['codigo'] }}@if (!empty($item['codigo_referencia'])) · {{ $item['codigo_referencia'] }}@endif</dd>
                         </div>
+                        @if (!empty($item['numero']))
+                            <div>
+                                <dt>Número</dt>
+                                <dd>Nº {{ $item['numero'] }}</dd>
+                            </div>
+                        @endif
                         <div>
                             <dt>Tipo</dt>
                             <dd>{{ $item['tipo'] }}</dd>
@@ -114,9 +120,9 @@
                             </span>
                             <span class="ficha-nombre">
                                 {{ $instrumento['nombre'] }}
-                                @unless ($instrumento['imagen'])
-                                    <small>Sin foto</small>
-                                @endunless
+                                @if (!empty($instrumento['codigo']))
+                                    <small>{{ $instrumento['codigo'] }}</small>
+                                @endif
                             </span>
                             <span class="ficha-cant">× {{ $instrumento['cantidad'] }}</span>
                         </li>

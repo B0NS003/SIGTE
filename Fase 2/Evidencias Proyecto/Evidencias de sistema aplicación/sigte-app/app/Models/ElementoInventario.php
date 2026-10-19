@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ElementoInventario extends Model
@@ -10,8 +11,8 @@ class ElementoInventario extends Model
     protected $table = 'elementos_inventario';
 
     protected $fillable = [
+        'sala_id',
         'codigo',
-        'sala',
         'nombre',
         'ubicacion',
         'stock',
@@ -28,9 +29,24 @@ class ElementoInventario extends Model
         ];
     }
 
+    public function salaFisica(): BelongsTo
+    {
+        return $this->belongsTo(Sala::class, 'sala_id');
+    }
+
+    public function codigoSala(): string
+    {
+        return $this->salaFisica?->codigo ?? '';
+    }
+
+    public function movimientos(): HasMany
+    {
+        return $this->hasMany(MovimientoInsumo::class, 'elemento_inventario_id');
+    }
+
     public function reposiciones(): HasMany
     {
-        return $this->hasMany(Reposicion::class);
+        return $this->hasMany(Reposicion::class, 'elemento_inventario_id');
     }
 
     public function estadoStock(): string

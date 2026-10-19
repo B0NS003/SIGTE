@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Caja;
-use App\Models\Personal;
+use App\Models\Servicio;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -228,7 +228,8 @@ class CajaSeeder extends Seeder
             $quien = $personas[$demo['quien']] ?? null;
             unset($demo['quien']);
             $demo['responsable_id'] = $quien['user_id'] ?? null;
-            $demo['personal_id'] = $quien['personal_id'] ?? null;
+            $demo['servicio_id'] = Servicio::idPorNombre($demo['servicio']);
+            unset($demo['servicio']);
             $demo['proceso_desde'] = $demo['proceso_desde'] ?? null;
             $demo['proceso_hasta'] = $demo['proceso_hasta'] ?? null;
             $demo['entregado_at'] = null;
@@ -240,18 +241,16 @@ class CajaSeeder extends Seeder
         }
     }
 
-    /** @return array{user_id: int, personal_id: int}|null */
+    /** @return array{user_id: int}|null */
     private function persona(string $email): ?array
     {
         $user = User::query()->where('email', $email)->first();
-        $personal = Personal::query()->where('email', $email)->first();
-        if ($user === null || $personal === null) {
+        if ($user === null) {
             return null;
         }
 
         return [
             'user_id' => $user->id,
-            'personal_id' => $personal->id,
         ];
     }
 }

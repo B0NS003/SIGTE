@@ -23,7 +23,6 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'rol_id' => Rol::query()->where('nombre', Rol::OPERADOR)->value('id'),
             'activo' => true,
-            'role' => Rol::OPERADOR,
             'remember_token' => Str::random(10),
         ];
     }

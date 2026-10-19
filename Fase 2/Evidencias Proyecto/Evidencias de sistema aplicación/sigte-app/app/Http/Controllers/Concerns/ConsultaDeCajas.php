@@ -21,7 +21,7 @@ trait ConsultaDeCajas
     private function cajas(): array
     {
         return Caja::query()
-            ->with(['responsable', 'persona'])
+            ->with(['responsable', 'servicioClinico'])
             ->whereNull('entregado_at')
             ->orderByDesc('urgente')
             ->orderBy('etapa_desde')

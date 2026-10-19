@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
+use App\Models\Ficha;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -11,8 +12,29 @@ class CatalogoController extends Controller
 {
     use ResuelveUsuario;
 
+    /** @var list<string> */
+    private const ORDEN_AREAS = [
+        'Cirugía general',
+        'Digestiva',
+        'Bariátrica',
+        'Niño',
+        'Ginecología y obstetricia',
+        'Cirugía vascular',
+        'Urología',
+        'Otorrino',
+        'Traumatología',
+        'Cirugía plástica',
+        'Oftalmología',
+        'Dental y maxilofacial',
+    ];
+
     private function catalogoItems(): array
     {
+        $desdeFichas = $this->catalogoDesdeFichas();
+        if ($desdeFichas !== []) {
+            return $desdeFichas;
+        }
+
         $items = [
             [
                 'codigo' => 'SET-LAP-01',
@@ -100,20 +122,94 @@ class CatalogoController extends Controller
             return $item;
         }, $items);
     }
+    /** @return list<array<string, mixed>> */
+    private function catalogoLista(): array
+    {
+        if (! Ficha::query()->exists()) {
+            return $this->catalogoItems();
+        }
+
+        return Ficha::query()
+            ->with(['items.instrumento:id,nombre,codigo_fabricante'])
+            ->orderBy('area')
+            ->orderBy('nombre')
+            ->withSum('items as piezas', 'cantidad')
+            ->get()
+            ->map(function (Ficha $ficha): array {
+                $piezas = (int) $ficha->getAttribute('piezas');
+                $contenido = $ficha->items
+                    ->map(fn ($linea) => trim(($linea->instrumento?->codigo_fabricante ?? '').' '.($linea->instrumento?->nombre ?? '')))
+                    ->implode(' ');
+
+                return [
+                    'codigo' => $ficha->codigo,
+                    'codigo_referencia' => $ficha->codigo_referencia,
+                    'numero' => $ficha->numero,
+                    'nombre' => $ficha->nombre,
+                    'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
+                    'servicio' => $ficha->area ?: 'Cirugía general',
+                    'guia' => $piezas > 0,
+                    'instrumentos' => [],
+                    'piezas' => $piezas,
+                    'buscar' => $contenido,
+                ];
+            })
+            ->all();
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function catalogoDesdeFichas(): array
+    {
+        if (! Ficha::query()->exists()) {
+            return [];
+        }
+
+        return Ficha::query()
+            ->with(['items.instrumento', 'servicioClinico'])
+            ->orderBy('area')
+            ->orderBy('nombre')
+            ->get()
+            ->map(function (Ficha $ficha): array {
+                $instrumentos = $ficha->items->map(function ($linea): array {
+                    $tamano = trim((string) $linea->instrumento?->tamano);
+
+                    return [
+                        'codigo' => $linea->instrumento?->codigo_fabricante ?? '',
+                        'nombre' => trim(($linea->instrumento?->nombre ?? '').($tamano !== '' ? ' '.$tamano : '')),
+                        'cantidad' => $linea->cantidad,
+                        'imagen' => false,
+                    ];
+                })->all();
+
+                return [
+                    'codigo' => $ficha->codigo,
+                    'codigo_referencia' => $ficha->codigo_referencia,
+                    'numero' => $ficha->numero,
+                    'nombre' => $ficha->nombre,
+                    'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
+                    'servicio' => $ficha->area ?: ($ficha->servicioClinico?->nombre ?? 'Central'),
+                    'guia' => $instrumentos !== [],
+                    'instrumentos' => $instrumentos,
+                    'piezas' => array_sum(array_column($instrumentos, 'cantidad')),
+                ];
+            })
+            ->all();
+    }
+
     public function catalogo(Request $request): View
     {
-        $items = $this->catalogoItems();
+        $items = $this->catalogoLista();
         $busqueda = trim((string) $request->query('q', ''));
         $servicio = trim((string) $request->query('servicio', ''));
-        $servicios = collect($items)->pluck('servicio')->unique()->sort()->values()->all();
+        $orden = array_flip(self::ORDEN_AREAS);
+        $servicios = collect($items)->pluck('servicio')->unique()->sortBy(
+            fn (string $nombre) => $orden[$nombre] ?? 99
+        )->values()->all();
         $needle = mb_strtolower($busqueda);
-        $porBusqueda = array_values(array_filter($items, function (array $item) use ($needle): bool {
-            if ($needle === '') {
-                return true;
-            }
-            $texto = mb_strtolower($item['codigo'].' '.$item['nombre'].' '.$item['servicio'].' '.$item['tipo']);
-            return str_contains($texto, $needle);
-        }));
+        $porBusqueda = array_values(array_filter(
+            $items,
+            fn (array $item): bool => $this->coincideBusqueda($item, $needle)
+        ));
         $conteoServicios = [];
         foreach ($porBusqueda as $item) {
             $clave = $item['servicio'];
@@ -126,7 +222,22 @@ class CatalogoController extends Controller
                 fn (array $item) => $item['servicio'] === $servicio
             ));
         }
-        $filtrados = array_map(fn (array $item) => $this->conEtapaActual($item), $filtrados);
+        $etapas = $filtrados === []
+            ? collect()
+            : Caja::query()
+                ->whereIn('codigo', array_column($filtrados, 'codigo'))
+                ->pluck('etapa', 'codigo');
+        $filtrados = array_map(function (array $item) use ($etapas): array {
+            $etapa = $etapas[$item['codigo']] ?? null;
+            $item['etapa_actual'] = $etapa ? Caja::etiquetaEtapa($etapa) : null;
+
+            return $item;
+        }, $filtrados);
+        usort($filtrados, function (array $a, array $b) use ($orden): int {
+            $area = ($orden[$a['servicio']] ?? 99) <=> ($orden[$b['servicio']] ?? 99);
+
+            return $area !== 0 ? $area : strcasecmp((string) $a['nombre'], (string) $b['nombre']);
+        });
         return view('catalogo.index', [
             'usuario' => $this->usuarioSesion(),
             'items' => $filtrados,
@@ -149,9 +260,36 @@ class CatalogoController extends Controller
     }
     public function ficha(string $codigo): View
     {
-        $item = collect($this->catalogoItems())->first(
-            fn (array $caja) => strcasecmp($caja['codigo'], $codigo) === 0
-        );
+        $registro = Ficha::query()
+            ->with(['items.instrumento', 'servicioClinico'])
+            ->whereRaw('lower(codigo) = ?', [mb_strtolower($codigo)])
+            ->first();
+        if ($registro !== null) {
+            $item = [
+                'codigo' => $registro->codigo,
+                'codigo_referencia' => $registro->codigo_referencia,
+                'numero' => $registro->numero,
+                'nombre' => $registro->nombre,
+                'tipo' => $registro->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
+                'servicio' => $registro->area ?: ($registro->servicioClinico?->nombre ?? 'Central'),
+                'guia' => $registro->items->isNotEmpty(),
+                'instrumentos' => $registro->items->map(function ($linea): array {
+                    $tamano = trim((string) $linea->instrumento?->tamano);
+
+                    return [
+                        'codigo' => $linea->instrumento?->codigo_fabricante ?? '',
+                        'nombre' => trim(($linea->instrumento?->nombre ?? '').($tamano !== '' ? ' '.$tamano : '')),
+                        'cantidad' => $linea->cantidad,
+                        'imagen' => false,
+                    ];
+                })->all(),
+                'piezas' => (int) $registro->items->sum('cantidad'),
+            ];
+        } else {
+            $item = collect($this->catalogoItems())->first(
+                fn (array $caja) => strcasecmp($caja['codigo'], $codigo) === 0
+            );
+        }
         if ($item !== null) {
             $item = $this->conEtapaActual($item);
         }
@@ -167,6 +305,34 @@ class CatalogoController extends Controller
      * @param  array<string, mixed>  $item
      * @return array<string, mixed>
      */
+    /** @param  array<string, mixed>  $item */
+    private function coincideBusqueda(array $item, string $needle): bool
+    {
+        if ($needle === '') {
+            return true;
+        }
+
+        $numero = ltrim((string) preg_replace('/\D/', '', (string) ($item['numero'] ?? '')), '0');
+        $pedido = ltrim((string) preg_replace('/\D/', '', $needle), '0');
+        if ($numero !== '' && $pedido !== '' && $numero === $pedido && preg_match('/^#?\s*0*\d+$/u', $needle) === 1) {
+            return true;
+        }
+
+        $texto = mb_strtolower(implode(' ', array_filter([
+            $item['codigo'] ?? '',
+            $item['codigo_referencia'] ?? '',
+            $item['numero'] ?? '',
+            $numero,
+            str_pad($numero, 2, '0', STR_PAD_LEFT),
+            $item['nombre'] ?? '',
+            $item['servicio'] ?? '',
+            $item['tipo'] ?? '',
+            $item['buscar'] ?? '',
+        ])));
+
+        return str_contains($texto, $needle);
+    }
+
     private function conEtapaActual(array $item): array
     {
         $caja = Caja::query()->where('codigo', $item['codigo'])->first();

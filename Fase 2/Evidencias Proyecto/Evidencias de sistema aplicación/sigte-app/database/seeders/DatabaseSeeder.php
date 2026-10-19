@@ -14,8 +14,9 @@ class DatabaseSeeder extends Seeder
             PersonalSeeder::class,
             CajaSeeder::class,
             ConsumoServicioSeeder::class,
-            InsumoSeeder::class,
             ElementoInventarioSeeder::class,
+            InsumoSeeder::class,
+            FichaSeeder::class,
         ]);
     }
 }

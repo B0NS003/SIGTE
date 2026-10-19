@@ -20,10 +20,11 @@ class InventarioController extends Controller
     private function inventarioItems(): array
     {
         return ElementoInventario::query()
+            ->with('salaFisica')
             ->orderBy('nombre')
             ->get()
             ->map(fn (ElementoInventario $elemento) => [
-                'sala' => $elemento->sala,
+                'sala' => $elemento->codigoSala(),
                 'codigo' => $elemento->codigo,
                 'nombre' => $elemento->nombre,
                 'ubicacion' => $elemento->ubicacion,
@@ -105,7 +106,7 @@ class InventarioController extends Controller
                 ? collect()
                 : Reposicion::query()
                     ->with(['elemento', 'autor'])
-                    ->whereHas('elemento', fn ($consulta) => $consulta->where('sala', $sala))
+                    ->whereHas('elemento.salaFisica', fn ($consulta) => $consulta->where('codigo', $sala))
                     ->latest()
                     ->limit(8)
                     ->get(),
@@ -129,7 +130,7 @@ class InventarioController extends Controller
         ]);
 
         $elemento = ElementoInventario::query()
-            ->where('sala', $datos['sala'])
+            ->whereHas('salaFisica', fn ($consulta) => $consulta->where('codigo', $datos['sala']))
             ->where('codigo', $datos['elemento'])
             ->first();
 
@@ -173,7 +174,7 @@ class InventarioController extends Controller
 
         return redirect()
             ->route('mockups.inventario', [
-                'sala' => $elemento->sala,
+                'sala' => $elemento->codigoSala(),
                 'elemento' => $elemento->codigo,
             ])
             ->with('ok', $mensaje);

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -17,6 +18,7 @@ class Personal extends Model
     ];
 
     protected $fillable = [
+        'user_id',
         'nombre',
         'email',
         'grupo',
@@ -45,18 +47,13 @@ class Personal extends Model
         return 'noche';
     }
 
-    public function cajas(): HasMany
+    public function usuario(): BelongsTo
     {
-        return $this->hasMany(Caja::class, 'personal_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public static function enPuesto(): ?self
+    public function cajas(): HasMany
     {
-        $id = session('puesto_personal_id');
-        if ($id === null) {
-            return null;
-        }
-
-        return static::query()->where('activo', true)->find($id);
+        return $this->hasMany(Caja::class, 'responsable_id', 'user_id');
     }
 }

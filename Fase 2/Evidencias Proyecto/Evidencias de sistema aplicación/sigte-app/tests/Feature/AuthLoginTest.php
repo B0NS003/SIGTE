@@ -31,7 +31,6 @@ class AuthLoginTest extends TestCase
             'email' => 'operador@sigte.local',
             'password' => 'password',
             'rol_id' => $rolId,
-            'role' => Rol::OPERADOR,
         ]);
 
         $this->post(route('login'), [

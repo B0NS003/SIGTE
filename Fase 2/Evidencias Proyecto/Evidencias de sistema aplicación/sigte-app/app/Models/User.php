@@ -18,7 +18,6 @@ class User extends Authenticatable
         'password',
         'rol_id',
         'activo',
-        'role', // columna legacy; se mantiene hasta limpiar migración antigua
     ];
 
     protected $hidden = [

@@ -12,7 +12,6 @@ class CajaRetroceso extends Model
     protected $fillable = [
         'caja_id',
         'user_id',
-        'personal_id',
         'etapa_desde',
         'etapa_hacia',
         'motivo',

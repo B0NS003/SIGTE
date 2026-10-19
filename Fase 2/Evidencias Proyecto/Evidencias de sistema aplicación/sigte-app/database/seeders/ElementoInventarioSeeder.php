@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ElementoInventario;
+use App\Models\Sala;
 use Illuminate\Database\Seeder;
 
 class ElementoInventarioSeeder extends Seeder
@@ -23,8 +24,11 @@ class ElementoInventarioSeeder extends Seeder
         ];
 
         foreach ($elementos as $datos) {
+            $salaId = Sala::query()->where('codigo', $datos['sala'])->value('id');
+            unset($datos['sala']);
+            $datos['sala_id'] = $salaId;
             ElementoInventario::query()->firstOrCreate(
-                ['sala' => $datos['sala'], 'codigo' => $datos['codigo']],
+                ['sala_id' => $salaId, 'codigo' => $datos['codigo']],
                 $datos
             );
         }

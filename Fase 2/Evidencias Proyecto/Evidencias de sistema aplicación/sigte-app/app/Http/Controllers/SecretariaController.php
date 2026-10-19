@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ConsumoServicio;
 use App\Models\Insumo;
 use App\Models\MovimientoInsumo;
+use App\Models\Servicio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -23,14 +24,15 @@ class SecretariaController extends Controller
 
         if ($servicio !== '' && in_array($servicio, ConsumoServicio::servicios(), true) && $periodo !== null) {
             $editando = ConsumoServicio::query()
-                ->where('servicio', $servicio)
+                ->where('servicio_id', Servicio::idPorNombre($servicio))
                 ->whereDate('periodo', $periodo)
                 ->first();
         }
 
         $consumos = ConsumoServicio::query()
+            ->with('servicioClinico')
             ->orderByDesc('periodo')
-            ->orderBy('servicio')
+            ->orderBy('servicio_id')
             ->get();
 
         return view('secretaria.produccion', [
@@ -70,14 +72,15 @@ class SecretariaController extends Controller
             ]);
         }
 
+        $servicioId = Servicio::idPorNombre($datos['servicio']);
         $existia = ConsumoServicio::query()
-            ->where('servicio', $datos['servicio'])
+            ->where('servicio_id', $servicioId)
             ->whereDate('periodo', $periodo)
             ->exists();
 
         ConsumoServicio::query()->updateOrCreate(
             [
-                'servicio' => $datos['servicio'],
+                'servicio_id' => $servicioId,
                 'periodo' => $periodo,
             ],
             [
@@ -100,9 +103,9 @@ class SecretariaController extends Controller
 
     public function insumos(): View
     {
-        $insumos = Insumo::query()->orderBy('nombre')->get();
+        $insumos = Insumo::query()->with('salaFisica')->orderBy('nombre')->get();
         $movimientos = MovimientoInsumo::query()
-            ->with(['insumo', 'autor'])
+            ->with(['insumo.salaFisica', 'autor'])
             ->latest()
             ->limit(12)
             ->get();
@@ -118,7 +121,7 @@ class SecretariaController extends Controller
     public function guardarMovimiento(Request $request): RedirectResponse
     {
         $datos = $request->validate([
-            'insumo_id' => ['required', 'integer', 'exists:insumos,id'],
+            'insumo_id' => ['required', 'integer', 'exists:elementos_inventario,id'],
             'tipo' => ['required', 'in:'.MovimientoInsumo::ENTRADA.','.MovimientoInsumo::SALIDA],
             'cantidad' => ['required', 'integer', 'min:1'],
             'observacion' => ['nullable', 'string', 'max:255'],
@@ -151,7 +154,7 @@ class SecretariaController extends Controller
             $insumo->save();
 
             MovimientoInsumo::query()->create([
-                'insumo_id' => $insumo->id,
+                'elemento_inventario_id' => $insumo->id,
                 'tipo' => $datos['tipo'],
                 'cantidad' => $datos['cantidad'],
                 'observacion' => $datos['observacion'] ?? null,
@@ -242,8 +245,9 @@ class SecretariaController extends Controller
     private function filasReporte(string $periodo)
     {
         return ConsumoServicio::query()
+            ->with('servicioClinico')
             ->whereDate('periodo', $periodo)
-            ->orderBy('servicio')
+            ->orderBy('servicio_id')
             ->get();
     }
 }

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ConsumoServicio;
+use App\Models\Servicio;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -24,7 +25,7 @@ class ConsumoServicioSeeder extends Seeder
         foreach ($demos as $demo) {
             ConsumoServicio::query()->updateOrCreate(
                 [
-                    'servicio' => $demo['servicio'],
+                    'servicio_id' => Servicio::idPorNombre($demo['servicio']),
                     'periodo' => $demo['periodo'],
                 ],
                 [

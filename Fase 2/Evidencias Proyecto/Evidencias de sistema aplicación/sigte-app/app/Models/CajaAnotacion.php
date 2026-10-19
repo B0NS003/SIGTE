@@ -12,7 +12,6 @@ class CajaAnotacion extends Model
     protected $fillable = [
         'caja_id',
         'user_id',
-        'personal_id',
         'texto',
     ];
 
@@ -26,13 +25,8 @@ class CajaAnotacion extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function persona(): BelongsTo
-    {
-        return $this->belongsTo(Personal::class, 'personal_id');
-    }
-
     public function nombreQuien(): string
     {
-        return $this->persona?->nombre ?? $this->autor?->name ?? '';
+        return $this->autor?->name ?? '';
     }
 }

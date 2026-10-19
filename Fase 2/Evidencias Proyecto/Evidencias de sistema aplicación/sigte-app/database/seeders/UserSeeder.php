@@ -46,7 +46,6 @@ class UserSeeder extends Seeder
                     'password' => 'password',
                     'rol_id' => $rolId,
                     'activo' => true,
-                    'role' => $demo['rol'], // compatibilidad con columna legacy
                 ]
             );
         }

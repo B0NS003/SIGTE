@@ -96,7 +96,7 @@
                     <ul class="inv-atencion">
                         @foreach ($atencion as $item)
                             <li>
-                                <span class="badge badge-sala badge-{{ $item['sala'] }}">{{ $salas[$item['sala']] }}</span>
+                                <span class="badge badge-sala badge-{{ $item['sala'] }}">{{ $salas[$item['sala']] ?? 'Sala' }}</span>
                                 <div>
                                     <strong>{{ $item['nombre'] }}</strong>
                                     <span>{{ $item['ubicacion'] }} · hay {{ $item['stock'] }} · mínimo {{ $item['minimo'] }}</span>

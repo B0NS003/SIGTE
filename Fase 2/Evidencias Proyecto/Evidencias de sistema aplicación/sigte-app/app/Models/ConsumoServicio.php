@@ -11,7 +11,7 @@ class ConsumoServicio extends Model
     protected $table = 'consumos_servicio';
 
     protected $fillable = [
-        'servicio',
+        'servicio_id',
         'periodo',
         'consumo',
         'litros',
@@ -28,6 +28,16 @@ class ConsumoServicio extends Model
         ];
     }
 
+    public function servicioClinico(): BelongsTo
+    {
+        return $this->belongsTo(Servicio::class, 'servicio_id');
+    }
+
+    public function getServicioAttribute(): string
+    {
+        return $this->servicioClinico?->nombre ?? '';
+    }
+
     public function autor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -36,7 +46,11 @@ class ConsumoServicio extends Model
     /** @return list<string> */
     public static function servicios(): array
     {
-        return ['Pabellon', 'Dental', 'Maternidad', 'Urgencia', 'UCI', 'Curaciones'];
+        return Servicio::query()
+            ->whereIn('codigo', ['pabellon', 'dental', 'maternidad', 'urgencia', 'uci', 'curaciones'])
+            ->orderBy('nombre')
+            ->pluck('nombre')
+            ->all();
     }
 
     public static function etiquetaPeriodo(Carbon|string|null $periodo): string

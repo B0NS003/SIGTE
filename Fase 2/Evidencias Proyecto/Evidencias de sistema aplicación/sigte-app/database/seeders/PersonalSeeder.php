@@ -18,7 +18,6 @@ class PersonalSeeder extends Seeder
                 'name' => 'Judith Herrada Valladares',
                 'password' => 'password',
                 'rol_id' => $rolId,
-                'role' => Rol::ADMINISTRADORA,
                 'activo' => true,
             ]
         );
@@ -93,7 +92,6 @@ class PersonalSeeder extends Seeder
                         'name' => $nombre,
                         'password' => 'password',
                         'rol_id' => $rolOperadora,
-                        'role' => Rol::OPERADOR,
                         'activo' => true,
                     ]
                 );
