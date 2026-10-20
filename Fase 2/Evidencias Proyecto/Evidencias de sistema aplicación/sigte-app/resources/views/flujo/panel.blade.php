@@ -102,18 +102,84 @@
                 class="ops-filter {{ $etapa_filtro === null ? 'is-active' : '' }}"
                 href="{{ $urlConsulta(null, $busqueda) }}"
             >
-                Todas <em>{{ $totalTodas }}</em>
+                <span>Todas</span>
+                <em>{{ $totalTodas }}</em>
             </a>
+
             @foreach ($fases as $i => $fase)
                 <a
                     class="ops-filter {{ $etapa_filtro === $i ? 'is-active' : '' }}"
                     href="{{ $urlConsulta($i, $busqueda) }}"
                 >
-                    {{ $fase }} <em>{{ $conteo_etapas[$i] ?? 0 }}</em>
+                    @switch($i)
+                        @case(0)
+                            {{-- Recepción: Package --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/>
+                                <path d="M12 22V12"/>
+                                <path d="m3.3 7 8.7 5 8.7-5"/>
+                                <path d="m7.5 4.27 9 5.15"/>
+                            </svg>
+                            @break
+
+                        @case(1)
+                            {{-- Lavado --}}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="M12 3c-2.5 4-7 8.5-7 12a7 7 0 0 0 14 0c0-3.5-4.5-8-7-12z"/>
+                                <path d="M9 16a3 3 0 0 0 3 3"/>
+                            </svg>
+                            @break
+
+                        @case(2)
+                            {{-- Preparación: Wrench --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a2.121 2.121 0 0 1-3-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/>
+                            </svg>
+                            @break
+
+                        @case(3)
+                            {{-- Esterilización --}}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path d="M9 12l2 2 4-4"/>
+                                <path d="M12 3v2m0 14v2M3 12h2m14 0h2"/>
+                            </svg>
+                            @break
+
+                        @case(4)
+                            {{-- Almacén: Archive --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="5" x="2" y="3" rx="1"/>
+                                <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/>
+                                <path d="M10 12h4"/>
+                            </svg>
+                            @break
+
+                        @case(5)
+                            {{-- Entrega: Check --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5"/>
+                            </svg>
+                            @break
+                    @endswitch
+
+                    <span>{{ $fase }}</span>
+                    <em>{{ $conteo_etapas[$i] ?? 0 }}</em>
                 </a>
             @endforeach
         </div>
-
         <p class="ops-result-meta">
             @if ($hay_filtros)
                 {{ $total_consulta }} {{ $total_consulta === 1 ? 'caja encontrada' : 'cajas encontradas' }}
