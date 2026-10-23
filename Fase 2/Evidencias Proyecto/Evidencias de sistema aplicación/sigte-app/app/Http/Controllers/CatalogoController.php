@@ -7,6 +7,7 @@ use App\Models\Caja;
 use App\Models\Ficha;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class CatalogoController extends Controller
@@ -256,15 +257,64 @@ class CatalogoController extends Controller
             'hay_filtros' => $busqueda !== '' || $servicio !== '',
         ]);
     }
-    public function catalogoAdmin(): View
+    public function catalogoAdmin(Request $request)
     {
+        // Se reutiliza la ruta GET existente para entregar fotografías sin modificar web.php.
+        if ($request->query('instrumento_imagen') !== null) {
+            abort_unless(ctype_digit((string) $request->query('instrumento_imagen')), 404);
+            abort_unless(Schema::hasColumn('instrumentos', 'imagen'), 404);
+            $id = (int) $request->query('instrumento_imagen');
+            $columnas = ['imagen'];
+            $campoMime = Schema::hasColumn('instrumentos', 'imagen_mime') ? 'imagen_mime'
+                : (Schema::hasColumn('instrumentos', 'imagen_formato') ? 'imagen_formato' : null);
+            if ($campoMime) $columnas[] = $campoMime;
+            $registro = DB::table('instrumentos')->where('id', $id)->first($columnas);
+            abort_if(!$registro || !$registro->imagen, 404);
+            $bytes = $registro->imagen;
+            if (is_resource($bytes)) $bytes = stream_get_contents($bytes);
+            if (is_string($bytes) && str_starts_with($bytes, '\\x')) {
+                $bytes = hex2bin(substr($bytes, 2));
+            }
+            abort_unless(is_string($bytes) && $bytes !== '', 404);
+            $mime = $campoMime ? (string) ($registro->{$campoMime} ?? '') : '';
+            if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+                $detector = new \finfo(FILEINFO_MIME_TYPE);
+                $mime = $detector->buffer($bytes);
+            }
+            abort_unless(in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true), 404);
+            return response($bytes, 200, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'private, max-age=3600',
+                'X-Content-Type-Options' => 'nosniff',
+            ]);
+        }
+
         // Servicios reales: tabla servicios, no especialidades de fichas.area.
         $servicios = DB::table('servicios')->orderBy('nombre')->pluck('nombre')->all();
         $items = $this->catalogoItems();
+        // Solo metadatos en el listado: los BYTEA se consultan al solicitar cada foto.
+        $tieneImagen = Schema::hasColumn('instrumentos', 'imagen');
+        $idsConImagen = $tieneImagen
+            ? DB::table('instrumentos')->whereNotNull('imagen')->pluck('id')->flip()
+            : collect();
+        $instrumentos = DB::table('instrumentos')
+            ->select('id', 'nombre', 'tamano', 'codigo_fabricante')
+            ->orderBy('nombre')->get()
+            ->map(function ($inst) use ($idsConImagen) {
+                return [
+                    'id' => $inst->id,
+                    'nombre' => $inst->nombre,
+                    'tamano' => $inst->tamano,
+                    'codigo' => $inst->codigo_fabricante,
+                    'imagen_url' => $idsConImagen->has($inst->id)
+                        ? url()->current().'?instrumento_imagen='.$inst->id : null,
+                ];
+            })->all();
 
         return view('catalogo.admin', [
             'usuario' => $this->usuarioSesion(),
             'items' => $items,
+            'instrumentosCatalogo' => $instrumentos,
             'tipos' => [
                 'Caja quirúrgica',
                 'Set de instrumental',
