@@ -129,7 +129,13 @@
                     <div class="cat-grid">
                         @foreach ($cajas as $item)
                             <a class="cat-card" href="{{ route('mockups.ficha', $item['codigo']) }}">
-                                <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
+                                <div class="cat-photo is-empty">
+                                    <img
+                                        class="cat-photo-placeholder"
+                                        src="{{ asset('images/catalogo/sin-imagen.png') }}"
+                                        alt="Imagen de la caja no disponible"
+                                        loading="lazy"
+                                    >
                                     <span>{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
                                 </div>
                                 <div class="cat-body">

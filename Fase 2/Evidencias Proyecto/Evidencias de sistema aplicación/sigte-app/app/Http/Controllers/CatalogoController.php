@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
 use App\Models\Ficha;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CatalogoController extends Controller
@@ -187,7 +188,13 @@ class CatalogoController extends Controller
                     'numero' => $ficha->numero,
                     'nombre' => $ficha->nombre,
                     'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
-                    'servicio' => $ficha->area ?: ($ficha->servicioClinico?->nombre ?? 'Central'),
+                    // Compatibilidad temporal: la vista actual agrupa por 'servicio',
+                    // aunque ese valor corresponde al área quirúrgica.
+                    // Se corregirá al actualizar admin.blade.php y sus filtros.
+                    'servicio' => $ficha->area ?: 'Sin área asignada',
+                    'area' => $ficha->area ?: 'Sin área asignada',
+                    'servicio_real' => $ficha->servicioClinico?->nombre ?? 'Sin servicio asignado',
+                    'servicio_id' => $ficha->servicio_id,
                     'guia' => $instrumentos !== [],
                     'instrumentos' => $instrumentos,
                     'piezas' => array_sum(array_column($instrumentos, 'cantidad')),
@@ -251,13 +258,26 @@ class CatalogoController extends Controller
     }
     public function catalogoAdmin(): View
     {
+        // Servicios reales: tabla servicios, no especialidades de fichas.area.
+        $servicios = DB::table('servicios')->orderBy('nombre')->pluck('nombre')->all();
+        $items = $this->catalogoItems();
+
         return view('catalogo.admin', [
             'usuario' => $this->usuarioSesion(),
-            'items' => $this->catalogoItems(),
-            'tipos' => ['Set quirúrgico', 'Caja de curación', 'Contenedor', 'Paquete grado médico'],
-            'servicios' => ['Pabellón', 'Maternidad', 'Curaciones', 'UCI', 'General', 'Urgencia'],
+            'items' => $items,
+            'tipos' => [
+                'Caja quirúrgica',
+                'Set de instrumental',
+                'Set de ópticas',
+                'Set de accesorios',
+                'Caja de implantes',
+                'Otros',
+            ],
+            'servicios' => $servicios,
+            'areas' => collect($items)->pluck('area')->filter()->unique()->sort()->values()->all(),
         ]);
     }
+
     public function ficha(string $codigo): View
     {
         $registro = Ficha::query()
