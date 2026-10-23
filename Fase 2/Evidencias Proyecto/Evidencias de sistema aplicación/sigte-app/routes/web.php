@@ -36,8 +36,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/consulta/catalogo', [CatalogoController::class, 'catalogo'])->name('mockups.catalogo');
         Route::get('/admin/catalogo', [CatalogoController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
         Route::get('/consulta/catalogo/{codigo}', [CatalogoController::class, 'ficha'])->name('mockups.ficha');
+
+        # Inventario
         Route::get('/consulta/inventario', [InventarioController::class, 'inventario'])->name('mockups.inventario');
         Route::post('/consulta/inventario/reposicion', [InventarioController::class, 'registrarReposicion'])->name('mockups.inventario.reponer');
+        Route::get('/consulta/inventario/{sala}/{codigo}/historial', [InventarioController::class, 'historialElemento'])->name('mockups.inventario.historial');
+
         Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('mockups.usuarios');
         Route::get('/admin/turnos', [AdminController::class, 'turnos'])->name('mockups.turnos');
         Route::post('/admin/turnos', [AdminController::class, 'asignarTurno'])->name('mockups.turnos.asignar');

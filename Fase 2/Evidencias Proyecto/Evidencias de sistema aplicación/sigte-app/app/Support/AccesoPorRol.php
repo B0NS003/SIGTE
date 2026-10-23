@@ -27,8 +27,12 @@ class AccesoPorRol
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+
+        /** Inventario */
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario.reponer' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.inventario.historial' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
+
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],

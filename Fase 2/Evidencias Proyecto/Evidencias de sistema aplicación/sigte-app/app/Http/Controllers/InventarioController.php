@@ -60,29 +60,26 @@ class InventarioController extends Controller
                 'en_proceso' => (int) $delLibro->sum('en_proceso'),
             ];
         }
-        $filtrados = $sala === 'todos'
-            ? []
+
+        $itemsSala = $sala === 'todos'
+            ? collect()
             : collect($items)
                 ->where('sala', $sala)
-                ->sortBy(fn (array $item) => ['critico' => 0, 'bajo' => 1, 'ok' => 2][$item['estado']] ?? 9)
-                ->values()
-                ->all();
-        if ($sala !== 'todos' && $busqueda !== '') {
-            $needle = mb_strtolower($busqueda);
-            $filtrados = array_values(array_filter(
-                $filtrados,
-                function (array $item) use ($needle): bool {
-                    $texto = mb_strtolower(
-                        $item['codigo'].' '.$item['nombre'].' '.$item['ubicacion']
-                    );
-                    return str_contains($texto, $needle);
-                }
-            ));
-        }
+                ->sortBy(fn(array $item) => [
+                    'crítico' => 0,
+                    'bajo' => 1,
+                    'ok' => 2,
+                ][$item['estado']] ?? 9)
+                ->values();
+
+        $filtrados = $itemsSala->all();
+
         $atencion = collect($items)->whereIn('estado', ['bajo', 'critico'])->values()->all();
         $rol = Auth::user()->nombreRol();
         return view('inventario.index', [
             'usuario' => $this->usuarioSesion(),
+            'rol' => $rol,
+            'esAdministradora' => $rol === Rol::ADMINISTRADORA,
             'puedeReponer' => in_array($rol, [Rol::ENFERMERA, Rol::ADMINISTRADORA], true),
             'elemento' => trim((string) request()->query('elemento', '')),
             'busqueda' => $busqueda,
@@ -95,10 +92,11 @@ class InventarioController extends Controller
                 : collect($items)->where('sala', $sala)->values()->all(),
             'atencion' => $atencion,
             'resumen' => [
-                'tipos' => count($filtrados),
-                'bajo_minimo' => collect($filtrados)->whereIn('estado', ['bajo', 'critico'])->count(),
-                'en_almacen' => collect($filtrados)->sum('stock'),
-                'en_proceso' => collect($filtrados)->sum('en_proceso'),
+                'tipos' => $itemsSala->count(),
+                'bajo_minimo' => $itemsSala
+                    ->whereIn('estado', ['bajo', 'critico'])->count(),
+                'en_almacen' => $itemsSala->sum('stock'),
+                'en_proceso' => $itemsSala->sum('en_proceso'),
             ],
             'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
             'hora' => now()->timezone('America/Santiago')->format('H:i'),
@@ -178,5 +176,31 @@ class InventarioController extends Controller
                 'elemento' => $elemento->codigo,
             ])
             ->with('ok', $mensaje);
+    }
+    
+    public function historialElemento(string $sala, string $codigo)
+    {
+        $elemento = ElementoInventario::query()
+            ->where('sala', $sala)
+            ->where('codigo', $codigo)
+            ->firstOrFail();
+            
+        $reposiciones = Reposicion::query()
+            ->with('autor')
+            ->where('elemento_inventario_id', $elemento->id)
+            ->latest()
+            ->get()
+            ->map(fn (Reposicion $reposicion) => [
+                'cantidad' => $reposicion->cantidad,
+                'fecha' => $reposicion->created_at
+                    ->timezone('America/Santiago')
+                    ->format('d/m/Y · H:i'),
+                'autor' => $reposicion->autor?->name ?? 'Sin usuario',
+            ]);
+            
+        return response()->json([
+            'elemento' => $elemento->nombre,
+            'historial' => $reposiciones,
+        ]);
     }
 }
