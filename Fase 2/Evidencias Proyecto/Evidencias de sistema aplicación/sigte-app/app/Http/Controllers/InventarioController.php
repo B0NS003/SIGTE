@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\ElementoInventario;
 use App\Models\Reposicion;
 use App\Models\Rol;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -111,7 +112,7 @@ class InventarioController extends Controller
         ]);
     }
 
-    public function registrarReposicion(Request $request): RedirectResponse
+    public function registrarReposicion(Request $request): JsonResponse|RedirectResponse
     {
         $datos = $request->validate([
             'sala' => ['required', 'in:lavado,armado,esteril'],
@@ -133,6 +134,13 @@ class InventarioController extends Controller
             ->first();
 
         if ($elemento === null) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'Elige el elemento que se repone.',
+                ], 422);
+            }
+
             return back()
                 ->withInput()
                 ->withErrors(['elemento' => 'Elige el elemento que se repone.']);
@@ -155,6 +163,13 @@ class InventarioController extends Controller
         } catch (Throwable $e) {
             report($e);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'No fue posible registrar la reposición. La cantidad disponible no cambió.',
+                ], 500);
+            }
+
             return back()
                 ->withInput()
                 ->withErrors([
@@ -168,6 +183,19 @@ class InventarioController extends Controller
             $mensaje .= ' La alerta de stock quedó desactivada.';
         } elseif ($teniaAlerta) {
             $mensaje .= ' Sigue bajo el mínimo ('.$elemento->minimo.').';
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'mensaje' => $mensaje,
+                'elemento' => [
+                    'stock' => (int) $elemento->stock,
+                    'minimo' => (int) $elemento->minimo,
+                    'codigo' => $elemento->codigo,
+                    'sala' => $elemento->codigoSala(),
+                ],
+            ]);
         }
 
         return redirect()

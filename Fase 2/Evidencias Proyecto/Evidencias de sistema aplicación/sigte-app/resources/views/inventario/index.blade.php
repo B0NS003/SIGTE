@@ -1,10 +1,12 @@
 @extends('layouts.app')
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/inventario.css') }}?v={{ @filemtime(public_path('css/inventario.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/inventario/modal-reposicion.css') }}?v={{ filemtime(public_path('css/inventario/modal-reposicion.css')) }}">
 @endpush
 
 @push('scripts')
 <script src="{{ asset('js/inventario.js') }}?v={{ @filemtime(public_path('js/inventario.js')) }}"></script>
+<script src="{{ asset('js/inventario/modal-reposicion.js') }}?v={{ filemtime(public_path('js/inventario/modal-reposicion.js')) }}" defer></script>
 @endpush
 
 @section('title', 'SIGTE — Inventario')
@@ -106,27 +108,27 @@ $totalElementos = collect($libros)->sum('tipos');
                 <span class="badge badge-urgent">{{ count($atencion) }}</span>
             </div>
             @if ($atencion === [])
-                <p class="recv-help">Ningún elemento está bajo el mínimo.</p>
+            <p class="recv-help">Ningún elemento está bajo el mínimo.</p>
             @else
-                <ul class="inv-atencion">
-                    @foreach ($atencion as $item)
-                        <li>
-                            <span class="badge badge-sala badge-{{ $item['sala'] }}">{{ $salas[$item['sala']] ?? 'Sala' }}</span>
-                            <div>
-                                <strong>{{ $item['nombre'] }}</strong>
-                                <span>{{ $item['ubicacion'] }} · hay {{ $item['stock'] }} · mínimo {{ $item['minimo'] }}</span>
-                            </div>
-                            @if ($item['estado'] === 'critico')
-                                <span class="pill pill-danger">Crítico</span>
-                            @else
-                                <span class="pill pill-warn">Bajo mínimo</span>
-                            @endif
-                            @if ($puedeReponer)
-                                <a class="panel-link" href="{{ route('mockups.inventario', ['sala' => $item['sala'], 'elemento' => $item['codigo']]) }}">Reponer</a>
-                            @endif
-                        </li>
-                    @endforeach
-                </ul>
+            <ul class="inv-atencion">
+                @foreach ($atencion as $item)
+                <li>
+                    <span class="badge badge-sala badge-{{ $item['sala'] }}">{{ $salas[$item['sala']] ?? 'Sala' }}</span>
+                    <div>
+                        <strong>{{ $item['nombre'] }}</strong>
+                        <span>{{ $item['ubicacion'] }} · hay {{ $item['stock'] }} · mínimo {{ $item['minimo'] }}</span>
+                    </div>
+                    @if ($item['estado'] === 'critico')
+                    <span class="pill pill-danger">Crítico</span>
+                    @else
+                    <span class="pill pill-warn">Bajo mínimo</span>
+                    @endif
+                    @if ($puedeReponer)
+                    <a class="panel-link" href="{{ route('mockups.inventario', ['sala' => $item['sala'], 'elemento' => $item['codigo']]) }}">Reponer</a>
+                    @endif
+                </li>
+                @endforeach
+            </ul>
             @endif
         </section>
 
@@ -345,137 +347,6 @@ $totalElementos = collect($libros)->sum('tipos');
     </main>
 </div>
 
-<!-- MODAL PARA ACTUALIZAR EL ELEMENTO -->
-@if ($puedeReponer)
-<div class="inv-modal" id="inv-modal-reposicion" hidden>
+@include('inventario.partials.modal-reposicion')
 
-    <div class="inv-modal-overlay" id="inv-modal-overlay"></div>
-
-    <div class="inv-modal-contenido"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="inv-modal-titulo">
-
-        <button
-            type="button"
-            class="inv-modal-cerrar"
-            id="inv-cerrar-reposicion"
-            aria-label="Cerrar">
-            ×
-        </button>
-
-        <form
-            class="inv-reposicion-modal"
-            action="{{ route('mockups.inventario.reponer') }}"
-            method="post"
-            novalidate>
-            @csrf
-
-            <input type="hidden" name="sala" value="{{ $sala }}">
-
-            <div class="panel-head">
-                <p class="inv-quien">
-                    {{ $usuario['nombre'] }} · {{ $fecha }} · {{ $hora }}
-                </p>
-            </div>
-
-            <div class="inv-modal-columnas">
-
-                <!-- COLUMNA IZQUIERDA: REGISTRO -->
-                <section class="inv-modal-registro">
-
-                    <h2 class="inv-modal-seccion-titulo">
-                        Registrar reposición
-                    </h2>
-
-                    <div class="inv-modal-elemento-bloque">
-
-                        <label class="field-label" for="elemento">
-                            Elemento
-                        </label>
-
-                        <p class="inv-modal-elemento" id="inv-elemento-nombre">
-                            Selecciona un elemento de la tabla
-                        </p>
-
-                        <p class="inv-modal-stock" id="inv-modal-stock"></p>
-
-                        <input
-                            type="hidden"
-                            id="elemento"
-                            name="elemento"
-                            required>
-                    </div>
-
-                    <div class="inv-modal-cantidad">
-
-                        <label class="field-label" for="cantidad">
-                            Cantidad que entra
-                        </label>
-
-                    <div class="inv-cantidad-campo">
-                        <label class="field">
-                            <input
-                                id="cantidad"
-                                name="cantidad"
-                                type="number"
-                                min="1"
-                                max="9999"
-                                step="1"
-                                required
-                                placeholder="Unidades"
-                                aria-describedby="inv-cantidad-error">
-                        </label>
-
-                        <p
-                            class="inv-cantidad-error"
-                            id="inv-cantidad-error"
-                            hidden>
-                            Ingresa una cantidad válida.
-                        </p>
-                    </div>
-
-                    </div>
-
-                    <p class="recv-help" id="inv-queda" hidden></p>
-
-                    <button
-                        class="btn btn-primary inv-btn-registrar"
-                        id="inv-anotar"
-                        type="submit">
-                        Registrar
-                    </button>
-
-                </section>
-
-                <!-- COLUMNA DERECHA: HISTORIAL -->
-                <section class="inv-modal-columna-historial">
-
-                    <h2 class="inv-modal-seccion-titulo">
-                        Historial del elemento
-                    </h2>
-
-                    <p id="inv-historial-cargando" class="recv-help" hidden>
-                        Cargando historial...
-                    </p>
-
-                    <p id="inv-historial-vacio" class="recv-help" hidden>
-                        Este elemento todavía no tiene reposiciones.
-                    </p>
-
-                    <p id="inv-historial-error" class="recv-help" hidden>
-                        No fue posible cargar el historial.
-                    </p>
-
-                    <ol class="act-lista" id="inv-historial-lista"></ol>
-
-                </section>
-
-            </div>
-
-        </form>
-
-    </div>
-</div>
-@endif
 @endsection
