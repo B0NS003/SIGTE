@@ -1593,7 +1593,7 @@
   display: grid;
   grid-template-columns: minmax(0, 2.05fr) minmax(290px, 1fr);
   gap: 1rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 #tab-nuevo-instrumento .admin-instrument-form {
@@ -1608,8 +1608,8 @@
 }
 
 #tab-nuevo-instrumento .instrumento-form-content {
-  padding: 1.35rem 1.45rem 2rem;
-  flex: 1;
+  padding: 1.35rem 1.45rem 1.5rem;
+  flex: 0 0 auto;
 }
 
 #tab-nuevo-instrumento .instrumento-form-content h2 {
@@ -1629,21 +1629,29 @@
 #tab-nuevo-instrumento .instrumento-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.35rem 1.1rem;
+  gap: 1.1rem;
   align-items: start;
 }
 
 #tab-nuevo-instrumento .instrumento-fields label {
-  display: flex;
-  flex-direction: column;
-  gap: .45rem;
+  display: block;
   min-width: 0;
-  color: #425b7c;
-  font-size: .72rem;
+  color: #365073;
+  font-size: .73rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .035em;
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: 0;
 }
+
+#tab-nuevo-instrumento .instrumento-fields label input,
+#tab-nuevo-instrumento .instrumento-fields label textarea,
+#tab-nuevo-instrumento .instrumento-fields label select {
+  display: block;
+  width: 100%;
+  margin-top: .5rem;
+}
+
 
 #tab-nuevo-instrumento .instrumento-fields input,
 #tab-nuevo-instrumento .instrumento-fields textarea {
@@ -1695,20 +1703,26 @@
 #tab-nuevo-instrumento .instrumento-form-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.2rem;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
   border-top: 1px solid var(--borde);
   background: #fafbfe;
 }
 
 #tab-nuevo-instrumento .instrumento-form-footer .btn {
-  min-width: 130px;
+  flex: 0 0 190px;
+  width: 190px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: .85rem;
+  font-weight: 700;
   border-radius: 10px;
 }
 
 #tab-nuevo-instrumento .instrumento-form-footer .btn-primary {
-  min-width: 225px;
+  min-width: 0;
 }
 
 #tab-nuevo-instrumento .instrumento-form-footer .btn-primary:disabled {
@@ -1717,11 +1731,12 @@
 }
 
 #tab-nuevo-instrumento .instrumento-photo-panel {
-  padding: 1.25rem;
+  padding: 1.1rem 1.25rem;
   border: 1px solid var(--borde);
   border-radius: 17px;
   background: #fff;
   min-width: 0;
+  align-self: start;
 }
 
 #tab-nuevo-instrumento .instrumento-photo-panel h3 {
@@ -1731,7 +1746,7 @@
 }
 
 #tab-nuevo-instrumento .instrumento-photo-panel h4 {
-  margin: 1.2rem 0 0.55rem;
+  margin: .85rem 0 .45rem;
   color: #60748f;
   font-size: 0.8rem;
 }
@@ -1742,8 +1757,8 @@
   align-items: center;
   justify-content: center;
   gap: .4rem;
-  min-height: 195px;
-  padding: 1rem;
+  min-height: 132px;
+  padding: .85rem;
   border: 1.5px dashed #c5d4e5;
   border-radius: 12px;
   background: #f9fbfd;
@@ -1786,20 +1801,20 @@
 }
 
 #tab-nuevo-instrumento .instrumento-preview {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-    border-radius: 11px;
-    background: #f3f6fa;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  background: #f3f6fa;
 }
 
 #tab-nuevo-instrumento .instrumento-preview img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 #tab-nuevo-instrumento .instrumento-photo-actions {
@@ -1807,7 +1822,7 @@
   justify-content: space-between;
   align-items: center;
   gap: .65rem;
-  margin-top: .7rem;
+  margin-top: .55rem;
 }
 
 #tab-nuevo-instrumento .instrumento-photo-actions .btn {
@@ -1855,51 +1870,41 @@
   }
 
   #tab-nuevo-instrumento .instrumento-form-footer .btn {
-    flex: 1;
+    flex: 1 1 140px;
+    width: auto;
     min-width: 0;
   }
 }
 
-/* Correcciones de distribución: Nuevo instrumento */
-#tab-nuevo-instrumento .instrumento-create-layout {
-  align-items: start;
-}
-
-#tab-nuevo-instrumento .admin-instrument-form {
-  align-self: start;
-  min-height: 0;
-}
-
-#tab-nuevo-instrumento .instrumento-form-content {
-  flex: 0 0 auto;
-  padding: 1.35rem 1.45rem 1.5rem;
-}
-
-#tab-nuevo-instrumento .instrumento-fields {
-  gap: 1.1rem;
-}
-
-#tab-nuevo-instrumento .instrumento-fields label {
-  display: block;
+/* Selección del tipo de conjunto: mismo diseño que los demás campos */
+#tab-nuevo-instrumento .instrumento-fields select {
   min-width: 0;
-  line-height: 1.45;
+  box-sizing: border-box;
+  min-height: 46px;
+  padding: .85rem .9rem;
+  border: 1px solid #d8e1ec;
+  border-radius: 10px;
+  background: #f9fbfd;
+  color: var(--navy);
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+#tab-nuevo-instrumento .instrumento-fields select:focus {
+  outline: 2px solid rgba(232, 90, 28, .2);
+  border-color: var(--naranja);
+}
+
+#tab-nuevo-instrumento .instrumento-fields select:invalid {
+  color: #64748b;
 }
 
 #tab-nuevo-instrumento .instrumento-fields label .instrumento-required {
-  display: inline;
   margin-left: .2rem;
-  vertical-align: baseline;
-}
-
-#tab-nuevo-instrumento .instrumento-fields label input,
-#tab-nuevo-instrumento .instrumento-fields label textarea {
-  display: block;
-  width: 100%;
-  margin-top: .5rem;
-}
-
-#tab-nuevo-instrumento .instrumento-fields textarea {
-  min-height: 112px;
 }
 
 #tab-nuevo-instrumento .instrumento-char-counter {
@@ -1908,10 +1913,45 @@
   margin-top: .3rem;
 }
 
-#tab-nuevo-instrumento .instrumento-form-footer {
-  margin-top: 0;
-}
-
 #tab-nuevo-instrumento .instrumento-photo-actions .btn {
   font-size: .85rem;
+}
+
+/* Nueva ficha: instrumentos reales, sin columna de fotografía */
+#tab-nueva-ficha .ficha-table-head,
+#tab-nueva-ficha .mant-pieza {
+  grid-template-columns: 42px minmax(0, 1fr) 110px 100px;
+}
+
+#tab-nueva-ficha .mant-pieza .pieza-nombre {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d7e1ed;
+  border-radius: 9px;
+  background: #fff;
+  padding: 10px 12px;
+  color: #16345b;
+  font: inherit;
+}
+
+#tab-nueva-ficha .mant-pieza .ficha-numero {
+  align-self: center;
+  text-align: center;
+  color: #64748b;
+  font-weight: 700;
+}
+
+#tab-nueva-ficha .mant-pieza .pieza-cant {
+  width: 100%;
+}
+
+@media (max-width: 650px) {
+  #tab-nueva-ficha .mant-pieza {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  #tab-nueva-ficha .mant-pieza .pieza-cant,
+  #tab-nueva-ficha .mant-pieza .js-quitar {
+    grid-column: 2;
+  }
 }

@@ -44,15 +44,11 @@
             <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-instrumento">+ Nuevo instrumento</button>
         </nav>
         <div class="admin-panel-tab" id="tab-catalogo" role="tabpanel">
-            <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-fichas"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Buscar por código, nombre, tipo o área…" autocomplete="off"></label></div>
+            <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-fichas"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Buscar por código, nombre, tipo o servicio…" autocomplete="off"></label></div>
             <div class="admin-filter-sections">
                 <section class="admin-filter-section">
                     <button class="ops-filter-label admin-filter-toggle" type="button" aria-expanded="false" aria-controls="filtros-servicio" data-filter-toggle="servicio"><span class="admin-filter-chevron" aria-hidden="true">▸</span> Filtrar por servicio</button>
                     <div class="ops-filters" id="filtros-servicio" aria-label="Filtrar fichas por servicio" hidden></div>
-                </section>
-                <section class="admin-filter-section">
-                    <button class="ops-filter-label admin-filter-toggle" type="button" aria-expanded="true" aria-controls="filtros-area" data-filter-toggle="area"><span class="admin-filter-chevron" aria-hidden="true">▾</span> Filtrar por área</button>
-                    <div class="ops-filters" id="filtros-area" aria-label="Filtrar fichas por área"></div>
                 </section>
             </div>
         <section class="mant-vitrina">
@@ -65,14 +61,14 @@
             </div>
             <div class="cat-grid" id="fichas-mural">
                 @foreach ($items as $item)
-                    <article class="cat-card mant-card" data-estado="vigente" data-servicio="{{ $item['servicio_real'] ?? 'Sin servicio asignado' }}" data-area="{{ $item['area'] ?? $item['servicio'] }}" data-guia="{{ $item['guia'] ? '1' : '0' }}">
+                    <article class="cat-card mant-card" data-estado="vigente" data-servicio="{{ $item['servicio_real'] ?? 'Sin servicio asignado' }}" data-guia="{{ $item['guia'] ? '1' : '0' }}">
                         <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
                             <span class="js-guia-label">{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
                         </div>
                         <div class="cat-body">
                             <strong class="js-codigo">{{ $item['codigo'] }}</strong>
                             <h2 class="js-nombre">{{ $item['nombre'] }}</h2>
-                            <span class="cat-servicio js-servicio">{{ $item['area'] ?? $item['servicio'] }}</span>
+                            <span class="cat-servicio js-servicio">{{ $item['servicio'] }}</span>
                             <p class="js-detalle">{{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
                             <div class="mant-acciones">
                                 <button class="btn btn-ghost js-editar" type="button">Editar</button>
@@ -102,28 +98,28 @@
         </section>
 
         <div class="admin-panel-tab" id="tab-nueva-ficha" role="tabpanel" hidden>
-        <div class="mant-head"><div><h2 id="ficha-encabezado">Crear nueva ficha</h2><p>Registra los datos generales y el contenido de la caja.</p></div></div>
-        <form class="mant-editor ficha-admin" id="ficha-form" action="{{ route('mockups.catalogo.admin') }}" method="get" onsubmit="return false">
+        <div class="mant-head"><div><h2 id="ficha-encabezado">Crear nueva ficha</h2><p>Registra los datos generales y los instrumentos del conjunto.</p></div></div>
+        <form class="mant-editor ficha-admin" id="ficha-form" action="{{ route('mockups.catalogo.fichas.guardar') }}" method="post" enctype="multipart/form-data">
+            @csrf
             <div class="ficha-layout ficha-layout-redisenada">
                 <section class="panel ficha-preview-panel" aria-label="Vista previa de la ficha">
                     <h2>Vista previa de la ficha</h2>
                     <div class="ficha-preview-content">
                         <div class="ficha-preview-photo" id="preview-guia">
                             <span class="ficha-preview-badge" id="preview-kicker">Sin guía visual</span>
-                            <img id="preview-foto" src="{{ asset('images/catalogo/sin_imagen.png') }}" data-placeholder="{{ asset('images/catalogo/sin_imagen.png') }}" alt="Vista previa de la caja">
+                            <img id="preview-foto" src="{{ asset('images/catalogo/sin_imagen.png') }}" data-placeholder="{{ asset('images/catalogo/sin_imagen.png') }}" alt="Vista previa del conjunto">
                         </div>
                         <div class="ficha-preview-info">
                             <span class="ficha-preview-code" id="preview-codigo">SET-XXX-00</span>
-                            <strong id="preview-titulo">Nombre de la caja</strong>
-                            <span class="ficha-preview-type" id="preview-tipo">Tipo de ficha</span>
-                            <div class="ficha-preview-fact"><span aria-hidden="true">✚</span><span id="preview-servicio">Servicio clínico</span></div>
-                            <div class="ficha-preview-fact"><span aria-hidden="true">⌖</span><span id="preview-area">Área quirúrgica</span></div>
+                            <strong id="preview-titulo">Nombre del conjunto</strong>
+                            <span class="ficha-preview-type" id="preview-tipo">Tipo de conjunto</span>
+                            <div class="ficha-preview-fact"><span aria-hidden="true">✚</span><span id="preview-servicio">Servicio</span></div>
                             <div class="ficha-preview-separator"></div>
                             <div class="ficha-preview-fact"><span aria-hidden="true">▣</span><span id="preview-cantidad">0 piezas</span></div>
                             <div class="ficha-preview-fact"><span aria-hidden="true">▧</span><span id="preview-guia-texto">Sin guía visual</span></div>
                         </div>
                     </div>
-                    <p class="ficha-preview-hint" id="preview-texto">Si la caja no tiene foto, se mostrará una imagen de referencia.</p>
+                    <p class="ficha-preview-hint" id="preview-texto">Si el conjunto no tiene foto, se mostrará una imagen de referencia.</p>
                     <div class="ficha-mosaico" id="preview-mosaico" hidden></div>
                 </section>
                 <section class="panel ficha-datos">
@@ -138,40 +134,21 @@
                             <input id="codigo" name="codigo" type="text" placeholder="SET-XXX-00" autocomplete="off">
                             <small class="ficha-input-hint">Ej.: SET-LAP-01</small>
                         </label>
-                        <label for="nombre">Nombre de la caja <span class="ficha-required">*</span>
-                            <input id="nombre" name="nombre" type="text" placeholder="Nombre de la caja" autocomplete="off">
+                        <label for="nombre">Nombre del conjunto <span class="ficha-required">*</span>
+                            <input id="nombre" name="nombre" type="text" placeholder="Nombre del conjunto" autocomplete="off">
                         </label>
-                        <label for="tipo">Tipo de ficha <span class="ficha-required">*</span>
-                            <select id="tipo" name="tipo">
-                                <option value="">Selecciona el tipo</option>
-                                @foreach (['Caja quirúrgica', 'Set de instrumental', 'Set de ópticas', 'Set de accesorios', 'Caja de implantes', 'Otros'] as $opcionTipo)
-                                    <option value="{{ $opcionTipo }}">{{ $opcionTipo }}</option>
-                                @endforeach
-                                @foreach ($tipos as $tipo)
-                                    @if (!in_array($tipo, ['Caja quirúrgica', 'Set de instrumental', 'Set de ópticas', 'Set de accesorios', 'Caja de implantes', 'Otros']))
-                                        <option value="{{ $tipo }}">{{ $tipo }} (anterior)</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </label>
-                        <label for="servicio">Servicio clínico <span class="ficha-required">*</span>
-                            <select id="servicio" name="servicio">
-                                <option value="">Selecciona el servicio</option>
-                                @foreach ($servicios as $servicio)
-                                    <option value="{{ $servicio }}">{{ $servicio }}</option>
-                                @endforeach
-                            </select>
-                        </label>
-                        <label for="area">Área quirúrgica <span class="ficha-required">*</span>
-                            <select id="area" name="area">
-                                <option value="">Selecciona el área</option>
-                                @foreach ($areas ?? [] as $areaOpcion)
-                                    <option value="{{ $areaOpcion }}">{{ $areaOpcion }}</option>
-                                @endforeach
-                            </select>
-                        </label>
+                        <label for="tipo">Tipo de conjunto <span class="ficha-required">*</span>
+                             <select id="tipo" name="tipo_conjunto_id" required data-sigte-lista="1"><option value="">Selecciona el tipo de conjunto</option></select>
+                         </label>
+                         <label for="servicio">Servicio <span class="ficha-required">*</span>
+                             <select id="servicio" name="servicio_id" required data-sigte-lista="1"><option value="">Selecciona el servicio</option>
+                                 @foreach ($serviciosFicha as $servicioFicha)
+                                     <option value="{{ $servicioFicha->id }}">{{ $servicioFicha->nombre }}</option>
+                                 @endforeach
+                             </select>
+                         </label>
                         <div class="ficha-upload-group">
-                            <span class="ficha-upload-label">Fotografía de la caja</span>
+                            <span class="ficha-upload-label">Fotografía del conjunto</span>
                             <label class="ficha-upload" for="foto">
                                 <span class="ficha-upload-icon" aria-hidden="true">☁</span>
                                 <strong id="foto-label">Seleccionar archivo</strong>
@@ -191,25 +168,27 @@
                     <h2>Instrumentos de la ficha</h2>
                     <button class="btn btn-ghost ficha-add-button" id="agregar-pieza" type="button">+ Agregar pieza</button>
                 </div>
-                <div class="ficha-table-head" aria-hidden="true"><span>#</span><span>Instrumento o material</span><span>Cantidad</span><span>Con foto</span><span></span></div>
+                <div class="ficha-table-head" aria-hidden="true"><span>#</span><span>Instrumento o material</span><span>Cantidad</span><span>Acción</span></div>
                 <div id="piezas"></div>
                 <div class="ficha-empty-state" id="piezas-vacio" hidden>
                     <span aria-hidden="true">▣</span>
                     <strong>Aún no se han agregado instrumentos.</strong>
                     <p>Presiona «Agregar pieza» para comenzar.</p>
                 </div>
-                <p class="ficha-ayuda">En esta etapa los instrumentos se agregan a modo de demostración. Luego se seleccionarán desde los instrumentos registrados.</p>
+                <p class="ficha-ayuda">Selecciona los instrumentos registrados para el tipo de conjunto y especifica su cantidad.</p>
             </section>
             <div class="ficha-footer-actions">
                 <button class="btn btn-ghost" id="ficha-cancelar" type="button">Cancelar</button>
-                <button class="btn btn-primary" id="ficha-guardar" type="button">Crear ficha</button>
+                <button class="btn btn-primary" id="ficha-guardar" type="submit">Crear ficha</button>
             </div>
         </form>
         </div>
 
         <section class="admin-panel-tab" id="tab-nuevo-instrumento" role="tabpanel" hidden>
             <div class="instrumento-create-layout">
-                <form class="panel admin-instrument-form" id="instrumento-form" onsubmit="return false">
+                <form class="panel admin-instrument-form" id="instrumento-form" enctype="multipart/form-data">
+                    @csrf
+                    <p id="instrumento-mensaje" role="status" aria-live="polite" hidden></p>
                     <div class="instrumento-form-content">
                         <h2 id="instrumento-form-titulo">Registrar nuevo instrumento</h2>
                         <p class="instrumento-form-sub">Completa la información del instrumento. Podrá utilizarse en varias fichas, sin duplicar su registro.</p>
@@ -223,15 +202,21 @@
                             <label for="instrumento-tamano">Tamaño
                                 <input id="instrumento-tamano" name="tamano" type="text" placeholder="Ej. 14 cm, 20 mm, N°5, etc." autocomplete="off">
                             </label>
-                            <label for="instrumento-descripcion">Descripción (opcional)
-                                <textarea id="instrumento-descripcion" name="descripcion" rows="4" maxlength="250" placeholder="Ej. Uso en cirugía general, punta curva, acero inoxidable, etc."></textarea>
-                                <small class="instrumento-char-counter"><span id="instrumento-descripcion-contador">0</span>/250</small>
+                            <label for="instrumento-tipo-conjunto">Tipo de conjunto <span class="instrumento-required">*</span>
+                                <select id="instrumento-tipo-conjunto" name="tipo_conjunto_id" required>
+                                    <option value="">Selecciona el tipo de conjunto</option>
+                                    @forelse ($tiposConjuntoInstrumento as $tipoConjunto)
+                                        <option value="{{ $tipoConjunto->id }}">{{ $tipoConjunto->nombre_conjunto }}</option>
+                                    @empty
+                                        <option value="" disabled>No hay tipos de conjunto registrados</option>
+                                    @endforelse
+                                </select>
                             </label>
                         </div>
                     </div>
                     <div class="instrumento-form-footer">
                         <button type="button" class="btn btn-ghost" id="instrumento-limpiar">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="instrumento-guardar" disabled title="Se habilitará cuando se conecte el registro a PostgreSQL">Guardar instrumento</button>
+                        <button type="button" class="btn btn-primary" id="instrumento-guardar">Guardar instrumento</button>
                     </div>
                 </form>
                 <aside class="panel instrumento-photo-panel" aria-label="Fotografía del instrumento">
@@ -284,9 +269,7 @@
         });
     });
     var servicioActivo = '';
-    var areaActiva = '';
     var serviciosDisponibles = @json($servicios);
-    var areasDisponibles = @json($areas ?? []);
     document.querySelectorAll('[data-filter-toggle]').forEach(function (boton) {
         boton.addEventListener('click', function () {
             var panel = document.getElementById('filtros-' + boton.dataset.filterToggle);
@@ -301,7 +284,7 @@
         var cards = tarjetasCatalogo();
         var grupos = new Map();
         cards.forEach(function (card) {
-            var area = card.dataset.area || 'Sin área asignada';
+            var area = card.dataset.servicio || 'Sin servicio asignado';
             if (!grupos.has(area)) grupos.set(area, []);
             grupos.get(area).push(card);
         });
@@ -329,7 +312,6 @@
         var q = document.getElementById('buscar-fichas').value.trim().toLocaleLowerCase();
         tarjetasCatalogo().forEach(function(card) {
             var coincide = (!servicioActivo || card.dataset.servicio === servicioActivo)
-                && (!areaActiva || card.dataset.area === areaActiva)
                 && card.textContent.toLocaleLowerCase().includes(q);
             card.hidden = !coincide;
         });
@@ -367,8 +349,7 @@
                 agregar(valor, valor, conteos.get(valor) || 0);
             });
         }
-        pintar('servicio','filtros-servicio',serviciosDisponibles,servicioActivo,function(v){servicioActivo=v;},'area',areaActiva);
-        pintar('area','filtros-area',areasDisponibles,areaActiva,function(v){areaActiva=v;},'servicio',servicioActivo);
+        pintar('servicio','filtros-servicio',serviciosDisponibles,servicioActivo,function(v){servicioActivo=v;},null,null);
         filtrarFichas();
     }
     document.getElementById('buscar-fichas').addEventListener('input', filtrarFichas);
@@ -386,7 +367,7 @@
             return (x.nombre + ' ' + x.codigo).toLocaleLowerCase().includes(q);
         });
         filtrados.forEach(function (inst) {
-            var clave = inst.codigo || inst.nombre;
+            var clave = String(inst.id);
             var retirado = instrumentosRetirados.has(clave);
             var card = document.createElement('article');
             card.className = 'admin-instrument-card' + (retirado ? ' mant-retirada' : '');
@@ -427,6 +408,10 @@
                 document.getElementById('instrumento-codigo').value = inst.codigo;
                 document.getElementById('instrumento-tamano').value = inst.tamano || '';
                 document.getElementById('instrumento-form-titulo').textContent = 'Editar instrumento';
+                document.getElementById('instrumento-tipo-conjunto').value = String(inst.tipo_conjunto_id || '');
+                instrumentoEditando = inst.id;
+                instrumentoQuitarFoto = false;
+                document.getElementById('instrumento-guardar').textContent = 'Guardar cambios';
                 if (inst.imagen_url) establecerPreviewInstrumento(inst.imagen_url);
                 mostrarTab('nuevo-instrumento');
             });
@@ -461,6 +446,10 @@
     document.getElementById('buscar-instrumentos').addEventListener('input', function (e) { pintarInstrumentos(e.target.value); });
     var instrumentoFotoInput = document.getElementById('instrumento-foto');
     var instrumentoFotoPreviewUrl = null;
+    var instrumentoFotoArrastrada = null;
+    var instrumentoEditando = null;
+    var instrumentoQuitarFoto = false;
+    var instrumentoGuardando = false;
     function establecerPreviewInstrumento(url) {
         var img = document.getElementById('instrumento-preview-img');
         img.src = url || img.dataset.placeholder;
@@ -469,7 +458,13 @@
     function limpiarFormularioInstrumento() {
         document.getElementById('instrumento-form').reset();
         document.getElementById('instrumento-form-titulo').textContent = 'Registrar nuevo instrumento';
-        document.getElementById('instrumento-descripcion-contador').textContent = '0';
+        instrumentoEditando = null;
+        instrumentoQuitarFoto = false;
+        document.getElementById('instrumento-guardar').textContent = 'Guardar instrumento';
+        document.getElementById('instrumento-guardar').disabled = false;
+        document.getElementById('instrumento-guardar').removeAttribute('title');
+        instrumentoFotoArrastrada = null;
+        document.getElementById('instrumento-mensaje').hidden = true;
         document.getElementById('instrumento-foto-error').hidden = true;
         if (instrumentoFotoPreviewUrl) URL.revokeObjectURL(instrumentoFotoPreviewUrl);
         instrumentoFotoPreviewUrl = null;
@@ -483,22 +478,24 @@
             error.textContent = 'Selecciona una imagen JPG, PNG o WEBP de máximo 5 MB.';
             error.hidden = false;
             instrumentoFotoInput.value = '';
+            instrumentoFotoArrastrada = null;
             return;
         }
         if (instrumentoFotoPreviewUrl) URL.revokeObjectURL(instrumentoFotoPreviewUrl);
+        instrumentoFotoArrastrada = file;
+        instrumentoQuitarFoto = false;
         instrumentoFotoPreviewUrl = URL.createObjectURL(file);
         establecerPreviewInstrumento(instrumentoFotoPreviewUrl);
     }
-    instrumentoFotoInput.addEventListener('change', function () { cargarFotoInstrumento(this.files[0]); });
-    document.getElementById('instrumento-descripcion').addEventListener('input', function () {
-        document.getElementById('instrumento-descripcion-contador').textContent = String(this.value.length);
-    });
+    instrumentoFotoInput.addEventListener('change', function () { instrumentoFotoArrastrada = null; cargarFotoInstrumento(this.files[0]); });
     document.getElementById('instrumento-cambiar-foto').addEventListener('click', function () { instrumentoFotoInput.click(); });
     document.getElementById('instrumento-quitar-foto').addEventListener('click', function () {
         instrumentoFotoInput.value = '';
+        instrumentoFotoArrastrada = null;
         if (instrumentoFotoPreviewUrl) URL.revokeObjectURL(instrumentoFotoPreviewUrl);
         instrumentoFotoPreviewUrl = null;
         establecerPreviewInstrumento(null);
+        instrumentoQuitarFoto = !!instrumentoEditando;
         document.getElementById('instrumento-foto-error').hidden = true;
     });
     document.getElementById('instrumento-limpiar').addEventListener('click', function () {
@@ -516,8 +513,90 @@
         var file = e.dataTransfer.files[0];
         if (file) cargarFotoInstrumento(file);
     });
+    document.getElementById('instrumento-guardar').addEventListener('click', function () {
+        document.getElementById('instrumento-form').requestSubmit();
+    });
+    document.getElementById('instrumento-form').addEventListener('submit', async function (evento) {
+        evento.preventDefault();
+        if (instrumentoGuardando) return;
+        var mensaje = document.getElementById('instrumento-mensaje');
+        var boton = document.getElementById('instrumento-guardar');
+        var nombreNuevo = document.getElementById('instrumento-nombre').value.trim();
+        if (!nombreNuevo) {
+            mensaje.textContent = 'El nombre del instrumento es obligatorio.';
+            mensaje.style.color = '#b42318';
+            mensaje.hidden = false;
+            return;
+        }
+        if (!document.getElementById('instrumento-tipo-conjunto').value) {
+            mensaje.textContent = 'Selecciona un tipo de conjunto.';
+            mensaje.style.color = '#b42318';
+            mensaje.hidden = false;
+            return;
+        }
+        var datos = new FormData(this);
+        datos.set('nombre', nombreNuevo);
+        var archivo = instrumentoFotoInput.files[0] || instrumentoFotoArrastrada;
+        if (archivo) datos.set('foto', archivo);
+        if (instrumentoEditando) {
+            datos.set('_method', 'PUT');
+            if (instrumentoQuitarFoto && !archivo) datos.set('quitar_foto', '1');
+        }
+        var idEnEdicion = instrumentoEditando;
+        instrumentoGuardando = true;
+        boton.disabled = true;
+        boton.textContent = 'Guardando…';
+        mensaje.hidden = true;
+        try {
+            var urlGuardar = idEnEdicion
+                ? @json(route('mockups.catalogo.instrumentos.actualizar', ['instrumento' => '__ID__'])).replace('__ID__', encodeURIComponent(idEnEdicion))
+                : @json(route('mockups.catalogo.instrumentos.guardar'));
+            var respuesta = await fetch(urlGuardar, {
+                method: 'POST',
+                body: datos,
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            });
+            var resultado = await respuesta.json();
+            if (!respuesta.ok) {
+                var errores = resultado.errors ? Object.values(resultado.errors).flat().join(' ') : (resultado.message || 'No fue posible guardar el instrumento.');
+                throw new Error(errores);
+            }
+            if (idEnEdicion) {
+                var indice = instrumentosDemo.findIndex(function (inst) { return Number(inst.id) === Number(idEnEdicion); });
+                if (indice !== -1) instrumentosDemo[indice] = resultado.instrumento;
+            } else {
+                instrumentosDemo.push(resultado.instrumento);
+            }
+            limpiarFormularioInstrumento();
+            pintarInstrumentos(document.getElementById('buscar-instrumentos').value);
+            mostrarTab('instrumentos');
+            var panel = document.getElementById('tab-instrumentos');
+            var aviso = document.createElement('p');
+            aviso.className = 'adv-ok';
+            aviso.setAttribute('role', 'status');
+            aviso.textContent = idEnEdicion
+                ? 'Instrumento actualizado correctamente en la base de datos.'
+                : 'Instrumento registrado correctamente en la base de datos.';
+            var anterior = panel.querySelector('.instrumento-aviso-guardado');
+            if (anterior) anterior.remove();
+            aviso.classList.add('instrumento-aviso-guardado');
+            panel.prepend(aviso);
+        } catch (fallo) {
+            mensaje.textContent = fallo.message || 'Error al guardar el instrumento.';
+            mensaje.style.color = '#b42318';
+            mensaje.hidden = false;
+        } finally {
+            instrumentoGuardando = false;
+            boton.disabled = false;
+            boton.textContent = instrumentoEditando ? 'Guardar cambios' : 'Guardar instrumento';
+        }
+    });
     pintarInstrumentos('');
     var formFila = null;
+    var fichaEditandoId = null;
+    var serviciosFicha = @json($serviciosFicha);
+    var tiposFicha = @json($tiposConjuntoInstrumento);
     var titulo = document.getElementById('ficha-titulo');
     var modo = document.getElementById('ficha-modo');
     var guardar = document.getElementById('ficha-guardar');
@@ -528,7 +607,6 @@
     var nombre = document.getElementById('nombre');
     var tipo = document.getElementById('tipo');
     var servicio = document.getElementById('servicio');
-    var area = document.getElementById('area');
     var guia = document.getElementById('guia');
     var foto = document.getElementById('foto');
     var piezas = document.getElementById('piezas');
@@ -540,44 +618,100 @@
         (esError ? error : ok).textContent = texto || '';
     }
 
-    function filaPieza(pieza) {
-        var fila = document.createElement('div');
-        fila.className = 'mant-pieza';
-        fila.innerHTML = '<span class="ficha-thumb is-empty js-letra" aria-hidden="true">—</span><input class="pieza-nombre" type="text" placeholder="Instrumento o material" autocomplete="off"><input class="pieza-cant" type="number" min="1" placeholder="Cant."><label class="check"><input class="pieza-foto" type="checkbox"><span>Con foto</span></label><button class="btn btn-ghost js-quitar" type="button">Quitar</button>';
-        if (pieza && pieza.nombre) {
-            fila.querySelector('.pieza-nombre').value = pieza.nombre;
-            fila.querySelector('.pieza-cant').value = pieza.cantidad || '';
-            fila.querySelector('.pieza-foto').checked = !!pieza.imagen;
-            marcarLetra(fila);
-        }
-        return fila;
+    function opcionesConjunto() {
+        return instrumentosDemo.filter(function (x) { return String(x.tipo_conjunto_id) === tipo.value; });
     }
-
-    function marcarLetra(fila) {
-        var texto = fila.querySelector('.pieza-nombre').value.trim();
-        var letra = fila.querySelector('.js-letra');
-        var conFoto = fila.querySelector('.pieza-foto').checked && texto;
-        letra.textContent = conFoto ? texto.charAt(0).toUpperCase() : '—';
-        letra.classList.toggle('is-empty', !conFoto);
-    }
-
-    function pintarPiezas(lista) {
-        piezas.replaceChildren();
-        (lista || []).forEach(function (pieza) {
-            piezas.appendChild(filaPieza(pieza));
+    // Los tipos se filtran solamente al cambiar el servicio.
+    // Al elegir un tipo primero NO se reconstruye el select abierto:
+    // hacerlo durante el evento del propio select puede dejar su texto visual desactualizado.
+    function poblarTipos(seleccion) {
+        var servicioId = String(servicio.value || '');
+        var elegidoId = seleccion === undefined ? String(tipo.value || '') : String(seleccion || '');
+        var disponibles = tiposFicha.filter(function (registro) {
+            return !servicioId || String(registro.servicio_id) === servicioId;
         });
+
+        tipo.replaceChildren();
+        var textoInicial = servicioId && disponibles.length === 0
+            ? 'No hay tipos de conjunto registrados para este servicio'
+            : 'Selecciona el tipo de conjunto';
+        tipo.add(new Option(textoInicial, ''));
+        disponibles.forEach(function (registro) {
+            tipo.add(new Option(registro.nombre_conjunto, String(registro.id)));
+        });
+        tipo.value = disponibles.some(function (registro) {
+            return String(registro.id) === elegidoId;
+        }) ? elegidoId : '';
+        // Mantener el select habilitado para mostrar el motivo de la lista vacía.
+        tipo.disabled = false;
+    }
+
+    function cambioServicioFicha() {
+        // El servicio elegido manda: si no hay tipos, el desplegable queda sin resultados.
+        poblarTipos('');
+        pintarPiezas([]);
+        aviso('', false);
         actualizarVista();
     }
 
+    function cambioTipoFicha() {
+        var elegido = tiposFicha.find(function (registro) {
+            return String(registro.id) === String(tipo.value);
+        });
+        if (elegido) {
+            // Actualizar el campo de servicio sin reconstruir el selector de tipo
+            // durante su propio evento de cambio.
+            servicio.value = String(elegido.servicio_id);
+            if (servicio.value !== String(elegido.servicio_id)) {
+                aviso('No se encontró el servicio asociado al tipo de conjunto.', true);
+                return;
+            }
+        }
+        pintarPiezas([]);
+        actualizarVista();
+    }
+
+    // Usar solo change: reconstruir opciones en input/focus produce conflictos
+    // con el menú nativo de algunos navegadores.
+    servicio.addEventListener('change', cambioServicioFicha);
+    tipo.addEventListener('change', cambioTipoFicha);
+    function filaPieza(pieza) {
+        var fila = document.createElement('div');
+        fila.className = 'mant-pieza';
+        var numero = document.createElement('span');
+        numero.className = 'ficha-numero';
+        numero.textContent = String(piezas.children.length + 1);
+        var selector = document.createElement('select');
+        selector.className = 'pieza-nombre';
+        selector.setAttribute('aria-label', 'Instrumento o material');
+        selector.add(new Option('Selecciona un instrumento', ''));
+        opcionesConjunto().forEach(function (inst) {
+            selector.add(new Option(inst.nombre + (inst.tamano ? ' · ' + inst.tamano : ''), inst.id));
+        });
+        selector.value = pieza && pieza.id ? String(pieza.id) : '';
+        var cantidad = document.createElement('input');
+        cantidad.className = 'pieza-cant';
+        cantidad.type = 'number';
+        cantidad.min = '1';
+        cantidad.step = '1';
+        cantidad.placeholder = 'Cant.';
+        cantidad.setAttribute('aria-label', 'Cantidad');
+        cantidad.value = pieza && pieza.cantidad ? pieza.cantidad : 1;
+        var quitar = document.createElement('button');
+        quitar.className = 'btn btn-ghost js-quitar';
+        quitar.type = 'button';
+        quitar.textContent = 'Quitar';
+        fila.append(numero, selector, cantidad, quitar);
+        return fila;
+    }
+    function pintarPiezas(lista) {
+        piezas.replaceChildren();
+        (lista || []).forEach(function (pieza) { piezas.appendChild(filaPieza(pieza)); });
+        actualizarVista();
+    }
     function leerPiezas() {
-        return Array.prototype.map.call(piezas.querySelectorAll('.mant-pieza'), function (fila) {
-            return {
-                nombre: fila.querySelector('.pieza-nombre').value.trim(),
-                cantidad: Number(fila.querySelector('.pieza-cant').value),
-                imagen: fila.querySelector('.pieza-foto').checked
-            };
-        }).filter(function (pieza) {
-            return pieza.nombre !== '' || pieza.cantidad;
+        return Array.from(piezas.querySelectorAll('.mant-pieza')).map(function (fila) {
+            return { instrumento_id: Number(fila.querySelector('.pieza-nombre').value), cantidad: Number(fila.querySelector('.pieza-cant').value) };
         });
     }
 
@@ -587,10 +721,9 @@
         var conGuia = guia.checked;
         document.getElementById('preview-kicker').textContent = conGuia ? 'Con guía visual' : 'Sin guía visual';
         document.getElementById('preview-codigo').textContent = codigo.value.trim().toUpperCase() || 'SET-XXX-00';
-        document.getElementById('preview-titulo').textContent = nombre.value.trim() || 'Nombre de la caja';
-        document.getElementById('preview-tipo').textContent = tipo.value || 'Tipo de ficha';
-        document.getElementById('preview-servicio').textContent = servicio.value || 'Servicio clínico';
-        document.getElementById('preview-area').textContent = area.value || 'Área quirúrgica';
+        document.getElementById('preview-titulo').textContent = nombre.value.trim() || 'Nombre del conjunto';
+        document.getElementById('preview-tipo').textContent = tipo.value ? tipo.selectedOptions[0].textContent : 'Tipo de conjunto';
+        document.getElementById('preview-servicio').textContent = servicio.value ? servicio.selectedOptions[0].textContent : 'Servicio clínico';
         var cantidad = leerPiezas().reduce(function (total, pieza) { return total + (pieza.cantidad || 0); }, 0);
         document.getElementById('preview-cantidad').textContent = cantidad + (cantidad === 1 ? ' pieza' : ' piezas');
         document.getElementById('preview-guia-texto').textContent = conGuia ? 'Con guía visual' : 'Sin guía visual';
@@ -603,12 +736,12 @@
         }
         img.src = previewFotoUrl || img.dataset.placeholder;
         document.getElementById('foto-label').textContent = foto.files && foto.files[0] ? foto.files[0].name : 'Seleccionar archivo';
-        document.getElementById('preview-texto').textContent = previewFotoUrl ? 'Vista previa de la fotografía seleccionada.' : 'Si la caja no tiene foto, se mostrará una imagen de referencia.';
+        document.getElementById('preview-texto').textContent = previewFotoUrl ? 'Vista previa de la fotografía seleccionada.' : 'Si el conjunto no tiene foto, se mostrará una imagen de referencia.';
         var mosaico = document.getElementById('preview-mosaico');
         mosaico.replaceChildren();
         mosaico.hidden = true;
         document.getElementById('piezas-vacio').hidden = piezas.children.length > 0;
-        piezas.querySelectorAll('.mant-pieza').forEach(function (fila) { marcarLetra(fila); });
+        piezas.querySelectorAll('.mant-pieza').forEach(function (fila, i) { fila.querySelector('.ficha-numero').textContent = String(i + 1); });
     }
 
     function resumir() {
@@ -640,15 +773,15 @@
             formFila.classList.remove('is-editing');
         }
         formFila = null;
+        fichaEditandoId = null;
         titulo.textContent = 'Nueva ficha';
         modo.textContent = 'Alta';
         guardar.textContent = 'Crear ficha';
         cancelar.hidden = false;
         codigo.value = '';
         nombre.value = '';
-        tipo.value = '';
         servicio.value = '';
-        area.value = '';
+        poblarTipos('');
         guia.checked = false;
         foto.value = '';
         pintarPiezas([]);
@@ -664,7 +797,6 @@
         card.dataset.estado = datos.estado || 'vigente';
         card.dataset.guia = datos.guia ? '1' : '0';
         card.dataset.servicio = datos.servicio_real || 'Sin servicio asignado';
-        card.dataset.area = datos.area || 'Sin área asignada';
         card.classList.toggle('mant-retirada', card.dataset.estado === 'retirada');
         var photo = card.querySelector('.cat-photo');
         var retirada = card.dataset.estado === 'retirada';
@@ -672,11 +804,13 @@
         card.querySelector('.js-guia-label').textContent = retirada ? 'Retirada' : (datos.guia ? 'Con guía visual' : 'Sin guía visual');
         card.querySelector('.js-codigo').textContent = datos.codigo;
         card.querySelector('.js-nombre').textContent = datos.nombre;
-        card.querySelector('.js-servicio').textContent = datos.area;
+        card.querySelector('.js-servicio').textContent = datos.servicio_real || datos.servicio;
         card.querySelector('.js-detalle').textContent = datos.tipo + ' · ' + total + (total === 1 ? ' pieza' : ' piezas');
     }
 
     document.getElementById('agregar-pieza').addEventListener('click', function () {
+        if (!tipo.value) { aviso('Selecciona primero el tipo de conjunto.', true); return; }
+        if (!opcionesConjunto().length) { aviso('Este tipo de conjunto no tiene instrumentos registrados.', true); return; }
         piezas.appendChild(filaPieza(null));
         actualizarVista();
     });
@@ -710,9 +844,9 @@
             var ficha = fichas[clave];
             codigo.value = clave;
             nombre.value = ficha.nombre;
-            tipo.value = ficha.tipo;
-            servicio.value = ficha.servicio_real || '';
-            area.value = ficha.area || ficha.servicio || '';
+            servicio.value = String(ficha.servicio_id || '');
+            poblarTipos(String(ficha.tipo_conjunto_id || ''));
+            fichaEditandoId = ficha.id || null;
             guia.checked = !!ficha.guia;
             foto.value = '';
             pintarPiezas(ficha.instrumentos);
@@ -753,61 +887,90 @@
         mostrarTab('catalogo');
     });
 
-    guardar.addEventListener('click', function () {
-        var clave = codigo.value.trim().toUpperCase();
+    document.getElementById('ficha-form').addEventListener('submit', async function (evento) {
+        evento.preventDefault();
         var contenido = leerPiezas();
-        if (!clave || !nombre.value.trim() || !tipo.value || !servicio.value || !area.value) {
-            aviso('Completa código, nombre, tipo, servicio y área.', true);
-            return;
+        if (!codigo.value.trim() || !nombre.value.trim() || !servicio.value || !tipo.value) {
+            aviso('Completa código, nombre, servicio y tipo de conjunto.', true); return;
         }
-        if (!contenido.length || contenido.some(function (pieza) { return !pieza.nombre || !(pieza.cantidad >= 1); })) {
-            aviso('Cada pieza necesita nombre y cantidad.', true);
-            return;
+        if (!contenido.length || contenido.some(function (p) { return !p.instrumento_id || !Number.isInteger(p.cantidad) || p.cantidad < 1; })) {
+            aviso('Selecciona al menos un instrumento y una cantidad válida por fila.', true); return;
         }
-        var repetida = Array.prototype.some.call(document.querySelectorAll('#fichas-mural .js-codigo'), function (celda) {
-            var esLaMisma = formFila && celda.closest('.mant-card') === formFila;
-            return !esLaMisma && celda.textContent.toUpperCase() === clave;
+        if (new Set(contenido.map(function (p) { return p.instrumento_id; })).size !== contenido.length) {
+            aviso('No repitas instrumentos. Modifica su cantidad en la fila existente.', true); return;
+        }
+        var datos = new FormData(this);
+        datos.set('codigo', codigo.value.trim().toUpperCase());
+        datos.set('nombre', nombre.value.trim());
+        datos.set('servicio_id', servicio.value);
+        datos.set('tipo_conjunto_id', tipo.value);
+        datos.set('guia_visual', guia.checked ? '1' : '0');
+        contenido.forEach(function (p, i) {
+            datos.set('instrumentos[' + i + '][instrumento_id]', String(p.instrumento_id));
+            datos.set('instrumentos[' + i + '][cantidad]', String(p.cantidad));
         });
-        if (repetida) {
-            aviso(clave + ' ya está en el catálogo.', true);
-            return;
+        if (fichaEditandoId) datos.set('_method', 'PUT');
+        guardar.disabled = true;
+        guardar.textContent = 'Guardando…';
+        aviso('', false);
+        try {
+            var url = fichaEditandoId
+                ? @json(route('mockups.catalogo.fichas.actualizar', ['ficha' => '__ID__'])).replace('__ID__', encodeURIComponent(fichaEditandoId))
+                : @json(route('mockups.catalogo.fichas.guardar'));
+            var respuesta = await fetch(url, {
+                method: 'POST', body: datos, credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            var resultado = await respuesta.json();
+            if (!respuesta.ok) throw new Error(resultado.errors ? Object.values(resultado.errors).flat().join(' ') : (resultado.message || 'No fue posible guardar la ficha.'));
+            window.location.href = @json(route('mockups.catalogo.admin')) + '?ficha_guardada=1';
+        } catch (e) {
+            aviso(e.message || 'Error al guardar la ficha.', true);
+        } finally {
+            guardar.disabled = false;
+            guardar.textContent = fichaEditandoId ? 'Guardar cambios' : 'Crear ficha';
         }
-        var datos = {
-            codigo: clave,
-            nombre: nombre.value.trim(),
-            tipo: tipo.value,
-            servicio: area.value,
-            servicio_real: servicio.value,
-            area: area.value,
-            guia: guia.checked,
-            instrumentos: contenido,
-            estado: formFila ? formFila.dataset.estado : 'vigente'
-        };
-        if (formFila) {
-            var anterior = formFila.querySelector('.js-codigo').textContent;
-            if (anterior !== clave) {
-                delete fichas[anterior];
-            }
-            fichas[clave] = datos;
-            escribirCard(formFila, datos);
-            aviso('Vista previa actualizada. Los cambios aún no están guardados en la base de datos.', false);
-            limpiarAlta();
-            agruparPorArea();
-            resumir();
-            return;
-        }
-        var card = document.createElement('article');
-        card.className = 'cat-card mant-card';
-        card.innerHTML = htmlCard();
-        fichas[clave] = datos;
-        escribirCard(card, datos);
-        document.getElementById('fichas-mural').prepend(card);
-        aviso('Ficha agregada a esta vista temporal. No está guardada en la base de datos.', false);
-        limpiarAlta();
-        agruparPorArea();
-        resumir();
     });
+    if (new URLSearchParams(window.location.search).has('ficha_guardada')) {
+        var avisoCatalogo = document.createElement('p');
+        avisoCatalogo.className = 'adv-ok';
+        avisoCatalogo.textContent = 'Ficha guardada correctamente en la base de datos.';
+        document.getElementById('tab-catalogo').prepend(avisoCatalogo);
+    }
+    // CORRECCIÓN: El selector visual global .sigte-lista mantiene una copia
+    // desactualizada cuando poblarTipos() modifica las opciones del SELECT real.
+    // Estos DOS campos son dependientes y deben funcionar como SELECT nativos.
+    // No afecta a los demás desplegables de SIGTE.
+    (function mantenerSelectsNativosDeFicha() {
+        var panelFicha = document.getElementById('tab-nueva-ficha');
 
+        function restaurarSelects() {
+            ['tipo', 'servicio'].forEach(function (id) {
+                var selector = document.getElementById(id);
+                if (!selector) return;
+                var envoltorio = selector.closest('.sigte-lista');
+                if (envoltorio) {
+                    // Reutilizar el SELECT original conserva listeners y valores.
+                    envoltorio.replaceWith(selector);
+                }
+                selector.classList.remove('sigte-lista-nativa');
+                selector.setAttribute('data-sigte-lista', '1');
+                // Por si el inicializador también ocultó el SELECT en línea.
+                ['display', 'position', 'opacity', 'visibility', 'pointer-events', 'width', 'height'].forEach(function (prop) {
+                    selector.style.removeProperty(prop);
+                });
+            });
+        }
+
+        // Detecta también si el script global envuelve los SELECT después.
+        var observador = new MutationObserver(restaurarSelects);
+        observador.observe(panelFicha, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', restaurarSelects);
+        window.addEventListener('load', restaurarSelects);
+        restaurarSelects();
+    })();
+
+    poblarTipos('');
     pintarPiezas([]);
     agruparPorArea();
     construirFiltrosServicio();

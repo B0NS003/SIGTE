@@ -9,14 +9,12 @@ use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 
-# si no esta autenticado, se redirige a la pagina de login
 Route::middleware('guest')->group(function () {
     Route::get('/', fn () => redirect()->route('login'));
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-# si esta autenticado, se redirige a la pagina de panel
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -35,6 +33,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/operador/entrega', [FlujoController::class, 'registrarEntrega'])->name('mockups.entrega.registrar');
         Route::get('/consulta/catalogo', [CatalogoController::class, 'catalogo'])->name('mockups.catalogo');
         Route::get('/admin/catalogo', [CatalogoController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
+        Route::post('/admin/catalogo/fichas', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.guardar');
+        Route::put('/admin/catalogo/fichas/{ficha}', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.actualizar');
+        Route::post('/admin/catalogo/instrumentos', [CatalogoController::class, 'guardarInstrumento'])->name('mockups.catalogo.instrumentos.guardar');
         Route::get('/consulta/catalogo/{codigo}', [CatalogoController::class, 'ficha'])->name('mockups.ficha');
         Route::get('/consulta/inventario', [InventarioController::class, 'inventario'])->name('mockups.inventario');
         Route::post('/consulta/inventario/reposicion', [InventarioController::class, 'registrarReposicion'])->name('mockups.inventario.reponer');
@@ -49,7 +50,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/custodia', [AdminController::class, 'custodia'])->name('mockups.custodia');
         Route::get('/admin/alertas', [AdminController::class, 'alertas'])->name('mockups.alertas');
         Route::get('/enfermera/cierre-turno', [EnfermeraController::class, 'cierreTurno'])->name('mockups.cierre_turno');
-
+        Route::put('/admin/catalogo/instrumentos/{instrumento}',[CatalogoController::class, 'actualizarInstrumento'])->name('mockups.catalogo.instrumentos.actualizar');
         Route::get('/secretaria/produccion', [SecretariaController::class, 'produccion'])->name('secretaria.produccion');
         Route::post('/secretaria/produccion', [SecretariaController::class, 'guardarProduccion'])->name('secretaria.produccion.guardar');
         Route::get('/secretaria/insumos', [SecretariaController::class, 'insumos'])->name('secretaria.insumos');

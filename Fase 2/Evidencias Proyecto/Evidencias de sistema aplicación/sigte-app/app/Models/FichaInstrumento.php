@@ -12,6 +12,7 @@ class FichaInstrumento extends Model
     protected $fillable = [
         'ficha_id',
         'instrumento_id',
+        'tipo_conjunto_id',
         'cantidad',
         'orden',
     ];
@@ -19,6 +20,9 @@ class FichaInstrumento extends Model
     protected function casts(): array
     {
         return [
+            'ficha_id' => 'integer',
+            'instrumento_id' => 'integer',
+            'tipo_conjunto_id' => 'integer',
             'cantidad' => 'integer',
             'orden' => 'integer',
         ];
@@ -26,11 +30,16 @@ class FichaInstrumento extends Model
 
     public function ficha(): BelongsTo
     {
-        return $this->belongsTo(Ficha::class);
+        return $this->belongsTo(Ficha::class, 'ficha_id');
     }
 
     public function instrumento(): BelongsTo
     {
-        return $this->belongsTo(Instrumento::class);
+        return $this->belongsTo(Instrumento::class, 'instrumento_id');
+    }
+
+    public function tipoConjunto(): BelongsTo
+    {
+        return $this->belongsTo(TipoConjunto::class, 'tipo_conjunto_id');
     }
 }
