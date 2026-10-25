@@ -47,7 +47,10 @@
             <input type="hidden" name="sala" value="{{ $sala }}">
 
             <div class="panel-head">
-                <p class="inv-quien">
+                <p
+                    class="inv-quien"
+                    id="inv-modal-fecha-hora"
+                    data-usuario="{{ $usuario['nombre'] }}">
                     {{ $usuario['nombre'] }} · {{ $fecha }} · {{ $hora }}
                 </p>
             </div>

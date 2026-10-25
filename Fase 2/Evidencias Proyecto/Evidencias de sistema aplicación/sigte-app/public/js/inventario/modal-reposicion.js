@@ -1,6 +1,7 @@
 /* MODAL PARA ACTUALIZAR EL ELEMENTO */
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('inv-modal-reposicion');
+    const fechaHoraModal = document.getElementById('inv-modal-fecha-hora');
     const botones = document.querySelectorAll('.inv-editar-stock');
     const cerrar = document.getElementById('inv-cerrar-reposicion');
     const overlay = document.getElementById('inv-modal-overlay');
@@ -30,6 +31,34 @@ document.addEventListener('DOMContentLoaded', function () {
     let botonAnterior = null;
 
     let temporizadorConfirmacion;
+
+    /* Zona horaria de Chile en automático */
+    function actualizarFechaHoraModal() {
+        if (!fechaHoraModal) {
+            return;
+        }
+
+        const ahora = new Date();
+
+        const fecha = new Intl.DateTimeFormat('es-CL', {
+            timeZone: 'America/Santiago',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }).format(ahora);
+
+        const hora = new Intl.DateTimeFormat('es-CL', {
+            timeZone: 'America/Santiago',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).format(ahora);
+
+        const usuario = fechaHoraModal.dataset.usuario;
+
+        fechaHoraModal.textContent = `${usuario} · ${fecha} · ${hora}`;
+    }
 
     function mostrarConfirmacion(mensaje) {
         if (!toastConfirmacion || !toastConfirmacionTexto) {
@@ -109,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.hidden = false;
         document.body.style.overflow = 'hidden';
 
+        actualizarFechaHoraModal();
         cargarHistorial(boton);
         cantidad.focus();
 
@@ -179,6 +209,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     cerrar.addEventListener('click', cerrarModal);
+
+    const temporizadorFechaHora = setInterval(function () {
+        if (!modal.hidden) {
+            actualizarFechaHoraModal();
+        }
+    }, 1000);
+
     overlay.addEventListener('click', cerrarModal);
 
     cantidad.addEventListener('input', validarCantidad);

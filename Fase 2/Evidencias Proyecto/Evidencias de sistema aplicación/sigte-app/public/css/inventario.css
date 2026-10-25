@@ -191,32 +191,103 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.55rem;
 }
+
+/* TARJETAS DE SELECCIÓN DE INVENTARIO */
 .inv-switch-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.12rem;
-  min-height: 5.4rem;
-  padding: 0.75rem 0.85rem;
-  border: 1px solid var(--borde);
-  border-top: 4px solid var(--borde);
-  border-radius: 14px;
-  background: #fff;
-  color: var(--navy);
-  text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 118px;
+    padding: 1rem;
+    border: 1px solid var(--borde);
+    border-top: 4px solid var(--borde);
+    border-radius: 14px;
+    background: #fff;
+    color: var(--navy);
+    text-decoration: none;
+    box-shadow: 0 3px 12px rgba(11, 31, 75, 0.04);
+    transition: box-shadow 0.18s ease, transform 0.18s ease,
+        border-color 0.18s ease;
 }
-.inv-switch-item:hover { text-decoration: none; color: var(--navy); background: #f8fafc; }
-.inv-switch-item strong { font-size: 0.95rem; }
-.inv-switch-item em, .inv-switch-item span { font-style: normal; color: var(--muted); font-size: 0.78rem; }
-.inv-switch-item span.is-alert { color: #9a3412; font-weight: 700; }
-.inv-switch-item.sala-lavado { border-top-color: var(--sala-lavado); }
-.inv-switch-item.sala-armado { border-top-color: var(--sala-armado); }
-.inv-switch-item.sala-esteril { border-top-color: var(--sala-esteril); }
-.inv-switch-item.sala-todos { border-top-color: var(--navy); }
-.inv-switch-item.is-active { background: #fff; color: var(--navy); }
-.inv-switch-item.sala-lavado.is-active { box-shadow: 0 0 0 2px var(--sala-lavado); }
-.inv-switch-item.sala-armado.is-active { box-shadow: 0 0 0 2px var(--sala-armado); }
-.inv-switch-item.sala-esteril.is-active { box-shadow: 0 0 0 2px var(--sala-esteril); }
-.inv-switch-item.sala-todos.is-active { box-shadow: 0 0 0 2px var(--navy); }
+
+.inv-switch-item:hover {
+    text-decoration: none;
+    color: var(--navy);
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgba(11, 31, 75, 0.09);
+}
+
+.inv-switch-item strong {
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.inv-switch-item em {
+    font-style: normal;
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.inv-switch-item span {
+    margin-top: auto;
+    font-style: normal;
+    color: #15803d;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.inv-switch-item span.is-alert {
+    color: #b45309;
+}
+
+/* COLOR IDENTIFICADOR DE CADA SALA */
+.inv-switch-item.sala-lavado {
+    border-top-color: var(--sala-lavado);
+}
+
+.inv-switch-item.sala-armado {
+    border-top-color: var(--sala-armado);
+}
+
+.inv-switch-item.sala-esteril {
+    border-top-color: var(--sala-esteril);
+}
+
+.inv-switch-item.sala-todos {
+    border-top-color: var(--navy);
+}
+
+/* TARJETA SELECCIONADA */
+.inv-switch-item.is-active {
+    background: #fff;
+    color: var(--navy);
+}
+
+.inv-switch-item.sala-lavado.is-active {
+    border-color: var(--sala-lavado);
+    border-top-color: var(--sala-lavado);
+    box-shadow: 0 0 0 2px var(--sala-lavado);
+}
+
+.inv-switch-item.sala-armado.is-active {
+    border-color: var(--sala-armado);
+    border-top-color: var(--sala-armado);
+    box-shadow: 0 0 0 2px var(--sala-armado);
+}
+
+.inv-switch-item.sala-esteril.is-active {
+    border-color: var(--sala-esteril);
+    border-top-color: var(--sala-esteril);
+    box-shadow: 0 0 0 2px var(--sala-esteril);
+}
+
+.inv-switch-item.sala-todos.is-active {
+    border-color: var(--navy);
+    border-top-color: var(--navy);
+    box-shadow: 0 0 0 2px var(--navy);
+}
+
 .inv-resumen {
   display: flex;
   gap: 0.85rem;
@@ -430,27 +501,25 @@
     border-color: var(--navy);
 }
 
+/* COLOR UNIFORME DE PAGINACIÓN */
 .inv-pagina-numero.is-active {
     background: var(--navy);
     border-color: var(--navy);
     color: #fff;
 }
 
-.inv-pagina-btn {
-    font-size: 1.2rem;
-    line-height: 1;
-}
-
-.inv-pagina-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
-
-.inv-pagina-btn:active:not(:disabled),
-.inv-pagina-numero:active {
-    transform: scale(0.96);
-}
-
-.inv-paginacion[hidden] {
-    display: none !important;
+/* BOTÓN ACCIÓN DEL INVENTARIO */
+.inv-editar-stock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 28px;
+    background-color: var(--navy);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    box-shadow: none;
+    padding: 0;
+    cursor: pointer;
 }

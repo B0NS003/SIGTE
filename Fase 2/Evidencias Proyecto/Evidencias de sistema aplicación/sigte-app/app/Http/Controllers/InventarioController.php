@@ -208,8 +208,9 @@ class InventarioController extends Controller
     
     public function historialElemento(string $sala, string $codigo)
     {
+
         $elemento = ElementoInventario::query()
-            ->where('sala', $sala)
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $sala))
             ->where('codigo', $codigo)
             ->firstOrFail();
             
@@ -217,6 +218,7 @@ class InventarioController extends Controller
             ->with('autor')
             ->where('elemento_inventario_id', $elemento->id)
             ->latest()
+            ->limit(5)
             ->get()
             ->map(fn (Reposicion $reposicion) => [
                 'cantidad' => $reposicion->cantidad,

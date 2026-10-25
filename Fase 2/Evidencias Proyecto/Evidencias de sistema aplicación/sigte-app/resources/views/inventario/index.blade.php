@@ -43,7 +43,6 @@ $totalElementos = collect($libros)->sum('tipos');
         <div class="main-top">
             <div>
                 @if ($esAdministradora)
-                <p class="eyebrow">Supervisión · Inventario</p>
                 <h1>Inventario</h1>
                 <p class="main-sub">
                     Supervisa el stock disponible, identifica elementos bajo mínimo y revisa el estado de las salas.
@@ -68,7 +67,6 @@ $totalElementos = collect($libros)->sum('tipos');
         </div>
 
         <section class="inv-elige" aria-label="Elegir libro">
-            <p>1 · Elige el libro</p>
             <div class="inv-switch">
                 <a class="inv-switch-item sala-todos {{ $sala === 'todos' ? 'is-active' : '' }}"
                     href="{{ route('mockups.inventario', ['sala' => 'todos']) }}">
@@ -94,7 +92,6 @@ $totalElementos = collect($libros)->sum('tipos');
         <section class="panel inv-mira">
             <div class="panel-head">
                 <div>
-                    <p class="inv-paso">2 · Lo que hay que mirar</p>
                     <h2 class="inv-titulo">
                         <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 4.5 20.5 19.5h-17L12 4.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
@@ -137,7 +134,6 @@ $totalElementos = collect($libros)->sum('tipos');
         <section class="panel list inv-book sala-{{ $sala }}">
             <div class="panel-head">
                 <div>
-                    <p class="inv-paso">2 · Revisa el stock</p>
                     <h2 class="inv-titulo">
                         <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
