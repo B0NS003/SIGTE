@@ -75,7 +75,28 @@ class InventarioController extends Controller
 
         $filtrados = $itemsSala->all();
 
-        $atencion = collect($items)->whereIn('estado', ['bajo', 'critico'])->values()->all();
+        /* JERARQUÍA PARA EL ELEMENTO A REPONER */
+        $atencion = collect($items)
+            ->whereIn('estado', ['bajo', 'critico'])
+            ->sortBy(function ($item) {
+                $prioridadEstado = [
+                    'critico' => 0,
+                    'bajo' => 1,
+                ][$item['estado']] ?? 2;
+
+                $stock = (float) $item['stock'];
+                $minimo = (float) $item['minimo'];
+
+                // Calcula cuánto stock hay en relación con el mínimo requerido.
+                $proporcionStock = $minimo > 0
+                    ? $stock / $minimo
+                    : 1;
+
+                return [$prioridadEstado, $proporcionStock];
+            })
+            ->values()
+            ->all();
+
         $rol = Auth::user()->nombreRol();
         return view('inventario.index', [
             'usuario' => $this->usuarioSesion(),

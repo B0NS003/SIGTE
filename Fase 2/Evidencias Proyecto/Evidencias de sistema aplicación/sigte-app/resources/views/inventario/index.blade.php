@@ -2,10 +2,16 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/inventario.css') }}?v={{ @filemtime(public_path('css/inventario.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/inventario/modal-reposicion.css') }}?v={{ filemtime(public_path('css/inventario/modal-reposicion.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/inventario/tarjeta-prioridad.css') }}?v={{ @filemtime(public_path('css/inventario/tarjeta-prioridad.css')) }}">
 @endpush
 
 @push('scripts')
 <script src="{{ asset('js/inventario.js') }}?v={{ @filemtime(public_path('js/inventario.js')) }}"></script>
+
+@if ($sala === 'todos')
+<script src="{{ asset('js/inventario/tarjeta-prioridad.js') }}?v={{ @filemtime(public_path('js/inventario/tarjeta-prioridad.js')) }}"></script>
+@endif
+
 <script src="{{ asset('js/inventario/modal-reposicion.js') }}?v={{ filemtime(public_path('js/inventario/modal-reposicion.js')) }}" defer></script>
 @endpush
 
@@ -68,12 +74,40 @@ $totalElementos = collect($libros)->sum('tipos');
 
         <section class="inv-elige" aria-label="Elegir libro">
             <div class="inv-switch">
+
+                <!-- CAMPANITA DE NOTIFICACIÓN EN LA TARJETA PRINCIPAL -->
                 <a class="inv-switch-item sala-todos {{ $sala === 'todos' ? 'is-active' : '' }}"
                     href="{{ route('mockups.inventario', ['sala' => 'todos']) }}">
-                    <strong>Los tres</strong>
+
+                    <span class="inv-tarjeta-encabezado">
+                        <strong>Los tres</strong>
+
+                        @if ($esAdministradora && count($atencion) > 0)
+                        <span class="inv-campana-alertas"
+                            aria-label="{{ count($atencion) }} elementos requieren atención"
+                            title="{{ count($atencion) }} elementos requieren atención">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M10 21h4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    stroke-linecap="round" />
+                            </svg>
+                            <span class="inv-campana-contador">{{ count($atencion) }}</span>
+                        </span>
+                        @endif
+                    </span>
+
                     <em>{{ $totalElementos }} elementos</em>
                     <span>Vista general</span>
                 </a>
+
                 @foreach ($salas as $key => $label)
                 @php $libroNav = $conteoSalas[$key]; @endphp
                 <a class="inv-switch-item sala-{{ $key }} {{ $sala === $key ? 'is-active' : '' }}"
@@ -89,46 +123,7 @@ $totalElementos = collect($libros)->sum('tipos');
         </section>
 
         @if ($sala === 'todos')
-        <section class="panel inv-mira">
-            <div class="panel-head">
-                <div>
-                    <h2 class="inv-titulo">
-                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 4.5 20.5 19.5h-17L12 4.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
-                            <path d="M12 10v4.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
-                            <path d="M12 17.2h.01" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" />
-                        </svg>
-                        Para mirar ahora
-                    </h2>
-                </div>
-
-                <span class="badge badge-urgent">{{ count($atencion) }}</span>
-            </div>
-            @if ($atencion === [])
-            <p class="recv-help">Ningún elemento está bajo el mínimo.</p>
-            @else
-            <ul class="inv-atencion">
-                @foreach ($atencion as $item)
-                <li>
-                    <span class="badge badge-sala badge-{{ $item['sala'] }}">{{ $salas[$item['sala']] ?? 'Sala' }}</span>
-                    <div>
-                        <strong>{{ $item['nombre'] }}</strong>
-                        <span>{{ $item['ubicacion'] }} · hay {{ $item['stock'] }} · mínimo {{ $item['minimo'] }}</span>
-                    </div>
-                    @if ($item['estado'] === 'critico')
-                    <span class="pill pill-danger">Crítico</span>
-                    @else
-                    <span class="pill pill-warn">Bajo mínimo</span>
-                    @endif
-                    @if ($puedeReponer)
-                    <a class="panel-link" href="{{ route('mockups.inventario', ['sala' => $item['sala'], 'elemento' => $item['codigo']]) }}">Reponer</a>
-                    @endif
-                </li>
-                @endforeach
-            </ul>
-            @endif
-        </section>
-
+        @include('inventario.partials.tarjeta-prioridad')
         @else
 
         <section class="panel list inv-book sala-{{ $sala }}">

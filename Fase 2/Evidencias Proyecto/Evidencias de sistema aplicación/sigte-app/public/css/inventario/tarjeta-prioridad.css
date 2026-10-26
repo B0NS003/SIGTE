@@ -1,0 +1,134 @@
+/* TARJETA DE PRIORIDADES DE REPOSICIÓN */
+.inv-mira { margin-top: 0; border-top: 4px solid var(--navy); }
+.inv-mira h2 { margin: 0; }
+
+/* LISTA DE TARJETAS DE PRIORIDADES */
+.inv-atencion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* TARJETA INDIVIDUAL */
+.inv-atencion li.inv-prioridad {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    transition: background .15s ease, border-color .15s ease,
+                box-shadow .15s ease;
+}
+
+.inv-atencion li.inv-prioridad:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(11, 31, 75, 0.05);
+}
+
+/* CONTENIDO IZQUIERDO */
+.inv-prioridad-contenido {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+}
+
+.inv-prioridad-estado {
+    display: flex;
+    align-items: center;
+}
+
+.inv-atencion .inv-prioridad-nombre {
+    display: block;
+    margin: 0;
+    color: var(--navy);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.inv-atencion .inv-prioridad-detalle {
+    display: block;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+/* COLUMNA DERECHA */
+.inv-prioridad-lateral {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.inv-prioridad-reponer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--navy);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .15s ease;
+}
+
+.inv-prioridad-reponer:hover {
+    background: #243f70;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.inv-prioridad-reponer:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+/* ADAPTACIÓN PARA PANTALLAS PEQUEÑAS */
+@media (max-width: 600px) {
+    .inv-atencion li.inv-prioridad {
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .inv-prioridad-contenido {
+        gap: 7px;
+    }
+
+    .inv-atencion .inv-prioridad-nombre {
+        font-size: 0.9rem;
+    }
+
+    .inv-atencion .inv-prioridad-detalle {
+        font-size: 0.75rem;
+        overflow-wrap: anywhere;
+    }
+
+    .inv-prioridad-lateral .badge {
+        max-width: 110px;
+        text-align: right;
+        white-space: normal;
+    }
+
+    .inv-prioridad-reponer {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+}
