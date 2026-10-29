@@ -18,6 +18,7 @@ use App\Support\Auditoria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -180,7 +181,7 @@ class FlujoController extends Controller
             'hay_filtros' => $busqueda !== '' || $etapaFiltro !== null,
         ];
     }
-    public function panel(Request $request, string $rol): View|RedirectResponse
+    public function panel(Request $request, string $rol): View|RedirectResponse|Response
     {
         $user = Auth::user();
         $rolReal = $user->nombreRol();
@@ -239,47 +240,50 @@ class FlujoController extends Controller
                 'hay_filtros' => false,
             ];
         }
-        return view($vista, [
-            'usuario' => $usuario,
-            'rol_key' => $rol,
-            'fases' => $fases,
-            'cajas' => $consulta['cajas'],
-            'cajas_por_etapa' => $consulta['cajas_por_etapa'],
-            'busqueda' => $consulta['busqueda'],
-            'etapa_filtro' => $consulta['etapa_filtro'],
-            'conteo_etapas' => $consulta['conteo_etapas'],
-            'total_consulta' => $consulta['total'],
-            'hay_filtros' => $consulta['hay_filtros'],
-            'kpis' => [
-                ['label' => 'En flujo', 'value' => 28, 'hint' => 'Cajas/sets activos', 'tone' => ''],
-                ['label' => 'Listas para entrega', 'value' => 12, 'hint' => 'En almacen esteril', 'tone' => 'ok'],
-                ['label' => 'Entregadas hoy', 'value' => 19, 'hint' => 'Con custodia', 'tone' => ''],
-                ['label' => 'Requieren atencion', 'value' => 3, 'hint' => 'Retraso o faltante', 'tone' => 'warn'],
-            ],
-            'alertas' => [
-                ['nivel' => 'alta', 'titulo' => 'SET-042 lleva 4h en esterilizacion', 'detalle' => 'Pabellon · Autoclave 2'],
-                ['nivel' => 'media', 'titulo' => 'CAJA-118 sin custodia al salir de lavado', 'detalle' => 'Urgencia'],
-                ['nivel' => 'media', 'titulo' => 'Faltante en SET-007 (1 pinza)', 'detalle' => 'Detectado en preparacion'],
-            ],
-            'etiquetas_etapa' => array_map(
-                fn (string $etapa) => Caja::etiquetaEtapa($etapa),
-                Caja::etapas()
-            ),
-            'panorama' => $this->panorama($consulta['cajas']),
-            'falla_produccion' => $request->boolean('falla'),
-            'accion_modal' => match ($request->query('accion')) {
-                'retroceso' => 'retroceso',
-                'etapa', 'actividad' => 'etapa',
-                default => null,
-            },
-            'caja_modal' => trim((string) $request->query('caja', '')),
-            'pasos_etapa' => $this->pasosPorEtapa(),
-            'anotaciones_por_caja' => $rol === Rol::OPERADOR ? $this->anotacionesPorCaja() : [],
-            'ahora_modal' => [
-                'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
-                'hora' => now()->timezone('America/Santiago')->format('H:i'),
-            ],
-        ]);
+        return response()
+            ->view($vista, [
+                'usuario' => $usuario,
+                'rol_key' => $rol,
+                'fases' => $fases,
+                'cajas' => $consulta['cajas'],
+                'cajas_por_etapa' => $consulta['cajas_por_etapa'],
+                'busqueda' => $consulta['busqueda'],
+                'etapa_filtro' => $consulta['etapa_filtro'],
+                'conteo_etapas' => $consulta['conteo_etapas'],
+                'total_consulta' => $consulta['total'],
+                'hay_filtros' => $consulta['hay_filtros'],
+                'kpis' => [
+                    ['label' => 'En flujo', 'value' => 28, 'hint' => 'Cajas/sets activos', 'tone' => ''],
+                    ['label' => 'Listas para entrega', 'value' => 12, 'hint' => 'En almacen esteril', 'tone' => 'ok'],
+                    ['label' => 'Entregadas hoy', 'value' => 19, 'hint' => 'Con custodia', 'tone' => ''],
+                    ['label' => 'Requieren atencion', 'value' => 3, 'hint' => 'Retraso o faltante', 'tone' => 'warn'],
+                ],
+                'alertas' => [
+                    ['nivel' => 'alta', 'titulo' => 'SET-042 lleva 4h en esterilizacion', 'detalle' => 'Pabellon · Autoclave 2'],
+                    ['nivel' => 'media', 'titulo' => 'CAJA-118 sin custodia al salir de lavado', 'detalle' => 'Urgencia'],
+                    ['nivel' => 'media', 'titulo' => 'Faltante en SET-007 (1 pinza)', 'detalle' => 'Detectado en preparacion'],
+                ],
+                'etiquetas_etapa' => array_map(
+                    fn (string $etapa) => Caja::etiquetaEtapa($etapa),
+                    Caja::etapas()
+                ),
+                'panorama' => $this->panorama($consulta['cajas']),
+                'falla_produccion' => $request->boolean('falla'),
+                'accion_modal' => match ($request->query('accion')) {
+                    'retroceso' => 'retroceso',
+                    'etapa', 'actividad' => 'etapa',
+                    default => null,
+                },
+                'caja_modal' => trim((string) $request->query('caja', '')),
+                'pasos_etapa' => $this->pasosPorEtapa(),
+                'anotaciones_por_caja' => $rol === Rol::OPERADOR ? $this->anotacionesPorCaja() : [],
+                'ahora_modal' => [
+                    'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
+                    'hora' => now()->timezone('America/Santiago')->format('H:i'),
+                ],
+            ])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
     public function recepcion(): View
     {
