@@ -1,0 +1,38 @@
+﻿Resumen de la
+Reunión Retrospectiva
+Información de la empresa y proyecto:
+Empresa / Organización
+Hospital San José de Melipilla
+Proyecto
+SIGTE - Sistema Integral de Gestión y Trazabilidad de Esterilización
+Información de la reunión:
+Lugar
+Reunión virtual mediante Discord
+Fecha
+06/10/2026
+Número de iteración / sprint
+1
+Personas convocadas a la reunión
+3
+Personas que asistieron a la reunión
+3
+Instrucciones:
+La reunión retrospectiva es una herramienta del marco de trabajo Scrum, que pertenece a la familia de marcos de trabajo de desarrollo ágil, se realiza en cada iteración (denominado Sprint en Scrum), justo después de la reunión de revisión de la iteración (Sprint Review Meeting) con el dueño del Producto (Product Owner). En esta reunión deben revisarse tres aspectos, lo que salió bien durante la iteración (aciertos), lo que no salió tan bien (errores) y las mejoras que pudieran hacerse en la próxima iteración para evitar errores y mantener aciertos.
+El dueño del producto (Product Owner) no asiste a la reunión, por lo que es una oportunidad para el equipo para poder hablar sin tapujos de los éxitos y fracasos, siendo importante para el equipo el analizar su propio desempeño e identificar estrategias para mejorar sus procesos. De forma similar, el Scrum Master (quien es el coach del equipo Scrum) puede observar impedimentos comunes que están afectando al equipo y tomar acciones para resolverlos.
+La reunión usualmente se restringe a tres horas.
+Formulario de reunión retrospectiva
+¿Qué salió bien en la iteración? (aciertos)
+¿Qué no salió bien en la iteración? (errores)
+¿Qué mejoras vamos a implementar en la próxima iteración? (recomendaciones de mejora continua)
+- Se completaron las historias de usuario planificadas dentro del tiempo estimado.
+- Se implementó el inicio de sesión con credenciales y sus respectivas validaciones, además de las vistas y funciones correspondientes a los roles definidos.
+- Se avanzó en el flujo del proceso, dejando algunos ajustes pendientes de revisión y validación con el cliente.
+- Se distribuyeron las tareas entre las integrantes del equipo, considerando sus responsabilidades y disponibilidad.
+- La coordinación de los horarios y la disponibilidad de cada integrante dificultó mantener un flujo de trabajo conjunto.
+- Los avances se realizaron principalmente de forma individual, lo que limitó el seguimiento compartido de las tareas y dificultó mantener una visión general del progreso del equipo.
+- Establecer horarios y una duración definida para las reuniones, con el fin de revisar los avances, identificar tareas pendientes y detectar si alguna integrante necesita apoyo.
+- Mantener actualizado Trello, registrando las tareas, sus responsables y sus estados, para facilitar el seguimiento del trabajo.
+- Mejorar la coordinación y comunicación entre las integrantes para compartir avances oportunamente y resolver dificultades en conjunto.
+Nota:
+Se recomienda utilizar viñetas (bullets) para enumerar los aciertos, errores y recomendaciones de mejora continua.
+El formulario se puede extender cuantas páginas sea necesario para registrar todos los aciertos, errores y recomendaciones.

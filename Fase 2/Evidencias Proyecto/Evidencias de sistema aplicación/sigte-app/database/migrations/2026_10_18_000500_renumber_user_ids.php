@@ -26,6 +26,7 @@ return new class extends Migration
                 ['caja_anotaciones', 'user_id'],
                 ['caja_retrocesos', 'user_id'],
                 ['reposiciones', 'user_id'],
+                ['registros_auditoria', 'user_id'],
                 ['sessions', 'user_id'],
             ];
 

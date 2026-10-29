@@ -6,13 +6,40 @@
 @section('title', 'SIGTE — Historial de entregas')
 
 @section('content')
+@php
+    $ordenSectores = ['Pabellon', 'Pabellón', 'Dental', 'UCI', 'Urgencia', 'Maternidad', 'Curaciones', 'Otro servicio'];
+    $slugSector = function (string $servicio): string {
+        $clave = mb_strtolower(strtr($servicio, [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
+        ]));
+        $clave = preg_replace('/[^a-z0-9]+/', '', $clave) ?: 'otro';
+
+        return match (true) {
+            str_contains($clave, 'pabell') => 'pabellon',
+            str_contains($clave, 'dental') => 'dental',
+            str_contains($clave, 'uci') => 'uci',
+            str_contains($clave, 'urgencia') => 'urgencia',
+            str_contains($clave, 'matern') => 'maternidad',
+            str_contains($clave, 'curacion') => 'curaciones',
+            default => 'otro',
+        };
+    };
+    $etiquetaCuando = fn (string $cuando): ?string => match ($cuando) {
+        'hoy' => 'Hoy',
+        'ayer' => 'Ayer',
+        default => null,
+    };
+    $panelVolver = ($usuario['rol'] ?? '') === 'Enfermera de turno'
+        ? route('mockups.panel', 'enfermera')
+        : route('mockups.panel', 'administradora');
+@endphp
 <div class="shell">
     <aside class="sidebar">
         <div class="logo-wrap">
             <img src="{{ asset('images/logo-hospital-circular.png') }}" alt="Logo hospital">
             <div>
                 <div class="logo">SIG<span>TE</span></div>
-                <div class="logo-sub">Administración</div>
+                <div class="logo-sub">{{ ($usuario['rol'] ?? '') === 'Enfermera de turno' ? 'Turno' : 'Administración' }}</div>
             </div>
         </div>
         @include('partials.menu-rol')
@@ -31,196 +58,153 @@
     <main class="main">
         <div class="main-top">
             <div>
-                <p class="eyebrow">Gestión · solo administradora</p>
+                <p class="eyebrow">Gestión · entregas</p>
                 <h1>Historial de entregas</h1>
-                <p class="main-sub">Cada salida queda con las cajas, el servicio y las dos personas: quien entrega y quien recibe.</p>
+                <p class="main-sub">Consulta las salidas registradas: cajas, material, servicio y quién entregó o recibió.</p>
             </div>
             <div class="main-actions">
-                <a class="btn btn-ghost" href="{{ route('mockups.panel', 'administradora') }}">Volver al resumen</a>
+                <a class="btn btn-ghost" href="{{ $panelVolver }}">Volver al resumen</a>
             </div>
         </div>
 
         @if ($falla)
             <div class="ops-empty">
                 <strong>No se pudo cargar el historial</strong>
-                <p>El listado no está disponible en este momento.</p>
+                <p>El listado no está disponible en este momento. Las entregas no se modificaron.</p>
                 <p><a href="{{ route('mockups.historial_entregas') }}">Intentar de nuevo</a></p>
             </div>
         @else
-            @php
-                $ordenSectores = ['Pabellón', 'Dental', 'UCI', 'Urgencia', 'Maternidad', 'Curaciones'];
-                $slugSector = [
-                    'Pabellón' => 'pabellon',
-                    'Dental' => 'dental',
-                    'UCI' => 'uci',
-                    'Urgencia' => 'urgencia',
-                    'Maternidad' => 'maternidad',
-                    'Curaciones' => 'curaciones',
-                ];
-                $grupos = collect($entregas)->groupBy('servicio')->sortBy(function ($grupo, $servicio) use ($ordenSectores) {
-                    $indice = array_search($servicio, $ordenSectores, true);
+            @if ($servicios->isNotEmpty())
+                <div class="hist-sectores" aria-label="Filtrar por servicio">
+                    <a
+                        class="hist-sector {{ $filtros['servicio'] === '' ? 'is-on' : '' }}"
+                        href="{{ route('mockups.historial_entregas', array_filter(['q' => $filtros['q'] ?: null, 'cuando' => $filtros['cuando'] !== 'todas' ? $filtros['cuando'] : null])) }}"
+                    >
+                        <strong>Todas</strong>
+                        <span class="n">{{ $resumen['total'] ?? 0 }}</span>
+                        <small>Hoy {{ $resumen['hoy'] ?? 0 }}</small>
+                    </a>
+                    @foreach ($servicios->sortBy(function ($fila) use ($ordenSectores) {
+                        $indice = array_search($fila['servicio'], $ordenSectores, true);
+                        return $indice === false ? 99 : $indice;
+                    }) as $fila)
+                        <a
+                            class="hist-sector sec-{{ $slugSector($fila['servicio']) }} {{ $filtros['servicio'] === $fila['servicio'] ? 'is-on' : '' }}"
+                            href="{{ route('mockups.historial_entregas', array_filter([
+                                'q' => $filtros['q'] ?: null,
+                                'cuando' => $filtros['cuando'] !== 'todas' ? $filtros['cuando'] : null,
+                                'servicio' => $fila['servicio'],
+                            ])) }}"
+                        >
+                            <strong>{{ $fila['servicio'] }}</strong>
+                            <span class="n">{{ $fila['total'] }}</span>
+                            @if ($fila['ultima_hora'])
+                                <small>{{ $fila['ultima_hora'] }} · {{ $fila['ultima_fecha'] }}</small>
+                            @endif
+                        </a>
+                    @endforeach
+                </div>
+            @endif
 
-                    return $indice === false ? 99 : $indice;
-                });
-            @endphp
-            <div class="hist-sectores" id="sectores">
-                @foreach ($grupos as $servicio => $grupo)
-                    @php $ultima = $grupo->first(); @endphp
-                    <button class="hist-sector sec-{{ $slugSector[$servicio] ?? 'otro' }}" type="button" data-servicio="{{ $servicio }}">
-                        <strong>{{ $servicio }}</strong>
-                        <span class="n">{{ $grupo->count() }}</span>
-                        <small>{{ $grupo->count() === 1 ? 'entrega' : 'entregas' }}</small>
-                        <small>Última {{ $ultima['hora'] }} · {{ $ultima['fecha'] }}</small>
-                    </button>
-                @endforeach
-            </div>
-
-            <form class="query-toolbar panel" id="filtro-entregas" action="{{ route('mockups.historial_entregas') }}" method="get" onsubmit="return false">
-                <label class="field" style="margin:0; flex:1;">
-                    <span class="icon" aria-hidden="true">⌕</span>
-                    <input id="q" type="search" placeholder="Código, persona o número de entrega" autocomplete="off">
+            <form class="users-filtros hist-filtros" method="get" action="{{ route('mockups.historial_entregas') }}">
+                <label class="field hist-buscar">
+                    <span>Buscar</span>
+                    <input type="search" name="q" value="{{ $filtros['q'] }}" placeholder="Código, persona, caja o material" autocomplete="off">
                 </label>
-                <label class="field field-select" style="margin:0; min-width:11rem;">
-                    <select id="cuando">
-                        <option value="todas">Todas</option>
-                        <option value="hoy">Hoy</option>
-                        <option value="ayer">Ayer</option>
-                        <option value="semana">Esta semana</option>
+                <label class="field hist-periodo">
+                    <span>Período</span>
+                    <select name="cuando">
+                        <option value="todas" @selected($filtros['cuando'] === 'todas')>Todas</option>
+                        <option value="hoy" @selected($filtros['cuando'] === 'hoy')>Hoy</option>
+                        <option value="ayer" @selected($filtros['cuando'] === 'ayer')>Ayer</option>
+                        <option value="semana" @selected($filtros['cuando'] === 'semana')>Últimos 7 días</option>
                     </select>
                 </label>
+                @if ($filtros['servicio'] !== '')
+                    <input type="hidden" name="servicio" value="{{ $filtros['servicio'] }}">
+                @endif
+                <div class="users-filtros-acciones">
+                    <button class="btn btn-dark" type="submit">Consultar</button>
+                    @if ($filtros['q'] !== '' || $filtros['cuando'] !== 'todas' || $filtros['servicio'] !== '')
+                        <a class="btn btn-ghost" href="{{ route('mockups.historial_entregas') }}">Limpiar</a>
+                    @endif
+                </div>
             </form>
 
             <div class="mant-head">
                 <div>
-                    <h2 id="lista-titulo">Últimas entregas</h2>
-                    <p id="entregas-meta">Las {{ min(3, count($entregas)) }} más recientes</p>
+                    <h2>
+                        @if ($filtros['servicio'] !== '')
+                            {{ $filtros['servicio'] }}
+                        @else
+                            Entregas registradas
+                        @endif
+                    </h2>
+                    <p>
+                        @if ($entregas->total() === 0)
+                            Sin coincidencias con el criterio actual
+                        @else
+                            {{ $entregas->total() }} {{ $entregas->total() === 1 ? 'entrega' : 'entregas' }}
+                            · pág. {{ $entregas->currentPage() }}/{{ max(1, $entregas->lastPage()) }}
+                        @endif
+                    </p>
                 </div>
-                <button class="btn btn-ghost" id="ver-ultimas" type="button" hidden>Ver últimas</button>
             </div>
 
-            <div class="ops-empty" id="entregas-vacio" hidden>
-                <strong>No hay entregas con ese criterio</strong>
-                <p>Probá con otro código, servicio o persona.</p>
-            </div>
-
-            <div class="hist-lista" id="entregas-lista">
-                @foreach ($entregas as $entrega)
-                    @php
-                        $texto = mb_strtolower(implode(' ', [
-                            $entrega['id'],
-                            $entrega['servicio'],
-                            $entrega['entrega'],
-                            $entrega['recibe'],
-                            collect($entrega['cajas'])->pluck('codigo')->implode(' '),
-                            collect($entrega['cajas'])->pluck('nombre')->implode(' '),
-                            implode(' ', $entrega['materiales']),
-                        ]));
-                    @endphp
-                    <article class="hist-card sec-{{ $slugSector[$entrega['servicio']] ?? 'otro' }}" data-servicio="{{ $entrega['servicio'] }}" data-cuando="{{ $entrega['cuando'] }}" data-texto="{{ $texto }}">
-                        <div class="hist-cuando">
-                            <strong>{{ $entrega['hora'] }}</strong>
-                            <span>{{ $entrega['fecha'] }}</span>
-                            <small>{{ $entrega['id'] }}</small>
-                        </div>
-                        <div class="hist-cuerpo">
-                            <div class="hist-top">
-                                <h2>{{ $entrega['servicio'] }}</h2>
-                                <span class="badge">{{ count($entrega['cajas']) }} {{ count($entrega['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
+            @if ($entregas->total() === 0)
+                <div class="ops-empty">
+                    <strong>No hay entregas con ese criterio</strong>
+                    <p>Prueba con otro código, servicio, persona o período.</p>
+                    @if ($filtros['q'] !== '' || $filtros['cuando'] !== 'todas' || $filtros['servicio'] !== '')
+                        <p><a href="{{ route('mockups.historial_entregas') }}">Ver todas las entregas</a></p>
+                    @endif
+                </div>
+            @else
+                <div class="hist-lista">
+                    @foreach ($entregas as $entrega)
+                        <article class="hist-card sec-{{ $slugSector($entrega['servicio']) }}">
+                            <div class="hist-cuando">
+                                <strong>{{ $entrega['hora'] }}</strong>
+                                <span>{{ $entrega['fecha'] }}</span>
+                                @if ($relativo = $etiquetaCuando($entrega['cuando']))
+                                    <em class="hist-relativo">{{ $relativo }}</em>
+                                @endif
+                                <small>{{ $entrega['id'] }}</small>
                             </div>
-                            <div class="hist-cajas">
-                                @foreach ($entrega['cajas'] as $caja)
-                                    <span class="hist-chip">{{ $caja['codigo'] }} <small>{{ $caja['nombre'] }}</small></span>
-                                @endforeach
-                                @forelse ($entrega['materiales'] as $material)
-                                    <span class="hist-chip is-material">{{ $material }}</span>
-                                @empty
-                                    <span class="hist-chip is-material">Sin material extra</span>
-                                @endforelse
-                            </div>
-                            <div class="entrega-datos">
-                                <div class="entrega-dato">
-                                    <span>Quién entrega</span>
-                                    <strong>{{ $entrega['entrega'] }}</strong>
-                                    <small>{{ $entrega['entrega_rol'] }}</small>
+                            <div class="hist-cuerpo">
+                                <div class="hist-top">
+                                    <h2>{{ $entrega['servicio'] }}</h2>
+                                    <span class="badge">{{ count($entrega['cajas']) }} {{ count($entrega['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
                                 </div>
-                                <div class="entrega-dato">
-                                    <span>Quién recibe</span>
-                                    <strong>{{ $entrega['recibe'] }}</strong>
-                                    <small>{{ $entrega['recibe_rol'] }}</small>
+                                <div class="hist-cajas">
+                                    @forelse ($entrega['cajas'] as $caja)
+                                        <span class="hist-chip">{{ $caja['codigo'] }} <small>{{ $caja['nombre'] }}</small></span>
+                                    @empty
+                                        <span class="hist-chip is-material">Sin cajas</span>
+                                    @endforelse
+                                    @foreach ($entrega['materiales'] as $material)
+                                        <span class="hist-chip is-material">{{ $material }}</span>
+                                    @endforeach
+                                </div>
+                                <div class="entrega-datos">
+                                    <div class="entrega-dato">
+                                        <span>Quién entrega</span>
+                                        <strong>{{ $entrega['entrega'] }}</strong>
+                                        <small>{{ $entrega['entrega_rol'] }}</small>
+                                    </div>
+                                    <div class="entrega-dato">
+                                        <span>Quién recibe</span>
+                                        <strong>{{ $entrega['recibe'] }}</strong>
+                                        <small>{{ $entrega['recibe_rol'] }}</small>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
+                        </article>
+                    @endforeach
+                </div>
+                @include('admin.partials.paginas', ['paginador' => $entregas, 'etiqueta' => 'Páginas de entregas'])
+            @endif
         @endif
     </main>
 </div>
-@unless ($falla)
-<script>
-    var q = document.getElementById('q');
-    var cuando = document.getElementById('cuando');
-    var meta = document.getElementById('entregas-meta');
-    var titulo = document.getElementById('lista-titulo');
-    var vacio = document.getElementById('entregas-vacio');
-    var verUltimas = document.getElementById('ver-ultimas');
-    var cards = document.querySelectorAll('#entregas-lista .hist-card');
-    var sectorActivo = '';
-
-    function marcarSector() {
-        document.querySelectorAll('.hist-sector').forEach(function (boton) {
-            boton.classList.toggle('is-on', boton.dataset.servicio === sectorActivo);
-        });
-        verUltimas.hidden = sectorActivo === '';
-        titulo.textContent = sectorActivo === '' ? 'Últimas entregas' : sectorActivo;
-    }
-
-    function aplicar() {
-        var texto = q.value.trim().toLowerCase();
-        var coinciden = [];
-        cards.forEach(function (card) {
-            var coincideTexto = texto === '' || card.dataset.texto.indexOf(texto) !== -1;
-            var coincideSector = sectorActivo === '' || card.dataset.servicio === sectorActivo;
-            var coincideCuando = cuando.value === 'todas'
-                || (cuando.value === 'semana' && card.dataset.cuando !== 'anterior')
-                || card.dataset.cuando === cuando.value;
-            card.hidden = true;
-            if (coincideTexto && coincideSector && coincideCuando) {
-                coinciden.push(card);
-            }
-        });
-        var mostrar = sectorActivo === '' ? coinciden.slice(0, 3) : coinciden;
-        mostrar.forEach(function (card) {
-            card.hidden = false;
-        });
-        vacio.hidden = mostrar.length !== 0;
-        meta.hidden = mostrar.length === 0;
-        if (sectorActivo === '') {
-            meta.textContent = mostrar.length === 1 ? 'La más reciente' : 'Las ' + mostrar.length + ' más recientes';
-        } else {
-            meta.textContent = mostrar.length === 1 ? '1 entrega' : mostrar.length + ' entregas';
-        }
-    }
-
-    document.getElementById('sectores').addEventListener('click', function (evento) {
-        var boton = evento.target.closest('.hist-sector');
-        if (!boton) {
-            return;
-        }
-        sectorActivo = sectorActivo === boton.dataset.servicio ? '' : boton.dataset.servicio;
-        marcarSector();
-        aplicar();
-    });
-
-    verUltimas.addEventListener('click', function () {
-        sectorActivo = '';
-        marcarSector();
-        aplicar();
-    });
-
-    q.addEventListener('input', aplicar);
-    cuando.addEventListener('change', aplicar);
-    aplicar();
-</script>
-@endunless
 @endsection

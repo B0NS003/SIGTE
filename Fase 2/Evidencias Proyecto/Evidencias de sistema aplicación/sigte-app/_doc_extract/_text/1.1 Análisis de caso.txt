@@ -1,0 +1,93 @@
+﻿ANÁLISIS DE CASO55726179070INSTITUTO PROFESIONAL DUOC UC - SEDE MELIPILLA
+ESCUELA DE INFORMÁTICA Y TELECOMUNICACIONES
+CARRERA INGENIERÍA EN INFORMÁTICA
+55726179070
+Sistema integral de gestión y trazabilidad de esterilización
+Cliente
+:
+Hospital San José de Melipilla
+Equipo
+:
+Natalia Carolina Sánchez Herrada
+Alejandra Ignacia Riquelme Velasquez
+Yamilet Monserrat Maureira Hernandez
+Fecha
+:
+02/09/2026
+Índice
+TOC \h \u \z \t "Heading 1,1,Heading 2,2,Heading 3,3,Heading 4,4,Heading 5,5,Heading 6,6,"Índice	2
+1. Contexto	3
+2. Problemática	3
+3. Justificación del proyecto	4
+4. Objetivo General	5
+5. Objetivos específicos	5
+6. Alcance del Proyecto	6
+7. Limitaciones	6
+8. Metodología	7
+9. Resultados Esperados	7
+10. Conclusiones	7
+1. Contexto
+La central de retroceso más conocida como el servicio de esterilización del Hospital San José de Melipilla cumple un rol fundamental dentro del funcionamiento hospitalario, debido a que en esta área se reciben, procesan, esterilizan, almacenan y entregan los instrumentos y materiales necesarios para los distintos procedimientos clínicos y quirúrgicos. Por la naturaleza de sus funciones, se trata de un servicio que requiere mantener un adecuado control de los materiales y de cada una de las etapas por las que estos pasan.
+Anteriormente, el servicio de esterilización se encontraba en una infraestructura de menor tamaño, lo que permitía una comunicación más directa entre las distintas áreas y facilitaba la coordinación de las actividades realizadas por el personal. Sin embargo, con el traslado del Hospital San José de Melipilla a sus nuevas instalaciones ubicadas en Santa María, la infraestructura hospitalaria aumentó considerablemente en tamaño y capacidad, generando cambios en la distribución y funcionamiento de sus distintos servicios.
+Esta nueva infraestructura contempla espacios más amplios y áreas diferenciadas para el desarrollo de las distintas etapas del proceso de esterilización. A diferencia de la situación anterior, donde las áreas se encontraban más próximas entre sí y la comunicación era más sencilla, la nueva distribución física genera una mayor separación entre los espacios de trabajo.
+Además, el crecimiento del hospital ha significado un aumento en su capacidad de atención, en la cantidad de pacientes atendidos y en las actividades que se desarrollan diariamente. Esto también se refleja en el Servicio de Esterilización, donde actualmente se debe gestionar una mayor cantidad de equipamiento, materiales y procesos en comparación con el funcionamiento que tenía anteriormente.
+2. Problemática
+A partir de la entrevista realizada a Judith Herrada, enfermera supervisora del servicio de esterilización del Hospital San José de Melipilla, se pudieron identificar diversas problemáticas relacionadas con la gestión, comunicación y trazabilidad dentro del servicio. Entre las principales se encuentran:
+Registros manuales: Gran parte de la información relacionada con los materiales que ingresan y salen del servicio se registra en libros y documentos físicos.
+Dependencia de planillas excel: Actualmente se utilizan planillas excel como apoyo para compartir información entre los computadores del servicio, pero estas no reemplazan completamente los registros en papel.
+Falta de un sistema de trazabilidad: No existe una plataforma centralizada que permita registrar y consultar el recorrido de una caja desde su ingreso al servicio hasta su entrega al área correspondiente.
+Dificultad para conocer el estado y ubicación de los materiales: No siempre es posible conocer rápidamente si una caja se encuentra en lavado, preparación, esterilización, almacenamiento o si ya fue entregada a un servicio.
+Problemas de comunicación interna: Debido a la nueva distribución del hospital, las áreas de lavado, administrativa y esterilización se encuentran separadas físicamente, dificultando la comunicación entre los funcionarios.
+Falta de sistemas de alerta adecuados: La distribución de los espacios provoca que algunos funcionarios no puedan escuchar los timbres o alarmas desde sus áreas de trabajo.
+Gestión de inventario mediante registros físicos: El contenido de las cajas y parte del inventario se controla mediante registros y documentos que deben ser actualizados manualmente.
+Aumento de la cantidad de trabajo: El crecimiento del hospital y de la cantidad de pacientes ha generado un aumento en la producción del Servicio de Esterilización y, por consecuencia, en la cantidad de materiales que deben ser procesados y controlados.
+De las problemáticas identificadas, el proyecto se centrará principalmente en la falta de un sistema integral de gestión y trazabilidad, debido a que actualmente el seguimiento de los materiales depende principalmente de registros manuales y planillas que no permiten visualizar de manera centralizada el estado, ubicación y recorrido de las cajas.
+Esta situación dificulta el control del proceso y puede generar errores de registro, pérdida de tiempo y dificultades para obtener información oportuna cuando se necesita conocer el estado de un determinado material. Por este motivo, se plantea el desarrollo de un sistema que permita digitalizar y centralizar esta información, facilitando la gestión y trazabilidad de los materiales del Servicio de Esterilización.
+3. Justificación del proyecto
+Este proyecto representa una oportunidad para realizar un aporte a nuestra comunidad, desarrollando una solución tecnológica para una necesidad real del Hospital San José de Melipilla. Consideramos que mejorar la gestión del servicio de esterilización puede generar un impacto positivo, ya que este servicio es fundamental para el funcionamiento de las distintas áreas del hospital.
+Nuestra propuesta busca facilitar parte de la carga de trabajo de los funcionarios, especialmente en las tareas relacionadas con el registro, gestión y seguimiento de los materiales. Además, se espera que la centralización de la información permita disminuir errores asociados a los registros manuales y facilite el acceso oportuno a la información, contribuyendo a que el servicio pueda funcionar de manera más ordenada y eficiente.
+Finalmente, consideramos que desarrollar una solución adaptada a las necesidades específicas del servicio de esterilización representa una propuesta novedosa dentro de este contexto y, a la vez, un proyecto factible de realizar de acuerdo con los conocimientos, herramientas y tiempo disponible para su desarrollo.
+4. Objetivo General
+Desarrollar un sistema web para gestionar y realizar la trazabilidad del material quirúrgico del servicio de Esterilización del Hospital San José de Melipilla, con el propósito de centralizar la información, gestionar el inventario y optimizar el seguimiento de los materiales durante las distintas etapas de su procesamiento.
+5. Objetivos específicos
+Analizar los procesos actuales y levantar los requerimientos necesarios para la gestión y trazabilidad del material quirúrgico del servicio de Esterilización.
+Diseñar el flujo de trazabilidad, los prototipos de interfaz y el modelo de datos de la solución web, de acuerdo con los requerimientos identificados.
+Desarrollar los módulos y funcionalidades principales del sistema web para la gestión, trazabilidad e inventario del material quirúrgico.
+Integrar las funcionalidades desarrolladas en un sistema web centralizado y ejecutar pruebas funcionales para verificar su correcto funcionamiento y cumplimiento con los requerimientos definidos.
+Validar la solución desarrollada mediante escenarios de uso basados en los requerimientos y necesidades identificados junto al personal del servicio de Esterilización.
+6. Alcance del Proyecto
+El proyecto contempla el desarrollo de una solución web orientada a la gestión y trazabilidad de los materiales del servicio de esterilización. Dentro de su alcance se consideran las siguientes funcionalidades:
+Trazabilidad por estados: Seguimiento de los materiales durante las seis etapas del proceso: recepción, lavado, preparación, esterilización, almacenamiento y entrega, permitiendo conocer el estado en que se encuentra cada material.
+Inventario digital: Registro y gestión del inventario asociado a cada caja de instrumental, permitiendo consultar su contenido y mantener actualizada la información.
+Control de custodia: Registro de la entrega y recepción de los materiales, identificando quién entrega y quién recibe cada caja o set de instrumental.
+Reportes y alertas: Generación de reportes a partir de la información registrada y alertas que permitan facilitar el seguimiento y apoyar la gestión del servicio.
+7. Limitaciones
+El proyecto se encuentra delimitado por el tiempo y los recursos disponibles para su desarrollo, por lo que no contempla los siguientes aspectos:
+Equipamiento especializado: No contempla la compra ni integración de equipos especializados de lectura, identificación u otros dispositivos adicionales.
+Infraestructura física: No incluye obras civiles, remodelaciones ni modificaciones a los espacios físicos del Servicio de Esterilización.
+Trazabilidad externa: El sistema se enfocará en el proceso de los materiales dentro del Servicio de Esterilización, sin abarcar su distribución externa una vez realizada la entrega al servicio correspondiente.
+Funcionalidades adicionales: Debido al período de desarrollo de 18 semanas, se priorizan las funcionalidades principales necesarias para cumplir con los objetivos del proyecto, dejando fuera aquellas que no sean esenciales para el funcionamiento de la solución.
+8. Metodología
+El proyecto se desarrollará utilizando el marco de trabajo ágil Scrum, debido a que se trabajará con un cliente real y los requerimientos pueden ser ajustados o complementados a medida que se conozca con mayor profundidad el proceso del servicio de Esterilización. Además, el tiempo disponible para desarrollar el proyecto es acotado, por lo que se requiere una metodología que permita organizar el trabajo en períodos cortos, priorizar las funcionalidades más importantes y obtener retroalimentación de manera continua. Esto permitirá adaptar la solución a las necesidades reales del cliente y detectar oportunamente posibles mejoras o cambios.
+El trabajo se organizará de manera iterativa e incremental, comenzando con el levantamiento y priorización de requerimientos para construir el Product Backlog. A partir de este se planificarán las actividades de desarrollo, diseño y pruebas, trabajando en ciclos que permitan entregar avances funcionales y recibir retroalimentación del cliente para orientar las siguientes etapas del proyecto.
+Los roles y responsabilidades del equipo serán los siguientes:
+Alejandra Riquelme: Scrum Master, Team Developer
+Natalia Sanchez: Product Owner, Team Developer
+Yamilet Maureira: Team Developer
+Product Owner: Responsable de representar las necesidades del cliente, gestionar y priorizar los requerimientos del producto.
+Scrum Master: Responsable de facilitar la aplicación de Scrum, coordinar el trabajo del equipo y apoyar la resolución de impedimentos.
+Team Developer: Responsable de participar en el análisis, diseño, desarrollo, pruebas e implementación de las funcionalidades del sistema.
+9. Resultados esperados
+Como resultado del proyecto se espera desarrollar una solución web funcional que permita mejorar la gestión y trazabilidad de los materiales del Servicio de Esterilización. Se espera obtener los siguientes resultados:
+Sistema web funcional: Contar con una plataforma que centralice la información relacionada con los materiales y su procesamiento.
+Trazabilidad de los materiales: Permitir conocer el estado y recorrido de cada caja durante las distintas etapas del proceso de esterilización.
+Inventario digital: Disponer de información actualizada sobre el contenido de las cajas de instrumental.
+Mejor gestión de la información: Facilitar el acceso y consulta de los registros, disminuyendo la dependencia de documentos físicos.
+Apoyo al trabajo de los funcionarios: Facilitar las tareas de registro, seguimiento y control de los materiales, contribuyendo a disminuir parte de la carga administrativa.
+Disminución de errores: Reducir los errores asociados al registro y seguimiento manual de la información.
+Pruebas y validación: Comprobar mediante pruebas funcionales que las principales funcionalidades desarrolladas respondan a los requerimientos definidos.
+10. Conclusiones
+A partir del análisis realizado, se pudo identificar que el servicio de esterilización cumple un papel fundamental para el funcionamiento del Hospital San José de Melipilla y que la gestión de sus materiales requiere mantener información actualizada y accesible durante todo su proceso.
+Las problemáticas identificadas permitieron definir como principal necesidad el desarrollo de una solución que facilite la gestión y trazabilidad de los materiales, disminuyendo la dependencia de registros manuales y apoyando el trabajo de los funcionarios.
+Por lo anterior, se propone desarrollar un sistema web que permita centralizar la información, gestionar el inventario y realizar el seguimiento de los materiales durante las distintas etapas del proceso. Se espera que esta solución contribuya a mejorar la organización del servicio, disminuir posibles errores y facilitar el trabajo de sus funcionarios.
+Finalmente, mediante el uso de Scrum y considerando el tiempo y los recursos disponibles, se considera que el proyecto es factible de desarrollar, priorizando las funcionalidades principales que permitan responder a la necesidad identificada.

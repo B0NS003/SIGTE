@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\CajaAnotacion;
 use App\Models\Caja;
 use App\Models\ConsumoServicio;
+use App\Models\Entrega;
+use App\Models\EntregaCaja;
 use App\Models\Insumo;
 use App\Models\Personal;
 use App\Models\Rol;
@@ -12,6 +14,7 @@ use App\Models\User;
 use App\Http\Controllers\Concerns\ConsultaDeCajas;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Support\AccesoPorRol;
+use App\Support\Auditoria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -331,6 +334,7 @@ class FlujoController extends Controller
                 'etapa_destino' => 'No se puede saltar etapas. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
             ]);
         }
+        $desde = $etiquetaActual;
         $caja->etapa = $siguiente;
         $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
         $caja->actividad = null;
@@ -346,6 +350,12 @@ class FlujoController extends Controller
             'personal_id' => $marca['personal_id'],
             'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
         ]);
+        Auditoria::registrar(
+            'Avanzó etapa',
+            'etapa',
+            $caja->codigo,
+            $desde.' → '.Caja::etiquetaEtapa($siguiente),
+        );
         return $this->volverAlFlujo($request, $caja->codigo, false)
             ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.'.$this->firmaPuesto());
     }
@@ -412,6 +422,12 @@ class FlujoController extends Controller
                 'etapa' => 'No fue posible completar el retroceso. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
             ]);
         }
+        Auditoria::registrar(
+            'Corrigió etapa',
+            'etapa',
+            $caja->codigo,
+            $etiquetaActual.' → '.$etiquetaAnterior.'. '.$motivo,
+        );
         return $this->volverAlFlujo($request, $caja->codigo, false, 'retroceso')
             ->with('ok', 'Listo. '.$caja->codigo.' volvió a '.$etiquetaAnterior.'.'.$this->firmaPuesto());
     }
@@ -505,6 +521,12 @@ class FlujoController extends Controller
             return response()->json(['mensaje' => 'No fue posible completar el registro.'], 500);
         }
         $nota->load(['autor', 'persona']);
+        Auditoria::registrar(
+            'Anotó en etapa',
+            'etapa',
+            $caja->codigo,
+            Caja::etiquetaEtapa($caja->etapa).' · '.$nota->texto,
+        );
         return response()->json([
             'texto' => $nota->texto,
             'actividad' => $caja->actividad,
@@ -703,35 +725,80 @@ class FlujoController extends Controller
         }
         $datos = $validador->validate();
         $codigos = $datos['cajas'] ?? [];
-        // Comprobar que todas las cajas seleccionadas estén listas para entrega.
-        if (!empty($codigos)) {
-            $cantidadDisponibles = Caja::query()
+        $material = null;
+        if (($datos['material'] ?? '') === 'otro') {
+            $material = trim((string) ($datos['otro'] ?? ''));
+        } elseif (! empty($datos['material'])) {
+            $material = (string) $datos['material'];
+        }
+
+        $cajas = collect();
+        if (! empty($codigos)) {
+            $cajas = Caja::query()
                 ->whereIn('codigo', $codigos)
-                ->where('etapa', 'entrega')
+                ->where('etapa', Caja::ETAPA_ENTREGA)
                 ->whereNull('entregado_at')
-                ->count();
-            if ($cantidadDisponibles !== count($codigos)) {
+                ->get();
+            if ($cajas->count() !== count($codigos)) {
                 return back()
                     ->withErrors([
                         'cajas' => 'Una o más cajas ya no están disponibles para entrega. Actualiza el formulario.',
                     ])
                     ->withInput();
             }
-            // Registrar la fecha y hora de entrega de las cajas.
-            $marca = $this->marca();
-            Caja::query()
-                ->whereIn('codigo', $codigos)
-                ->where('etapa', 'entrega')
-                ->whereNull('entregado_at')
-                ->update([
-                    'entregado_at' => now(),
-                    'responsable_id' => $marca['user_id'],
-                    'personal_id' => $marca['personal_id'],
-                ]);
         }
+
+        $marca = $this->marca();
+        $ahora = now();
+        $entrega = Entrega::query()->create([
+            'codigo' => Entrega::siguienteCodigo($ahora->copy()->timezone('America/Santiago')),
+            'servicio' => $datos['servicio'],
+            'recibe' => $datos['retira'],
+            'recibe_rol' => 'Personal del servicio',
+            'material' => $material,
+            'observacion' => $datos['obs'] ?? null,
+            'user_id' => $marca['user_id'],
+            'entregado_at' => $ahora,
+        ]);
+
+        foreach ($cajas as $caja) {
+            $caja->fill([
+                'entregado_at' => $ahora,
+                'estado' => 'Entregada a '.$datos['servicio'],
+                'ubicacion' => 'Ventanilla de entrega',
+                'responsable_id' => $marca['user_id'],
+                'personal_id' => $marca['personal_id'],
+            ])->save();
+
+            EntregaCaja::query()->create([
+                'entrega_id' => $entrega->id,
+                'caja_id' => $caja->id,
+                'codigo' => $caja->codigo,
+                'nombre' => str_starts_with(mb_strtoupper($caja->codigo), 'SET-')
+                    ? 'Set · '.$caja->servicio
+                    : 'Caja · '.$caja->servicio,
+            ]);
+
+            Auditoria::registrar(
+                'Registró entrega',
+                'entrega',
+                $caja->codigo,
+                'Retira '.$datos['retira'].' · '.$datos['servicio'].' · '.$entrega->codigo,
+            );
+        }
+
+        if ($cajas->isEmpty() && $material !== null) {
+            Auditoria::registrar(
+                'Registró entrega',
+                'entrega',
+                $entrega->codigo,
+                'Material · '.$material.' · Retira '.$datos['retira'].' · '.$datos['servicio'],
+            );
+        }
+
         return back()->with(
             'ok',
-            'La entrega se registró correctamente.'.$this->firmaPuesto()
+            'La entrega '.$entrega->codigo.' se registró correctamente.'.$this->firmaPuesto()
         );
     }
 

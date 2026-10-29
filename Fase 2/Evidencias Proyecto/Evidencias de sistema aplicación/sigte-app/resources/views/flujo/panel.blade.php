@@ -216,7 +216,11 @@
                             <h2>{{ $grupo['nombre'] }}</h2>
                             <span>{{ count($grupo['cajas']) }} {{ count($grupo['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
                         </summary>
-                        <div class="ops-etapa-list">
+                        <div
+                            class="ops-etapa-list {{ count($grupo['cajas']) > 2 ? 'is-kds' : '' }}"
+                            tabindex="0"
+                            aria-label="Cajas en {{ $grupo['nombre'] }}"
+                        >
                             @foreach ($grupo['cajas'] as $caja)
                                 @include('flujo.partials.tarjeta-caja', ['caja' => $caja, 'fases' => $fases])
                             @endforeach

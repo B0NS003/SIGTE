@@ -1,0 +1,90 @@
+﻿Pestaña 1
+ACTA DE CONSTITUCIÓN55726179070INSTITUTO PROFESIONAL DUOC UC - SEDE MELIPILLA
+ESCUELA DE INFORMÁTICA Y TELECOMUNICACIONES
+CARRERA INGENIERÍA EN INFORMÁTICA
+55726179070
+Sistema integral de gestión y trazabilidad de esterilización
+Cliente
+:
+Hospital San José de Melipilla
+Equipo
+:
+Natalia Carolina Sánchez Herrada
+Alejandra Ignacia Riquelme Velasquez
+Yamilet Monserrat Maureira Hernandez
+Fecha de inicio
+:
+02/09/2026
+Índice
+TOC \h \u \z \t "Heading 1,1,Heading 2,2,Heading 3,3,Heading 4,4,Heading 5,5,Heading 6,6,"1. Antecedentes y problema3
+2. Justificación del proyecto3
+3. Visión y objetivos4
+3.1. Objetivo general4
+3.1.1. Objetivos específicos4
+4. Stakeholders y usuarios4
+5. Alcance inicial / MVP5
+6. Solución propuesta6
+7. Restricciones y supuestos6
+8. Criterios de éxito7
+9. Aprobación del acta7
+1. Antecedentes y problema
+La central de reprocesamiento, correspondiente al servicio de esterilización del hospital san josé de melipilla, cumple un rol fundamental en el funcionamiento del establecimiento, ya que es responsable de procesar, almacenar y entregar el material quirúrgico utilizado por las distintas unidades del hospital. El proceso contempla diversas etapas, entre ellas la recepción, lavado, preparación, esterilización, almacenamiento y entrega del material.
+Tras el traslado del hospital a sus nuevas instalaciones, el servicio de esterilización aumentó su espacio y capacidad de trabajo, contando con áreas diferenciadas para las distintas etapas del proceso. Sin embargo, parte de la información relacionada con la trazabilidad de los materiales continúa registrándose mediante libros, documentos físicos y planillas excel. Además, la distribución física de las áreas dificulta el acceso oportuno a la información y la comunicación entre los funcionarios involucrados en el proceso.
+Actualmente, la información asociada al procesamiento y movimiento de los materiales se encuentra distribuida en diferentes medios de registro, lo que dificulta su consulta, actualización y seguimiento oportuno. Esta situación puede aumentar la carga administrativa del personal y dificultar la identificación del estado, ubicación, movimientos e historial de las cajas durante su procesamiento.
+2. Justificación del proyecto
+La gestión de la trazabilidad del material quirúrgico requiere disponer de información organizada, actualizada y accesible durante su procesamiento. La situación actual dificulta el seguimiento oportuno de dicha información, generando una mayor carga administrativa y dificultades para consultar el estado y recorrido del material. Por ello, el proyecto se justifica en la necesidad de mejorar la gestión y disponibilidad de la información asociada al proceso de esterilización, facilitando su consulta y seguimiento por parte del personal involucrado.
+La implementación del proyecto permitirá mejorar la organización y disponibilidad de la información relacionada con el material quirúrgico, facilitando su consulta y seguimiento durante el proceso de esterilización. Asimismo, se espera disminuir la dependencia de registros manuales, apoyar las labores del personal y disponer de información más clara y accesible para la gestión del material. Estos beneficios contribuirán a una gestión más ordenada de los registros y a un mejor seguimiento de la trazabilidad durante el procesamiento y entrega del material.
+3. Visión y objetivos
+Contribuir a una gestión más ordenada y accesible de la información asociada al material quirúrgico del servicio de esterilización del hospital san josé de melipilla, facilitando su seguimiento y trazabilidad durante las distintas etapas de procesamiento.
+3.1. Objetivo general
+Desarrollar e implementar un sistema web para la gestión y trazabilidad del material quirúrgico del servicio de esterilización del hospital san josé de melipilla, centralizando la información facilitando el seguimiento del material desde su recepción hasta su almacenamiento y posterior entrega.
+3.1.1. Objetivos específicos
+Analizar los procesos actuales del servicio de esterilización e identificar los principales requerimientos asociados a la gestión y trazabilidad del material quirúrgico.
+Diseñar el flujo de trazabilidad, el modelo de información y las interfaces de usuario que darán soporte a la gestión del material quirúrgico.
+Desarrollar los módulos principales del sistema para gestionar materiales, trazabilidad, inventario y registros de recepción y entrega.
+Integrar los componentes desarrollados y ejecutar pruebas funcionales que permitan comprobar el funcionamiento de la solución.
+Validar la solución mediante escenarios de uso relacionados con las actividades realizadas por el personal del servicio de esterilización.
+4. Stakeholders y usuarios
+El proyecto contempla la participación de actores vinculados al servicio de esterilización y al desarrollo de la solución, considerando sus distintos niveles de participación dentro del proyecto.
+Supervisora del servicio de esterilización: Actúa como contraparte del servicio, aportando información sobre los procesos actuales, necesidades y requerimientos. Además, participará en la revisión y validación de la solución desarrollada.
+Personal del servicio de esterilización: Corresponde a los principales usuarios de la solución, ya que interactuarán con el sistema en el desarrollo de las actividades asociadas a la gestión y trazabilidad del material quirúrgico.
+Equipo de proyecto: Integrado por Natalia Sánchez Herrada, Alejandra Riquelme Velásquez y Yamilet Maureira Hernández. El equipo estará a cargo del análisis, diseño, desarrollo, integración, pruebas y documentación de la solución, organizando el trabajo mediante la metodología scrum.
+Hospital san josé de melipilla: Corresponde a la institución en cuyo contexto se desarrolla el proyecto y donde se encuentra el servicio de esterilización involucrado. La institución constituye el contexto organizacional y beneficiario de la solución propuesta.
+5. Alcance inicial / MVP
+El MVP corresponde a una primera versión funcional del sistema web, orientada a apoyar la gestión y trazabilidad del material quirúrgico del servicio de esterilización del hospital san josé de melipilla. El alcance inicial considera las funcionalidades prioritarias identificadas a partir de las necesidades del servicio. Su detalle y prioridad podrán ser refinados durante el desarrollo mediante el Product Backlog y la retroalimentación de la contraparte.
+La primera versión del sistema contempla:
+Control de acceso al sistema según los perfiles definidos para los usuarios autorizados.
+Registro y seguimiento del material quirúrgico, considerando su estado, ubicación, movimiento e historial durante las etapas definidas del proceso.
+Registro, consulta y administración de la información relacionada con las cajas y materiales disponibles.
+Registro de los movimientos de ingreso y salida del material, identificando a los funcionarios involucrados en cada operación.
+Búsqueda y visualización de información asociada al material, incluyendo su estado e historial de movimientos.
+Generación de información resumida que apoye el seguimiento y la gestión del material procesado.
+Para mantener un alcance acotado y viable durante el desarrollo del MVP, inicialmente quedarán fuera:
+Implementación de dispositivos físicos, lectores o tecnologías de identificación automática que no formen parte de los recursos disponibles para el proyecto.
+Seguimiento de los materiales posterior a su entrega desde el servicio de esterilización.
+Funcionalidades avanzadas de análisis de datos o inteligencia de negocios que excedan los reportes básicos definidos.
+Las funcionalidades de alertas, notificaciones y otros mecanismos complementarios podrán ser evaluados durante el refinamiento del Product Backlog, de acuerdo con su prioridad, viabilidad y tiempo disponible.
+6. Solución propuesta
+Como respuesta al problema identificado, se propone desarrollar una solución web orientada a apoyar la gestión y trazabilidad del material quirúrgico. La propuesta busca disponer de un punto centralizado para registrar y consultar la información asociada al material, facilitando su seguimiento a lo largo del proceso definido.
+La solución considerará el acceso de los usuarios autorizados según los perfiles establecidos y permitirá relacionar la información registrada con los movimientos y estados correspondientes. Su desarrollo se realizará de manera incremental, tomando como referencia el alcance inicial del MVP y el refinamiento del Product Backlog durante los sprints.
+La propuesta estará orientada a complementar los procesos actuales mediante una herramienta digital, manteniendo las restricciones y límites definidos para el proyecto.
+7. Restricciones y supuestos
+El desarrollo del proyecto estará condicionado por las siguientes restricciones:
+El proyecto deberá desarrollarse dentro del período académico establecido para su ejecución.
+La carga laboral del personal del servicio puede limitar su disponibilidad para actividades de levantamiento, revisión y validación.
+El desarrollo estará condicionado por las herramientas, infraestructura y recursos tecnológicos disponibles para el equipo durante el período del proyecto.
+Para el desarrollo del proyecto se considera que:
+Se contará con la participación del personal del servicio para proporcionar información sobre los procesos y apoyar su revisión durante el proyecto.
+Se dispondrá de instancias de revisión y validación con la contraparte del servicio durante el desarrollo.
+El equipo contará con las herramientas y recursos tecnológicos necesarios para desarrollar y probar el MVP.
+El alcance inicial y las prioridades definidas para el MVP servirán como base para el desarrollo, permitiendo el refinamiento del Product Backlog durante los sprints de acuerdo con la retroalimentación obtenida.
+8. Criterios de éxito
+El proyecto se considerará exitoso cuando la solución desarrollada cumpla con los objetivos y el alcance definidos para el MVP. Para su evaluación, se considerarán los siguientes criterios:
+Las funcionalidades principales definidas en el alcance deberán encontrarse desarrolladas y operativas.
+Las funcionalidades implementadas deberán cumplir los resultados esperados en las pruebas funcionales realizadas por el equipo.
+El sistema deberá permitir registrar y consultar el estado, ubicación, movimientos e historial del material quirúrgico de acuerdo con el flujo definido.
+La solución deberá ser revisada y validada mediante escenarios de uso representativos de las actividades realizadas por el personal del servicio de esterilización.
+El proyecto deberá entregar el MVP dentro del alcance y plazo definidos para su ejecución.
+9. Aprobación del acta
+Nombre
+Firma

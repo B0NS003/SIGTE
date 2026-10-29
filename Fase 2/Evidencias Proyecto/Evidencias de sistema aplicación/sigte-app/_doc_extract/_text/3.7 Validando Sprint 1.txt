@@ -1,0 +1,389 @@
+﻿Validando Sprint 1
+“Sistema integral de gestión y trazabilidad de esterilización”
+SIGTE
+Fecha: 18/09/2026
+Tabla de contenido
+Contenido
+TOC \h \u \z \t "Heading 1,1,Heading 2,2,Heading 3,3,"Datos del documento	3
+Planilla product backlog con registro de avances día a día y validación del product owner.	4
+Gráfico de avance del sprint 1.	4
+Pila del producto actualizada.	4
+Datos del documento
+Histórico de Revisiones
+Versión
+Fecha
+Descripción/cambio
+Autor
+0.5
+12/10/2026
+Se actualizó el Product Backlog según las horas trabajadas por cada integrante, se incorporó el gráfico del Sprint 1 y se actualizó la prioridad de las historias de usuario.
+Equipo de desarrollo
+0.1
+18/09/2026
+Se completaron los campos del documento, se organizaron las historias de usuario con sus respectivas tareas y se definió la estructura inicial para su asignación y actualización del Product Backlog.
+Alejandra Riquelme
+Información del Proyecto
+Organización
+Duoc UC. Escuela de Informática y Telecomunicaciones
+Sección
+001D
+Proyecto (Nombre)
+Sistema integral de gestión y trazabilidad de esterilización
+Fecha de Inicio
+18/09/2026
+Fecha de Término
+24/11/2026
+Patrocinador principal
+Judith Herrada
+Docente
+Juan Andrés Hernandez Aliaga
+Integrantes
+Rut
+Nombre
+Correo
+21.476.321-4
+Yamilet Maureira Hernández
+yam.maureira@duocuc.cl
+21.690.023-5
+Natalia Sánchez Herrada
+na.sanchezh@duocuc.cl
+20.963.474-0
+Alejandra Riquelme Velásquez
+al.riquelmev@duocuc.cl
+Planilla product backlog con registro de avances día a día y validación del product owner.
+Historia
+Tarea
+Horas estimadas
+Horas realizadas por día
+Estado
+Responsable
+1
+2
+3
+4
+5
+Total
+(A/R)
+Iniciar sesión en la plataforma
+Diseñar la interfaz de inicio de sesión
+3
+Yamilet Maureira
+3
+3
+A
+Implementar el proceso de autenticación del usuario
+6
+Yamilet Maureira
+3
+3
+6
+A
+Implementar la validación de las credenciales ingresadas
+3
+Yamilet Maureira
+3
+3
+A
+Implementar el inicio y cierre de sesión del usuario
+3
+Yamilet Maureira
+3
+3
+A
+Implementar el mensaje para credenciales no válidas
+2
+Yamilet Maureira
+2
+2
+A
+Control de acceso según rol
+Definir los permisos correspondientes a cada rol
+4
+Yamilet Maureira
+4
+4
+A
+Implementar la identificación del rol del usuario autenticado
+3
+Yamilet Maureira
+3
+3
+A
+Restringir el acceso a las funcionalidades según el rol asignado
+3
+Yamilet Maureira
+3
+3
+A
+Adaptar el menú y las opciones visibles según el rol asignado
+4
+Yamilet Maureira
+4
+4
+A
+Consulta de estado y ubicación de cajas quirúrgicas
+Diseñar la interfaz de consulta de cajas quirúrgicas
+3
+Yamilet Maureira
+3
+3
+A
+Implementar el listado de cajas agrupadas por etapa
+4
+Yamilet Maureira
+4
+4
+A
+Implementar la selección de una etapa para consultar sus cajas
+3
+Yamilet Maureira
+3
+3
+A
+Implementar la búsqueda de una caja quirúrgica
+2
+Yamilet Maureira
+2
+2
+A
+Mostrar la etapa actual, ubicación, tiempo en la etapa y responsable
+4
+Yamilet Maureira
+4
+4
+A
+Implementar el mensaje cuando no se encuentren cajas coincidentes
+2
+Yamilet Maureira
+2
+2
+A
+Registro de cambio de etapa de cajas quirúrgicas
+Diseñar la interfaz para registrar el cambio de etapa
+2
+Natalia Sanchez
+2
+2
+A
+Implementar la selección de la siguiente etapa según el flujo definido
+3
+Natalia Sanchez
+3
+3
+A
+Validar que la información requerida esté completa antes de registrar el cambio
+1
+Natalia Sanchez
+1
+1
+A
+Registrar fecha, hora y usuario que realiza el cambio
+1
+Natalia Sanchez
+1
+1
+A
+Actualizar la etapa actual de la caja quirúrgica
+1
+Natalia Sanchez
+1
+1
+A
+Implementar la confirmación del cambio y mensajes ante cambios no válidos
+1
+Natalia Sanchez
+1
+1
+A
+Retroceder etapa
+Diseñar la interfaz para registrar el retroceso de etapa
+2
+Natalia Sanchez
+2
+2
+A
+Implementar selección de una etapa anterior permitida
+2
+Natalia Sanchez
+2
+2
+A
+Solicitar y validar el motivo del retroceso
+1
+Natalia Sanchez
+1
+1
+A
+Registrar la fecha, hora, motivo y usuario que realiza el retroceso
+1
+Natalia Sanchez
+1
+1
+A
+Actualizar la etapa actual de la caja quirúrgica
+1
+Natalia Sanchez
+1
+1
+A
+Implementar la confirmación del retroceso y mensajes ante retrocesos no válidos
+1
+Natalia Sanchez
+1
+1
+A
+Consulta de inventarios por separado
+Diseñar la interfaz de consulta de los inventarios
+2
+Alejandra Riquelme
+2
+2
+A
+Organizar la visualización de los inventarios disponibles
+1
+Alejandra Riquelme
+1
+1
+A
+Implementar el listado de insumos y materiales registrados
+1
+Alejandra Riquelme
+1
+1
+A
+Implementar la búsqueda y filtro de elementos del inventario
+1
+Alejandra Riquelme
+1
+1
+A
+Mostrar la cantidad disponible e información de cada elemento
+1
+Alejandra Riquelme
+1
+1
+A
+Implementar el mensaje cuando no se encuentren resultados
+1
+Alejandra Riquelme
+1
+1
+A
+Registro de entrega de cajas quirúrgicas y materiales
+Diseñar el formulario de entrega de cajas y materiales
+2
+Alejandra Riquelme
+2
+2
+A
+Implementar la selección de las cajas y materiales que serán entregados
+2
+Alejandra Riquelme
+2
+2
+A
+Registrar el servicio de destino y la persona que recibe la entrega
+1
+Alejandra Riquelme
+1
+1
+A
+Validar que la información requerida para la entrega esté completa
+2
+Alejandra Riquelme
+2
+2
+A
+Registrar la fecha, hora y usuario que realiza la entrega
+1
+Alejandra Riquelme
+1
+1
+A
+Actualizar el estado de las cajas entregadas
+1
+Alejandra Riquelme
+1
+1
+A
+Implementar la confirmación de la entrega y mensajes ante datos inválidos
+1
+Alejandra Riquelme
+1
+1
+A
+Consulta del catálogo digital de cajas quirúrgicas
+Diseñar la interfaz principal del catálogo digital
+3
+Natalia Sanchez
+3
+3
+A
+Implementar el listado de cajas quirúrgicas registradas
+2
+Natalia Sanchez
+2
+2
+A
+Implementar la búsqueda de cajas por nombre o identificador
+1
+Natalia Sanchez
+1
+1
+A
+Implementar el filtro de cajas por servicio hospitalario
+1
+Natalia Sanchez
+1
+1
+A
+Mostrar la información básica e imagen disponible de las cajas
+3
+Natalia Sanchez
+3
+3
+A
+Implementar el mensaje cuando no se encuentren cajas coincidentes
+1
+Natalia Sanchez
+1
+1
+A
+Gráfico de avance del sprint 1.
+Pila del producto actualizada.
+ID
+Historia de Usuario
+Estimación
+Prioridad
+HIU-EP1-001
+Iniciar sesión en la plataforma
+3
+Alta
+HIU-EP1-002
+Control de acceso según rol
+2
+Alta
+HIU-EP2-001
+Consulta de estado y ubicación de cajas quirúrgicas
+8
+Alta
+HIU-EP2-002
+Registro de cambio de etapa de cajas quirúrgicas
+3
+Alta
+HIU-EP2-003
+Retroceder etapa
+5
+Alta
+HIU-EP3-001
+Consulta de inventarios por separado
+2
+Alta
+HIU-EP5-001
+Registro de entrega de cajas quirúrgicas y materiales
+2
+Alta
+HIU-EP4-001
+Consulta del catálogo digital de cajas quirúrgicas
+9
+Media

@@ -6,15 +6,24 @@ use App\Http\Controllers\Concerns\ConsultaDeCajas;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
 use App\Models\ElementoInventario;
+use App\Models\Entrega;
 use App\Models\Personal;
+use App\Models\RegistroAuditoria;
 use App\Models\Rol;
 use App\Models\User;
+use App\Support\Auditoria;
+use App\Support\CadenaCustodia;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class AdminController extends Controller
 {
@@ -79,8 +88,21 @@ class AdminController extends Controller
         ]);
 
         $persona = Personal::query()->findOrFail($datos['personal_id']);
+        $antes = $persona->turno;
         $persona->turno = $datos['turno'] ?? null;
         $persona->save();
+
+        if ($antes !== $persona->turno) {
+            $etiqueta = $persona->turno === null
+                ? 'Sin asignar'
+                : (Personal::TURNOS[$persona->turno]['etiqueta'] ?? $persona->turno);
+            Auditoria::registrar(
+                $persona->turno === null ? 'Quitó turno' : 'Asignó turno',
+                'turnos',
+                $persona->nombre,
+                'Turno '.$etiqueta,
+            );
+        }
 
         return response()->json(['ok' => true, 'turno' => $persona->turno]);
     }
@@ -90,7 +112,7 @@ class AdminController extends Controller
         $datos = $this->validarCuenta($request);
 
         $rol = Rol::query()->findOrFail($datos['rol_id']);
-        User::query()->create([
+        $nuevo = User::query()->create([
             'name' => $datos['nombre'],
             'email' => $datos['email'],
             'password' => $datos['password'],
@@ -98,6 +120,8 @@ class AdminController extends Controller
             'role' => $rol->nombre,
             'activo' => true,
         ]);
+
+        Auditoria::registrar('Creó usuario', 'usuarios', $nuevo->name, 'Rol '.$rol->etiqueta());
 
         return $this->volverACuentas($request)
             ->with('ok', 'Cuenta creada. '.$datos['nombre'].' quedó como '.$rol->etiqueta().'.');
@@ -129,6 +153,8 @@ class AdminController extends Controller
         }
         $user->save();
 
+        Auditoria::registrar('Actualizó cuenta', 'usuarios', $user->name, 'Rol '.$rol->etiqueta());
+
         return $this->volverACuentas($request)
             ->with('ok', 'Datos actualizados. '.$user->name.' quedó como '.$rol->etiqueta().'.');
     }
@@ -149,6 +175,13 @@ class AdminController extends Controller
 
         $user->activo = ! $user->activo;
         $user->save();
+
+        Auditoria::registrar(
+            $user->activo ? 'Activó usuario' : 'Desactivó usuario',
+            'usuarios',
+            $user->name,
+            $user->activo ? 'Cuenta activa' : 'Cuenta inactiva',
+        );
 
         $mensaje = $user->activo
             ? $user->name.' puede volver a entrar.'
@@ -218,170 +251,419 @@ class AdminController extends Controller
     }
     public function reportes(Request $request): View
     {
-        $cajas = $this->cajas();
-        $fases = $this->fases();
+        $filtros = $this->filtrosReporte($request);
+        $falla = $request->boolean('falla');
+        $datos = [
+            'movimientos' => collect(),
+            'por_tipo' => collect(),
+            'entregas' => collect(),
+            'en_flujo' => collect(),
+        ];
+
+        if (! $falla) {
+            try {
+                $datos = $this->datosReporte($filtros);
+            } catch (Throwable $e) {
+                report($e);
+                $falla = true;
+            }
+        }
+
         $momento = now()->timezone('America/Santiago');
-        $filas = array_map(fn (array $caja) => [
-            'id' => $caja['id'],
-            'servicio' => $caja['servicio'],
-            'indice' => $caja['fase_idx'],
-            'etapa' => $fases[$caja['fase_idx']] ?? '',
-        ], $cajas);
+
         return view('admin.reportes', [
             'usuario' => $this->usuarioSesion(),
-            'falla' => $request->boolean('falla'),
+            'falla' => $falla,
+            'filtros' => $filtros,
             'fecha' => $momento->format('d/m/Y'),
             'hora' => $momento->format('H:i'),
-            'fases' => $fases,
-            'filas' => $filas,
+            'movimientos' => $datos['movimientos'],
+            'por_tipo' => $datos['por_tipo'],
+            'entregas' => $datos['entregas'],
+            'en_flujo' => $datos['en_flujo'],
+            'tipos_auditoria' => RegistroAuditoria::TIPOS,
         ]);
+    }
+
+    public function exportarReportes(Request $request): StreamedResponse
+    {
+        $filtros = $this->filtrosReporte($request);
+        $datos = $this->datosReporte($filtros);
+        $nombre = 'sigte-reporte-'.$filtros['desde'].'_'.$filtros['hasta'].'.csv';
+
+        return response()->streamDownload(function () use ($datos, $filtros) {
+            $salida = fopen('php://output', 'w');
+            fwrite($salida, "\xEF\xBB\xBF");
+            fputcsv($salida, ['Reporte SIGTE', 'Desde '.$filtros['desde'], 'Hasta '.$filtros['hasta']]);
+            fputcsv($salida, []);
+            fputcsv($salida, ['Fecha', 'Hora', 'Usuario', 'Accion', 'Tipo', 'Objeto', 'Detalle']);
+            foreach ($datos['movimientos'] as $fila) {
+                fputcsv($salida, [
+                    $fila['fecha'],
+                    $fila['hora'],
+                    $fila['actor'],
+                    $fila['accion'],
+                    $fila['tipo_etiqueta'],
+                    $fila['objeto'],
+                    $fila['detalle'],
+                ]);
+            }
+            fputcsv($salida, []);
+            fputcsv($salida, ['Entregas en el periodo']);
+            fputcsv($salida, ['Codigo', 'Servicio', 'Fecha entrega', 'Responsable']);
+            foreach ($datos['entregas'] as $entrega) {
+                fputcsv($salida, [
+                    $entrega['codigo'],
+                    $entrega['servicio'],
+                    $entrega['cuando'],
+                    $entrega['responsable'],
+                ]);
+            }
+            fclose($salida);
+        }, $nombre, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * @return array{desde: string, hasta: string, tipo: string}
+     */
+    private function filtrosReporte(Request $request): array
+    {
+        $hoy = now()->timezone('America/Santiago')->toDateString();
+        $desde = (string) $request->input('desde', now()->timezone('America/Santiago')->subDays(13)->toDateString());
+        $hasta = (string) $request->input('hasta', $hoy);
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde)) {
+            $desde = now()->timezone('America/Santiago')->subDays(13)->toDateString();
+        }
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta)) {
+            $hasta = $hoy;
+        }
+        if ($desde > $hasta) {
+            [$desde, $hasta] = [$hasta, $desde];
+        }
+        $tipo = (string) $request->input('tipo', '');
+        if ($tipo !== '' && ! array_key_exists($tipo, RegistroAuditoria::TIPOS)) {
+            $tipo = '';
+        }
+
+        return [
+            'desde' => $desde,
+            'hasta' => $hasta,
+            'tipo' => $tipo,
+        ];
+    }
+
+    /**
+     * @param  array{desde: string, hasta: string, tipo: string}  $filtros
+     * @return array{movimientos: Collection<int, array<string, string>>, por_tipo: Collection<string, int>, entregas: Collection<int, array<string, string>>, en_flujo: Collection<int, array<string, string|int>>}
+     */
+    private function datosReporte(array $filtros): array
+    {
+        $inicio = Carbon::parse($filtros['desde'], 'America/Santiago')->startOfDay()->timezone('UTC');
+        $fin = Carbon::parse($filtros['hasta'], 'America/Santiago')->endOfDay()->timezone('UTC');
+
+        $consulta = RegistroAuditoria::query()
+            ->with('actor')
+            ->whereBetween('created_at', [$inicio, $fin])
+            ->latest('created_at')
+            ->latest('id');
+        if ($filtros['tipo'] !== '') {
+            $consulta->where('tipo', $filtros['tipo']);
+        }
+
+        $registros = $consulta->limit(500)->get();
+        $movimientos = $registros->map(fn (RegistroAuditoria $r) => array_merge($r->paraConsulta(), [
+            'tipo_etiqueta' => RegistroAuditoria::TIPOS[$r->tipo] ?? $r->tipo,
+        ]));
+
+        $porTipo = $registros->groupBy('tipo')->map->count();
+
+        $entregas = Caja::query()
+            ->with(['responsable', 'persona'])
+            ->whereNotNull('entregado_at')
+            ->whereBetween('entregado_at', [$inicio, $fin])
+            ->orderByDesc('entregado_at')
+            ->limit(100)
+            ->get()
+            ->map(fn (Caja $caja) => [
+                'codigo' => $caja->codigo,
+                'servicio' => $caja->servicio,
+                'cuando' => $caja->entregado_at->timezone('America/Santiago')->format('d/m/Y H:i'),
+                'responsable' => $caja->nombreResponsable(),
+            ]);
+
+        $enFlujo = Caja::query()
+            ->whereNull('entregado_at')
+            ->get()
+            ->groupBy(fn (Caja $caja) => Caja::etiquetaEtapa((string) $caja->etapa))
+            ->map(fn ($grupo, $etapa) => [
+                'etapa' => $etapa,
+                'cantidad' => $grupo->count(),
+            ])
+            ->values();
+
+        return [
+            'movimientos' => $movimientos,
+            'por_tipo' => $porTipo,
+            'entregas' => $entregas,
+            'en_flujo' => $enFlujo,
+        ];
     }
     public function historialEntregas(Request $request): View
     {
-        $entregas = [
-            [
-                'id' => 'ENT-241',
-                'fecha' => '06/10/2026',
-                'hora' => '11:40',
-                'cuando' => 'hoy',
-                'servicio' => 'Pabellón',
-                'entrega' => 'Yamilet Maureira',
-                'entrega_rol' => 'Operadora',
-                'recibe' => 'Daniela Soto',
-                'recibe_rol' => 'Enfermera de pabellón',
-                'cajas' => [
-                    ['codigo' => 'SET-033', 'nombre' => 'Set de pabellón'],
-                    ['codigo' => 'CAJA-091', 'nombre' => 'Caja instrumental'],
-                ],
-                'materiales' => ['Paquete de ropa'],
-            ],
-            [
-                'id' => 'ENT-240',
-                'fecha' => '06/10/2026',
-                'hora' => '10:20',
-                'cuando' => 'hoy',
-                'servicio' => 'Dental',
-                'entrega' => 'Carla Muñoz',
-                'entrega_rol' => 'Operadora',
-                'recibe' => 'Daniela Soto',
-                'recibe_rol' => 'Enfermera de dental',
-                'cajas' => [
-                    ['codigo' => 'SET-DEN-04', 'nombre' => 'Set dental'],
-                ],
-                'materiales' => ['Instrumental suelto'],
-            ],
-            [
-                'id' => 'ENT-238',
-                'fecha' => '06/10/2026',
-                'hora' => '09:15',
-                'cuando' => 'hoy',
-                'servicio' => 'UCI',
-                'entrega' => 'Carla Muñoz',
-                'entrega_rol' => 'Operadora',
-                'recibe' => 'Alejandra Riquelme',
-                'recibe_rol' => 'Enfermera de turno',
-                'cajas' => [
-                    ['codigo' => 'SET-055', 'nombre' => 'Set de UCI'],
-                ],
-                'materiales' => ['Material de curación'],
-            ],
-            [
-                'id' => 'ENT-230',
-                'fecha' => '05/10/2026',
-                'hora' => '18:02',
-                'cuando' => 'ayer',
-                'servicio' => 'Urgencia',
-                'entrega' => 'Yamilet Maureira',
-                'entrega_rol' => 'Operadora',
-                'recibe' => 'Patricia Vega',
-                'recibe_rol' => 'Enfermera de urgencia',
-                'cajas' => [
-                    ['codigo' => 'CAJA-118', 'nombre' => 'Caja de urgencia'],
-                ],
-                'materiales' => [],
-            ],
-            [
-                'id' => 'ENT-226',
-                'fecha' => '05/10/2026',
-                'hora' => '16:20',
-                'cuando' => 'ayer',
-                'servicio' => 'Maternidad',
-                'entrega' => 'Carla Muñoz',
-                'entrega_rol' => 'Operadora',
-                'recibe' => 'Natalia Sánchez',
-                'recibe_rol' => 'Jefatura de maternidad',
-                'cajas' => [
-                    ['codigo' => 'SET-007', 'nombre' => 'Set de maternidad'],
-                ],
-                'materiales' => ['Instrumental suelto'],
-            ],
-            [
-                'id' => 'ENT-214',
-                'fecha' => '04/10/2026',
-                'hora' => '12:05',
-                'cuando' => 'anterior',
-                'servicio' => 'Curaciones',
-                'entrega' => 'Yamilet Maureira',
-                'entrega_rol' => 'Operadora',
-                'recibe' => 'Daniela Soto',
-                'recibe_rol' => 'Enfermera de curaciones',
-                'cajas' => [
-                    ['codigo' => 'CAJA-200', 'nombre' => 'Caja de curación'],
-                ],
-                'materiales' => ['Material de curación'],
-            ],
-        ];
+        $falla = $request->boolean('falla');
+        $filtros = $this->filtrosHistorialEntregas($request);
+        $entregas = new LengthAwarePaginator([], 0, 8, 1, [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]);
+        $servicios = collect();
+        $resumen = [];
+
+        if (! $falla) {
+            try {
+                $consulta = Entrega::query()
+                    ->with(['quienEntrega.rol', 'items'])
+                    ->latest('entregado_at')
+                    ->latest('id');
+                $this->aplicarFiltrosHistorialEntregas($consulta, $filtros);
+                $entregas = $consulta
+                    ->paginate(8)
+                    ->withQueryString()
+                    ->through(fn (Entrega $entrega) => $entrega->paraConsulta());
+
+                $servicios = Entrega::query()
+                    ->select('servicio')
+                    ->selectRaw('count(*) as total')
+                    ->selectRaw('max(entregado_at) as ultima')
+                    ->groupBy('servicio')
+                    ->orderBy('servicio')
+                    ->get()
+                    ->map(function ($fila) {
+                        $ultima = $fila->ultima
+                            ? Carbon::parse($fila->ultima)->timezone('America/Santiago')
+                            : null;
+
+                        return [
+                            'servicio' => $fila->servicio,
+                            'total' => (int) $fila->total,
+                            'ultima_fecha' => $ultima?->format('d/m/Y'),
+                            'ultima_hora' => $ultima?->format('H:i'),
+                        ];
+                    });
+
+                $resumen = [
+                    'total' => Entrega::query()->count(),
+                    'hoy' => Entrega::query()
+                        ->where('entregado_at', '>=', now('America/Santiago')->startOfDay()->timezone('UTC'))
+                        ->count(),
+                ];
+            } catch (Throwable $e) {
+                report($e);
+                $falla = true;
+            }
+        }
+
         return view('admin.historial', [
             'usuario' => $this->usuarioSesion(),
             'entregas' => $entregas,
-            'servicios' => collect($entregas)->pluck('servicio')->unique()->values()->all(),
-            'falla' => $request->boolean('falla'),
+            'servicios' => $servicios,
+            'filtros' => $filtros,
+            'resumen' => $resumen,
+            'falla' => $falla,
         ]);
+    }
+
+    /**
+     * @return array{q: string, cuando: string, servicio: string}
+     */
+    private function filtrosHistorialEntregas(Request $request): array
+    {
+        $cuando = (string) $request->input('cuando', 'todas');
+        if (! in_array($cuando, ['todas', 'hoy', 'ayer', 'semana'], true)) {
+            $cuando = 'todas';
+        }
+
+        return [
+            'q' => trim((string) $request->input('q', '')),
+            'cuando' => $cuando,
+            'servicio' => trim((string) $request->input('servicio', '')),
+        ];
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\Entrega>  $consulta
+     * @param  array{q: string, cuando: string, servicio: string}  $filtros
+     */
+    private function aplicarFiltrosHistorialEntregas($consulta, array $filtros): void
+    {
+        $inicio = now()->timezone('America/Santiago')->startOfDay();
+        if ($filtros['cuando'] === 'hoy') {
+            $consulta->where('entregado_at', '>=', $inicio->copy()->timezone('UTC'));
+        } elseif ($filtros['cuando'] === 'ayer') {
+            $consulta->whereBetween('entregado_at', [
+                $inicio->copy()->subDay()->timezone('UTC'),
+                $inicio->copy()->timezone('UTC')->subSecond(),
+            ]);
+        } elseif ($filtros['cuando'] === 'semana') {
+            $consulta->where('entregado_at', '>=', $inicio->copy()->subDays(6)->timezone('UTC'));
+        }
+
+        if ($filtros['servicio'] !== '') {
+            $consulta->where('servicio', $filtros['servicio']);
+        }
+
+        if ($filtros['q'] !== '') {
+            $buscar = $filtros['q'];
+            $consulta->where(function ($q) use ($buscar) {
+                $q->where('codigo', 'ilike', '%'.$buscar.'%')
+                    ->orWhere('servicio', 'ilike', '%'.$buscar.'%')
+                    ->orWhere('recibe', 'ilike', '%'.$buscar.'%')
+                    ->orWhere('material', 'ilike', '%'.$buscar.'%')
+                    ->orWhereHas('quienEntrega', fn ($actor) => $actor->where('name', 'ilike', '%'.$buscar.'%'))
+                    ->orWhereHas('items', fn ($item) => $item
+                        ->where('codigo', 'ilike', '%'.$buscar.'%')
+                        ->orWhere('nombre', 'ilike', '%'.$buscar.'%'));
+            });
+        }
     }
     public function custodia(Request $request): View
     {
+        $falla = $request->boolean('falla');
+        $filtros = $this->filtrosAuditoria($request);
+        $actores = collect();
+        $cadenas = new LengthAwarePaginator([], 0, 3, 1, [
+            'path' => $request->url(),
+            'pageName' => 'pc',
+        ]);
+        $auditoria = new LengthAwarePaginator([], 0, 10, 1, [
+            'path' => $request->url(),
+            'pageName' => 'pa',
+        ]);
+
+        if (! $falla) {
+            try {
+                if ($filtros['modo'] === 'caja') {
+                    if ($filtros['caja'] !== '') {
+                        $todas = CadenaCustodia::buscar($filtros['caja']);
+                        $porPagina = 3;
+                        $total = count($todas);
+                        $ultima = max(1, (int) ceil($total / $porPagina));
+                        $pagina = min(max(1, (int) $request->query('pc', 1)), $ultima);
+                        $cadenas = new LengthAwarePaginator(
+                            array_slice($todas, ($pagina - 1) * $porPagina, $porPagina),
+                            $total,
+                            $porPagina,
+                            $pagina,
+                            [
+                                'path' => $request->url(),
+                                'query' => $request->query(),
+                                'pageName' => 'pc',
+                            ]
+                        );
+                    }
+                } else {
+                    $consulta = RegistroAuditoria::query()->with('actor')->latest('created_at')->latest('id');
+                    $this->aplicarFiltrosAuditoria($consulta, $filtros);
+                    $auditoria = $consulta
+                        ->paginate(10, ['*'], 'pa')
+                        ->withQueryString()
+                        ->through(fn (RegistroAuditoria $registro) => $registro->paraConsulta());
+                }
+
+                $actores = User::query()
+                    ->whereIn('id', RegistroAuditoria::query()->select('user_id')->whereNotNull('user_id'))
+                    ->orderBy('name')
+                    ->get(['id', 'name']);
+            } catch (Throwable $e) {
+                report($e);
+                $falla = true;
+            }
+        }
+
+        $usuarioElegido = $filtros['usuario'] !== null
+            ? User::query()->find($filtros['usuario'])
+            : null;
+
         return view('admin.custodia', [
             'usuario' => $this->usuarioSesion(),
-            'falla' => $request->boolean('falla'),
-            'cadenas' => [
-                [
-                    'caja' => 'SET-007',
-                    'servicio' => 'Maternidad',
-                    'estado' => 'En almacén',
-                    'alerta' => false,
-                    'cuando' => 'hoy',
-                    'eventos' => [
-                        ['hora' => '08:10', 'tipo' => 'Recepción', 'de' => 'Enf. Carla Muñoz', 'a' => 'Y. Maureira', 'nota' => 'Área sucia'],
-                        ['hora' => '09:05', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Recepción → Lavado'],
-                        ['hora' => '10:20', 'tipo' => 'Avance', 'de' => 'A. Riquelme', 'a' => '—', 'nota' => 'Lavado → Preparación'],
-                        ['hora' => '11:40', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Preparación → Esterilización'],
-                        ['hora' => '13:41', 'tipo' => 'Avance', 'de' => 'Y. Maureira', 'a' => '—', 'nota' => 'Esterilización → Almacén'],
-                    ],
-                ],
-                [
-                    'caja' => 'CAJA-118',
-                    'servicio' => 'Urgencia',
-                    'estado' => 'Incidencia',
-                    'alerta' => true,
-                    'cuando' => 'hoy',
-                    'eventos' => [
-                        ['hora' => '12:40', 'tipo' => 'Recepción', 'de' => 'Enf. Luis Perez', 'a' => 'A. Riquelme', 'nota' => 'Ingreso urgencia'],
-                        ['hora' => '13:58', 'tipo' => 'Avance', 'de' => 'A. Riquelme', 'a' => '—', 'nota' => 'Recepción → Lavado'],
-                        ['hora' => '14:05', 'tipo' => 'Alerta', 'de' => 'Sistema', 'a' => '—', 'nota' => 'Sin custodia al salir de lavado'],
-                    ],
-                ],
-            ],
-            'auditoria' => [
-                ['fecha' => '06/10', 'hora' => '14:12', 'cuando' => 'hoy', 'actor' => 'Y. Maureira', 'accion' => 'Avanzó etapa', 'tipo' => 'etapa', 'objeto' => 'SET-042', 'detalle' => 'Preparación → Esterilización'],
-                ['fecha' => '06/10', 'hora' => '13:58', 'cuando' => 'hoy', 'actor' => 'A. Riquelme', 'accion' => 'Avanzó etapa', 'tipo' => 'etapa', 'objeto' => 'CAJA-118', 'detalle' => 'Recepción → Lavado'],
-                ['fecha' => '06/10', 'hora' => '13:41', 'cuando' => 'hoy', 'actor' => 'Y. Maureira', 'accion' => 'Avanzó etapa', 'tipo' => 'etapa', 'objeto' => 'SET-007', 'detalle' => 'Esterilización → Almacén'],
-                ['fecha' => '06/10', 'hora' => '12:10', 'cuando' => 'hoy', 'actor' => 'N. Sánchez', 'accion' => 'Actualizó stock mínimo', 'tipo' => 'inventario', 'objeto' => 'SET-CES-02', 'detalle' => 'Mínimo 2 → 3'],
-                ['fecha' => '06/10', 'hora' => '11:55', 'cuando' => 'hoy', 'actor' => 'N. Sánchez', 'accion' => 'Creó usuario', 'tipo' => 'usuarios', 'objeto' => 'C. Muñoz', 'detalle' => 'Rol Operadora'],
-                ['fecha' => '06/10', 'hora' => '11:20', 'cuando' => 'hoy', 'actor' => 'Y. Maureira', 'accion' => 'Registró recepción', 'tipo' => 'etapa', 'objeto' => 'CAJA-091', 'detalle' => 'Desde Pabellón'],
-                ['fecha' => '05/10', 'hora' => '10:45', 'cuando' => 'ayer', 'actor' => 'A. Riquelme', 'accion' => 'Registró entrega', 'tipo' => 'entrega', 'objeto' => 'SET-019', 'detalle' => 'Retira Enf. D. Soto · UCI'],
-                ['fecha' => '01/10', 'hora' => '09:30', 'cuando' => 'mes', 'actor' => 'N. Sánchez', 'accion' => 'Desactivó usuario', 'tipo' => 'usuarios', 'objeto' => 'P. Vega', 'detalle' => 'Cuenta inactiva'],
-            ],
+            'falla' => $falla,
+            'filtros' => $filtros,
+            'actores' => $actores,
+            'usuario_elegido' => $usuarioElegido,
+            'tipos_auditoria' => RegistroAuditoria::TIPOS,
+            'cadenas' => $cadenas,
+            'auditoria' => $auditoria,
         ]);
+    }
+
+    /**
+     * @return array{modo: string, q: string, usuario: ?int, periodo: string, tipo: string, caja: string}
+     */
+    private function filtrosAuditoria(Request $request): array
+    {
+        $modo = (string) $request->input('modo', 'bitacora');
+        if (! in_array($modo, ['bitacora', 'caja'], true)) {
+            $modo = 'bitacora';
+        }
+        $periodo = (string) $request->input('periodo', 'mes');
+        if (! in_array($periodo, ['hoy', 'semana', 'mes'], true)) {
+            $periodo = 'mes';
+        }
+        $tipo = (string) $request->input('tipo', '');
+        if ($tipo !== '' && ! array_key_exists($tipo, RegistroAuditoria::TIPOS)) {
+            $tipo = '';
+        }
+        $usuario = $request->input('usuario');
+        $caja = mb_strtoupper(trim((string) $request->input('caja', '')));
+        // Si llegan con un código de caja desde la bitácora, abrir modo cadena.
+        if ($caja !== '' && ! $request->filled('modo')) {
+            $modo = 'caja';
+        }
+
+        return [
+            'modo' => $modo,
+            'q' => trim((string) $request->input('q', '')),
+            'usuario' => $usuario !== null && $usuario !== '' ? (int) $usuario : null,
+            'periodo' => $periodo,
+            'tipo' => $tipo,
+            'caja' => $caja,
+        ];
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\RegistroAuditoria>  $consulta
+     * @param  array{modo: string, q: string, usuario: ?int, periodo: string, tipo: string, caja: string}  $filtros
+     */
+    private function aplicarFiltrosAuditoria($consulta, array $filtros): void
+    {
+        $inicio = now()->timezone('America/Santiago')->startOfDay();
+        if ($filtros['periodo'] === 'hoy') {
+            $consulta->where('created_at', '>=', $inicio->copy()->timezone('UTC'));
+        } elseif ($filtros['periodo'] === 'semana') {
+            $consulta->where('created_at', '>=', $inicio->copy()->subDays(6)->timezone('UTC'));
+        } else {
+            $consulta->where('created_at', '>=', $inicio->copy()->startOfMonth()->timezone('UTC'));
+        }
+
+        if ($filtros['usuario'] !== null) {
+            $consulta->where('user_id', $filtros['usuario']);
+        }
+
+        if ($filtros['tipo'] !== '') {
+            $consulta->where('tipo', $filtros['tipo']);
+        }
+
+        if ($filtros['q'] !== '') {
+            $buscar = $filtros['q'];
+            $consulta->where(function ($q) use ($buscar) {
+                $q->where('accion', 'ilike', '%'.$buscar.'%')
+                    ->orWhere('objeto', 'ilike', '%'.$buscar.'%')
+                    ->orWhere('detalle', 'ilike', '%'.$buscar.'%')
+                    ->orWhereHas('actor', fn ($actor) => $actor->where('name', 'ilike', '%'.$buscar.'%'));
+            });
+        }
     }
     private function alertasDeInventario(): array
     {

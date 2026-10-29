@@ -1,0 +1,32 @@
+﻿Resumen de la
+Reunión Retrospectiva
+Información de la empresa y proyecto:
+Empresa / Organización
+Hospital San José de Melipilla
+Proyecto
+SIGTE - Sistema Integral de Gestión y Trazabilidad de Esterilización
+Información de la reunión:
+Lugar
+Reunión virtual mediante Discord
+Fecha
+12/10/2026
+Número de iteración / sprint
+1
+Personas convocadas a la reunión
+3
+Personas que asistieron a la reunión
+3
+Instrucciones:
+La reunión retrospectiva es una herramienta del marco de trabajo Scrum, que pertenece a la familia de marcos de trabajo de desarrollo ágil, se realiza en cada iteración (denominado Sprint en Scrum), justo después de la reunión de revisión de la iteración (Sprint Review Meeting) con el dueño del Producto (Product Owner). En esta reunión deben revisarse tres aspectos, lo que salió bien durante la iteración (aciertos), lo que no salió tan bien (errores) y las mejoras que pudieran hacerse en la próxima iteración para evitar errores y mantener aciertos.
+El dueño del producto (Product Owner) no asiste a la reunión, por lo que es una oportunidad para el equipo para poder hablar sin tapujos de los éxitos y fracasos, siendo importante para el equipo el analizar su propio desempeño e identificar estrategias para mejorar sus procesos. De forma similar, el Scrum Master (quien es el coach del equipo Scrum) puede observar impedimentos comunes que están afectando al equipo y tomar acciones para resolverlos.
+La reunión usualmente se restringe a tres horas.
+Formulario de reunión retrospectiva
+¿Qué salió bien en la iteración? (aciertos)
+¿Qué no salió bien en la iteración? (errores)
+¿Qué mejoras vamos a implementar en la próxima iteración? (recomendaciones de mejora continua)
+Como equipo de trabajo se mejoró la organización de las reuniones, acotaron la duración y se trataron temas y dudas pertinentes, se compartieron más ideas de trabajo, dando a lugar el intercambio de visiones sobre cómo debería funcionar el sistema.
+Habrá que realizar modificaciones en cuanto a la lógica de la base de datos, al ir a validar con el cliente, se tomó en consideración el cómo se manejaba realmente para poder implementarlo en el sistema y hacer un cruce realista.
+Como equipo debemos dedicarle más tiempo al desarrollo, así como también más reuniones para dar apoyo en cuanto a las actividades que se deben desarrollar, en caso de dificultades.
+Nota:
+Se recomienda utilizar viñetas (bullets) para enumerar los aciertos, errores y recomendaciones de mejora continua.
+El formulario se puede extender cuantas páginas sea necesario para registrar todos los aciertos, errores y recomendaciones.

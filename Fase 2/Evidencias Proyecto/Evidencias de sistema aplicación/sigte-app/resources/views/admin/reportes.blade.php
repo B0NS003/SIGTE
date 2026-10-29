@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) }}">
 @endpush
 
-@section('title', 'SIGTE — Reportes de producción')
+@section('title', 'SIGTE — Reportes')
 
 @section('content')
 <div class="shell">
@@ -33,12 +33,14 @@
     <main class="main">
         <div class="main-top">
             <div>
-                <p class="eyebrow">Hospital San José de Melipilla</p>
-                <h1>Reportes de producción</h1>
-                <p class="main-sub">Arma el consolidado de la central, revísalo en pantalla y elige el formato para entregarlo.</p>
+                <p class="eyebrow">Gestión</p>
+                <h1>Reportes</h1>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'administradora') }}">Volver al resumen</a>
+                @unless ($falla)
+                    <a class="btn btn-dark" href="{{ route('mockups.reportes.exportar', $filtros) }}">Exportar Excel</a>
+                @endunless
             </div>
         </div>
 
@@ -49,59 +51,57 @@
                 <p><a href="{{ route('mockups.reportes') }}">Intentar de nuevo</a></p>
             </div>
         @else
-            <form class="panel rep-armar" id="rep-armar" action="#" onsubmit="return false;">
+            <form class="panel rep-armar" method="get" action="{{ route('mockups.reportes') }}">
                 <div class="panel-head">
-                    <h2>Qué va en el reporte</h2>
+                    <h2>Período del reporte</h2>
                 </div>
                 <div class="rep-filtros">
-                    <label class="field field-select">
-                        <span>Período</span>
-                        <select id="rep-periodo" name="periodo">
-                            <option value="ahora" selected>Ahora</option>
-                            <option value="hoy">Hoy</option>
-                            <option value="semana">Esta semana</option>
-                            <option value="mes">Este mes</option>
-                        </select>
+                    <label class="field">
+                        <span>Desde</span>
+                        <input type="date" name="desde" value="{{ $filtros['desde'] }}" required>
+                    </label>
+                    <label class="field">
+                        <span>Hasta</span>
+                        <input type="date" name="hasta" value="{{ $filtros['hasta'] }}" required>
                     </label>
                     <label class="field field-select">
-                        <span>Etapa</span>
-                        <select id="rep-etapa" name="etapa">
-                            <option value="" selected>Todas</option>
-                            @foreach ($fases as $indice => $fase)
-                                <option value="{{ $indice }}">{{ $fase }}</option>
+                        <span>Tipo de acción</span>
+                        <select name="tipo">
+                            <option value="">Todos</option>
+                            @foreach ($tipos_auditoria as $clave => $etiqueta)
+                                <option value="{{ $clave }}" @selected($filtros['tipo'] === $clave)>{{ $etiqueta }}</option>
                             @endforeach
                         </select>
                     </label>
+                    <div class="users-filtros-acciones">
+                        <button class="btn btn-dark" type="submit">Consultar</button>
+                    </div>
                 </div>
-                <div class="rep-incluye">
-                    <p>Incluir</p>
-                    <label><input type="checkbox" id="rep-inc-etapa" checked> Resumen por etapa</label>
-                    <label><input type="checkbox" id="rep-inc-cajas" checked> Listado de cajas</label>
-                </div>
-                <button class="btn btn-dark" type="submit">Ver vista previa</button>
             </form>
 
-            <article class="panel list rep-hoja" id="rep-hoja" aria-label="Vista previa del reporte">
+            <article class="panel list rep-hoja" aria-label="Vista previa del reporte">
                 <header class="rep-hoja-top">
                     <div>
                         <p>Hospital San José de Melipilla</p>
-                        <h2>Producción de la central</h2>
-                        <p id="rep-periodo-txt">Etapa actual de cada caja</p>
+                        <h2>Actividad de la central</h2>
+                        <p>
+                            Del {{ \Carbon\Carbon::parse($filtros['desde'])->format('d/m/Y') }}
+                            al {{ \Carbon\Carbon::parse($filtros['hasta'])->format('d/m/Y') }}
+                        </p>
                     </div>
                     <div class="rep-formatos">
-                        <button class="btn rep-excel" type="button">Excel</button>
-                        <button class="btn rep-pdf" type="button">PDF</button>
+                        <a class="btn rep-excel" href="{{ route('mockups.reportes.exportar', $filtros) }}">Excel</a>
                     </div>
                 </header>
 
                 <dl class="rep-firma">
                     <div>
                         <dt>Fecha</dt>
-                        <dd id="rep-fecha">{{ $fecha }}</dd>
+                        <dd>{{ $fecha }}</dd>
                     </div>
                     <div>
                         <dt>Hora</dt>
-                        <dd id="rep-hora">{{ $hora }}</dd>
+                        <dd>{{ $hora }}</dd>
                     </div>
                     <div>
                         <dt>Generó</dt>
@@ -109,26 +109,47 @@
                     </div>
                 </dl>
 
-                <div id="rep-vacio" class="ops-empty" hidden>
-                    <strong id="rep-vacio-titulo">Sin datos para ese período</strong>
-                    <p id="rep-vacio-texto">El reporte del período se arma cuando cada paso queda registrado. Hoy solo se ve la etapa actual.</p>
-                </div>
+                @if ($movimientos->isEmpty() && $entregas->isEmpty())
+                    <div class="ops-empty">
+                        <strong>Sin datos en ese período</strong>
+                        <p>No hay movimientos ni entregas entre esas fechas. Prueba ampliar el rango.</p>
+                    </div>
+                @else
+                    <p class="rep-total">Movimientos en el período <strong>{{ $movimientos->count() }}</strong></p>
 
-                <div id="rep-cuerpo">
-                    <p class="rep-total">Cajas en el reporte <strong id="rep-total">{{ count($filas) }}</strong></p>
+                    <section>
+                        <h3>Por tipo de acción</h3>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>Tipo</th><th>Cantidad</th></tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($por_tipo as $tipo => $cantidad)
+                                        <tr>
+                                            <td>{{ $tipos_auditoria[$tipo] ?? $tipo }}</td>
+                                            <td>{{ $cantidad }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="2">Sin acciones registradas</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
 
-                    <section id="rep-bloque-etapa">
-                        <h3>Por etapa</h3>
+                    <section>
+                        <h3>Cajas en flujo ahora</h3>
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr><th>Etapa</th><th>Cajas</th></tr>
                                 </thead>
-                                <tbody id="rep-etapas">
-                                    @foreach ($fases as $indice => $fase)
-                                        <tr data-indice="{{ $indice }}">
-                                            <td>{{ $fase }}</td>
-                                            <td>{{ collect($filas)->where('indice', $indice)->count() }}</td>
+                                <tbody>
+                                    @foreach ($en_flujo as $fila)
+                                        <tr>
+                                            <td>{{ $fila['etapa'] }}</td>
+                                            <td>{{ $fila['cantidad'] }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -136,113 +157,64 @@
                         </div>
                     </section>
 
-                    <section id="rep-bloque-cajas">
-                        <h3>Cajas</h3>
+                    <section>
+                        <h3>Entregas del período</h3>
+                        @if ($entregas->isEmpty())
+                            <p class="recv-help">No hubo entregas registradas en ese rango.</p>
+                        @else
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr><th>Caja</th><th>Servicio</th><th>Cuándo</th><th>Responsable</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($entregas as $entrega)
+                                            <tr>
+                                                <td><strong>{{ $entrega['codigo'] }}</strong></td>
+                                                <td>{{ $entrega['servicio'] }}</td>
+                                                <td>{{ $entrega['cuando'] }}</td>
+                                                <td>{{ $entrega['responsable'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </section>
+
+                    <section>
+                        <h3>Detalle de movimientos</h3>
                         <div class="table-wrap">
                             <table>
                                 <thead>
-                                    <tr><th>Caja</th><th>Etapa</th></tr>
+                                    <tr>
+                                        <th>Fecha y hora</th>
+                                        <th>Usuario</th>
+                                        <th>Acción</th>
+                                        <th>Objeto</th>
+                                        <th>Detalle</th>
+                                    </tr>
                                 </thead>
-                                <tbody id="rep-cajas">
-                                    @foreach ($filas as $fila)
+                                <tbody>
+                                    @foreach ($movimientos as $fila)
                                         <tr>
-                                            <td><strong>{{ $fila['id'] }}</strong></td>
-                                            <td>{{ $fila['etapa'] }}</td>
+                                            <td>
+                                                <strong>{{ $fila['hora'] }}</strong>
+                                                <small>{{ $fila['fecha'] }}</small>
+                                            </td>
+                                            <td><strong>{{ $fila['actor'] }}</strong></td>
+                                            <td>{{ $fila['accion'] }}</td>
+                                            <td>{{ $fila['objeto'] }}</td>
+                                            <td class="muted-cell">{{ $fila['detalle'] }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </section>
-                </div>
+                @endif
             </article>
         @endif
     </main>
 </div>
-@unless ($falla)
-<script>
-(function () {
-    var filas = @json($filas);
-    var fases = @json($fases);
-    var periodo = document.getElementById('rep-periodo');
-    var etapa = document.getElementById('rep-etapa');
-    var incEtapa = document.getElementById('rep-inc-etapa');
-    var incCajas = document.getElementById('rep-inc-cajas');
-    var cuerpo = document.getElementById('rep-cuerpo');
-    var vacio = document.getElementById('rep-vacio');
-    var vacioTitulo = document.getElementById('rep-vacio-titulo');
-    var vacioTexto = document.getElementById('rep-vacio-texto');
-    var total = document.getElementById('rep-total');
-    var cuerpoEtapas = document.getElementById('rep-etapas');
-    var cuerpoCajas = document.getElementById('rep-cajas');
-    var bloqueEtapa = document.getElementById('rep-bloque-etapa');
-    var bloqueCajas = document.getElementById('rep-bloque-cajas');
-    var periodoTxt = document.getElementById('rep-periodo-txt');
-    var etiquetas = {
-        ahora: 'Etapa actual de cada caja',
-        hoy: 'Hoy',
-        semana: 'Esta semana',
-        mes: 'Este mes'
-    };
-
-    function pintar() {
-        var esAhora = periodo.value === 'ahora';
-        periodoTxt.textContent = etiquetas[periodo.value] || etiquetas.ahora;
-        var ahora = new Date();
-        document.getElementById('rep-fecha').textContent = ahora.toLocaleDateString('es-CL');
-        document.getElementById('rep-hora').textContent = ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-
-        if (!esAhora) {
-            cuerpo.hidden = true;
-            vacio.hidden = false;
-            vacioTitulo.textContent = 'Sin datos para ese período';
-            vacioTexto.textContent = 'El reporte del período se arma cuando cada paso queda registrado. Hoy solo se ve la etapa actual.';
-            return;
-        }
-
-        var elegidas = filas.filter(function (fila) {
-            if (etapa.value !== '' && String(fila.indice) !== etapa.value) {
-                return false;
-            }
-            return true;
-        });
-
-        if (elegidas.length === 0) {
-            cuerpo.hidden = true;
-            vacio.hidden = false;
-            vacioTitulo.textContent = 'Ninguna caja coincide';
-            vacioTexto.textContent = 'Prueba con otra etapa.';
-            return;
-        }
-
-        vacio.hidden = true;
-        cuerpo.hidden = false;
-        total.textContent = String(elegidas.length);
-        bloqueEtapa.hidden = !incEtapa.checked;
-        bloqueCajas.hidden = !incCajas.checked;
-
-        cuerpoEtapas.innerHTML = fases.map(function (nombre, indice) {
-            var cantidad = elegidas.filter(function (fila) { return fila.indice === indice; }).length;
-            if (etapa.value !== '' && String(indice) !== etapa.value) {
-                return '';
-            }
-            return '<tr><td>' + nombre + '</td><td>' + cantidad + '</td></tr>';
-        }).join('');
-
-        cuerpoCajas.innerHTML = elegidas.map(function (fila) {
-            return '<tr><td><strong>' + fila.id + '</strong></td><td>' + fila.etapa + '</td></tr>';
-        }).join('');
-    }
-
-    document.getElementById('rep-armar').addEventListener('submit', function (evento) {
-        evento.preventDefault();
-        pintar();
-        document.getElementById('rep-hoja').scrollIntoView({ block: 'nearest' });
-    });
-    [periodo, etapa, incEtapa, incCajas].forEach(function (campo) {
-        campo.addEventListener('change', pintar);
-    });
-})();
-</script>
-@endunless
 @endsection

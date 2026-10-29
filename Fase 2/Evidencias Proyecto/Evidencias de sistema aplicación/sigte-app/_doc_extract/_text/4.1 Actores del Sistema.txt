@@ -1,0 +1,58 @@
+﻿Regla de oro (UML): “Un actor no es un cargo, es un ROL que un usuario desempeña al interactuar con el sistema”.
+1.- La Jefa de Central (Judith) y el “Administrador del Sistema”
+Judith desempeñará múltiples roles (actores) en el sistema según la tarea que ejecute en el momento:
+Cuando gestiona cuentas, da permisos o asigna configuraciones (Actúa como Administrador del Sistema).
+Cuando audita la producción, genera el reporte mensual de litros o revisa la trazabilidad (Actúa como Supervisora / Jefatura).
+Cuando apoya en el armado, tirado de cargas o esterilización (Actúa como Operador / Enfermera).
+2.- Enfermeros de turno vs Operadores ¿Son actores distintos?
+Según lo recopilado en las dos entrevistas, Judith y la funcionaria mencionan que el personal se mueve entre el área sucia (lavado), área de armado, autoclaves/peróxido y entrega/bodega. Además, la etiqueta física de la carga requiere el “Nombre de la operadora”.
+3.- Descripción de cada actor:
+Usuario del Sistema
+Representa a cualquier usuario registrado y validado dentro de la plataforma. Es la entidad base de la cual heredan el resto de los actores del sistema.
+Operador
+Personal técnico y auxiliar de la Central encargado de la ejecución física y registro operativo del flujo de esterilización en el día a día.
+Responsabilidades:
+Recepción: Registrar el ingreso de material sucio proveniente de los servicios clínicos.
+Procesamiento y Armado: Consultar el catálogo/inventario de cajas y registrar el armado del instrumental.
+Esterilización: Registrar la carga de equipos (Autoclave / Peróxido) y la ejecución de controles.
+Entrega e Insumos: Registrar la descarga, movimientos de insumos y entrega de material estéril a los servicios.
+Restricciones: No puede crear ni modificar cuentas de usuario, alterar roles, ni editar fichas o definir stock mínimo.
+Enfermera de Turno
+Profesional de enfermería responsable de la supervisión directa del proceso operativo durante el turno. Cuenta con privilegios sobre el trabajo de piso para garantizar la calidad y trazabilidad.
+Responsabilidades:
+Supervisión y Control: Monitorear alertas del sistema (escasez de insumos, vencimientos de material, errores de carga).
+Ajustes y Correcciones: Actualizar o corregir fichas operativas e inventarios cuando existan discrepancias o excepciones en el turno.
+Gestión de Stock: Definir y modificar los umbrales de stock mínimo de insumos y ropa textil.
+Auditoría de Turno: Consultar el historial de entregas y generar reportes operativos del turno.
+Restricciones: No puede crear, modificar ni desactivar cuentas de usuario en la plataforma.
+Secretaria
+Personal administrativo de la gestión de datos de consumo, registro de producción y consolidación de información estadística de la Central.
+Responsabilidades:
+Carga de producción y litros: Ingresar y actualizar la información de consumos por servicio para el cálculo mensual de litros.
+Gestión de insumos: Consultar el inventario de insumos, registrar sus movimientos y apoyar en el control de stock de la Central.
+Reportes estadísticos: Generar y exportar reportes de producción mensuales por servicio clínico (Pabellón, Dental, Maternidad, etc).
+Restricciones: No realiza tareas clínicas ni operativas en el flujo físico de esterilización (no opera autoclaves ni armados) ni administra cuentas de usuario.
+Administrador
+Jefa de la Central (o administración de TI). Es la dueña del acceso, configuraciones globales e indicadores de gestión del sistema.
+Responsabilidades:
+Gestión de Usuarios: Crear, editar, asignar roles y desactivar cuentas de usuario.
+Parámetros del Sistema: Configurar parámetros globales de la aplicación y fichas del catálogo.
+Reportes y Gestión: Generar reportes consolidando la producción en litros, estadísticas mensuales por servicio e informes para la unidad de calidad.
+Auditoría General: Consultar logs de actividad y trazabilidad histórica completa del sistema.
+P0 – Sprint 1 (sin esto no hay sistema)
+HIU-EP1-001 Login
+HIU-EP1-002 Permisos por rol (admin / enfermera / operador)
+HIU-EP2-001 Ver estado/ubicación de cajas
+HIU-EP2-002 Cambiar etapa
+HIU-EP4-001 Catálogo básico
+P1 – Sprint 2 (custodia + operación)
+6. HIU-EP5-001 Registrar entrega
+7. HIU-EP5-002 Confirmar recepción
+8. HIU-EP2-003 Datos de esterilización / control
+9. HIU-EP4-002 Ficha de caja
+P2 – Sprint 3 (inventario + admin)
+10. EP3 completo (inventario)
+11. HIU-EP4-003 Mantener fichas
+12. HIU-EP1-003 Gestión usuarios (solo administradora)
+13. HIU-EP5-003 Historial entregas
+14. EP6 reportes + HIU-EP1-004 auditoría

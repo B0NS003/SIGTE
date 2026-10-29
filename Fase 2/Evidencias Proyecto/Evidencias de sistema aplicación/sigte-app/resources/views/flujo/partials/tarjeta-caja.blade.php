@@ -195,55 +195,56 @@
         <p class="proceso-texto">{{ ! empty($caja['proceso_listo']) ? 'Listo para pasar' : 'En curso' }}</p>
     </div>
 
-    <details class="track-more">
-        <summary>
-            <span class="track-summary-label">Más información</span>
-            @if (($usuario['rol'] ?? '') === 'Operadora')
-                <span class="track-card-actions" onclick="event.stopPropagation()">
-                    @if ($volverNombre !== '')
-                        <button class="btn btn-ghost btn-corregir" type="button" data-abrir="retroceso" data-caja="{{ $caja['id'] }}" data-volver="{{ $volverNombre }}">
-                            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Corregir etapa
-                        </button>
-                    @endif
-                    @if ($destinoNombre !== '')
-                        <button class="btn btn-dark" type="button" data-abrir="etapa" data-caja="{{ $caja['id'] }}">
-                            Pasar de etapa
-                            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    @else
-                        <a class="btn btn-dark" href="{{ route('mockups.entrega', ['caja' => $caja['id']]) }}">Registrar entrega</a>
-                    @endif
-                </span>
-            @endif
-        </summary>
-
-            <dl class="track-facts">
-                <div>
-                    <dt>Etapa actual</dt>
-                    <dd>{{ $etapaActual }}</dd>
+    <div class="track-foot-bar">
+        <details class="track-more">
+            <summary>
+                <span class="track-summary-label">Más información</span>
+            </summary>
+            <div class="track-detalle">
+                <div class="track-dato">
+                    <span>Etapa</span>
+                    <strong>{{ $etapaActual }}</strong>
                 </div>
-                <div>
-                    <dt>Actividad</dt>
-                    <dd data-actividad>{{ $caja['actividad'] ?: 'Sin anotar' }}</dd>
+                <div class="track-dato">
+                    <span>Actividad</span>
+                    <strong data-actividad>{{ $caja['actividad'] ?: 'Sin anotar' }}</strong>
                 </div>
-                <div>
-                    <dt>Ubicación</dt>
-                    <dd>{{ $caja['ubicacion'] }}</dd>
+                <div class="track-dato">
+                    <span>Ubicación</span>
+                    <strong>{{ $caja['ubicacion'] }}</strong>
                 </div>
-                <div>
-                    <dt>Desde</dt>
-                    <dd>{{ $caja['hora'] }}</dd>
+                <div class="track-dato">
+                    <span>Desde</span>
+                    <strong>{{ $caja['hora'] }}</strong>
                 </div>
-                <div>
-                    <dt>Responsable</dt>
-                    <dd>{{ $caja['operadora'] }}</dd>
+                <div class="track-dato track-dato-wide">
+                    <span>Responsable</span>
+                    <strong>{{ $caja['operadora'] }}</strong>
                 </div>
-            </dl>
-    </details>
+            </div>
+        </details>
+        @if (($usuario['rol'] ?? '') === 'Operadora')
+            <div class="track-card-actions">
+                @if ($volverNombre !== '')
+                    <button class="btn btn-ghost btn-corregir" type="button" data-abrir="retroceso" data-caja="{{ $caja['id'] }}" data-volver="{{ $volverNombre }}">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Corregir
+                    </button>
+                @endif
+                @if ($destinoNombre !== '')
+                    <button class="btn btn-dark" type="button" data-abrir="etapa" data-caja="{{ $caja['id'] }}">
+                        Pasar de etapa
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                @else
+                    <a class="btn btn-dark" href="{{ route('mockups.entrega', ['caja' => $caja['id']]) }}">Registrar entrega</a>
+                @endif
+            </div>
+        @endif
+    </div>
 </article>
 @include('flujo.partials.track-anim')

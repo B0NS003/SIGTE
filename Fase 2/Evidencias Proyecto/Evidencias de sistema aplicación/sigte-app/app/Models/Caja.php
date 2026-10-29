@@ -39,6 +39,7 @@ class Caja extends Model
             'etapa_desde' => 'datetime',
             'proceso_desde' => 'datetime',
             'proceso_hasta' => 'datetime',
+            'entregado_at' => 'datetime',
         ];
     }
 

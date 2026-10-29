@@ -1,0 +1,66 @@
+﻿VISIÓN DEL PROYECTO + 4 PILARES55726179070INSTITUTO PROFESIONAL DUOC UC - SEDE MELIPILLA
+ESCUELA DE INFORMÁTICA Y TELECOMUNICACIONES
+CARRERA INGENIERÍA EN INFORMÁTICA
+55726179070
+Sistema integral de gestión y trazabilidad de esterilización
+Cliente
+:
+Hospital San José de Melipilla
+Equipo
+:
+Natalia Carolina Sánchez Herrada
+Alejandra Ignacia Riquelme Velasquez
+Yamilet Monserrat Maureira Hernandez
+Fecha
+:
+02/09/2026
+Índice
+TOC \h \u \z \t "Heading 1,1,Heading 2,2,Heading 3,3,Heading 4,4,Heading 5,5,Heading 6,6,"1. Visión del proyecto	3
+2. Los 4 pilares del proyecto (Scrum + Enfoque de Calidad)	4
+2.1 Pilar de valor	4
+2.2 Pilar de satisfacción del Usuario	5
+2.3 Pilar de calidad Técnica	5
+2.4 Pilar de mejora Continua	5
+3. Conclusiones	5
+1. Visión del proyecto
+Declaración de la Visión
+Para el servicio de esterilización del Hospital San José de Melipilla, que hoy opera con registros mayoritariamente manuales, el sistema SIGTE será una plataforma web centralizada que permita trazabilidad en tiempo real del instrumental quirúrgico, control de inventario digital y registro de custodia en cada etapa del ciclo, a fin de reducir errores, mejorar la visibilidad operativa y respaldar auditorías clínicas.
+Grupo Objetivo
+Necesidades
+Producto / Servicio
+Valor
+• Funcionarios  del servicio de esterilización del Hospital San José de Melipilla.
+• Supervisión / jefatura del servicio de esterilización.
+• Seguimiento digital del instrumental en el ciclo completo: recepción, lavado, preparación, esterilización, almacenamiento y entrega.
+• Reemplazar el inventario en papel por un inventario digital por caja o set médico.
+• Registrar responsables en cada transferencia (quién entrega y quién recibe) para control de custodia y auditoría.
+• Contar con alertas y reportes básicos ante faltantes, retrasos o estados críticos.
+• Reducir errores humanos, pérdida o deterioro de instrumental y sobrecarga operativa del equipo técnico.
+SIGTE (Sistema Integral de Gestión y Trazabilidad de Esterilización): sistema web MVP para la operación interna del servicio de esterilización.
+Funcionalidades principales del MVP:
+1. Trazabilidad por estados del ciclo del instrumental (6 fases).
+2. Inventario digital por caja/set.
+3. Control de custodia y transferencia de responsabilidad.
+4. Reportes y alertas operativas básicas.
+5. Gestión de usuarios/roles para operación y supervisión.
+Fuera de alcance del MVP: renovación de equipos físicos, remodelación de infraestructura, trazabilidad externa del material y tecnologías avanzadas tipo RFID (visión futura).
+• Visibilidad en tiempo real del estado del instrumental.
+• Menor riesgo operativo y clínico asociado a fallas de registro manual.
+• Mejor respaldo para auditorías y cumplimiento normativo.
+• Optimización del trabajo del personal técnico al digitalizar el flujo.
+• Base escalable para mejoras futuras (alertas avanzadas u otras tecnologías de identificación).
+2. Los 4 pilares del proyecto (Scrum + Enfoque de Calidad)
+Los cuatro pilares permiten orientar el desarrollo del proyecto, buscando que la solución entregue valor al Servicio de Esterilización, responda a las necesidades de sus usuarios, mantenga una adecuada calidad técnica y pueda mejorar durante su desarrollo a partir de la retroalimentación obtenida.
+2.1 Pilar de valor
+El proyecto busca generar valor mediante una solución que responda a una necesidad real del Servicio de Esterilización reemplazando los registros manuales por información digital, centralizada y consultable para quienes lo usen en sus labores. En SIGTE este valor se traduce en priorizar las funcionalidades que aporten directamente en la operación diaria como la gestión y trazabilidad de los materiales, facilitando el acceso a la información, el control del inventario y el seguimiento de cada etapa del proceso.  Las alertas y reportes se incorporarán según prioridad del Product Backlog sin desviar el foco del núcleo funcional.
+El PO priorizara el backlog según el valor operativo para el servicio y cada sprint deberá entregar un incremento usable relacionado con trazabilidad, inventario o custodia.
+2.2 Pilar de satisfacción del Usuario
+La solución será orientada a las necesidades de los funcionarios y de la supervisión del Servicio de Esterilización. Se buscará que el sistema sea fácil de utilizar y que facilite las tareas que actualmente requieren registros y búsquedas manuales. La retroalimentación del usuario será considerada durante el desarrollo para realizar los ajustes necesarios.
+2.3 Pilar de calidad Técnica
+El sistema será desarrollado aplicando buenas prácticas de desarrollo de software, considerando aspectos como organización del código, estructura de la base de datos, seguridad, usabilidad y funcionamiento de las principales funcionalidades. Además, se realizarán pruebas funcionales para detectar errores y verificar que el sistema cumpla con los requerimientos definidos.
+2.4 Pilar de mejora Continua
+El proyecto se desarrollará de manera iterativa utilizando Scrum, permitiendo revisar periódicamente el avance y realizar mejoras durante el proceso. A partir de las revisiones, pruebas y retroalimentación obtenida, se podrán identificar errores, necesidades o ajustes que permitan mejorar progresivamente la solución.
+3. Conclusiones
+El desarrollo de este proyecto representa una oportunidad para aplicar una solución tecnológica a una necesidad real del Servicio de Esterilización del Hospital San José de Melipilla. A través de SIGTE se busca facilitar la gestión de los materiales, mejorar su trazabilidad y entregar información más accesible para apoyar el trabajo de los funcionarios.
+Los cuatro pilares definidos permitirán orientar el desarrollo hacia una solución que entregue valor al servicio, considere las necesidades de sus usuarios, mantenga una adecuada calidad técnica y pueda mejorar durante el desarrollo a partir de la retroalimentación obtenida.
+Finalmente, el uso de Scrum permitirá organizar el trabajo de manera iterativa y priorizar las funcionalidades más importantes dentro del tiempo disponible, buscando que el resultado final responda a las necesidades identificadas y sea factible de desarrollar durante las 18 semanas del proyecto.

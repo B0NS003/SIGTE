@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\ElementoInventario;
 use App\Models\Reposicion;
 use App\Models\Rol;
+use App\Support\Auditoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -164,6 +165,12 @@ class InventarioController extends Controller
         }
 
         $elemento->refresh();
+        Auditoria::registrar(
+            'Registró reposición',
+            'inventario',
+            $elemento->codigo,
+            '+'.$datos['cantidad'].' unidades · stock '.$elemento->stock,
+        );
         $mensaje = 'Reposición registrada. '.$elemento->nombre.' quedó en '.$elemento->stock.' unidades.';
         if ($teniaAlerta && ! $elemento->tieneAlertaStock()) {
             $mensaje .= ' La alerta de stock quedó desactivada.';

@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Rol;
 use App\Models\User;
-use Database\Seeders\RolSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +14,9 @@ class AuthLoginTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(RolSeeder::class);
+        foreach ([Rol::ADMINISTRADORA, Rol::ENFERMERA, Rol::OPERADOR, Rol::SECRETARIA] as $nombre) {
+            Rol::query()->updateOrCreate(['nombre' => $nombre], ['descripcion' => $nombre]);
+        }
     }
 
     public function test_login_page_is_shown(): void

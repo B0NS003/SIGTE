@@ -132,7 +132,7 @@
                             @if ($a['tipo'] === 'Inventario')
                                 <a class="btn btn-ghost" href="{{ route('mockups.inventario', array_filter(['sala' => $a['sala'] ?? null, 'elemento' => $a['caja']])) }}">Ver inventario</a>
                             @elseif ($a['tipo'] === 'Custodia')
-                                <a class="btn btn-ghost" href="{{ route('mockups.custodia') }}">Ver custodia</a>
+                                <a class="btn btn-ghost" href="{{ route('mockups.custodia') }}">Ver auditoría</a>
                             @else
                                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">Ver flujo</a>
                             @endif

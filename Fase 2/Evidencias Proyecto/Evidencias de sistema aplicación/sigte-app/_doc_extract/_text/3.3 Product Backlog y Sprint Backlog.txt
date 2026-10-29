@@ -1,0 +1,657 @@
+﻿PRODUCT BACKLOG Y SPRINT BACKLOG55726179070INSTITUTO PROFESIONAL DUOC UC - SEDE MELIPILLA
+ESCUELA DE INFORMÁTICA Y TELECOMUNICACIONES
+CARRERA INGENIERÍA EN INFORMÁTICA
+55726179070
+Sistema integral de gestión y trazabilidad de esterilización
+Cliente
+:
+Hospital San José de Melipilla
+Equipo
+:
+Natalia Carolina Sánchez Herrada
+Alejandra Ignacia Riquelme Velasquez
+Yamilet Monserrat Maureira Hernandez
+Fecha
+:
+25/08/2026
+Índice
+TOC \h \u \z \t "Heading 1,1,Heading 2,2,Heading 3,3,Heading 4,4,Heading 5,5,Heading 6,6,"1. Product backlog	3
+1.1 Estimación de puntos de historia	3
+1.2 Patrón de comparación	4
+2. Comprometer historias de usuario	4
+2.1 Sprint 1	4
+2.2 Sprint 2	4
+2.3 Sprint 3	5
+3. Definición de las tareas	5
+3.1 Sprint 1	5
+3.2 Sprint 2	9
+3.3 Sprint 3	11
+4. Gráfico Burndown Chart inicial	16
+4.1 Sprint 1	17
+4.2 Sprint 2	18
+4.3 Sprint 3	18
+1. Product backlog
+1.1 Estimación de puntos de historia
+ID
+Historia de Usuario
+Estimación
+HIU-EP1-001
+Iniciar sesión en la plataforma
+3
+HIU-EP1-002
+Control de acceso según rol
+2
+HIU-EP1-003
+Gestión de usuarios y roles
+3
+HIU-EP1-004
+Consulta de auditoría
+3
+HIU-EP2-001
+Consulta de estado y ubicación de cajas quirúrgicas
+8
+HIU-EP2-002
+Registro de cambio de etapa de cajas quirúrgicas
+3
+HIU-EP2-003
+Retroceder etapa
+5
+HIU-EP2-004
+Registrar actividad de la etapa
+13
+HIU-EP3-001
+Consulta de inventarios por separado
+2
+HIU-EP3-002
+Registrar salida de insumos
+3
+HIU-EP3-003
+Configurar alertas de inventario
+4
+HIU-EP3-004
+Registrar reposición de insumos
+4
+HIU-EP4-001
+Consulta del catálogo digital de cajas quirúrgicas
+9
+HIU-EP4-002
+Consulta detallada de las cajas quirúrgicas
+5
+HIU-EP4-003
+Funcionalidad agregar cajas quirúrgicas
+4
+HIU-EP5-001
+Registro de entrega de cajas quirúrgicas y materiales
+2
+HIU-EP5-002
+Historial de entregas de cajas quirúrgicas y materiales
+2
+HIU-EP6-001
+Consulta de estadísticas de producción de la Central
+8
+HIU-EP6-002
+Generación de reportes de producción de la Central
+4
+1.2 Patrón de comparación
+Para estimar los puntos de historia, el equipo utilizará Planning Poker con una escala de Fibonacci de 1, 2, 3, 5, 8 y 13 puntos. Cada integrante realizará su estimación de forma independiente y luego se compararán las propuestas. Si existen diferencias, se revisará la historia y se acordará un valor común considerando su complejidad, esfuerzo, cantidad de trabajo e incertidumbre. Como referencia, se utilizará una historia previamente estimada para comparar el esfuerzo relativo de las demás.
+2. Comprometer historias de usuario
+Para el primer Sprint, el equipo seleccionará las historias de usuario que serán desarrolladas durante el período, considerando su prioridad, estimación y capacidad de trabajo del equipo.
+2.1 Sprint 1
+ID
+Historia de usuario
+HIU-EP1-001
+Iniciar sesión en la plataforma
+HIU-EP1-002
+Control de acceso según rol
+HIU-EP2-001
+Consulta de estado y ubicación de cajas quirúrgicas
+HIU-EP2-002
+Registro de cambio de etapa de cajas quirúrgicas
+HIU-EP2-003
+Retroceder etapa
+HIU-EP3-001
+Consulta de inventarios por separado
+HIU-EP4-001
+Consulta del catálogo digital de cajas quirúrgicas
+HIU-EP5-001
+Registro de entrega de cajas quirúrgicas y materiales
+2.2 Sprint 2
+ID
+Historia de usuario
+HIU-EP2-004
+Registrar actividad de la etapa
+HIU-EP3-002
+Registrar salida de insumos
+HIU-EP3-004
+Registrar reposición de insumos
+HIU-EP4-002
+Consulta detallada de las cajas quirúrgicas
+2.3 Sprint 3
+ID
+Historia de usuario
+HIU-EP1-003
+Gestión de usuarios y roles
+HIU-EP1-004
+Consulta de auditoría
+HIU-EP3-003
+Configurar alertas de inventario
+HIU-EP4-003
+Funcionalidad agregar cajas quirúrgicas
+HIU-EP5-002
+Historial de entregas de cajas quirúrgicas y materiales
+HIU-EP6-001
+Consulta de estadísticas de producción de la Central
+HIU-EP6-002
+Generación de reportes de producción de la Central
+HIU-EP6-002
+Generación de reportes de producción de la Central
+3. Definición de las tareas
+3.1 Sprint 1
+ID Historia
+ID Tarea
+Tarea o actividad
+Estimación horas
+HIU-EP1-001
+T-SP1-001
+Diseñar la interfaz de inicio de sesión
+3
+HIU-EP1-001
+T-SP1-002
+Implementar el proceso de autenticación del usuario
+6
+HIU-EP1-001
+T-SP1-003
+Implementar la validación de las credenciales ingresadas
+3
+HIU-EP1-001
+T-SP1-004
+Implementar el inicio y cierre de sesión del usuario
+3
+HIU-EP1-001
+T-SP1-005
+Implementar el mensaje para credenciales no válidas
+2
+HIU-EP1-002
+T-SP1-006
+Definir los permisos correspondientes a cada rol
+4
+HIU-EP1-002
+T-SP1-007
+Implementar la identificación del rol del usuario autenticado
+3
+HIU-EP1-002
+T-SP1-008
+Restringir el acceso a las funcionalidades según el rol asignado
+3
+HIU-EP1-002
+T-SP1-009
+Adaptar el menú y las opciones visibles según el rol asignado
+4
+HIU-EP2-001
+T-SP1-0010
+Diseñar la interfaz de consulta de cajas quirúrgicas
+3
+HIU-EP2-001
+T-SP1-0011
+Implementar el listado de cajas agrupadas por etapa
+4
+HIU-EP2-001
+T-SP1-0012
+Implementar la selección de una etapa para consultar sus cajas
+3
+HIU-EP2-001
+T-SP1-0013
+Implementar la búsqueda de una caja quirúrgica
+2
+HIU-EP2-001
+T-SP1-0014
+Mostrar la etapa actual, ubicación, tiempo en la etapa y responsable
+4
+HIU-EP2-001
+T-SP1-0015
+Implementar el mensaje cuando no se encuentren cajas coincidentes
+2
+HIU-EP2-002
+T-SP1-0016
+Diseñar la interfaz para registrar el cambio de etapa
+2
+HIU-EP2-002
+T-SP1-0017
+Implementar la selección de la siguiente etapa según el flujo definido
+3
+HIU-EP2-002
+T-SP1-0018
+Validar que la información requerida esté completa antes de registrar el cambio
+1
+HIU-EP2-002
+T-SP1-0019
+Registrar fecha, hora y usuario que realiza el cambio
+1
+HIU-EP2-002
+T-SP1-0020
+Actualizar la etapa actual de la caja quirúrgica
+1
+HIU-EP2-002
+T-SP1-0021
+Implementar la confirmación del cambio y mensajes ante cambios no válidos
+1
+HIU-EP2-003
+T-SP1-0022
+Diseñar la interfaz para registrar el retroceso de etapa
+2
+HIU-EP2-003
+T-SP1-0023
+Implementar selección de una etapa anterior permitida
+1
+HIU-EP2-003
+T-SP1-0024
+Solicitar y validar el motivo del retroceso
+1
+HIU-EP2-003
+T-SP1-0025
+Registrar la fecha, hora, motivo y usuario que realiza el retroceso
+1
+HIU-EP2-003
+T-SP1-0026
+Actualizar la etapa actual de la caja quirúrgica
+1
+HIU-EP2-003
+T-SP1-0027
+Implementar la confirmación del retroceso y mensajes ante retrocesos no válidos
+1
+HIU-EP3-001
+T-SP1-0028
+Diseñar la interfaz de consulta de los inventarios
+2
+HIU-EP3-001
+T-SP1-0029
+Organizar la visualización de los inventarios disponibles
+1
+HIU-EP3-001
+T-SP1-0030
+Implementar el listado de insumos y materiales registrados
+1
+HIU-EP3-001
+T-SP1-0031
+Implementar la búsqueda y filtro de elementos del inventario
+1
+HIU-EP3-001
+T-SP1-0032
+Mostrar la cantidad disponible e información de cada elemento
+1
+HIU-EP3-001
+T-SP1-0033
+Implementar el mensaje cuando no se encuentren resultados
+1
+HIU-EP5-001
+T-SP1-0034
+Diseñar el formulario de entrega de cajas y materiales
+2
+HIU-EP5-001
+T-SP1-0035
+Implementar la selección de las cajas y materiales que serán entregados
+2
+HIU-EP5-001
+T-SP1-0036
+Registrar el servicio de destino y la persona que recibe la entrega
+1
+HIU-EP5-001
+T-SP1-0037
+Validar que la información requerida para la entrega esté completa
+2
+HIU-EP5-001
+T-SP1-0038
+Registrar la fecha, hora y usuario que realiza la entrega
+1
+HIU-EP5-001
+T-SP1-0039
+Actualizar el estado de las cajas entregadas
+1
+HIU-EP5-001
+T-SP1-0040
+Implementar la confirmación de la entrega y mensajes ante datos inválidos
+1
+HIU-EP4-001
+T-SP1-0041
+Diseñar la interfaz principal del catálogo digital
+3
+HIU-EP4-001
+T-SP1-0042
+Implementar el listado de cajas quirúrgicas registradas
+2
+HIU-EP4-001
+T-SP1-0043
+Implementar la búsqueda de cajas por nombre o identificador
+1
+HIU-EP4-001
+T-SP1-0044
+Implementar el filtro de cajas por servicio hospitalario
+1
+HIU-EP4-001
+T-SP1-0045
+Mostrar la información básica e imagen disponible de las cajas
+3
+HIU-EP4-001
+T-SP1-0046
+Implementar el mensaje cuando no se encuentren cajas coincidentes
+1
+3.2 Sprint 2
+ID Historia
+ID Tarea
+Tarea o actividad
+Estimación horas
+HIU-EP2-004
+T-SP2-001
+Diseñar la interfaz para registrar la actividad realizada dentro de una etapa
+3
+HIU-EP2-004
+T-SP2-002
+Implementar la selección de la caja quirúrgica
+2
+HIU-EP2-004
+T-SP2-003
+Mostrar la etapa actual de la caja
+1
+HIU-EP2-004
+T-SP2-004
+Implementar la selección de la actividad correspondiente a la etapa actual
+2
+HIU-EP2-004
+T-SP2-005
+Permitir registrar información complementaria asociada a la actividad
+2
+HIU-EP2-004
+T-SP2-006
+Validar que la actividad seleccionada corresponda a la etapa actual
+2
+HIU-EP2-004
+T-SP2-007
+Validar que los datos obligatorios estén completos
+2
+HIU-EP2-004
+T-SP2-008
+Registrar la fecha, hora y usuario que realiza la actividad
+1
+HIU-EP2-004
+T-SP2-009
+Registrar la actividad en la trazabilidad de la caja
+1
+HIU-EP2-004
+T-SP2-0010
+Implementar la confirmación del registro y mensajes ante datos no válidos
+1
+HIU-EP3-002
+T-SP2-0011
+Diseñar el formulario para registrar movimientos de inventario
+2
+HIU-EP3-002
+T-SP2-0012
+Implementar la selección del elemento del inventario
+HIU-EP3-002
+T-SP2-0013
+Permitir ingresar la cantidad del movimiento
+HIU-EP3-002
+T-SP2-0014
+Validar la disponibilidad suficiente para movimientos de salida
+HIU-EP3-002
+T-SP2-0015
+Validar que los datos obligatorios estén completos
+HIU-EP3-002
+T-SP2-0016
+Actualizar la cantidad disponible según el tipo de movimiento
+HIU-EP3-002
+T-SP2-0017
+Registrar la fecha, hora y usuario que realiza el movimiento
+HIU-EP3-002
+T-SP2-0018
+Implementar la confirmación del movimiento y mensajes ante datos no válidos
+HIU-EP3-004
+T-SP2-0019
+Diseñar el formulario para registrar la reposición de elementos del inventario
+HIU-EP3-004
+T-SP2-0020
+Implementar la selección del elemento que será repuesto
+HIU-EP3-004
+T-SP2-0021
+Permitir ingresar la cantidad de reposición
+HIU-EP3-004
+T-SP2-0022
+Validar que la cantidad de reposición sea válida
+HIU-EP3-004
+T-SP2-0023
+Validar que los datos obligatorios estén completos
+HIU-EP3-004
+T-SP2-0024
+Registrar la fecha, hora y usuario que realiza la reposición
+HIU-EP3-004
+T-SP2-0025
+Actualizar la cantidad disponible del elemento
+HIU-EP3-004
+T-SP2-0026
+Desactivar la alerta de stock cuando corresponda
+HIU-EP3-004
+T-SP2-0027
+Implementar la confirmación de la reposición y mensajes ante datos no válidos
+HIU-EP4-002
+T-SP2-0028
+Diseñar la interfaz de la ficha detallada de una caja quirúrgica
+HIU-EP4-002
+T-SP2-0029
+Mostrar datos generales de la caja seleccionada
+HIU-EP4-002
+T-SP2-0030
+Implementar el listado de instrumentos y materiales que componen la caja
+HIU-EP4-002
+T-SP2-0031
+Mostrar la cantidad requerida de cada instrumento o material
+HIU-EP4-002
+T-SP2-0032
+Mostrar la guía visual de la caja cuando se encuentre disponible
+HIU-EP4-002
+T-SP2-0033
+Mostrar imágenes de las pinzas e instrumentos que cuenten con registro visual
+HIU-EP4-002
+T-SP2-0034
+Implementar una advertencia cuando la caja no cuente con una guía visual
+HIU-EP4-002
+T-SP2-0035
+Implementar el mensaje de error cuando la ficha no pueda ser cargada
+3.3 Sprint 3
+ID Historia
+ID Tarea
+Tarea o actividad
+Estimación horas
+HIU-EP1-003
+T-SP3-001
+Diseñar la interfaz de gestión de usuarios
+HIU-EP1-003
+T-SP3-002
+Implementar el listado de usuarios registrados
+HIU-EP1-003
+T-SP3-003
+Diseñar e implementar el formulario de creación de usuarios
+HIU-EP1-003
+T-SP3-004
+Permitir la asignación de roles al crear un usuario
+HIU-EP1-003
+T-SP3-005
+Implementar la modificación de los datos registrados de un usuario
+HIU-EP1-003
+T-SP3-006
+Permitir la modificación del rol asignado
+HIU-EP1-003
+T-SP3-007
+Implementar la desactivación de usuarios
+HIU-EP1-003
+T-SP3-008
+Validar que los datos obligatorios estén completos
+HIU-EP1-003
+T-SP3-009
+Implementar la confirmación de las operaciones y mensajes ante datos no válidos
+HIU-EP1-004
+T-SP3-0010
+Diseñar la interfaz de consulta de auditoría
+HIU-EP1-004
+T-SP3-0011
+Implementar el registro automático de las acciones auditables realizadas por los usuarios
+HIU-EP1-004
+T-SP3-0012
+Mostrar el listado general de acciones registradas
+HIU-EP1-004
+T-SP3-0013
+Mostrar la fecha, hora, usuario y acción realizada en cada registro
+HIU-EP1-004
+T-SP3-0014
+Implementar la búsqueda de un usuario específico
+HIU-EP1-004
+T-SP3-0015
+Permitir consultar el historial de acciones del usuario seleccionado
+HIU-EP1-004
+T-SP3-0016
+Implementar filtros básicos para facilitar la consulta de los registros
+HIU-EP1-004
+T-SP3-0017
+Implementar mensajes de búsqueda sin resultados y error del sistema
+HIU-EP3-003
+T-SP3-0018
+Diseñar la interfaz de configuración de niveles mínimos de inventario
+HIU-EP3-003
+T-SP3-0019
+Diseñar la interfaz de configuración de niveles mínimos de inventario
+HIU-EP3-003
+T-SP3-0020
+Permitir ingresar el nivel mínimo de existencias
+HIU-EP3-003
+T-SP3-0021
+Validar que el nivel mínimo ingresado sea válido
+HIU-EP3-003
+T-SP3-0022
+Guardar el nivel mínimo configurado para el elemento seleccionado
+HIU-EP3-003
+T-SP3-0023
+Permitir la modificación del nivel mínimo configurado
+HIU-EP3-003
+T-SP3-0024
+Comparar la cantidad disponible con el nivel mínimo establecido
+HIU-EP3-003
+T-SP3-0025
+Generar alerta cuando las existencias alcancen o desciendan del nivel configurado
+HIU-EP3-003
+T-SP3-0026
+Implementar mensajes de confirmación y error para la configuración
+HIU-EP4-003
+T-SP3-0027
+Diseñar la interfaz de administración de cajas del catálogo
+HIU-EP4-003
+T-SP3-0028
+Diseñar e implementar el formulario para agregar una caja quirúrgica
+HIU-EP4-003
+T-SP3-0029
+Permitir registrar los datos generales de la caja
+HIU-EP4-003
+T-SP3-0030
+Implementar la incorporación de instrumentos, materiales y cantidades de la caja
+HIU-EP4-003
+T-SP3-0031
+Permitir cargar imágenes y guía visual de la caja cuando se encuentren disponibles
+HIU-EP4-003
+T-SP3-0032
+Permitir crear cajas que no cuenten con imágenes o guía visual
+HIU-EP4-003
+T-SP3-0033
+Validar que los datos obligatorios estén completos
+HIU-EP4-003
+T-SP3-0034
+Validar que la caja no se encuentre registrada previamente
+HIU-EP4-003
+T-SP3-0035
+Implementar la modificación de la información y contenido de una caja
+HIU-EP4-003
+T-SP3-0036
+Implementar el retiro de una caja del catálogo, conservando sus registros históricos
+HIU-EP4-003
+T-SP3-0037
+Implementar mensajes de confirmación y error para las operaciones
+HIU-EP5-002
+T-SP3-0038
+Diseñar la interfaz del historial de entregas
+HIU-EP5-002
+T-SP3-0039
+Implementar el listado de entregas registradas
+HIU-EP5-002
+T-SP3-0040
+Mostrar las cajas y materiales incluidos en cada entrega
+HIU-EP5-002
+T-SP3-0041
+Mostrar el servicio de destino y la persona que recibió la entrega
+HIU-EP5-002
+T-SP3-0042
+Mostrar la fecha, hora y usuario que realizó la entrega
+HIU-EP5-002
+T-SP3-0043
+Mostrar los participantes asociados a la entrega y recepción
+HIU-EP5-002
+T-SP3-0044
+Implementar la búsqueda de una entrega específica
+HIU-EP5-002
+T-SP3-0045
+Implementar filtros básicos para facilitar la consulta de las entregas registradas
+HIU-EP5-002
+T-SP3-0046
+Implementar mensajes de búsqueda sin resultados y error del sistema
+HIU-EP6-001
+T-SP3-0047
+Diseñar el panel de estadísticas de producción de la Central
+HIU-EP6-001
+T-SP3-0048
+Obtener y procesar la información de producción registrada en el sistema
+HIU-EP6-001
+T-SP3-0049
+Mostrar la cantidad de cajas procesadas
+HIU-EP6-001
+T-SP3-0050
+Mostrar la cantidad de cajas procesadas en cada etapa del proceso
+HIU-EP6-001
+T-SP3-0051
+Implementar filtros por período para consultar las estadísticas
+HIU-EP6-001
+T-SP3-0052
+Representar la información mediante indicadores y gráficos
+HIU-EP6-001
+T-SP3-0053
+Actualizar los resultados según los filtros seleccionados
+HIU-EP6-001
+T-SP3-0054
+Implementar mensajes cuando no existan datos o se produzca un error en la consulta
+HIU-EP6-002
+T-SP3-0055
+Diseñar la interfaz para generar reportes de producción
+HIU-EP6-002
+T-SP3-0056
+Implementar la selección del período que abarcará el reporte
+HIU-EP6-002
+T-SP3-0057
+Permitir aplicar filtros a la información que se incluirá en el reporte
+HIU-EP6-002
+T-SP3-0058
+Obtener la información de producción registrada en el sistema
+HIU-EP6-002
+T-SP3-0059
+Organizar la información de producción que se incluirá en el reporte
+HIU-EP6-002
+T-SP3-0060
+Mostrar la vista previa del reporte generado
+HIU-EP6-002
+T-SP3-0061
+Implementar la descarga del reporte
+HIU-EP6-002
+T-SP3-0062
+Registrar la fecha, hora y usuario que generó el reporte
+HIU-EP6-002
+T-SP3-0063
+Implementar mensajes cuando no existan datos o se produzca un error
+4. Gráfico Burndown Chart inicial
+El Scrum Master define el siguiente gráfico inicial del primer Sprint, el gráfico sólo debe contener las tareas definidas para el primer Sprint mostrando el total de horas definidas, pero sin avance aún en las tareas.
+4.1 Sprint 1
+4.2 Sprint 2 [En proceso]
+4.3 Sprint 3

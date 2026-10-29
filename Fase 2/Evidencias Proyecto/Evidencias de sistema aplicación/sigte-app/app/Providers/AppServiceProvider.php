@@ -24,15 +24,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('flujo.*', function ($view): void {
+        View::composer(['flujo.*', 'flujo.partials.*'], function ($view): void {
+            $turno = Personal::turnoVigente();
             $user = Auth::user();
             if ($user === null || $user->nombreRol() !== Rol::OPERADOR) {
                 $view->with('puesto', null);
                 $view->with('nomina', collect());
+                $view->with('turnoVigente', $turno);
+                $view->with('idsDelTurno', []);
 
                 return;
             }
-            $turno = Personal::turnoVigente();
             $porCorreo = Personal::query()->get()->keyBy('email');
             $nomina = User::query()
                 ->where('activo', true)

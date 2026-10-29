@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/usuarios/{user}', [AdminController::class, 'actualizarUsuario'])->name('mockups.usuarios.actualizar');
         Route::post('/admin/usuarios/{user}/estado', [AdminController::class, 'cambiarEstadoUsuario'])->name('mockups.usuarios.estado');
         Route::get('/admin/reportes', [AdminController::class, 'reportes'])->name('mockups.reportes');
+        Route::get('/admin/reportes/exportar', [AdminController::class, 'exportarReportes'])->name('mockups.reportes.exportar');
         Route::get('/admin/entregas', [AdminController::class, 'historialEntregas'])->name('mockups.historial_entregas');
         Route::get('/admin/custodia', [AdminController::class, 'custodia'])->name('mockups.custodia');
         Route::get('/admin/alertas', [AdminController::class, 'alertas'])->name('mockups.alertas');
