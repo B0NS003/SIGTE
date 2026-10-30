@@ -38,7 +38,8 @@
                     <p class="main-sub">{{ $item['codigo'] }}@if (!empty($item['codigo_referencia'])) · {{ $item['codigo_referencia'] }}@endif @if (!empty($item['numero'])) · Nº {{ $item['numero'] }}@endif · {{ $item['servicio'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
                 @endif
             </div>
-            <div class="main-actions">
+            @if ($item)
+<div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">
                     <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
@@ -46,14 +47,42 @@
                     Volver al catálogo
                 </a>
             </div>
+            @endif
         </div>
 
         @if (! $item)
-            <div class="ops-empty">
-                <strong>No fue posible cargar la ficha</strong>
-                <p>No hay una caja «{{ $codigo }}» en el catálogo.</p>
-                <p><a href="{{ route('mockups.catalogo') }}">Intentar de nuevo</a></p>
-            </div>
+            <section class="ficha-error-contenedor">
+                <div class="ficha-error-card" role="status">
+                    <div class="ficha-error-ilustracion" aria-hidden="true">
+                        <div class="ficha-error-circulo">
+                            <svg viewBox="0 0 100 100" fill="none">
+                                <path d="M17 30C17 25 21 21 26 21H43L52 30H74C79 30 83 34 83 39V72C83 77 79 81 74 81H26C21 81 17 77 17 72V30Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+                                <rect x="27" y="43" width="46" height="29" rx="5" stroke="currentColor" stroke-width="4"/>
+                                <circle cx="40" cy="53" r="4" fill="currentColor"/>
+                                <path d="M31 67L43 57L51 64L60 54L70 67" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="ficha-error-alerta">!</span>
+                    </div>
+                    <h2>No fue posible cargar la ficha</h2>
+                    <p class="ficha-error-descripcion">No hay una caja «{{ $codigo }}» en el catálogo.</p>
+                    <div class="ficha-error-aviso">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10" fill="#3B82F6"/>
+                            <path d="M12 10.5V16M12 7.5V7.6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <p>Verifica que el código esté correcto o selecciona una ficha desde el catálogo.</p>
+                    </div>
+                    <div class="ficha-error-acciones">
+                        <a href="{{ route('mockups.catalogo') }}" class="ficha-error-boton">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Volver al catálogo
+                        </a>
+                    </div>
+                </div>
+            </section>
         @else
             <div class="ficha-layout ficha-operador-resumen">
                 <section class="ficha-guia ficha-operador-guia {{ $item['guia'] ? '' : 'is-empty' }}" aria-label="Guía visual">
