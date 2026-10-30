@@ -63,16 +63,16 @@
                 @foreach ($items as $item)
                     <article class="cat-card mant-card" data-estado="vigente" data-servicio="{{ $item['servicio_real'] ?? 'Sin servicio asignado' }}" data-guia="{{ $item['guia'] ? '1' : '0' }}">
                         <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
-                            <span class="js-guia-label">{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
+                            <span class="js-guia-label sigte-card-guide"><svg class="sigte-card-icon sigte-card-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.7 5.1C11.1 5 11.5 5 12 5c5.5 0 9 7 9 7a14 14 0 0 1-3.2 4.2"/><path d="M6.2 6.2C3.9 8.1 3 12 3 12s3.5 7 9 7a9.7 9.7 0 0 0 3.4-.6"/><path d="M10.1 10.1a2.7 2.7 0 0 0 3.8 3.8"/></svg><svg class="sigte-card-icon sigte-card-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.4 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="sigte-guide-text">{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span></span>
                         </div>
                         <div class="cat-body">
                             <strong class="js-codigo">{{ $item['codigo'] }}</strong>
                             <h2 class="js-nombre">{{ $item['nombre'] }}</h2>
-                            <span class="cat-servicio js-servicio">{{ $item['servicio'] }}</span>
-                            <p class="js-detalle">{{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
+                            <span class="cat-servicio js-servicio"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1M10 21v-3h4v3"/></svg><span class="sigte-servicio-texto">{{ $item['servicio'] }}</span></span>
+                            <p class="js-detalle"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2.8 8.5 4.6v9.2L12 21.2l-8.5-4.6V7.4L12 2.8Z"/><path d="m3.5 7.4 8.5 4.8 8.5-4.8M12 12.2v9"/></svg><span class="sigte-piezas-texto">{{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</span></p>
                             <div class="mant-acciones">
-                                <button class="btn btn-ghost js-editar" type="button">Editar</button>
-                                <button class="btn btn-ghost js-retirar" type="button">Retirar</button>
+                                <button class="btn btn-ghost js-editar" type="button"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 20 4.4-1 10.5-10.5-3.4-3.4L5 15.6 4 20Z"/><path d="m13.8 6.9 3.4 3.4M14.5 5.1l1.6-1.6a2.1 2.1 0 0 1 3 3l-1.6 1.6"/></svg><span>Editar</span></button>
+                                <button class="btn btn-ghost js-retirar" type="button"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9 7V4h6v3m3.2 0-.8 13H6.6L5.8 7M10 10.5v6m4-6v6"/></svg><span>Retirar</span></button>
                             </div>
                         </div>
                     </article>
@@ -789,7 +789,18 @@
     }
 
     function htmlCard() {
-        return '<div class="cat-photo is-empty"><span class="js-guia-label">Sin guía visual</span></div><div class="cat-body"><strong class="js-codigo"></strong><h2 class="js-nombre"></h2><span class="cat-servicio js-servicio"></span><p class="js-detalle"></p><div class="mant-acciones"><button class="btn btn-ghost js-editar" type="button">Editar</button><button class="btn btn-ghost js-retirar" type="button">Retirar</button></div></div>';
+        return `<div class="cat-photo is-empty">
+            <span class="js-guia-label sigte-card-guide"><svg class="sigte-card-icon sigte-card-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.7 5.1C11.1 5 11.5 5 12 5c5.5 0 9 7 9 7a14 14 0 0 1-3.2 4.2"/><path d="M6.2 6.2C3.9 8.1 3 12 3 12s3.5 7 9 7a9.7 9.7 0 0 0 3.4-.6"/><path d="M10.1 10.1a2.7 2.7 0 0 0 3.8 3.8"/></svg><svg class="sigte-card-icon sigte-card-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.4 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="sigte-guide-text">Sin guía visual</span></span>
+        </div>
+        <div class="cat-body">
+            <strong class="js-codigo"></strong><h2 class="js-nombre"></h2>
+            <span class="cat-servicio js-servicio"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1M10 21v-3h4v3"/></svg><span class="sigte-servicio-texto"></span></span>
+            <p class="js-detalle"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2.8 8.5 4.6v9.2L12 21.2l-8.5-4.6V7.4L12 2.8Z"/><path d="m3.5 7.4 8.5 4.8 8.5-4.8M12 12.2v9"/></svg><span class="sigte-piezas-texto"></span></p>
+            <div class="mant-acciones">
+                <button class="btn btn-ghost js-editar" type="button"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 20 4.4-1 10.5-10.5-3.4-3.4L5 15.6 4 20Z"/><path d="m13.8 6.9 3.4 3.4M14.5 5.1l1.6-1.6a2.1 2.1 0 0 1 3 3l-1.6 1.6"/></svg><span>Editar</span></button>
+                <button class="btn btn-ghost js-retirar" type="button"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9 7V4h6v3m3.2 0-.8 13H6.6L5.8 7M10 10.5v6m4-6v6"/></svg><span>Retirar</span></button>
+            </div>
+        </div>`;
     }
 
     function escribirCard(card, datos) {
@@ -801,11 +812,11 @@
         var photo = card.querySelector('.cat-photo');
         var retirada = card.dataset.estado === 'retirada';
         photo.classList.toggle('is-empty', retirada || !datos.guia);
-        card.querySelector('.js-guia-label').textContent = retirada ? 'Retirada' : (datos.guia ? 'Con guía visual' : 'Sin guía visual');
+        card.querySelector('.sigte-guide-text').textContent = retirada ? 'Retirada' : (datos.guia ? 'Con guía visual' : 'Sin guía visual');
         card.querySelector('.js-codigo').textContent = datos.codigo;
         card.querySelector('.js-nombre').textContent = datos.nombre;
-        card.querySelector('.js-servicio').textContent = datos.servicio_real || datos.servicio;
-        card.querySelector('.js-detalle').textContent = datos.tipo + ' · ' + total + (total === 1 ? ' pieza' : ' piezas');
+        card.querySelector('.sigte-servicio-texto').textContent = datos.servicio_real || datos.servicio;
+        card.querySelector('.sigte-piezas-texto').textContent = total + (total === 1 ? ' pieza' : ' piezas');
     }
 
     document.getElementById('agregar-pieza').addEventListener('click', function () {
@@ -871,9 +882,9 @@
         card.dataset.estado = 'retirada';
         card.classList.add('mant-retirada');
         card.querySelector('.cat-photo').classList.add('is-empty');
-        card.querySelector('.js-guia-label').textContent = 'Retirada';
+        card.querySelector('.sigte-guide-text').textContent = 'Retirada';
         retirar.disabled = true;
-        retirar.textContent = 'Retirada';
+        retirar.querySelector('span').textContent = 'Retirada';
         if (fichas[claveRetiro]) {
             fichas[claveRetiro].estado = 'retirada';
         }

@@ -1955,3 +1955,619 @@
     grid-column: 2;
   }
 }
+
+/* SIGTE: tarjetas renovadas del catálogo, basadas en la referencia visual.
+   Mantienen intactas las imágenes actuales y no modifican los formularios. */
+#tab-catalogo .cat-grid,
+.cat-area .cat-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 255px), 1fr));
+  gap: 1rem;
+}
+
+#tab-catalogo .mant-card,
+.cat-area .sigte-consulta-card {
+  position: relative;
+  border: 1px solid #dbe4ef;
+  border-radius: 20px;
+  background: #fff;
+  padding: 11px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(15, 40, 78, .045);
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+#tab-catalogo .mant-card:hover,
+.cat-area .sigte-consulta-card:hover {
+  border-color: #bfcddd;
+  box-shadow: 0 12px 28px rgba(15, 40, 78, .10);
+  transform: translateY(-2px);
+}
+
+/* Imagen original / marcador de imagen del proyecto: no se reemplaza. */
+#tab-catalogo .mant-card .cat-photo,
+.cat-area .sigte-consulta-card .cat-photo {
+  position: relative;
+  min-height: 0;
+  height: 157px;
+  padding: 12px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  overflow: hidden;
+  background: linear-gradient(145deg, #f2f5f8, #e8eef3);
+}
+
+#tab-catalogo .mant-card .cat-photo.is-empty,
+.cat-area .sigte-consulta-card .cat-photo.is-empty {
+  background: linear-gradient(145deg, #f2f5f8, #e8eef3);
+}
+
+#tab-catalogo .mant-card .sigte-card-guide,
+.cat-area .sigte-consulta-card .sigte-card-guide {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  max-width: 100%;
+  white-space: nowrap;
+  border: 1px solid #e4eaf2;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .95);
+  color: #677992;
+  box-shadow: 0 3px 12px rgba(30, 48, 82, .06);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.sigte-card-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  vertical-align: middle;
+}
+
+.sigte-card-guide .sigte-card-eye {
+  display: none;
+}
+
+#tab-catalogo .mant-card[data-guia="1"] .sigte-card-guide .sigte-card-eye,
+.cat-area .sigte-consulta-card .cat-photo:not(.is-empty) .sigte-card-guide .sigte-card-eye {
+  display: inline-block;
+}
+
+#tab-catalogo .mant-card[data-guia="1"] .sigte-card-guide .sigte-card-eye-off,
+.cat-area .sigte-consulta-card .cat-photo:not(.is-empty) .sigte-card-guide .sigte-card-eye-off {
+  display: none;
+}
+
+#tab-catalogo .mant-card .cat-body,
+.cat-area .sigte-consulta-card .cat-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  padding: 14px 6px 5px;
+  min-width: 0;
+}
+
+#tab-catalogo .mant-card .js-codigo,
+.cat-area .sigte-consulta-card .sigte-consulta-codigo {
+  color: #d94f0e;
+  font-size: .83rem;
+  font-weight: 800;
+  letter-spacing: .045em;
+}
+
+#tab-catalogo .mant-card .js-nombre,
+.cat-area .sigte-consulta-card .cat-body h2 {
+  color: var(--navy);
+  font-size: 1.12rem;
+  line-height: 1.3;
+  font-weight: 800;
+  margin: .3rem 0 .65rem;
+  overflow-wrap: anywhere;
+}
+
+#tab-catalogo .mant-card .js-servicio,
+.cat-area .sigte-consulta-card .cat-servicio {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  margin: 0 0 .85rem;
+  max-width: 100%;
+  border-radius: 999px;
+  background: #eaf0ff;
+  color: #37567f;
+  font-size: .77rem;
+  font-weight: 800;
+  white-space: normal;
+}
+
+#tab-catalogo .mant-card .js-detalle,
+.cat-area .sigte-consulta-card .sigte-consulta-piezas {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  color: #63758e;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+#tab-catalogo .mant-card .js-detalle .sigte-card-icon,
+.cat-area .sigte-consulta-card .sigte-consulta-piezas .sigte-card-icon {
+  width: 19px;
+  height: 19px;
+}
+
+#tab-catalogo .mant-card .mant-acciones {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #edf1f6;
+  margin-bottom: 0;
+}
+
+#tab-catalogo .mant-card .mant-acciones .btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 40px;
+  padding: .5rem .2rem;
+  border-radius: 11px;
+  border: 1px solid #dce5f1;
+  background: #fff;
+  color: var(--navy);
+  font-size: .75rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#tab-catalogo .mant-card .mant-acciones .btn:hover:not(:disabled) {
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+#tab-catalogo .mant-card .mant-acciones .js-retirar .sigte-card-icon {
+  color: #e85a1c;
+}
+
+#tab-catalogo .mant-card .mant-acciones .btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.cat-area .sigte-consulta-card .cat-body {
+  padding-bottom: 13px;
+}
+
+.cat-area .sigte-consulta-card .sigte-consulta-piezas {
+  margin-top: auto;
+}
+
+.cat-area .sigte-consulta-card .cat-photo-placeholder {
+  object-fit: cover;
+}
+
+@media (max-width: 620px) {
+
+  #tab-catalogo .cat-grid,
+  .cat-area .cat-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 235px), 1fr));
+  }
+}
+
+
+/* Ficha de consulta del operador: diseño compacto y checklist de apoyo. */
+.ficha-operador-resumen {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .85fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ficha-operador-guia {
+  display: grid;
+  grid-template-columns: minmax(155px, .85fr) 1fr;
+  gap: 16px;
+  align-items: center;
+  min-height: 0;
+  padding: 12px;
+  border: 1px solid var(--borde);
+  border-radius: 15px;
+  background: #fff;
+}
+
+.ficha-operador-guia.is-empty {
+  justify-content: initial;
+  border-style: solid;
+}
+
+.ficha-operador-guia-imagen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 172px;
+  border-radius: 11px;
+  background: repeating-linear-gradient(135deg, #f2f5f9 0, #f2f5f9 9px, #f8fafc 9px, #f8fafc 18px);
+  color: #b4c1d0;
+}
+
+.ficha-operador-guia-etiqueta {
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  border-radius: 99px;
+  padding: 5px 9px;
+  background: #fff;
+  color: #516582;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #0b1f4b0a;
+}
+
+.ficha-operador-guia-texto .ficha-kicker {
+  font-size: 10px;
+}
+
+.ficha-operador-guia-texto strong {
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.35;
+  margin: 5px 0;
+}
+
+.ficha-operador-guia-texto p {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.ficha-operador-datos {
+  padding: 16px;
+  border-radius: 15px;
+}
+
+.ficha-operador-datos h2 {
+  font-size: 16px;
+}
+
+.ficha-operador-datos .ficha-facts {
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.ficha-operador-datos .ficha-facts div {
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.ficha-operador-datos .ficha-facts dt {
+  font-size: 10px;
+}
+
+.ficha-operador-datos .ficha-facts dd {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.ficha-operador-lista {
+  padding: 14px 17px 8px;
+  border-radius: 15px;
+}
+
+.ficha-operador-barra {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.ficha-operador-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ficha-operador-titulo h2 {
+  font-size: 17px;
+}
+
+.ficha-operador-contador {
+  border-radius: 99px;
+  background: #fff0e8;
+  color: #c64b13;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ficha-operador-progreso {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 170px;
+  flex: 1;
+  max-width: 290px;
+  font-size: 12px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.ficha-operador-progreso-pista {
+  height: 8px;
+  border-radius: 99px;
+  background: #e8edf4;
+  overflow: hidden;
+  flex: 1;
+}
+
+#ficha-progreso-barra {
+  height: 100%;
+  width: 0;
+  background: #ea5b1c;
+  border-radius: inherit;
+  transition: width .2s ease;
+}
+
+.ficha-operador-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ficha-operador-acciones .btn {
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 9px;
+}
+
+.ficha-operador-acciones .btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.ficha-operador-ayuda {
+  margin: 9px 0 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ficha-operador-cabecera,
+.ficha-operador-fila {
+  display: grid;
+  grid-template-columns: 32px 30px minmax(0, 1fr) 75px;
+  gap: 10px;
+  align-items: center;
+}
+
+.ficha-operador-cabecera {
+  background: #f5f7fa;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: #60718a;
+  font-weight: 800;
+}
+
+.ficha-operador-cabecera span:last-child {
+  text-align: right;
+}
+
+.ficha-operador-items {
+  margin-top: 0;
+}
+
+.ficha-operador-items li {
+  display: block;
+  padding: 0;
+  border-top: 0;
+  border-bottom: 1px solid #e8edf4;
+}
+
+.ficha-operador-fila {
+  padding: 8px 12px;
+  cursor: pointer;
+  min-height: 52px;
+  transition: background .15s;
+}
+
+.ficha-operador-fila:hover {
+  background: #f8fafc;
+}
+
+.ficha-operador-check {
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid #9aabc1;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+.ficha-operador-check:checked {
+  background: #e85a1c;
+  border-color: #e85a1c;
+}
+
+.ficha-operador-check:checked::after {
+  content: '✓';
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ficha-operador-check:focus-visible {
+  outline: 3px solid #f8b58c;
+  outline-offset: 2px;
+}
+
+.ficha-operador-numero {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.ficha-operador-instrumento {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ficha-operador-instrumento .ficha-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex: none;
+  font-size: 12px;
+}
+
+.ficha-operador-instrumento .ficha-nombre {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.ficha-operador-items .ficha-cant {
+  min-width: 0;
+  justify-self: end;
+  background: #f3f6fa;
+  padding: 6px 9px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.ficha-operador-items li.is-revisado {
+  background: #f7fbf9;
+}
+
+.ficha-operador-items li.is-revisado .ficha-nombre {
+  color: #64748b;
+  text-decoration: line-through;
+}
+
+.ficha-operador-completada {
+  margin: 12px 0 6px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #eaf8f0;
+  color: #1f6c4b;
+  font-size: 12px;
+}
+
+.ficha-operador-completada[hidden] {
+  display: none;
+}
+
+@media(max-width:980px) {
+  .ficha-operador-resumen {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width:620px) {
+  .ficha-operador-guia {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-operador-guia-imagen {
+    min-height: 125px;
+  }
+
+  .ficha-operador-progreso {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .ficha-operador-cabecera,
+  .ficha-operador-fila {
+    grid-template-columns: 24px 22px minmax(0, 1fr) 48px;
+    gap: 6px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .ficha-operador-instrumento {
+    gap: 7px;
+  }
+
+  .ficha-operador-instrumento .ficha-nombre {
+    font-size: 12px;
+  }
+
+  .ficha-operador-instrumento .ficha-thumb {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Iconos compactos en los datos generales de la ficha del operador */
+.ficha-operador-datos .ficha-facts .ficha-dato-con-icono {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ficha-operador-datos .ficha-dato-icono {
+  width: 33px;
+  height: 33px;
+  flex: 0 0 33px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf0ff;
+  border-radius: 9px;
+  color: #356de6;
+}
+
+.ficha-operador-datos .ficha-dato-icono svg {
+  width: 19px;
+  height: 19px;
+}
+
+.ficha-operador-datos .ficha-dato-texto {
+  min-width: 0;
+}
+
+.ficha-operador-datos .ficha-dato-texto dt {
+  margin: 0;
+}
+
+.ficha-operador-datos .ficha-dato-texto dd {
+  margin-top: 4px;
+}
+
+.ficha-operador-guia-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ficha-operador-guia-etiqueta svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
