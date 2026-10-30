@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
 use App\Models\Ficha;
+use App\Models\Instrumento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -14,116 +15,12 @@ class CatalogoController extends Controller
 {
     use ResuelveUsuario;
 
-    /** @var list<string> */
-    private const ORDEN_AREAS = [
-        'Cirugía general',
-        'Digestiva',
-        'Bariátrica',
-        'Niño',
-        'Ginecología y obstetricia',
-        'Cirugía vascular',
-        'Urología',
-        'Otorrino',
-        'Traumatología',
-        'Cirugía plástica',
-        'Oftalmología',
-        'Dental y maxilofacial',
-    ];
-
     private function catalogoItems(): array
     {
-        $desdeFichas = $this->catalogoDesdeFichas();
-        if ($desdeFichas !== []) {
-            return $desdeFichas;
-        }
-
-        $items = [
-            [
-                'codigo' => 'SET-LAP-01',
-                'nombre' => 'Set laparoscopia básico',
-                'tipo' => 'Set quirúrgico',
-                'servicio' => 'Pabellón',
-                'guia' => true,
-                'instrumentos' => [
-                    ['nombre' => 'Trocar 5 mm', 'cantidad' => 4, 'imagen' => true],
-                    ['nombre' => 'Trocar 10 mm', 'cantidad' => 2, 'imagen' => true],
-                    ['nombre' => 'Pinza grasper', 'cantidad' => 4, 'imagen' => true],
-                    ['nombre' => 'Pinza Maryland', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Tijera', 'cantidad' => 2, 'imagen' => true],
-                    ['nombre' => 'Cánula de aspiración', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Óptica', 'cantidad' => 1, 'imagen' => true],
-                    ['nombre' => 'Cable de luz', 'cantidad' => 1, 'imagen' => false],
-                ],
-            ],
-            [
-                'codigo' => 'SET-CES-02',
-                'nombre' => 'Set cesárea',
-                'tipo' => 'Set quirúrgico',
-                'servicio' => 'Maternidad',
-                'guia' => true,
-                'instrumentos' => [
-                    ['nombre' => 'Bisturí', 'cantidad' => 2, 'imagen' => true],
-                    ['nombre' => 'Pinza Kocher', 'cantidad' => 6, 'imagen' => true],
-                    ['nombre' => 'Pinza anatómica', 'cantidad' => 4, 'imagen' => true],
-                    ['nombre' => 'Retractor', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Portaagujas', 'cantidad' => 4, 'imagen' => true],
-                    ['nombre' => 'Tijera Mayo', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Separador', 'cantidad' => 4, 'imagen' => false],
-                ],
-            ],
-            [
-                'codigo' => 'CAJ-CUR-10',
-                'nombre' => 'Caja curación general',
-                'tipo' => 'Caja de curación',
-                'servicio' => 'Curaciones',
-                'guia' => true,
-                'instrumentos' => [
-                    ['nombre' => 'Pinza anatómica', 'cantidad' => 4, 'imagen' => true],
-                    ['nombre' => 'Tijera', 'cantidad' => 2, 'imagen' => true],
-                    ['nombre' => 'Riñonera', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Gasas', 'cantidad' => 4, 'imagen' => false],
-                ],
-            ],
-            [
-                'codigo' => 'SET-UCI-03',
-                'nombre' => 'Set vía aérea UCI',
-                'tipo' => 'Set quirúrgico',
-                'servicio' => 'UCI',
-                'guia' => false,
-                'instrumentos' => [
-                    ['nombre' => 'Laringoscopio', 'cantidad' => 1, 'imagen' => true],
-                    ['nombre' => 'Pinza Magill', 'cantidad' => 2, 'imagen' => true],
-                    ['nombre' => 'Guía', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Jeringa', 'cantidad' => 2, 'imagen' => false],
-                    ['nombre' => 'Cánula', 'cantidad' => 2, 'imagen' => false],
-                ],
-            ],
-            [
-                'codigo' => 'CNT-EST-01',
-                'nombre' => 'Contenedor rígido 1/1',
-                'tipo' => 'Contenedor',
-                'servicio' => 'General',
-                'guia' => true,
-                'instrumentos' => [
-                    ['nombre' => 'Contenedor con filtro', 'cantidad' => 1, 'imagen' => true],
-                ],
-            ],
-            [
-                'codigo' => 'PKG-GM-05',
-                'nombre' => 'Paquete grado médico pequeño',
-                'tipo' => 'Paquete grado médico',
-                'servicio' => 'Urgencia',
-                'guia' => false,
-                'instrumentos' => [
-                    ['nombre' => 'Instrumental suelto empacado', 'cantidad' => 1, 'imagen' => false],
-                ],
-            ],
-        ];
-        return array_map(function (array $item): array {
-            $item['piezas'] = array_sum(array_column($item['instrumentos'], 'cantidad'));
-            return $item;
-        }, $items);
+        // El catálogo muestra únicamente las fichas existentes en PostgreSQL.
+        return $this->catalogoDesdeFichas();
     }
+
     /** @return list<array<string, mixed>> */
     private function catalogoLista(): array
     {
@@ -132,8 +29,7 @@ class CatalogoController extends Controller
         }
 
         return Ficha::query()
-            ->with(['items.instrumento:id,nombre,codigo_fabricante'])
-            ->orderBy('area')
+            ->with(['items.instrumento:id,nombre,codigo_fabricante', 'servicioClinico'])
             ->orderBy('nombre')
             ->withSum('items as piezas', 'cantidad')
             ->get()
@@ -145,12 +41,10 @@ class CatalogoController extends Controller
 
                 return [
                     'codigo' => $ficha->codigo,
-                    'codigo_referencia' => $ficha->codigo_referencia,
-                    'numero' => $ficha->numero,
                     'nombre' => $ficha->nombre,
-                    'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
-                    'servicio' => $ficha->area ?: 'Cirugía general',
-                    'guia' => $piezas > 0,
+                    'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : ($ficha->tipo === 'caja' ? 'Caja quirúrgica' : $ficha->tipo),
+                    'servicio' => $ficha->servicioClinico?->nombre ?? 'Sin servicio asignado',
+                    'guia' => (bool) $ficha->guia_visual,
                     'instrumentos' => [],
                     'piezas' => $piezas,
                     'buscar' => $contenido,
@@ -168,7 +62,6 @@ class CatalogoController extends Controller
 
         return Ficha::query()
             ->with(['items.instrumento', 'servicioClinico'])
-            ->orderBy('area')
             ->orderBy('nombre')
             ->get()
             ->map(function (Ficha $ficha): array {
@@ -176,6 +69,7 @@ class CatalogoController extends Controller
                     $tamano = trim((string) $linea->instrumento?->tamano);
 
                     return [
+                        'id' => $linea->instrumento_id,
                         'codigo' => $linea->instrumento?->codigo_fabricante ?? '',
                         'nombre' => trim(($linea->instrumento?->nombre ?? '').($tamano !== '' ? ' '.$tamano : '')),
                         'cantidad' => $linea->cantidad,
@@ -185,18 +79,14 @@ class CatalogoController extends Controller
 
                 return [
                     'codigo' => $ficha->codigo,
-                    'codigo_referencia' => $ficha->codigo_referencia,
-                    'numero' => $ficha->numero,
                     'nombre' => $ficha->nombre,
-                    'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
-                    // Compatibilidad temporal: la vista actual agrupa por 'servicio',
-                    // aunque ese valor corresponde al área quirúrgica.
-                    // Se corregirá al actualizar admin.blade.php y sus filtros.
-                    'servicio' => $ficha->area ?: 'Sin área asignada',
-                    'area' => $ficha->area ?: 'Sin área asignada',
+                    'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : ($ficha->tipo === 'caja' ? 'Caja quirúrgica' : $ficha->tipo),
+                    'servicio' => $ficha->servicioClinico?->nombre ?? 'Sin servicio asignado',
                     'servicio_real' => $ficha->servicioClinico?->nombre ?? 'Sin servicio asignado',
                     'servicio_id' => $ficha->servicio_id,
-                    'guia' => $instrumentos !== [],
+                    'id' => $ficha->id,
+                    'tipo_conjunto_id' => $ficha->tipo_conjunto_id,
+                    'guia' => (bool) $ficha->guia_visual,
                     'instrumentos' => $instrumentos,
                     'piezas' => array_sum(array_column($instrumentos, 'cantidad')),
                 ];
@@ -209,10 +99,7 @@ class CatalogoController extends Controller
         $items = $this->catalogoLista();
         $busqueda = trim((string) $request->query('q', ''));
         $servicio = trim((string) $request->query('servicio', ''));
-        $orden = array_flip(self::ORDEN_AREAS);
-        $servicios = collect($items)->pluck('servicio')->unique()->sortBy(
-            fn (string $nombre) => $orden[$nombre] ?? 99
-        )->values()->all();
+        $servicios = collect($items)->pluck('servicio')->unique()->sort()->values()->all();
         $needle = mb_strtolower($busqueda);
         $porBusqueda = array_values(array_filter(
             $items,
@@ -241,11 +128,10 @@ class CatalogoController extends Controller
 
             return $item;
         }, $filtrados);
-        usort($filtrados, function (array $a, array $b) use ($orden): int {
-            $area = ($orden[$a['servicio']] ?? 99) <=> ($orden[$b['servicio']] ?? 99);
-
-            return $area !== 0 ? $area : strcasecmp((string) $a['nombre'], (string) $b['nombre']);
-        });
+        usort($filtrados, fn (array $a, array $b): int =>
+            strcasecmp((string) $a['servicio'], (string) $b['servicio'])
+            ?: strcasecmp((string) $a['nombre'], (string) $b['nombre'])
+        );
         return view('catalogo.index', [
             'usuario' => $this->usuarioSesion(),
             'items' => $filtrados,
@@ -289,8 +175,10 @@ class CatalogoController extends Controller
             ]);
         }
 
-        // Servicios reales: tabla servicios, no especialidades de fichas.area.
+        // Servicios reales desde la tabla servicios.
         $servicios = DB::table('servicios')->orderBy('nombre')->pluck('nombre')->all();
+        $tiposConjuntoInstrumento = DB::table('tipo_conjunto')->orderBy('nombre_conjunto')->get(['id', 'codigo', 'nombre_conjunto', 'servicio_id']);
+        $serviciosFicha = DB::table('servicios')->orderBy('nombre')->get(['id', 'nombre']);
         $items = $this->catalogoItems();
         // Solo metadatos en el listado: los BYTEA se consultan al solicitar cada foto.
         $tieneImagen = Schema::hasColumn('instrumentos', 'imagen');
@@ -298,7 +186,7 @@ class CatalogoController extends Controller
             ? DB::table('instrumentos')->whereNotNull('imagen')->pluck('id')->flip()
             : collect();
         $instrumentos = DB::table('instrumentos')
-            ->select('id', 'nombre', 'tamano', 'codigo_fabricante')
+            ->select('id', 'nombre', 'tamano', 'codigo_fabricante', 'tipo_conjunto_id')
             ->orderBy('nombre')->get()
             ->map(function ($inst) use ($idsConImagen) {
                 return [
@@ -306,6 +194,7 @@ class CatalogoController extends Controller
                     'nombre' => $inst->nombre,
                     'tamano' => $inst->tamano,
                     'codigo' => $inst->codigo_fabricante,
+                    'tipo_conjunto_id' => $inst->tipo_conjunto_id,
                     'imagen_url' => $idsConImagen->has($inst->id)
                         ? url()->current().'?instrumento_imagen='.$inst->id : null,
                 ];
@@ -324,8 +213,195 @@ class CatalogoController extends Controller
                 'Otros',
             ],
             'servicios' => $servicios,
-            'areas' => collect($items)->pluck('area')->filter()->unique()->sort()->values()->all(),
+            'tiposConjuntoInstrumento' => $tiposConjuntoInstrumento,
+            'serviciosFicha' => $serviciosFicha,
         ]);
+    }
+
+    public function guardarInstrumento(Request $request)
+    {
+        // La ruta debe permanecer protegida por los middleware auth y acceso.
+        $datos = $request->validate([
+            'nombre' => ['required', 'string', 'max:200'],
+            'codigo_fabricante' => ['nullable', 'string', 'max:150'],
+            'tamano' => ['nullable', 'string', 'max:150'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'tipo_conjunto_id' => ['required', 'integer', 'exists:tipo_conjunto,id'],
+        ]);
+
+        $foto = $request->file('foto');
+        if ($foto && ! Schema::hasColumn('instrumentos', 'imagen')) {
+            return response()->json(['message' => 'La tabla instrumentos no tiene la columna imagen.'], 422);
+        }
+
+        $instrumento = DB::transaction(function () use ($datos, $foto) {
+            $registro = Instrumento::create([
+                'nombre' => trim($datos['nombre']),
+                'codigo_fabricante' => trim($datos['codigo_fabricante'] ?? '') ?: null,
+                'tamano' => trim($datos['tamano'] ?? '') ?: null,
+                'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
+            ]);
+            if ($foto) {
+                $hex = bin2hex(file_get_contents($foto->getRealPath()));
+                $mime = $foto->getMimeType();
+                $campoFormato = Schema::hasColumn('instrumentos', 'imagen_mime') ? 'imagen_mime'
+                    : (Schema::hasColumn('instrumentos', 'imagen_formato') ? 'imagen_formato' : null);
+                DB::update("UPDATE instrumentos SET imagen = decode(?, 'hex') WHERE id = ?", [$hex, $registro->id]);
+                if ($campoFormato) {
+                    DB::table('instrumentos')->where('id', $registro->id)->update([$campoFormato => $mime]);
+                }
+            }
+            return $registro;
+        });
+
+        return response()->json([
+            'message' => 'Instrumento registrado correctamente.',
+            'instrumento' => [
+                'id' => $instrumento->id,
+                'nombre' => $instrumento->nombre,
+                'codigo' => $instrumento->codigo_fabricante ?? '',
+                'tamano' => $instrumento->tamano ?? '',
+                'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
+                'imagen_url' => $foto ? route('mockups.catalogo.admin', ['instrumento_imagen' => $instrumento->id]) : null,
+            ],
+        ], 201);
+    }
+
+    public function actualizarInstrumento(Request $request, Instrumento $instrumento)
+    {
+        $datos = $request->validate([
+            'nombre' => ['required', 'string', 'max:200'],
+            'codigo_fabricante' => ['nullable', 'string', 'max:150'],
+            'tamano' => ['nullable', 'string', 'max:150'],
+            'tipo_conjunto_id' => ['required', 'integer', 'exists:tipo_conjunto,id'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'quitar_foto' => ['nullable', 'boolean'],
+        ]);
+
+        $foto = $request->file('foto');
+        $quitarFoto = (bool) ($datos['quitar_foto'] ?? false);
+        if (($foto || $quitarFoto) && ! Schema::hasColumn('instrumentos', 'imagen')) {
+            return response()->json(['message' => 'La tabla instrumentos no tiene la columna imagen.'], 422);
+        }
+
+        DB::transaction(function () use ($instrumento, $datos, $foto, $quitarFoto) {
+            $instrumento->update([
+                'nombre' => trim($datos['nombre']),
+                'codigo_fabricante' => trim($datos['codigo_fabricante'] ?? '') ?: null,
+                'tamano' => trim($datos['tamano'] ?? '') ?: null,
+                'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
+            ]);
+
+            $campoFormato = Schema::hasColumn('instrumentos', 'imagen_mime') ? 'imagen_mime'
+                : (Schema::hasColumn('instrumentos', 'imagen_formato') ? 'imagen_formato' : null);
+
+            if ($foto) {
+                $contenido = file_get_contents($foto->getRealPath());
+                $hex = bin2hex($contenido);
+                DB::update("UPDATE instrumentos SET imagen = decode(?, 'hex') WHERE id = ?", [$hex, $instrumento->id]);
+                if ($campoFormato) {
+                    DB::table('instrumentos')->where('id', $instrumento->id)
+                        ->update([$campoFormato => $foto->getMimeType()]);
+                }
+            } elseif ($quitarFoto) {
+                $cambios = ['imagen' => null];
+                if ($campoFormato) {
+                    $cambios[$campoFormato] = null;
+                }
+                DB::table('instrumentos')->where('id', $instrumento->id)->update($cambios);
+            }
+        });
+
+        $tieneImagen = Schema::hasColumn('instrumentos', 'imagen')
+            && DB::table('instrumentos')->where('id', $instrumento->id)->whereNotNull('imagen')->exists();
+
+        return response()->json([
+            'message' => 'Instrumento actualizado correctamente.',
+            'instrumento' => [
+                'id' => $instrumento->id,
+                'nombre' => $instrumento->nombre,
+                'codigo' => $instrumento->codigo_fabricante ?? '',
+                'tamano' => $instrumento->tamano ?? '',
+                'tipo_conjunto_id' => (int) $instrumento->tipo_conjunto_id,
+                'imagen_url' => $tieneImagen
+                    ? route('mockups.catalogo.admin', ['instrumento_imagen' => $instrumento->id, 'v' => now()->timestamp])
+                    : null,
+            ],
+        ]);
+    }
+
+
+    /** Registra o actualiza una ficha y su composición en una sola transacción. */
+    public function guardarFicha(Request $request, ?Ficha $ficha = null)
+    {
+        $datos = $request->validate([
+            'codigo' => ['required', 'string', 'max:100'],
+            'nombre' => ['required', 'string', 'max:255'],
+            'servicio_id' => ['required', 'integer', 'exists:servicios,id'],
+            'tipo_conjunto_id' => ['required', 'integer', 'exists:tipo_conjunto,id'],
+            'guia_visual' => ['nullable', 'boolean'],
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
+            'instrumentos' => ['required', 'array', 'min:1'],
+            'instrumentos.*.instrumento_id' => ['required', 'integer', 'distinct', 'exists:instrumentos,id'],
+            'instrumentos.*.cantidad' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $conjunto = DB::table('tipo_conjunto')->where('id', $datos['tipo_conjunto_id'])->first(['id', 'servicio_id', 'nombre_conjunto']);
+        if (!$conjunto || (int) $conjunto->servicio_id !== (int) $datos['servicio_id']) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['tipo_conjunto_id' => 'El tipo de conjunto no pertenece al servicio seleccionado.']);
+        }
+        $ids = collect($datos['instrumentos'])->pluck('instrumento_id')->all();
+        $validos = DB::table('instrumentos')->whereIn('id', $ids)->where('tipo_conjunto_id', $conjunto->id)->count();
+        if ($validos !== count($ids)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['instrumentos' => 'Hay instrumentos que no pertenecen al tipo de conjunto seleccionado.']);
+        }
+        $codigo = mb_strtoupper(trim($datos['codigo']));
+        $duplicado = DB::table('fichas')->whereRaw('UPPER(codigo) = ?', [$codigo]);
+        if ($ficha) $duplicado->where('id', '<>', $ficha->id);
+        if ($duplicado->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['codigo' => 'Este código ya está registrado.']);
+        }
+
+        $registro = DB::transaction(function () use ($datos, $codigo, $ficha) {
+            $valores = [
+                'codigo' => $codigo,
+                'nombre' => trim($datos['nombre']),
+                'servicio_id' => (int) $datos['servicio_id'],
+                'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
+                'guia_visual' => (bool) ($datos['guia_visual'] ?? false),
+                'updated_at' => now(),
+            ];
+            // El tipo de registro es "caja"; el conjunto específico se guarda por FK.
+            if (!$ficha) {
+                $valores['tipo'] = 'caja';
+                $valores['created_at'] = now();
+            }
+            if ($requestFoto = request()->file('foto')) {
+                // BYTEA de PostgreSQL: la conversión hex evita problemas con datos binarios.
+                $valores['imagen'] = DB::raw("decode('".bin2hex(file_get_contents($requestFoto->getRealPath()))."', 'hex')");
+                $valores['imagen_formato'] = $requestFoto->getMimeType();
+            }
+            if ($ficha) {
+                DB::table('fichas')->where('id', $ficha->id)->update($valores);
+                $id = $ficha->id;
+                DB::table('ficha_instrumentos')->where('ficha_id', $id)->delete();
+            } else {
+                $id = DB::table('fichas')->insertGetId($valores);
+            }
+            foreach ($datos['instrumentos'] as $orden => $linea) {
+                DB::table('ficha_instrumentos')->insert([
+                    'ficha_id' => $id,
+                    'instrumento_id' => (int) $linea['instrumento_id'],
+                    'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
+                    'cantidad' => (int) $linea['cantidad'],
+                    'orden' => $orden + 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+            return $id;
+        });
+        return response()->json(['message' => $ficha ? 'Ficha actualizada correctamente.' : 'Ficha creada correctamente.', 'id' => $registro]);
     }
 
     public function ficha(string $codigo): View
@@ -337,16 +413,15 @@ class CatalogoController extends Controller
         if ($registro !== null) {
             $item = [
                 'codigo' => $registro->codigo,
-                'codigo_referencia' => $registro->codigo_referencia,
-                'numero' => $registro->numero,
                 'nombre' => $registro->nombre,
-                'tipo' => $registro->tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica',
-                'servicio' => $registro->area ?: ($registro->servicioClinico?->nombre ?? 'Central'),
-                'guia' => $registro->items->isNotEmpty(),
+                'tipo' => $registro->tipo === 'set' ? 'Set quirúrgico' : ($registro->tipo === 'caja' ? 'Caja quirúrgica' : $registro->tipo),
+                'servicio' => $registro->servicioClinico?->nombre ?? 'Sin servicio asignado',
+                'guia' => (bool) $registro->guia_visual,
                 'instrumentos' => $registro->items->map(function ($linea): array {
                     $tamano = trim((string) $linea->instrumento?->tamano);
 
                     return [
+                        'id' => $linea->instrumento_id,
                         'codigo' => $linea->instrumento?->codigo_fabricante ?? '',
                         'nombre' => trim(($linea->instrumento?->nombre ?? '').($tamano !== '' ? ' '.$tamano : '')),
                         'cantidad' => $linea->cantidad,
@@ -382,18 +457,8 @@ class CatalogoController extends Controller
             return true;
         }
 
-        $numero = ltrim((string) preg_replace('/\D/', '', (string) ($item['numero'] ?? '')), '0');
-        $pedido = ltrim((string) preg_replace('/\D/', '', $needle), '0');
-        if ($numero !== '' && $pedido !== '' && $numero === $pedido && preg_match('/^#?\s*0*\d+$/u', $needle) === 1) {
-            return true;
-        }
-
         $texto = mb_strtolower(implode(' ', array_filter([
             $item['codigo'] ?? '',
-            $item['codigo_referencia'] ?? '',
-            $item['numero'] ?? '',
-            $numero,
-            str_pad($numero, 2, '0', STR_PAD_LEFT),
             $item['nombre'] ?? '',
             $item['servicio'] ?? '',
             $item['tipo'] ?? '',

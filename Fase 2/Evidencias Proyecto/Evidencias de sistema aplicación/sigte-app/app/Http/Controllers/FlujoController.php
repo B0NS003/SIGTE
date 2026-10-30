@@ -7,6 +7,9 @@ use App\Models\Caja;
 use App\Models\ConsumoServicio;
 use App\Models\Entrega;
 use App\Models\EntregaCaja;
+use App\Models\Ficha;
+use App\Models\Servicio;
+use App\Models\TipoConjunto;
 use App\Models\Insumo;
 use App\Models\Rol;
 use App\Models\User;
@@ -284,14 +287,108 @@ class FlujoController extends Controller
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');
     }
+    /** Selección real de fichas desde el catálogo para iniciar una recepción. */
     public function recepcion(): View
     {
+        // Solo servicios con fichas ligadas: sin catálogo el paso 2 queda vacío y parece “roto”.
+        $serviciosConCatalogo = Ficha::query()
+            ->whereNotNull('servicio_id')
+            ->whereNotNull('tipo_conjunto_id')
+            ->distinct()
+            ->pluck('servicio_id');
+        $servicios = Servicio::query()
+            ->whereIn('id', $serviciosConCatalogo)
+            ->orderBy('nombre')
+            ->get(['id', 'nombre']);
+        $tipos = TipoConjunto::query()->orderBy('nombre_conjunto')
+            ->get(['id', 'servicio_id', 'nombre_conjunto']);
+        $fichas = Ficha::query()->withSum('items as piezas', 'cantidad')
+            ->whereNotNull('servicio_id')
+            ->whereNotNull('tipo_conjunto_id')
+            ->orderBy('nombre')->get(['id', 'codigo', 'nombre', 'servicio_id', 'tipo_conjunto_id', 'guia_visual']);
+
         return view('flujo.recepcion', [
             'usuario' => $this->usuarioSesion(),
-            'servicios' => ['Pabellon', 'Urgencia', 'Maternidad', 'UCI', 'Curaciones', 'Otro servicio'],
-            'tipos' => ['Set quirurgico', 'Caja de curacion', 'Contenedor', 'Paquete grado medico'],
+            'servicios' => $servicios,
+            'tiposConjunto' => $tipos,
+            'fichasCatalogo' => $fichas,
+            'puesto' => User::quienRegistra(),
         ]);
     }
+
+    /** Crea la caja del flujo únicamente a partir de una ficha válida del catálogo. */
+    public function guardarRecepcion(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'servicio_id' => ['required', 'integer', 'exists:servicios,id'],
+            'tipo_conjunto_id' => ['required', 'integer', 'exists:tipo_conjunto,id'],
+            'ficha_id' => ['required', 'integer', 'exists:fichas,id'],
+            'quien_entrega' => ['required', 'string', 'max:150'],
+            'obs' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'servicio_id.required' => 'Selecciona el servicio de origen.',
+            'tipo_conjunto_id.required' => 'Selecciona el tipo de conjunto.',
+            'ficha_id.required' => 'Selecciona una caja del catálogo.',
+            'quien_entrega.required' => 'Escribe el nombre de quien entrega el material.',
+        ]);
+
+        if ($aviso = $this->faltaPuesto()) {
+            return back()->withInput()->withErrors(['puesto' => $aviso]);
+        }
+
+        $ficha = Ficha::query()->findOrFail($datos['ficha_id']);
+        $tipo = TipoConjunto::query()->findOrFail($datos['tipo_conjunto_id']);
+        if ((int) $tipo->servicio_id !== (int) $datos['servicio_id']
+            || (int) $ficha->servicio_id !== (int) $datos['servicio_id']
+            || (int) $ficha->tipo_conjunto_id !== (int) $tipo->id) {
+            return back()->withInput()->withErrors(['ficha_id' => 'La caja no corresponde al servicio y tipo seleccionados.']);
+        }
+        if (Caja::query()->where('codigo', $ficha->codigo)->exists()) {
+            return back()->withInput()->withErrors(['ficha_id' => 'Esta caja ya está registrada en el flujo. No puede ingresarse dos veces.']);
+        }
+
+        $marca = $this->marca();
+        try {
+            DB::transaction(function () use ($ficha, $datos, $marca): void {
+                // Bloquea la fila para evitar dos recepciones simultáneas del mismo código.
+                $existente = Caja::query()->where('codigo', $ficha->codigo)->lockForUpdate()->first();
+                if ($existente !== null) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'ficha_id' => 'Esta caja ya está registrada en el flujo.',
+                    ]);
+                }
+                $caja = Caja::query()->create([
+                    'codigo' => $ficha->codigo,
+                    'ficha_id' => $ficha->id,
+                    'servicio_id' => $ficha->servicio_id,
+                    'etapa' => Caja::ETAPA_RECEPCION,
+                    'ubicacion' => 'Área sucia',
+                    'estado' => 'En Recepción',
+                    'actividad' => null,
+                    'urgente' => false,
+                    'responsable_id' => $marca['user_id'],
+                    'etapa_desde' => now(),
+                ]);
+                $detalle = 'Recepción. Entrega: '.trim($datos['quien_entrega']).'.';
+                if (!empty($datos['obs'])) {
+                    $detalle .= ' Observación: '.trim($datos['obs']);
+                }
+                $caja->anotaciones()->create([
+                    'user_id' => $marca['user_id'],
+                    'texto' => $detalle,
+                ]);
+            });
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withInput()->withErrors(['ficha_id' => 'No se pudo registrar la recepción. Revisa los datos e inténtalo nuevamente.']);
+        }
+
+        return redirect()->route('mockups.recepcion')
+            ->with('recepcion_ok', 'La caja '.$ficha->codigo.' — '.$ficha->nombre.' fue registrada correctamente en la etapa Recepción. Entregada por: '.trim($datos['quien_entrega']).'.');
+    }
+
     public function avanzar(Request $request): RedirectResponse
     {
         return redirect()->route('mockups.panel', array_filter([

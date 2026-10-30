@@ -5,7 +5,10 @@ namespace Database\Seeders;
 use App\Models\Ficha;
 use App\Models\FichaInstrumento;
 use App\Models\Instrumento;
+use App\Models\Servicio;
+use App\Models\TipoConjunto;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class FichaSeeder extends Seeder
 {
@@ -27,14 +30,18 @@ class FichaSeeder extends Seeder
                 continue;
             }
 
+            $tipo = ($ficha['tipo'] ?? 'caja') === 'set' ? 'set' : 'caja';
+            $servicioId = $this->servicioIdParaArea($this->area((string) ($ficha['hoja'] ?? '')));
+            $tipoConjuntoId = $this->tipoConjuntoId($servicioId, $tipo);
+
             $registro = Ficha::query()->updateOrCreate(
                 ['codigo' => $ficha['codigo']],
                 [
                     'nombre' => $nombre,
-                    'numero' => ($ficha['numero'] ?? '') !== '' ? (string) $ficha['numero'] : null,
-                    'codigo_referencia' => ($ficha['codigo_referencia'] ?? '') !== '' ? (string) $ficha['codigo_referencia'] : null,
-                    'tipo' => ($ficha['tipo'] ?? 'caja') === 'set' ? 'set' : 'caja',
-                    'area' => $this->area((string) ($ficha['hoja'] ?? '')),
+                    'tipo' => $tipo,
+                    'servicio_id' => $servicioId,
+                    'tipo_conjunto_id' => $tipoConjuntoId,
+                    'guia_visual' => false,
                 ]
             );
 
@@ -75,6 +82,34 @@ class FichaSeeder extends Seeder
         }
 
         return self::AREAS[$clave] ?? 'Cirugía general';
+    }
+
+    private function servicioIdParaArea(string $area): int
+    {
+        $nombre = match (true) {
+            str_contains($area, 'Dental') => 'Dental',
+            str_contains($area, 'Ginecología') || str_contains($area, 'obstetricia') => 'Maternidad',
+            str_contains($area, 'Urgencia') => 'Urgencia',
+            default => 'Pabellon',
+        };
+
+        return (int) (Servicio::query()->where('nombre', $nombre)->value('id')
+            ?? Servicio::query()->where('codigo', 'general')->value('id')
+            ?? Servicio::query()->value('id'));
+    }
+
+    private function tipoConjuntoId(int $servicioId, string $tipo): int
+    {
+        $codigo = Str::slug($tipo.'-'.$servicioId, '_');
+        $nombre = $tipo === 'set' ? 'Set quirúrgico' : 'Caja quirúrgica';
+
+        return (int) TipoConjunto::query()->firstOrCreate(
+            ['codigo' => $codigo],
+            [
+                'nombre_conjunto' => $nombre,
+                'servicio_id' => $servicioId,
+            ]
+        )->id;
     }
 
     /** @var array<string, string> */

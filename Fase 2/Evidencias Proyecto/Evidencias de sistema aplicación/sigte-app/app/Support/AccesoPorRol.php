@@ -16,6 +16,7 @@ class AccesoPorRol
      */
     private const RUTAS = [
         'mockups.recepcion' => [Rol::OPERADOR],
+        'mockups.recepcion.guardar' => [Rol::OPERADOR],
         'mockups.avanzar' => [Rol::OPERADOR],
         'mockups.avanzar.guardar' => [Rol::OPERADOR],
         'mockups.retroceder' => [Rol::OPERADOR],
@@ -26,6 +27,10 @@ class AccesoPorRol
         'mockups.entrega.registrar' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.fichas.guardar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.fichas.actualizar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.instrumentos.guardar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.instrumentos.actualizar' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
 
         /** Inventario */
