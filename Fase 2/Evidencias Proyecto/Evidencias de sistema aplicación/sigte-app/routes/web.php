@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
             ->whereIn('rol', ['administradora', 'enfermera', 'operador', 'secretaria'])
             ->name('mockups.panel');
         Route::get('/operador/recepcion', [FlujoController::class, 'recepcion'])->name('mockups.recepcion');
+        Route::post('/operador/recepcion', [FlujoController::class, 'guardarRecepcion'])->name('mockups.recepcion.guardar');
         Route::get('/operador/avanzar', [FlujoController::class, 'avanzar'])->name('mockups.avanzar');
         Route::post('/operador/avanzar', [FlujoController::class, 'guardarAvance'])->name('mockups.avanzar.guardar');
         Route::post('/operador/retroceder', [FlujoController::class, 'guardarRetroceso'])->name('mockups.retroceder');
