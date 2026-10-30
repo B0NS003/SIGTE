@@ -102,6 +102,7 @@ class InventarioController extends Controller
             'usuario' => $this->usuarioSesion(),
             'rol' => $rol,
             'esAdministradora' => $rol === Rol::ADMINISTRADORA,
+            'esEnfermera' => $rol === Rol::ENFERMERA,
             'puedeReponer' => in_array($rol, [Rol::ENFERMERA, Rol::ADMINISTRADORA], true),
             'elemento' => trim((string) request()->query('elemento', '')),
             'busqueda' => $busqueda,

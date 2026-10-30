@@ -48,18 +48,28 @@ $totalElementos = collect($libros)->sum('tipos');
     <main class="main inv-vista sala-{{ $sala }}">
         <div class="main-top">
             <div>
+                <!-- ROL ADMINISTRADORA -->
                 @if ($esAdministradora)
                 <h1>Inventario</h1>
                 <p class="main-sub">
                     Supervisa el stock disponible, identifica elementos bajo mínimo y revisa el estado de las salas.
                 </p>
-                @else
-                <p class="eyebrow">Consulta · tres libros</p>
+
+                <!-- ROL ENFERMERA DE TURNO -->
+                @elseif ($esEnfermera)
                 <h1>Inventario</h1>
                 <p class="main-sub">
-                    Elige un libro, revisa el stock y, si hace falta, registra la reposición debajo.
+                    Supervisa el stock de las salas, identifica elementos bajo mínimo y gestiona las reposiciones durante el turno.
+                </p>
+
+                <!-- ROL OPERADOR -->
+                @else
+                <h1>Inventario</h1>
+                <p class="main-sub">
+                    Consulta la disponibilidad y ubicación de los elementos para apoyar las tareas diarias de la Central.
                 </p>
                 @endif
+
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">
@@ -82,7 +92,7 @@ $totalElementos = collect($libros)->sum('tipos');
                     <span class="inv-tarjeta-encabezado">
                         <strong>Los tres</strong>
 
-                        @if ($esAdministradora && count($atencion) > 0)
+                        @if (($esAdministradora || $esEnfermera) && count($atencion) > 0)
                         <span class="inv-campana-alertas"
                             aria-label="{{ count($atencion) }} elementos requieren atención"
                             title="{{ count($atencion) }} elementos requieren atención">
@@ -218,7 +228,11 @@ $totalElementos = collect($libros)->sum('tipos');
                             <th>Mínimo</th>
                             <th>En proceso</th>
                             <th>Estado</th>
+
+                            <!-- ESTE BOTÓN SOLO APARECE PARA ADMIN Y ENFERMERA -->
+                            @if ($puedeReponer)
                             <th>Acción</th>
+                            @endif
                         </tr>
                     </thead>
 
@@ -251,38 +265,38 @@ $totalElementos = collect($libros)->sum('tipos');
                             </td>
 
                             <!-- BOTÓN DE EDITAR ELEMENTOS -->
-                            <td class="inv-accion">
-                                @if ($puedeReponer)
-                                <button
-                                    type="button"
-                                    class="inv-editar-stock"
-                                    data-codigo="{{ $item['codigo'] }}"
-                                    data-sala="{{ $item['sala'] }}"
-                                    data-nombre="{{ $item['nombre'] }}"
-                                    data-stock="{{ $item['stock'] }}"
-                                    data-minimo="{{ $item['minimo'] }}"
-                                    aria-label="Registrar reposición de {{ $item['nombre'] }}"
-                                    title="Registrar reposición">
-                                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 15.5v4z"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.75"
-                                            stroke-linejoin="round" />
-                                        <path d="m14.5 7.5 2 2"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.75"
-                                            stroke-linecap="round" />
-                                    </svg>
-                                </button>
-                                @endif
-                            </td>
+                            @if ($puedeReponer)
+                                <td class="inv-accion">
+                                    <button
+                                        type="button"
+                                        class="inv-editar-stock"
+                                        data-codigo="{{ $item['codigo'] }}"
+                                        data-sala="{{ $item['sala'] }}"
+                                        data-nombre="{{ $item['nombre'] }}"
+                                        data-stock="{{ $item['stock'] }}"
+                                        data-minimo="{{ $item['minimo'] }}"
+                                        aria-label="Registrar reposición de {{ $item['nombre'] }}"
+                                        title="Registrar reposición">
+                                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 15.5v4z"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.75"
+                                                stroke-linejoin="round" />
+                                            <path d="m14.5 7.5 2 2"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.75"
+                                                stroke-linecap="round" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                            @endif
                         </tr>
                         @endforeach
 
                         <tr id="inv-sin-resultados" hidden>
-                            <td colspan="8" class="text-center">
+                            <td colspan="{{ $puedeReponer ? 8 : 7 }}" class="text-center">
                                 No se encontraron elementos que coincidan con tu búsqueda.
                             </td>
                         </tr>
