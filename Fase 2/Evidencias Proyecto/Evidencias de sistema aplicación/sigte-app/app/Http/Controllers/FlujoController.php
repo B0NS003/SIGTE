@@ -8,7 +8,6 @@ use App\Models\ConsumoServicio;
 use App\Models\Entrega;
 use App\Models\EntregaCaja;
 use App\Models\Insumo;
-use App\Models\Personal;
 use App\Models\Rol;
 use App\Models\User;
 use App\Http\Controllers\Concerns\ConsultaDeCajas;
@@ -198,7 +197,7 @@ class FlujoController extends Controller
         if ($rol === Rol::SECRETARIA) {
             $inicio = now()->startOfMonth()->toDateString();
             $delMes = ConsumoServicio::query()->whereDate('periodo', $inicio)->get();
-            $insumos = Insumo::query()->get();
+            $insumos = Insumo::query()->with('salaFisica')->get();
             return view('secretaria.panel', [
                 'usuario' => $usuario,
                 'resumen' => [
@@ -347,11 +346,9 @@ class FlujoController extends Controller
         $caja->proceso_hasta = null;
         $marca = $this->marca();
         $caja->responsable_id = $marca['user_id'];
-        $caja->personal_id = $marca['personal_id'];
         $caja->save();
         $caja->anotaciones()->create([
             'user_id' => $marca['user_id'],
-            'personal_id' => $marca['personal_id'],
             'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
         ]);
         Auditoria::registrar(
@@ -406,18 +403,15 @@ class FlujoController extends Controller
                 $caja->proceso_desde = null;
                 $caja->proceso_hasta = null;
                 $caja->responsable_id = $marca['user_id'];
-                $caja->personal_id = $marca['personal_id'];
                 $caja->save();
                 $caja->retrocesos()->create([
                     'user_id' => $marca['user_id'],
-                    'personal_id' => $marca['personal_id'],
                     'etapa_desde' => $origen,
                     'etapa_hacia' => $anterior,
                     'motivo' => $motivo,
                 ]);
                 $caja->anotaciones()->create([
                     'user_id' => $marca['user_id'],
-                    'personal_id' => $marca['personal_id'],
                     'texto' => 'Volvió a '.Caja::etiquetaEtapa($anterior).'. '.$motivo,
                 ]);
             });
@@ -509,10 +503,8 @@ class FlujoController extends Controller
             $nota = DB::transaction(function () use ($caja, $texto, $actividad, $minutos, $marca) {
                 $nota = $caja->anotaciones()->create([
                     'user_id' => $marca['user_id'],
-                    'personal_id' => $marca['personal_id'],
                     'texto' => $texto,
                 ]);
-                $caja->personal_id = $marca['personal_id'] ?? $caja->personal_id;
                 $caja->responsable_id = $marca['user_id'];
                 $caja->actividad = mb_substr($actividad, 0, 80);
                 if ($minutos !== null) {
@@ -547,7 +539,7 @@ class FlujoController extends Controller
     {
         $grupos = [];
         CajaAnotacion::query()
-            ->with(['caja:id,codigo', 'autor:id,name', 'persona:id,nombre'])
+            ->with(['caja:id,codigo', 'autor:id,name'])
             ->orderBy('id')
             ->get()
             ->each(function (CajaAnotacion $nota) use (&$grupos): void {
@@ -836,15 +828,13 @@ class FlujoController extends Controller
         return null;
     }
 
-    /** @return array{user_id: int|null, personal_id: int|null} */
+    /** @return array{user_id: int|null} */
     private function marca(): array
     {
         $quien = User::quienRegistra();
-        $ficha = $quien === null ? null : Personal::query()->where('email', $quien->email)->first();
 
         return [
             'user_id' => $quien?->id ?? Auth::id(),
-            'personal_id' => $ficha?->id,
         ];
     }
 

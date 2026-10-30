@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Database\Seeders;
 
@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->sembrarNomina();
         $this->sembrarInventario();
         $this->sembrarInsumosSecretaria();
+        $this->call(FichaSeeder::class);
         $this->limpiarFlujo();
         $this->simularDosSemanas();
     }

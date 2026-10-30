@@ -7,6 +7,7 @@ use App\Models\ElementoInventario;
 use App\Models\Reposicion;
 use App\Models\Rol;
 use App\Support\Auditoria;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,10 +22,11 @@ class InventarioController extends Controller
     private function inventarioItems(): array
     {
         return ElementoInventario::query()
+            ->with('salaFisica')
             ->orderBy('nombre')
             ->get()
             ->map(fn (ElementoInventario $elemento) => [
-                'sala' => $elemento->sala,
+                'sala' => $elemento->codigoSala(),
                 'codigo' => $elemento->codigo,
                 'nombre' => $elemento->nombre,
                 'ubicacion' => $elemento->ubicacion,
@@ -60,29 +62,48 @@ class InventarioController extends Controller
                 'en_proceso' => (int) $delLibro->sum('en_proceso'),
             ];
         }
-        $filtrados = $sala === 'todos'
-            ? []
+
+        $itemsSala = $sala === 'todos'
+            ? collect()
             : collect($items)
                 ->where('sala', $sala)
-                ->sortBy(fn (array $item) => ['critico' => 0, 'bajo' => 1, 'ok' => 2][$item['estado']] ?? 9)
-                ->values()
-                ->all();
-        if ($sala !== 'todos' && $busqueda !== '') {
-            $needle = mb_strtolower($busqueda);
-            $filtrados = array_values(array_filter(
-                $filtrados,
-                function (array $item) use ($needle): bool {
-                    $texto = mb_strtolower(
-                        $item['codigo'].' '.$item['nombre'].' '.$item['ubicacion']
-                    );
-                    return str_contains($texto, $needle);
-                }
-            ));
-        }
-        $atencion = collect($items)->whereIn('estado', ['bajo', 'critico'])->values()->all();
+                ->sortBy(fn(array $item) => [
+                    'crítico' => 0,
+                    'bajo' => 1,
+                    'ok' => 2,
+                ][$item['estado']] ?? 9)
+                ->values();
+
+        $filtrados = $itemsSala->all();
+
+        /* JERARQUÍA PARA EL ELEMENTO A REPONER */
+        $atencion = collect($items)
+            ->whereIn('estado', ['bajo', 'critico'])
+            ->sortBy(function ($item) {
+                $prioridadEstado = [
+                    'critico' => 0,
+                    'bajo' => 1,
+                ][$item['estado']] ?? 2;
+
+                $stock = (float) $item['stock'];
+                $minimo = (float) $item['minimo'];
+
+                // Calcula cuánto stock hay en relación con el mínimo requerido.
+                $proporcionStock = $minimo > 0
+                    ? $stock / $minimo
+                    : 1;
+
+                return [$prioridadEstado, $proporcionStock];
+            })
+            ->values()
+            ->all();
+
         $rol = Auth::user()->nombreRol();
         return view('inventario.index', [
             'usuario' => $this->usuarioSesion(),
+            'rol' => $rol,
+            'esAdministradora' => $rol === Rol::ADMINISTRADORA,
+            'esEnfermera' => $rol === Rol::ENFERMERA,
             'puedeReponer' => in_array($rol, [Rol::ENFERMERA, Rol::ADMINISTRADORA], true),
             'elemento' => trim((string) request()->query('elemento', '')),
             'busqueda' => $busqueda,
@@ -95,10 +116,11 @@ class InventarioController extends Controller
                 : collect($items)->where('sala', $sala)->values()->all(),
             'atencion' => $atencion,
             'resumen' => [
-                'tipos' => count($filtrados),
-                'bajo_minimo' => collect($filtrados)->whereIn('estado', ['bajo', 'critico'])->count(),
-                'en_almacen' => collect($filtrados)->sum('stock'),
-                'en_proceso' => collect($filtrados)->sum('en_proceso'),
+                'tipos' => $itemsSala->count(),
+                'bajo_minimo' => $itemsSala
+                    ->whereIn('estado', ['bajo', 'critico'])->count(),
+                'en_almacen' => $itemsSala->sum('stock'),
+                'en_proceso' => $itemsSala->sum('en_proceso'),
             ],
             'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
             'hora' => now()->timezone('America/Santiago')->format('H:i'),
@@ -106,14 +128,14 @@ class InventarioController extends Controller
                 ? collect()
                 : Reposicion::query()
                     ->with(['elemento', 'autor'])
-                    ->whereHas('elemento', fn ($consulta) => $consulta->where('sala', $sala))
+                    ->whereHas('elemento.salaFisica', fn ($consulta) => $consulta->where('codigo', $sala))
                     ->latest()
                     ->limit(8)
                     ->get(),
         ]);
     }
 
-    public function registrarReposicion(Request $request): RedirectResponse
+    public function registrarReposicion(Request $request): JsonResponse|RedirectResponse
     {
         $datos = $request->validate([
             'sala' => ['required', 'in:lavado,armado,esteril'],
@@ -130,11 +152,18 @@ class InventarioController extends Controller
         ]);
 
         $elemento = ElementoInventario::query()
-            ->where('sala', $datos['sala'])
+            ->whereHas('salaFisica', fn ($consulta) => $consulta->where('codigo', $datos['sala']))
             ->where('codigo', $datos['elemento'])
             ->first();
 
         if ($elemento === null) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'Elige el elemento que se repone.',
+                ], 422);
+            }
+
             return back()
                 ->withInput()
                 ->withErrors(['elemento' => 'Elige el elemento que se repone.']);
@@ -157,6 +186,13 @@ class InventarioController extends Controller
         } catch (Throwable $e) {
             report($e);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'No fue posible registrar la reposición. La cantidad disponible no cambió.',
+                ], 500);
+            }
+
             return back()
                 ->withInput()
                 ->withErrors([
@@ -178,11 +214,52 @@ class InventarioController extends Controller
             $mensaje .= ' Sigue bajo el mínimo ('.$elemento->minimo.').';
         }
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'mensaje' => $mensaje,
+                'elemento' => [
+                    'stock' => (int) $elemento->stock,
+                    'minimo' => (int) $elemento->minimo,
+                    'codigo' => $elemento->codigo,
+                    'sala' => $elemento->codigoSala(),
+                ],
+            ]);
+        }
+
         return redirect()
             ->route('mockups.inventario', [
-                'sala' => $elemento->sala,
+                'sala' => $elemento->codigoSala(),
                 'elemento' => $elemento->codigo,
             ])
             ->with('ok', $mensaje);
+    }
+    
+    public function historialElemento(string $sala, string $codigo)
+    {
+
+        $elemento = ElementoInventario::query()
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $sala))
+            ->where('codigo', $codigo)
+            ->firstOrFail();
+            
+        $reposiciones = Reposicion::query()
+            ->with('autor')
+            ->where('elemento_inventario_id', $elemento->id)
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(fn (Reposicion $reposicion) => [
+                'cantidad' => $reposicion->cantidad,
+                'fecha' => $reposicion->created_at
+                    ->timezone('America/Santiago')
+                    ->format('d/m/Y · H:i'),
+                'autor' => $reposicion->autor?->name ?? 'Sin usuario',
+            ]);
+            
+        return response()->json([
+            'elemento' => $elemento->nombre,
+            'historial' => $reposiciones,
+        ]);
     }
 }

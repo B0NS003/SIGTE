@@ -10,10 +10,10 @@ class MovimientoInsumo extends Model
     public const ENTRADA = 'entrada';
     public const SALIDA = 'salida';
 
-    protected $table = 'movimientos_insumo';
+    protected $table = 'movimientos_inventario';
 
     protected $fillable = [
-        'insumo_id',
+        'elemento_inventario_id',
         'tipo',
         'cantidad',
         'observacion',
@@ -29,7 +29,7 @@ class MovimientoInsumo extends Model
 
     public function insumo(): BelongsTo
     {
-        return $this->belongsTo(Insumo::class);
+        return $this->belongsTo(ElementoInventario::class, 'elemento_inventario_id');
     }
 
     public function autor(): BelongsTo

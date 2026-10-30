@@ -104,7 +104,7 @@
                     <select id="insumo_id" name="insumo_id" required>
                         @foreach ($insumos as $item)
                             <option value="{{ $item->id }}" @selected((string) old('insumo_id') === (string) $item->id)>
-                                {{ $item->codigo }} — {{ $item->nombre }} ({{ $item->stock }})
+                                {{ $item->salaFisica?->nombre }} · {{ $item->codigo }} — {{ $item->nombre }} ({{ $item->stock }})
                             </option>
                         @endforeach
                     </select>

@@ -18,14 +18,14 @@ class Caja extends Model
 
     protected $fillable = [
         'codigo',
-        'servicio',
+        'ficha_id',
+        'servicio_id',
         'etapa',
         'ubicacion',
         'estado',
         'actividad',
         'urgente',
         'responsable_id',
-        'personal_id',
         'etapa_desde',
         'proceso_desde',
         'proceso_hasta',
@@ -43,14 +43,24 @@ class Caja extends Model
         ];
     }
 
+    public function ficha(): BelongsTo
+    {
+        return $this->belongsTo(Ficha::class, 'ficha_id');
+    }
+
+    public function servicioClinico(): BelongsTo
+    {
+        return $this->belongsTo(Servicio::class, 'servicio_id');
+    }
+
+    public function getServicioAttribute(): string
+    {
+        return $this->servicioClinico?->nombre ?? '';
+    }
+
     public function responsable(): BelongsTo
     {
         return $this->belongsTo(User::class, 'responsable_id');
-    }
-
-    public function persona(): BelongsTo
-    {
-        return $this->belongsTo(Personal::class, 'personal_id');
     }
 
     public function anotaciones(): HasMany
@@ -125,10 +135,6 @@ class Caja extends Model
 
     public function nombreResponsable(): string
     {
-        if ($this->persona?->nombre) {
-            return $this->persona->nombre;
-        }
-
         $responsable = $this->responsable;
         if ($responsable !== null && $responsable->esCuentaDelPuesto()) {
             $enPuesto = User::quienRegistra();

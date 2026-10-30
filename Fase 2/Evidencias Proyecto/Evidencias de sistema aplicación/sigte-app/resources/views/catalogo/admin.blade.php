@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="{{ asset('css/catalogo.css') }}?v={{ @filemtime(public_path('css/catalogo.css')) }}">
 @endpush
 
-@section('title', 'SIGTE — Mantener catálogo')
+@section('title', 'SIGTE — Administrar catálogo')
 
 @section('content')
 <div class="shell">
@@ -32,14 +32,29 @@
         <div class="main-top">
             <div>
                 <p class="eyebrow">Gestión · solo administradora</p>
-                <h1>Mantener catálogo</h1>
-                <p class="main-sub">Las mismas fichas que ve el servicio. Acá se arman, se corrigen y se retiran.</p>
-            </div>
-            <div class="main-actions">
-                <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">Ver catálogo de consulta</a>
+                <h1>Administrar catálogo</h1>
+                <p class="main-sub">Gestiona fichas quirúrgicas e instrumentos desde un solo lugar.</p>
             </div>
         </div>
 
+        <nav class="admin-tabs" aria-label="Secciones de administración del catálogo" role="tablist">
+            <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" data-tab="catalogo">Catálogo</button>
+            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="instrumentos">Instrumentos</button>
+            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nueva-ficha">+ Nueva ficha</button>
+            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-instrumento">+ Nuevo instrumento</button>
+        </nav>
+        <div class="admin-panel-tab" id="tab-catalogo" role="tabpanel">
+            <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-fichas"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Buscar por código, nombre, tipo o área…" autocomplete="off"></label></div>
+            <div class="admin-filter-sections">
+                <section class="admin-filter-section">
+                    <button class="ops-filter-label admin-filter-toggle" type="button" aria-expanded="false" aria-controls="filtros-servicio" data-filter-toggle="servicio"><span class="admin-filter-chevron" aria-hidden="true">▸</span> Filtrar por servicio</button>
+                    <div class="ops-filters" id="filtros-servicio" aria-label="Filtrar fichas por servicio" hidden></div>
+                </section>
+                <section class="admin-filter-section">
+                    <button class="ops-filter-label admin-filter-toggle" type="button" aria-expanded="true" aria-controls="filtros-area" data-filter-toggle="area"><span class="admin-filter-chevron" aria-hidden="true">▾</span> Filtrar por área</button>
+                    <div class="ops-filters" id="filtros-area" aria-label="Filtrar fichas por área"></div>
+                </section>
+            </div>
         <section class="mant-vitrina">
             <div class="mant-head">
                 <div>
@@ -50,14 +65,15 @@
             </div>
             <div class="cat-grid" id="fichas-mural">
                 @foreach ($items as $item)
-                    <article class="cat-card mant-card" data-estado="vigente" data-guia="{{ $item['guia'] ? '1' : '0' }}">
+                    <article class="cat-card mant-card" data-estado="vigente" data-servicio="{{ $item['servicio_real'] ?? 'Sin servicio asignado' }}" data-area="{{ $item['area'] ?? $item['servicio'] }}" data-guia="{{ $item['guia'] ? '1' : '0' }}">
                         <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
                             <span class="js-guia-label">{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
                         </div>
                         <div class="cat-body">
                             <strong class="js-codigo">{{ $item['codigo'] }}</strong>
                             <h2 class="js-nombre">{{ $item['nombre'] }}</h2>
-                            <p class="js-detalle">{{ $item['servicio'] }} · {{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
+                            <span class="cat-servicio js-servicio">{{ $item['area'] ?? $item['servicio'] }}</span>
+                            <p class="js-detalle">{{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</p>
                             <div class="mant-acciones">
                                 <button class="btn btn-ghost js-editar" type="button">Editar</button>
                                 <button class="btn btn-ghost js-retirar" type="button">Retirar</button>
@@ -67,78 +83,440 @@
                 @endforeach
             </div>
         </section>
+        </div>
 
+        <section class="admin-panel-tab" id="tab-instrumentos" role="tabpanel" hidden>
+            <div class="mant-head"><div><h2>Instrumentos registrados</h2><p>Consulta los instrumentos utilizados en las fichas.</p></div><span class="badge" id="instrumentos-cuenta">0</span></div>
+            <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-instrumentos"><span aria-hidden="true">⌕</span><input type="search" id="buscar-instrumentos" placeholder="Buscar instrumento por nombre o código…" autocomplete="off"></label></div>
+            <section class="admin-instrument-section">
+                <div class="admin-instrument-section-head">
+                    <div><h3>Instrumentos</h3><p id="instrumentos-meta">Instrumentos registrados</p></div>
+                    <div class="admin-instrument-view" role="group" aria-label="Tipo de visualización">
+                        <button type="button" class="admin-view-btn is-active" data-instrument-view="cards" aria-pressed="true">▦ Vista de tarjetas</button>
+                        <button type="button" class="admin-view-btn" data-instrument-view="list" aria-pressed="false">☷ Vista de lista</button>
+                    </div>
+                </div>
+                <div class="admin-instrument-grid" id="instrumentos-mural"></div>
+                <p class="admin-empty" id="instrumentos-vacio" hidden>No se encontraron instrumentos.</p>
+            </section>
+        </section>
+
+        <div class="admin-panel-tab" id="tab-nueva-ficha" role="tabpanel" hidden>
+        <div class="mant-head"><div><h2 id="ficha-encabezado">Crear nueva ficha</h2><p>Registra los datos generales y el contenido de la caja.</p></div></div>
         <form class="mant-editor ficha-admin" id="ficha-form" action="{{ route('mockups.catalogo.admin') }}" method="get" onsubmit="return false">
-            <div class="ficha-layout">
-                <section class="ficha-guia is-empty" id="preview-guia" aria-label="Así se ve la ficha">
-                    <span class="ficha-kicker" id="preview-kicker">Sin guía visual</span>
-                    <strong id="preview-titulo">Así la va a ver el servicio</strong>
-                    <p id="preview-texto">Si la caja no tiene foto, igual se puede crear. La lista de piezas alcanza.</p>
-                    <div class="ficha-mosaico" id="preview-mosaico"></div>
+            <div class="ficha-layout ficha-layout-redisenada">
+                <section class="panel ficha-preview-panel" aria-label="Vista previa de la ficha">
+                    <h2>Vista previa de la ficha</h2>
+                    <div class="ficha-preview-content">
+                        <div class="ficha-preview-photo" id="preview-guia">
+                            <span class="ficha-preview-badge" id="preview-kicker">Sin guía visual</span>
+                            <img id="preview-foto" src="{{ asset('images/catalogo/sin_imagen.png') }}" data-placeholder="{{ asset('images/catalogo/sin_imagen.png') }}" alt="Vista previa de la caja">
+                        </div>
+                        <div class="ficha-preview-info">
+                            <span class="ficha-preview-code" id="preview-codigo">SET-XXX-00</span>
+                            <strong id="preview-titulo">Nombre de la caja</strong>
+                            <span class="ficha-preview-type" id="preview-tipo">Tipo de ficha</span>
+                            <div class="ficha-preview-fact"><span aria-hidden="true">✚</span><span id="preview-servicio">Servicio clínico</span></div>
+                            <div class="ficha-preview-fact"><span aria-hidden="true">⌖</span><span id="preview-area">Área quirúrgica</span></div>
+                            <div class="ficha-preview-separator"></div>
+                            <div class="ficha-preview-fact"><span aria-hidden="true">▣</span><span id="preview-cantidad">0 piezas</span></div>
+                            <div class="ficha-preview-fact"><span aria-hidden="true">▧</span><span id="preview-guia-texto">Sin guía visual</span></div>
+                        </div>
+                    </div>
+                    <p class="ficha-preview-hint" id="preview-texto">Si la caja no tiene foto, se mostrará una imagen de referencia.</p>
+                    <div class="ficha-mosaico" id="preview-mosaico" hidden></div>
                 </section>
                 <section class="panel ficha-datos">
                     <div class="panel-head">
-                        <h2 id="ficha-titulo">Nueva ficha</h2>
+                        <h2 id="ficha-titulo">Datos generales</h2>
                         <span class="badge" id="ficha-modo">Alta</span>
                     </div>
                     <p class="adv-ok" id="ficha-ok" role="status" hidden></p>
                     <p class="auth-error" id="ficha-error" role="alert" hidden></p>
                     <div class="mant-datos">
-                        <label for="codigo">Código
+                        <label for="codigo">Código <span class="ficha-required">*</span>
                             <input id="codigo" name="codigo" type="text" placeholder="SET-XXX-00" autocomplete="off">
+                            <small class="ficha-input-hint">Ej.: SET-LAP-01</small>
                         </label>
-                        <label for="nombre">Nombre
+                        <label for="nombre">Nombre de la caja <span class="ficha-required">*</span>
                             <input id="nombre" name="nombre" type="text" placeholder="Nombre de la caja" autocomplete="off">
                         </label>
-                        <label for="tipo">Tipo
+                        <label for="tipo">Tipo de ficha <span class="ficha-required">*</span>
                             <select id="tipo" name="tipo">
-                                <option value="">Elige el tipo</option>
+                                <option value="">Selecciona el tipo</option>
+                                @foreach (['Caja quirúrgica', 'Set de instrumental', 'Set de ópticas', 'Set de accesorios', 'Caja de implantes', 'Otros'] as $opcionTipo)
+                                    <option value="{{ $opcionTipo }}">{{ $opcionTipo }}</option>
+                                @endforeach
                                 @foreach ($tipos as $tipo)
-                                    <option value="{{ $tipo }}">{{ $tipo }}</option>
+                                    @if (!in_array($tipo, ['Caja quirúrgica', 'Set de instrumental', 'Set de ópticas', 'Set de accesorios', 'Caja de implantes', 'Otros']))
+                                        <option value="{{ $tipo }}">{{ $tipo }} (anterior)</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </label>
-                        <label for="servicio">Servicio
+                        <label for="servicio">Servicio clínico <span class="ficha-required">*</span>
                             <select id="servicio" name="servicio">
-                                <option value="">Elige el servicio</option>
+                                <option value="">Selecciona el servicio</option>
                                 @foreach ($servicios as $servicio)
                                     <option value="{{ $servicio }}">{{ $servicio }}</option>
                                 @endforeach
                             </select>
                         </label>
-                    </div>
-                    <div class="ficha-guia-row">
-                        <label class="check">
-                            <input id="guia" type="checkbox">
-                            <span>Tiene guía visual</span>
+                        <label for="area">Área quirúrgica <span class="ficha-required">*</span>
+                            <select id="area" name="area">
+                                <option value="">Selecciona el área</option>
+                                @foreach ($areas ?? [] as $areaOpcion)
+                                    <option value="{{ $areaOpcion }}">{{ $areaOpcion }}</option>
+                                @endforeach
+                            </select>
                         </label>
-                        <label class="ficha-foto" for="foto">
-                            <span>Foto del set, si está</span>
-                            <input id="foto" name="foto" type="file" accept="image/*">
+                        <div class="ficha-upload-group">
+                            <span class="ficha-upload-label">Fotografía de la caja</span>
+                            <label class="ficha-upload" for="foto">
+                                <span class="ficha-upload-icon" aria-hidden="true">☁</span>
+                                <strong id="foto-label">Seleccionar archivo</strong>
+                                <small>JPG, PNG o WEBP (máx. 5 MB)</small>
+                            </label>
+                            <input id="foto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" class="ficha-file-input">
+                        </div>
+                        <label class="ficha-guia-check" for="guia">
+                            <input id="guia" type="checkbox">
+                            <span><strong>Incluir guía visual</strong><small>Opcional. Puedes agregar imágenes de las piezas.</small></span>
                         </label>
                     </div>
                 </section>
             </div>
-
-            <section class="panel ficha-lista">
+            <section class="panel ficha-lista ficha-lista-redisenada">
                 <div class="panel-head">
-                    <h2>Qué debe contener</h2>
-                    <button class="btn btn-ghost" id="agregar-pieza" type="button">Agregar pieza</button>
+                    <h2>Instrumentos de la ficha</h2>
+                    <button class="btn btn-ghost ficha-add-button" id="agregar-pieza" type="button">+ Agregar pieza</button>
                 </div>
+                <div class="ficha-table-head" aria-hidden="true"><span>#</span><span>Instrumento o material</span><span>Cantidad</span><span>Con foto</span><span></span></div>
                 <div id="piezas"></div>
-                <div class="cuenta-pie">
-                    <p class="ficha-ayuda">Retirar la deja fuera del catálogo vigente. El historial se mantiene.</p>
-                    <div class="recv-actions">
-                        <button class="btn btn-ghost" id="ficha-cancelar" type="button" hidden>Cancelar</button>
-                        <button class="btn btn-primary" id="ficha-guardar" type="button">Crear ficha</button>
-                    </div>
+                <div class="ficha-empty-state" id="piezas-vacio" hidden>
+                    <span aria-hidden="true">▣</span>
+                    <strong>Aún no se han agregado instrumentos.</strong>
+                    <p>Presiona «Agregar pieza» para comenzar.</p>
                 </div>
+                <p class="ficha-ayuda">En esta etapa los instrumentos se agregan a modo de demostración. Luego se seleccionarán desde los instrumentos registrados.</p>
             </section>
+            <div class="ficha-footer-actions">
+                <button class="btn btn-ghost" id="ficha-cancelar" type="button">Cancelar</button>
+                <button class="btn btn-primary" id="ficha-guardar" type="button">Crear ficha</button>
+            </div>
         </form>
+        </div>
+
+        <section class="admin-panel-tab" id="tab-nuevo-instrumento" role="tabpanel" hidden>
+            <div class="instrumento-create-layout">
+                <form class="panel admin-instrument-form" id="instrumento-form" onsubmit="return false">
+                    <div class="instrumento-form-content">
+                        <h2 id="instrumento-form-titulo">Registrar nuevo instrumento</h2>
+                        <p class="instrumento-form-sub">Completa la información del instrumento. Podrá utilizarse en varias fichas, sin duplicar su registro.</p>
+                        <div class="instrumento-fields">
+                            <label for="instrumento-nombre">Nombre del instrumento <span class="instrumento-required">*</span>
+                                <input id="instrumento-nombre" name="nombre" type="text" placeholder="Ej. Pinza Kocher" autocomplete="off" required maxlength="200">
+                            </label>
+                            <label for="instrumento-codigo">Código del fabricante
+                                <input id="instrumento-codigo" name="codigo_fabricante" type="text" placeholder="Ej. 0200-018-000" autocomplete="off">
+                            </label>
+                            <label for="instrumento-tamano">Tamaño
+                                <input id="instrumento-tamano" name="tamano" type="text" placeholder="Ej. 14 cm, 20 mm, N°5, etc." autocomplete="off">
+                            </label>
+                            <label for="instrumento-descripcion">Descripción (opcional)
+                                <textarea id="instrumento-descripcion" name="descripcion" rows="4" maxlength="250" placeholder="Ej. Uso en cirugía general, punta curva, acero inoxidable, etc."></textarea>
+                                <small class="instrumento-char-counter"><span id="instrumento-descripcion-contador">0</span>/250</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="instrumento-form-footer">
+                        <button type="button" class="btn btn-ghost" id="instrumento-limpiar">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="instrumento-guardar" disabled title="Se habilitará cuando se conecte el registro a PostgreSQL">Guardar instrumento</button>
+                    </div>
+                </form>
+                <aside class="panel instrumento-photo-panel" aria-label="Fotografía del instrumento">
+                    <h3>Fotografía del instrumento</h3>
+                    <label for="instrumento-foto" class="instrumento-dropzone" id="instrumento-dropzone">
+                        <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                        <strong>Arrastra una imagen aquí</strong>
+                        <span>o selecciona un archivo</span>
+                        <small>Formatos: JPG, PNG, WEBP · Máx. 5 MB</small>
+                    </label>
+                    <input id="instrumento-foto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" class="instrumento-hidden-file">
+                    <p class="instrumento-photo-error" id="instrumento-foto-error" role="alert" hidden></p>
+                    <h4>Vista previa</h4>
+                    <div class="instrumento-preview" id="instrumento-preview">
+                        <img id="instrumento-preview-img" src="{{ asset('images/catalogo/sin_imagen.png') }}" data-placeholder="{{ asset('images/catalogo/sin_imagen.png') }}" alt="Vista previa del instrumento">
+                    </div>
+                    <div class="instrumento-photo-actions">
+                        <button type="button" class="btn btn-ghost" id="instrumento-cambiar-foto">Cambiar imagen</button>
+                        <button type="button" class="instrumento-delete-photo" id="instrumento-quitar-foto" title="Quitar imagen" aria-label="Quitar imagen">✕</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
     </main>
 </div>
 <script>
     var fichas = @json(collect($items)->keyBy('codigo'));
+    var tabActual = 'catalogo';
+    function mostrarTab(id) {
+        tabActual = id;
+        document.querySelectorAll('.admin-tab').forEach(function (boton) {
+            var activo = boton.dataset.tab === id;
+            boton.classList.toggle('is-active', activo);
+            boton.setAttribute('aria-selected', activo ? 'true' : 'false');
+        });
+        document.querySelectorAll('.admin-panel-tab').forEach(function (panel) {
+            panel.hidden = panel.id !== 'tab-' + id;
+        });
+    }
+    document.querySelectorAll('.admin-tab').forEach(function (boton) {
+        boton.addEventListener('click', function () {
+            if (boton.dataset.tab === 'nueva-ficha' && tabActual !== 'nueva-ficha') {
+                limpiarAlta();
+                document.getElementById('ficha-encabezado').textContent = 'Crear nueva ficha';
+            }
+            if (boton.dataset.tab === 'nuevo-instrumento' && tabActual !== 'nuevo-instrumento') {
+                limpiarFormularioInstrumento();
+            }
+            mostrarTab(boton.dataset.tab);
+        });
+    });
+    var servicioActivo = '';
+    var areaActiva = '';
+    var serviciosDisponibles = @json($servicios);
+    var areasDisponibles = @json($areas ?? []);
+    document.querySelectorAll('[data-filter-toggle]').forEach(function (boton) {
+        boton.addEventListener('click', function () {
+            var panel = document.getElementById('filtros-' + boton.dataset.filterToggle);
+            panel.hidden = !panel.hidden;
+            boton.setAttribute('aria-expanded', String(!panel.hidden));
+            boton.querySelector('.admin-filter-chevron').textContent = panel.hidden ? '▸' : '▾';
+        });
+    });
+    function tarjetasCatalogo() { return Array.from(document.querySelectorAll('#fichas-mural .mant-card')); }
+    function agruparPorArea() {
+        var mural = document.getElementById('fichas-mural');
+        var cards = tarjetasCatalogo();
+        var grupos = new Map();
+        cards.forEach(function (card) {
+            var area = card.dataset.area || 'Sin área asignada';
+            if (!grupos.has(area)) grupos.set(area, []);
+            grupos.get(area).push(card);
+        });
+        mural.replaceChildren();
+        Array.from(grupos.keys()).sort(function(a,b) { return a.localeCompare(b,'es'); }).forEach(function(area) {
+            var grupo = document.createElement('details');
+            grupo.className = 'admin-area-group';
+            grupo.dataset.area = area;
+            grupo.open = true;
+            var resumen = document.createElement('summary');
+            resumen.className = 'admin-area-summary';
+            var titulo = document.createElement('strong');
+            titulo.textContent = area;
+            var cuenta = document.createElement('span');
+            cuenta.className = 'admin-area-count';
+            resumen.append(titulo, cuenta);
+            var grid = document.createElement('div');
+            grid.className = 'cat-grid';
+            grupos.get(area).forEach(function(card) { grid.appendChild(card); });
+            grupo.append(resumen, grid);
+            mural.appendChild(grupo);
+        });
+    }
+    function filtrarFichas() {
+        var q = document.getElementById('buscar-fichas').value.trim().toLocaleLowerCase();
+        tarjetasCatalogo().forEach(function(card) {
+            var coincide = (!servicioActivo || card.dataset.servicio === servicioActivo)
+                && (!areaActiva || card.dataset.area === areaActiva)
+                && card.textContent.toLocaleLowerCase().includes(q);
+            card.hidden = !coincide;
+        });
+        document.querySelectorAll('#fichas-mural .admin-area-group').forEach(function(grupo) {
+            var visibles = Array.from(grupo.querySelectorAll('.mant-card')).filter(function(card) { return !card.hidden; }).length;
+            grupo.hidden = visibles === 0;
+            grupo.querySelector('.admin-area-count').textContent = visibles + (visibles === 1 ? ' ficha' : ' fichas');
+        });
+    }
+    function construirFiltrosServicio() {
+        var cards = tarjetasCatalogo().filter(function(card) { return card.dataset.estado !== 'retirada'; });
+        function pintar(nombre, contenedorId, opciones, seleccionado, alSeleccionar, otraClave, otroValor) {
+            var contenedor = document.getElementById(contenedorId);
+            var conteos = new Map();
+            cards.forEach(function(card) {
+                if (otroValor && card.dataset[otraClave] !== otroValor) return;
+                var valor = card.dataset[nombre] || ('Sin ' + nombre + ' asignada');
+                conteos.set(valor, (conteos.get(valor) || 0) + 1);
+            });
+            contenedor.replaceChildren();
+            function agregar(etiqueta, valor, cantidad) {
+                var boton = document.createElement('button');
+                boton.type = 'button';
+                boton.className = 'ops-filter' + (seleccionado === valor ? ' is-active' : '');
+                boton.setAttribute('aria-pressed', String(seleccionado === valor));
+                boton.appendChild(document.createTextNode(etiqueta + ' '));
+                var em = document.createElement('em');
+                em.textContent = cantidad;
+                boton.appendChild(em);
+                boton.addEventListener('click', function() { alSeleccionar(valor); construirFiltrosServicio(); });
+                contenedor.appendChild(boton);
+            }
+            agregar('Todos', '', Array.from(conteos.values()).reduce(function(a,b) { return a+b; },0));
+            Array.from(new Set(opciones.concat(Array.from(conteos.keys())))).sort(function(a,b) { return a.localeCompare(b,'es'); }).forEach(function(valor) {
+                agregar(valor, valor, conteos.get(valor) || 0);
+            });
+        }
+        pintar('servicio','filtros-servicio',serviciosDisponibles,servicioActivo,function(v){servicioActivo=v;},'area',areaActiva);
+        pintar('area','filtros-area',areasDisponibles,areaActiva,function(v){areaActiva=v;},'servicio',servicioActivo);
+        filtrarFichas();
+    }
+    document.getElementById('buscar-fichas').addEventListener('input', filtrarFichas);
+    // Datos reales de instrumentos, sin transferir fotografías BYTEA en el HTML.
+    var instrumentosDemo = @json($instrumentosCatalogo);
+    var imagenInstrumentoRespaldo = @json(asset('images/catalogo/sin_imagen.png'));
+    var vistaInstrumentos = 'cards';
+    var instrumentosRetirados = new Set();
+    function pintarInstrumentos(filtro) {
+        var mural = document.getElementById('instrumentos-mural');
+        mural.replaceChildren();
+        mural.classList.toggle('is-list', vistaInstrumentos === 'list');
+        var q = (filtro || '').trim().toLocaleLowerCase();
+        var filtrados = instrumentosDemo.filter(function (x) {
+            return (x.nombre + ' ' + x.codigo).toLocaleLowerCase().includes(q);
+        });
+        filtrados.forEach(function (inst) {
+            var clave = inst.codigo || inst.nombre;
+            var retirado = instrumentosRetirados.has(clave);
+            var card = document.createElement('article');
+            card.className = 'admin-instrument-card' + (retirado ? ' mant-retirada' : '');
+
+            var foto = document.createElement('div');
+            foto.className = 'admin-instrument-photo';
+            var imagen = document.createElement('img');
+            imagen.className = 'admin-instrument-img';
+            imagen.src = inst.imagen_url || imagenInstrumentoRespaldo;
+            imagen.alt = 'Fotografía de ' + inst.nombre;
+            imagen.loading = 'lazy';
+            imagen.decoding = 'async';
+            imagen.addEventListener('error', function () {
+                if (!imagen.src.endsWith('/sin_imagen.png')) {
+                    imagen.src = imagenInstrumentoRespaldo;
+                }
+            });
+            foto.appendChild(imagen);
+
+            var contenido = document.createElement('div');
+            contenido.className = 'admin-instrument-body';
+            var nombre = document.createElement('strong');
+            nombre.textContent = inst.nombre;
+            var meta = document.createElement('small');
+            meta.textContent = inst.codigo || 'Sin código de fabricante';
+            contenido.append(nombre, meta);
+
+            var acciones = document.createElement('div');
+            acciones.className = 'mant-acciones admin-instrument-actions';
+            var editar = document.createElement('button');
+            editar.className = 'btn btn-ghost';
+            editar.type = 'button';
+            editar.textContent = 'Editar';
+            editar.disabled = retirado;
+            editar.addEventListener('click', function () {
+                limpiarFormularioInstrumento();
+                document.getElementById('instrumento-nombre').value = inst.nombre;
+                document.getElementById('instrumento-codigo').value = inst.codigo;
+                document.getElementById('instrumento-tamano').value = inst.tamano || '';
+                document.getElementById('instrumento-form-titulo').textContent = 'Editar instrumento';
+                if (inst.imagen_url) establecerPreviewInstrumento(inst.imagen_url);
+                mostrarTab('nuevo-instrumento');
+            });
+            var retirar = document.createElement('button');
+            retirar.className = 'btn btn-ghost';
+            retirar.type = 'button';
+            retirar.textContent = retirado ? 'Retirado' : 'Retirar';
+            retirar.disabled = retirado;
+            retirar.addEventListener('click', function () {
+                instrumentosRetirados.add(clave);
+                pintarInstrumentos(document.getElementById('buscar-instrumentos').value);
+            });
+            acciones.append(editar, retirar);
+            card.append(foto, contenido, acciones);
+            mural.appendChild(card);
+        });
+        document.getElementById('instrumentos-vacio').hidden = filtrados.length > 0;
+        document.getElementById('instrumentos-cuenta').textContent = String(filtrados.length);
+        document.getElementById('instrumentos-meta').textContent = filtrados.length + (filtrados.length === 1 ? ' instrumento mostrado' : ' instrumentos mostrados');
+    }
+    document.querySelectorAll('[data-instrument-view]').forEach(function (boton) {
+        boton.addEventListener('click', function () {
+            vistaInstrumentos = boton.dataset.instrumentView;
+            document.querySelectorAll('[data-instrument-view]').forEach(function (b) {
+                var activo = b === boton;
+                b.classList.toggle('is-active', activo);
+                b.setAttribute('aria-pressed', String(activo));
+            });
+            pintarInstrumentos(document.getElementById('buscar-instrumentos').value);
+        });
+    });
+    document.getElementById('buscar-instrumentos').addEventListener('input', function (e) { pintarInstrumentos(e.target.value); });
+    var instrumentoFotoInput = document.getElementById('instrumento-foto');
+    var instrumentoFotoPreviewUrl = null;
+    function establecerPreviewInstrumento(url) {
+        var img = document.getElementById('instrumento-preview-img');
+        img.src = url || img.dataset.placeholder;
+        document.getElementById('instrumento-preview').classList.toggle('has-image', !!url);
+    }
+    function limpiarFormularioInstrumento() {
+        document.getElementById('instrumento-form').reset();
+        document.getElementById('instrumento-form-titulo').textContent = 'Registrar nuevo instrumento';
+        document.getElementById('instrumento-descripcion-contador').textContent = '0';
+        document.getElementById('instrumento-foto-error').hidden = true;
+        if (instrumentoFotoPreviewUrl) URL.revokeObjectURL(instrumentoFotoPreviewUrl);
+        instrumentoFotoPreviewUrl = null;
+        establecerPreviewInstrumento(null);
+    }
+    function cargarFotoInstrumento(file) {
+        var error = document.getElementById('instrumento-foto-error');
+        error.hidden = true;
+        if (!file) return;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+            error.textContent = 'Selecciona una imagen JPG, PNG o WEBP de máximo 5 MB.';
+            error.hidden = false;
+            instrumentoFotoInput.value = '';
+            return;
+        }
+        if (instrumentoFotoPreviewUrl) URL.revokeObjectURL(instrumentoFotoPreviewUrl);
+        instrumentoFotoPreviewUrl = URL.createObjectURL(file);
+        establecerPreviewInstrumento(instrumentoFotoPreviewUrl);
+    }
+    instrumentoFotoInput.addEventListener('change', function () { cargarFotoInstrumento(this.files[0]); });
+    document.getElementById('instrumento-descripcion').addEventListener('input', function () {
+        document.getElementById('instrumento-descripcion-contador').textContent = String(this.value.length);
+    });
+    document.getElementById('instrumento-cambiar-foto').addEventListener('click', function () { instrumentoFotoInput.click(); });
+    document.getElementById('instrumento-quitar-foto').addEventListener('click', function () {
+        instrumentoFotoInput.value = '';
+        if (instrumentoFotoPreviewUrl) URL.revokeObjectURL(instrumentoFotoPreviewUrl);
+        instrumentoFotoPreviewUrl = null;
+        establecerPreviewInstrumento(null);
+        document.getElementById('instrumento-foto-error').hidden = true;
+    });
+    document.getElementById('instrumento-limpiar').addEventListener('click', function () {
+        limpiarFormularioInstrumento();
+        mostrarTab('instrumentos');
+    });
+    var instrumentoDropzone = document.getElementById('instrumento-dropzone');
+    ['dragenter', 'dragover'].forEach(function (tipo) {
+        instrumentoDropzone.addEventListener(tipo, function (e) { e.preventDefault(); instrumentoDropzone.classList.add('is-dragging'); });
+    });
+    ['dragleave', 'drop'].forEach(function (tipo) {
+        instrumentoDropzone.addEventListener(tipo, function (e) { e.preventDefault(); instrumentoDropzone.classList.remove('is-dragging'); });
+    });
+    instrumentoDropzone.addEventListener('drop', function (e) {
+        var file = e.dataTransfer.files[0];
+        if (file) cargarFotoInstrumento(file);
+    });
+    pintarInstrumentos('');
     var formFila = null;
     var titulo = document.getElementById('ficha-titulo');
     var modo = document.getElementById('ficha-modo');
@@ -150,6 +528,7 @@
     var nombre = document.getElementById('nombre');
     var tipo = document.getElementById('tipo');
     var servicio = document.getElementById('servicio');
+    var area = document.getElementById('area');
     var guia = document.getElementById('guia');
     var foto = document.getElementById('foto');
     var piezas = document.getElementById('piezas');
@@ -184,7 +563,7 @@
 
     function pintarPiezas(lista) {
         piezas.replaceChildren();
-        (lista && lista.length ? lista : [{}]).forEach(function (pieza) {
+        (lista || []).forEach(function (pieza) {
             piezas.appendChild(filaPieza(pieza));
         });
         actualizarVista();
@@ -202,36 +581,34 @@
         });
     }
 
+    var previewFotoUrl = null;
+    var previewFotoArchivo = null;
     function actualizarVista() {
-        var seccion = document.getElementById('preview-guia');
         var conGuia = guia.checked;
-        var tituloCaja = nombre.value.trim();
-        seccion.classList.toggle('is-empty', !conGuia);
-        document.getElementById('preview-kicker').textContent = conGuia ? 'Guía visual' : 'Sin guía visual';
-        document.getElementById('preview-titulo').textContent = tituloCaja || (conGuia ? 'Cómo se reconoce el set' : 'Así la va a ver el servicio');
-        document.getElementById('preview-texto').textContent = conGuia
-            ? 'Referencia de las piezas que tienen foto.'
-            : 'Si la caja no tiene foto, igual se puede crear. La lista de piezas alcanza.';
-        mosaico.replaceChildren();
-        if (!conGuia) {
-            return;
+        document.getElementById('preview-kicker').textContent = conGuia ? 'Con guía visual' : 'Sin guía visual';
+        document.getElementById('preview-codigo').textContent = codigo.value.trim().toUpperCase() || 'SET-XXX-00';
+        document.getElementById('preview-titulo').textContent = nombre.value.trim() || 'Nombre de la caja';
+        document.getElementById('preview-tipo').textContent = tipo.value || 'Tipo de ficha';
+        document.getElementById('preview-servicio').textContent = servicio.value || 'Servicio clínico';
+        document.getElementById('preview-area').textContent = area.value || 'Área quirúrgica';
+        var cantidad = leerPiezas().reduce(function (total, pieza) { return total + (pieza.cantidad || 0); }, 0);
+        document.getElementById('preview-cantidad').textContent = cantidad + (cantidad === 1 ? ' pieza' : ' piezas');
+        document.getElementById('preview-guia-texto').textContent = conGuia ? 'Con guía visual' : 'Sin guía visual';
+        var img = document.getElementById('preview-foto');
+        var archivoActual = foto.files && foto.files[0] ? foto.files[0] : null;
+        if (archivoActual !== previewFotoArchivo) {
+            if (previewFotoUrl) URL.revokeObjectURL(previewFotoUrl);
+            previewFotoArchivo = archivoActual;
+            previewFotoUrl = archivoActual ? URL.createObjectURL(archivoActual) : null;
         }
-        piezas.querySelectorAll('.mant-pieza').forEach(function (fila) {
-            marcarLetra(fila);
-            var texto = fila.querySelector('.pieza-nombre').value.trim();
-            if (!fila.querySelector('.pieza-foto').checked || !texto) {
-                return;
-            }
-            var figura = document.createElement('figure');
-            var thumb = document.createElement('span');
-            thumb.className = 'ficha-thumb';
-            thumb.textContent = texto.charAt(0).toUpperCase();
-            var caption = document.createElement('figcaption');
-            caption.textContent = texto;
-            figura.appendChild(thumb);
-            figura.appendChild(caption);
-            mosaico.appendChild(figura);
-        });
+        img.src = previewFotoUrl || img.dataset.placeholder;
+        document.getElementById('foto-label').textContent = foto.files && foto.files[0] ? foto.files[0].name : 'Seleccionar archivo';
+        document.getElementById('preview-texto').textContent = previewFotoUrl ? 'Vista previa de la fotografía seleccionada.' : 'Si la caja no tiene foto, se mostrará una imagen de referencia.';
+        var mosaico = document.getElementById('preview-mosaico');
+        mosaico.replaceChildren();
+        mosaico.hidden = true;
+        document.getElementById('piezas-vacio').hidden = piezas.children.length > 0;
+        piezas.querySelectorAll('.mant-pieza').forEach(function (fila) { marcarLetra(fila); });
     }
 
     function resumir() {
@@ -255,6 +632,7 @@
             texto += ' · ' + retiradas + (retiradas === 1 ? ' retirada' : ' retiradas');
         }
         document.getElementById('fichas-meta').textContent = texto;
+        construirFiltrosServicio();
     }
 
     function limpiarAlta() {
@@ -265,24 +643,28 @@
         titulo.textContent = 'Nueva ficha';
         modo.textContent = 'Alta';
         guardar.textContent = 'Crear ficha';
-        cancelar.hidden = true;
+        cancelar.hidden = false;
         codigo.value = '';
         nombre.value = '';
         tipo.value = '';
         servicio.value = '';
+        area.value = '';
         guia.checked = false;
         foto.value = '';
-        pintarPiezas([{}]);
+        pintarPiezas([]);
+        aviso('', false);
     }
 
     function htmlCard() {
-        return '<div class="cat-photo is-empty"><span class="js-guia-label">Sin guía visual</span></div><div class="cat-body"><strong class="js-codigo"></strong><h2 class="js-nombre"></h2><p class="js-detalle"></p><div class="mant-acciones"><button class="btn btn-ghost js-editar" type="button">Editar</button><button class="btn btn-ghost js-retirar" type="button">Retirar</button></div></div>';
+        return '<div class="cat-photo is-empty"><span class="js-guia-label">Sin guía visual</span></div><div class="cat-body"><strong class="js-codigo"></strong><h2 class="js-nombre"></h2><span class="cat-servicio js-servicio"></span><p class="js-detalle"></p><div class="mant-acciones"><button class="btn btn-ghost js-editar" type="button">Editar</button><button class="btn btn-ghost js-retirar" type="button">Retirar</button></div></div>';
     }
 
     function escribirCard(card, datos) {
         var total = datos.instrumentos.reduce(function (suma, pieza) { return suma + Number(pieza.cantidad || 0); }, 0);
         card.dataset.estado = datos.estado || 'vigente';
         card.dataset.guia = datos.guia ? '1' : '0';
+        card.dataset.servicio = datos.servicio_real || 'Sin servicio asignado';
+        card.dataset.area = datos.area || 'Sin área asignada';
         card.classList.toggle('mant-retirada', card.dataset.estado === 'retirada');
         var photo = card.querySelector('.cat-photo');
         var retirada = card.dataset.estado === 'retirada';
@@ -290,11 +672,13 @@
         card.querySelector('.js-guia-label').textContent = retirada ? 'Retirada' : (datos.guia ? 'Con guía visual' : 'Sin guía visual');
         card.querySelector('.js-codigo').textContent = datos.codigo;
         card.querySelector('.js-nombre').textContent = datos.nombre;
-        card.querySelector('.js-detalle').textContent = datos.servicio + ' · ' + datos.tipo + ' · ' + total + (total === 1 ? ' pieza' : ' piezas');
+        card.querySelector('.js-servicio').textContent = datos.area;
+        card.querySelector('.js-detalle').textContent = datos.tipo + ' · ' + total + (total === 1 ? ' pieza' : ' piezas');
     }
 
     document.getElementById('agregar-pieza').addEventListener('click', function () {
         piezas.appendChild(filaPieza(null));
+        actualizarVista();
     });
 
     piezas.addEventListener('click', function (evento) {
@@ -304,7 +688,7 @@
         }
         quitar.closest('.mant-pieza').remove();
         if (!piezas.children.length) {
-            pintarPiezas([{}]);
+            pintarPiezas([]);
             return;
         }
         actualizarVista();
@@ -327,7 +711,8 @@
             codigo.value = clave;
             nombre.value = ficha.nombre;
             tipo.value = ficha.tipo;
-            servicio.value = ficha.servicio;
+            servicio.value = ficha.servicio_real || '';
+            area.value = ficha.area || ficha.servicio || '';
             guia.checked = !!ficha.guia;
             foto.value = '';
             pintarPiezas(ficha.instrumentos);
@@ -337,6 +722,8 @@
             cancelar.hidden = false;
             aviso('', false);
             document.getElementById('ficha-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('ficha-encabezado').textContent = 'Editar ficha';
+            mostrarTab('nueva-ficha');
             nombre.focus();
         }
         if (!retirar) {
@@ -356,20 +743,21 @@
         if (fichas[claveRetiro]) {
             fichas[claveRetiro].estado = 'retirada';
         }
-        aviso(claveRetiro + ' salió del catálogo vigente. El historial se mantiene.', false);
+        aviso(claveRetiro + ' se marcó como retirada solo en esta vista temporal.', false);
         resumir();
     });
 
     cancelar.addEventListener('click', function () {
         limpiarAlta();
         aviso('', false);
+        mostrarTab('catalogo');
     });
 
     guardar.addEventListener('click', function () {
         var clave = codigo.value.trim().toUpperCase();
         var contenido = leerPiezas();
-        if (!clave || !nombre.value.trim() || !tipo.value || !servicio.value) {
-            aviso('Completa código, nombre, tipo y servicio.', true);
+        if (!clave || !nombre.value.trim() || !tipo.value || !servicio.value || !area.value) {
+            aviso('Completa código, nombre, tipo, servicio y área.', true);
             return;
         }
         if (!contenido.length || contenido.some(function (pieza) { return !pieza.nombre || !(pieza.cantidad >= 1); })) {
@@ -388,7 +776,9 @@
             codigo: clave,
             nombre: nombre.value.trim(),
             tipo: tipo.value,
-            servicio: servicio.value,
+            servicio: area.value,
+            servicio_real: servicio.value,
+            area: area.value,
             guia: guia.checked,
             instrumentos: contenido,
             estado: formFila ? formFila.dataset.estado : 'vigente'
@@ -400,8 +790,9 @@
             }
             fichas[clave] = datos;
             escribirCard(formFila, datos);
-            aviso('Listo. Quedaron los datos y el contenido de ' + clave + '.', false);
+            aviso('Vista previa actualizada. Los cambios aún no están guardados en la base de datos.', false);
             limpiarAlta();
+            agruparPorArea();
             resumir();
             return;
         }
@@ -411,11 +802,14 @@
         fichas[clave] = datos;
         escribirCard(card, datos);
         document.getElementById('fichas-mural').prepend(card);
-        aviso('Listo. ' + clave + ' quedó en el catálogo.', false);
+        aviso('Ficha agregada a esta vista temporal. No está guardada en la base de datos.', false);
         limpiarAlta();
+        agruparPorArea();
         resumir();
     });
 
-    pintarPiezas([{}]);
+    pintarPiezas([]);
+    agruparPorArea();
+    construirFiltrosServicio();
 </script>
 @endsection

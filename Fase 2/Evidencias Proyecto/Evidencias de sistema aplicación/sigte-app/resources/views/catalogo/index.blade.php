@@ -64,7 +64,7 @@
                         type="search"
                         name="q"
                         value="{{ $busqueda }}"
-                        placeholder="Buscar por código, nombre o servicio…"
+                        placeholder="Buscar por código, nombre o número…"
                         autocomplete="off"
                     >
                 </div>
@@ -82,9 +82,9 @@
             <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M4.5 6.5h15l-5.6 6.6V18l-3.8 1.8v-6.7L4.5 6.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
             </svg>
-            Filtrar por servicio
+            Filtrar por área
         </p>
-        <div class="ops-filters" aria-label="Filtrar por servicio">
+        <div class="ops-filters" aria-label="Filtrar por área">
             <a
                 class="ops-filter {{ $servicio === '' ? 'is-active' : '' }}"
                 href="{{ $urlCatalogo(null) }}"
@@ -105,7 +105,7 @@
             <div class="ops-empty" role="status">
                 <strong>No hay cajas coincidentes</strong>
                 <p>
-                    Prueba con otro código, nombre o servicio.
+                    Prueba con otro código, nombre o área.
                     @if ($hay_filtros)
                         <a href="{{ route('mockups.catalogo') }}">Ver todo el catálogo</a>
                     @endif
@@ -120,23 +120,40 @@
                     en el catálogo
                 @endif
             </p>
-            <div class="cat-grid">
-                @foreach ($items as $item)
-                    <a class="cat-card" href="{{ route('mockups.ficha', $item['codigo']) }}">
-                        <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
-                            <span>{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
-                        </div>
-                        <div class="cat-body">
-                            <strong>{{ $item['codigo'] }}</strong>
-                            <h2>{{ $item['nombre'] }}</h2>
-                            <p>
-                                <span class="cat-servicio">{{ $item['servicio'] }}</span>
-                                {{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}
-                            </p>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
+            @foreach (collect($items)->groupBy('servicio') as $area => $cajas)
+                <section class="cat-area">
+                    <div class="cat-area-head">
+                        <h2>{{ $area }}</h2>
+                        <span>{{ $cajas->count() }} {{ $cajas->count() === 1 ? 'caja' : 'cajas' }}</span>
+                    </div>
+                    <div class="cat-grid">
+                        @foreach ($cajas as $item)
+                            <a class="cat-card" href="{{ route('mockups.ficha', $item['codigo']) }}">
+                                <div class="cat-photo is-empty">
+                                    <img
+                                        class="cat-photo-placeholder"
+                                        src="{{ asset('images/catalogo/sin-imagen.png') }}"
+                                        alt="Imagen de la caja no disponible"
+                                        loading="lazy"
+                                    >
+                                    <span>{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span>
+                                </div>
+                                <div class="cat-body">
+                                    <strong>{{ $item['codigo'] }}@if (!empty($item['codigo_referencia'])) · {{ $item['codigo_referencia'] }}@endif</strong>
+                                    <h2>{{ $item['nombre'] }}</h2>
+                                    <p>
+                                        <span class="cat-servicio">{{ $item['servicio'] }}</span>
+                                        @if (!empty($item['numero']))
+                                            Nº {{ $item['numero'] }} ·
+                                        @endif
+                                        {{ $item['tipo'] }} · {{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}
+                                    </p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endforeach
         @endif
     </main>
 </div>

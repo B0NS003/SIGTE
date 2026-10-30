@@ -1,4 +1,4 @@
-@php
+﻿@php
     $salaDe = function (int $i): ?string {
         if ($i < 1) {
             return null;

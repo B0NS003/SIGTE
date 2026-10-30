@@ -7,13 +7,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reposicion extends Model
 {
-    protected $table = 'reposiciones';
+    protected $table = 'movimientos_inventario';
 
     protected $fillable = [
         'elemento_inventario_id',
+        'tipo',
         'cantidad',
+        'observacion',
         'user_id',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('reposicion', function ($consulta) {
+            $consulta->where('tipo', 'reposicion');
+        });
+
+        static::creating(function (Reposicion $reposicion) {
+            $reposicion->tipo = 'reposicion';
+        });
+    }
 
     protected function casts(): array
     {

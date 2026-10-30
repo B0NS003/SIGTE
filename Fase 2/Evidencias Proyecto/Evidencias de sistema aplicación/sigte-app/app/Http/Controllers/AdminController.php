@@ -117,7 +117,6 @@ class AdminController extends Controller
             'email' => $datos['email'],
             'password' => $datos['password'],
             'rol_id' => $rol->id,
-            'role' => $rol->nombre,
             'activo' => true,
         ]);
 
@@ -147,7 +146,6 @@ class AdminController extends Controller
         $user->name = $datos['nombre'];
         $user->email = $datos['email'];
         $user->rol_id = $rol->id;
-        $user->role = $rol->nombre;
         if (! empty($datos['password'])) {
             $user->password = $datos['password'];
         }
@@ -668,6 +666,7 @@ class AdminController extends Controller
     private function alertasDeInventario(): array
     {
         return ElementoInventario::query()
+            ->with('salaFisica')
             ->orderBy('codigo')
             ->get()
             ->filter(fn (ElementoInventario $elemento) => $elemento->tieneAlertaStock())
@@ -683,7 +682,7 @@ class AdminController extends Controller
                     'detalle' => 'Stock '.$elemento->stock.' · mínimo '.$elemento->minimo.' · '.$elemento->ubicacion,
                     'tipo' => 'Inventario',
                     'caja' => $elemento->codigo,
-                    'sala' => $elemento->sala,
+                    'sala' => $elemento->codigoSala(),
                     'hora' => 'Ahora',
                     'estado' => 'abierta',
                 ];
