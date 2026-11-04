@@ -23,7 +23,7 @@
 
     overflow-y: auto;
 
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--borde);
     border-top: 4px solid var(--navy);
     border-radius: 18px;
@@ -50,7 +50,7 @@
     border-radius: 50%;
 
     background: #f1f5f9;
-    color: var(--navy);
+    color: var(--ink);
 
     font-size: 1.5rem;
     line-height: 1;
@@ -148,7 +148,7 @@ body.inv-modal-abierto {
 /* Títulos */
 .inv-modal-seccion-titulo {
     margin: 0 0 1.2rem;
-    color: var(--navy);
+    color: var(--ink);
     font-size: 1.35rem;
     line-height: 1.2;
 }

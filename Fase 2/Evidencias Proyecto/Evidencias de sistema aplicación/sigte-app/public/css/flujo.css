@@ -13,13 +13,13 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--borde);
   border-radius: 999px;
   padding: 0.35rem 0.7rem;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--navy);
+  color: var(--ink);
 }
 
 .ops-dot {
@@ -45,7 +45,7 @@
   padding: 0.85rem 0.95rem 0.7rem;
   border: 1px solid var(--borde);
   border-radius: 16px;
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 4px 14px rgba(11, 31, 75, 0.04);
 }
 
@@ -58,13 +58,13 @@
   padding: 0.95rem 1.05rem;
   border: 1px solid var(--borde);
   border-radius: 16px;
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 6px 18px rgba(11, 31, 75, 0.05);
 }
 
 .puesto-card.is-empty {
   border-color: #fdba74;
-  background: linear-gradient(105deg, var(--naranja-suave) 0%, #fff 52%);
+  background: linear-gradient(105deg, var(--naranja-suave) 0%, var(--card) 52%);
 }
 
 .puesto-card-main {
@@ -90,7 +90,7 @@
 }
 
 .puesto-card.is-empty .puesto-avatar {
-  background: #fff;
+  background: var(--card);
   color: var(--naranja-oscuro);
   border: 1.5px solid #fdba74;
   box-shadow: none;
@@ -114,7 +114,7 @@
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--navy);
+  color: var(--ink);
   line-height: 1.2;
 }
 
@@ -143,19 +143,19 @@
   padding: 0.5rem 0.8rem;
   border: 1.5px solid var(--borde);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--card-2);
   transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .puesto-cambiar:focus-within {
   border-color: var(--naranja);
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 0 0 3px rgba(232, 90, 28, 0.14);
 }
 
 .puesto-cambiar.is-principal {
   min-width: 13.5rem;
-  background: #fff;
+  background: var(--card);
   border-color: #fdba74;
   box-shadow: 0 2px 10px rgba(232, 90, 28, 0.1);
 }
@@ -176,7 +176,7 @@
   background: transparent;
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--navy);
+  color: var(--ink);
   cursor: pointer;
 }
 
@@ -237,7 +237,7 @@
   border: 1.5px solid var(--borde);
   border-radius: 12px;
   padding: 0 0.9rem;
-  background: #fff;
+  background: var(--card);
   color: #64748b;
   box-shadow: 0 4px 14px rgba(11, 31, 75, 0.04);
 }
@@ -245,7 +245,7 @@
 .ops-search-field:focus-within {
   outline: none;
   border-color: var(--naranja);
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 0 0 3px rgba(232, 90, 28, 0.14);
   color: var(--naranja-oscuro);
 }
@@ -257,7 +257,7 @@
   padding: 0.55rem 0;
   font: inherit;
   font-size: 0.92rem;
-  color: var(--navy);
+  color: var(--ink);
   background: transparent;
 }
 
@@ -311,7 +311,7 @@
 }
 
 .ops-filter:hover {
-  color: var(--navy);
+  color: var(--ink);
   background: transparent;
   border-bottom-color: #fdba74;
   text-decoration: none;
@@ -346,10 +346,12 @@
 }
 
 .ops-etapa {
+  --etapa-acento: var(--naranja);
+  --etapa-acento-suave: var(--naranja-suave);
   margin: 0;
   border: 1px solid var(--borde);
   border-radius: 16px;
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 4px 14px rgba(11, 31, 75, 0.04);
   overflow: clip;
   border-left: 3px solid #cbd5e1;
@@ -359,8 +361,34 @@
   margin-top: 0.15rem;
 }
 
+/* Contorno + título del bloque por etapa (escala naranja logo HSJM; no tarjetas internas). */
+.ops-etapa--recepcion {
+  --etapa-acento: #C1272D;
+  --etapa-acento-suave: #fdf0f0;
+}
+.ops-etapa--lavado {
+  --etapa-acento: #E34E26;
+  --etapa-acento-suave: #fff0eb;
+}
+.ops-etapa--preparacion {
+  --etapa-acento: #F26522;
+  --etapa-acento-suave: #fff3eb;
+}
+.ops-etapa--esterilizacion {
+  --etapa-acento: #E8873A;
+  --etapa-acento-suave: #fff6ed;
+}
+.ops-etapa--almacen {
+  --etapa-acento: #F0A04B;
+  --etapa-acento-suave: #fff8f0;
+}
+.ops-etapa--entrega {
+  --etapa-acento: #D9774A;
+  --etapa-acento-suave: #faf3ef;
+}
+
 .ops-etapa[open] {
-  border-left-color: var(--naranja);
+  border-left-color: var(--etapa-acento);
   box-shadow: 0 8px 22px rgba(11, 31, 75, 0.07);
 }
 
@@ -375,13 +403,13 @@
   padding: 0.72rem 0.95rem;
   cursor: pointer;
   list-style: none;
-  background: #fff;
+  background: var(--card);
   border-bottom: 1px solid transparent;
 }
 
 .ops-etapa[open] > .ops-etapa-head {
   border-bottom-color: #eef2f7;
-  background: linear-gradient(90deg, var(--naranja-suave) 0%, #fff 42%);
+  background: linear-gradient(90deg, var(--etapa-acento-suave) 0%, var(--card) 42%);
 }
 
 .ops-etapa-head::-webkit-details-marker {
@@ -394,8 +422,8 @@
   width: 0.45rem;
   height: 0.45rem;
   margin-right: 0.45rem;
-  border-right: 2px solid var(--naranja);
-  border-bottom: 2px solid var(--naranja);
+  border-right: 2px solid var(--etapa-acento);
+  border-bottom: 2px solid var(--etapa-acento);
   transform: rotate(-45deg);
   vertical-align: 0.12rem;
 }
@@ -409,7 +437,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.02rem;
-  color: var(--navy);
+  color: var(--ink);
 }
 
 .ops-etapa-resumen {
@@ -428,7 +456,7 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--navy);
+  color: var(--ink);
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1;
@@ -467,7 +495,7 @@
 
 .ops-etapa-panel {
   padding: 0.55rem 0.7rem 0.55rem;
-  background: #fff;
+  background: var(--card);
 }
 
 .ops-etapa-list {
@@ -525,7 +553,7 @@
 }
 
 .ops-etapa-foot strong {
-  color: var(--navy);
+  color: var(--ink);
   font-weight: 800;
 }
 
@@ -572,7 +600,7 @@
   overflow: hidden;
 }
 .ops-etapa-list > .track-card .track-detalle {
-  grid-template-columns: 1fr 1fr;
+  max-width: none;
 }
 @media (max-width: 900px) {
   .ops-etapa-list,
@@ -586,7 +614,7 @@
   padding: 1.35rem 1.1rem;
   color: var(--muted);
   font-size: 0.92rem;
-  background: #fff;
+  background: var(--card);
   border: 1px dashed var(--borde);
   border-radius: 14px;
   text-align: center;
@@ -594,7 +622,7 @@
 
 .ops-empty strong {
   display: block;
-  color: var(--navy);
+  color: var(--ink);
   font-size: 1rem;
   margin-bottom: 0.35rem;
 }
@@ -625,7 +653,7 @@
 }
 
 .track-card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--borde);
   border-radius: 18px;
   padding: 1rem 1.1rem 0.95rem;
@@ -718,7 +746,7 @@
 
 .track-meta-tiempo {
   font-weight: 700;
-  color: var(--navy);
+  color: var(--ink);
 }
 
 .track-meta-sala {
@@ -727,7 +755,7 @@
 }
 
 .track-meta-persona {
-  color: var(--navy);
+  color: var(--ink);
   font-weight: 700;
 }
 
@@ -740,17 +768,17 @@
 }
 
 .track-foot-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.65rem 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 0.85rem;
+  row-gap: 0.35rem;
   margin-top: 0.55rem;
   padding-top: 0.65rem;
   border-top: 1px solid #eef2f7;
 }
 .track-more {
-  flex: 1 1 12rem;
+  grid-column: 1;
   margin: 0;
   min-width: 0;
 }
@@ -775,7 +803,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--navy);
+  color: var(--ink);
   font-size: 0.8rem;
   font-weight: 800;
 }
@@ -807,15 +835,15 @@
 .track-more[open] > summary {
   margin-bottom: 0.55rem;
   background: transparent;
-  border-bottom-color: var(--navy);
+  border-bottom-color: var(--ink);
 }
-.track-more[open] > summary .track-summary-label { color: var(--navy); }
+.track-more[open] > summary .track-summary-label { color: var(--ink); }
 
 .track-card.is-urgent:not(.is-proceso-listo) .track-more > summary:hover {
   border-bottom-color: #fdba74;
 }
 .track-card.is-urgent:not(.is-proceso-listo) .track-summary-label {
-  color: var(--navy);
+  color: var(--ink);
 }
 .track-card.is-proceso-listo.is-urgent .track-more > summary {
   border-color: transparent;
@@ -833,47 +861,84 @@
   background: transparent;
   border-bottom-color: #166534;
 }
+/* Lista compacta con iconos (acordeón), sin cajitas/bloques. */
 .track-detalle {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.45rem;
-  padding: 0.65rem;
-  border-radius: 14px;
-  background: #f8fafc;
-  border: 1px solid var(--borde);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0.1rem 0 0;
+  list-style: none;
+  max-width: 20rem;
+  border: 0;
+  background: transparent;
 }
 .track-dato {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  align-items: flex-start;
+  gap: 0.55rem;
   min-width: 0;
-  padding: 0.45rem 0.55rem;
-  border-radius: 10px;
-  background: #fff;
-  border: 1px solid #eef2f7;
+  padding: 0.4rem 0.05rem;
+  border: 0;
+  border-bottom: 1px solid #eef2f7;
+  border-radius: 0;
+  background: transparent;
 }
-.track-dato span {
-  font-size: 0.64rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
+.track-dato:last-child {
+  border-bottom: 0;
+  padding-bottom: 0.05rem;
+}
+.track-dato-icono {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.12rem;
+  border-radius: 6px;
+  background: var(--naranja-suave);
+  color: var(--naranja-oscuro);
+}
+.track-dato-icono svg {
+  width: 0.78rem;
+  height: 0.78rem;
+}
+.track-dato-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+/* Etiqueta secundaria chica; el valor manda. */
+.track-dato-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: #94a3b8;
+  line-height: 1.2;
 }
 .track-dato strong {
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: var(--navy);
-  line-height: 1.25;
+  color: var(--ink);
+  line-height: 1.3;
   word-break: break-word;
 }
-.track-dato-wide { grid-column: 1 / -1; }
 .track-foot-bar .track-card-actions {
-  flex: 0 0 auto;
-  margin-left: auto;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  margin-left: 0;
 }
 @media (max-width: 900px) {
-  .track-detalle { grid-template-columns: 1fr 1fr; }
+  .track-foot-bar {
+    grid-template-columns: 1fr;
+  }
+  .track-detalle { max-width: none; }
   .track-foot-bar .track-card-actions {
+    grid-column: 1;
+    grid-row: auto;
     width: 100%;
     justify-content: flex-end;
   }
@@ -889,7 +954,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.22rem;
-  color: var(--navy);
+  color: var(--ink);
   letter-spacing: -0.01em;
 }
 
@@ -949,6 +1014,7 @@
   margin: 0;
 }
 
+/* Flujo interno: siempre naranja (el color de etapa va en el contorno). */
 .track-step.done .track-node {
   background: #f45b20;
   border-color: #f45b20;
@@ -1066,7 +1132,7 @@
 }
 
 .track-facts div {
-  background: #f8fafc;
+  background: var(--card-2);
   border: 1px solid var(--borde);
   border-radius: 12px;
   padding: 0.55rem 0.7rem;
@@ -1083,7 +1149,7 @@
 
 .track-facts dd {
   margin: 0;
-  color: var(--navy);
+  color: var(--ink);
   font-weight: 700;
   font-size: 0.92rem;
 }
@@ -1142,14 +1208,14 @@
   font: inherit;
   resize: vertical;
   min-height: 88px;
-  background: #f8fafc;
+  background: var(--card-2);
   color: var(--texto);
   margin-bottom: 0.85rem;
 }
 
 .recv-textarea:focus {
   outline: none;
-  background: #fff;
+  background: var(--card);
   border-color: #fdba74;
   box-shadow: 0 0 0 4px rgba(232, 90, 28, .12);
 }
@@ -1202,11 +1268,11 @@
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--borde);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--card-2);
 }
 
 .act-lista strong {
-  color: var(--navy);
+  color: var(--ink);
   font-size: 0.92rem;
 }
 
@@ -1331,7 +1397,7 @@
   padding: 0;
   border: 0;
   border-radius: 18px;
-  background: #fff;
+  background: var(--card);
   color: var(--texto);
   box-shadow: 0 24px 60px rgba(11, 31, 75, 0.28);
 }
@@ -1354,7 +1420,7 @@
 
 .flujo-modal h2 {
   margin: 0;
-  color: var(--navy);
+  color: var(--ink);
   font-size: 1.35rem;
   line-height: 1.25;
 }
@@ -1364,12 +1430,12 @@
   padding: 1rem 1rem 1.05rem;
   border: 1px solid var(--borde);
   border-radius: 16px;
-  background: #f8fafc;
+  background: var(--card-2);
 }
 
 .flujo-paso-titulo {
   margin: 0;
-  color: var(--navy);
+  color: var(--ink);
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.3;
@@ -1447,7 +1513,7 @@
   padding: 0.75rem 0.9rem;
   font: inherit;
   resize: vertical;
-  background: #fff;
+  background: var(--card);
   color: var(--texto);
 }
 
@@ -1457,22 +1523,46 @@
   box-shadow: 0 0 0 4px rgba(232, 90, 28, 0.12);
 }
 
+/* Corregir = acción secundaria (texto), no compite con “Pasar de etapa”. */
 .track-card-actions .btn-corregir {
-  background: #fff;
-  color: var(--navy);
-  border: 1px solid var(--borde);
-  font-size: 0.9rem;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  box-shadow: none;
+  font-size: 0.75rem;
+  font-weight: 650;
+  padding: 0.2rem 0.35rem;
+  min-height: 0;
+  gap: 0.25rem;
+}
+.track-card-actions .btn-corregir .sigte-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  opacity: 0.75;
+}
+.track-card-actions .btn-corregir:hover {
+  background: transparent;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.track-card-actions .btn-dark {
+  font-size: 0.82rem;
+  padding: 0.45rem 0.75rem;
 }
 
 .track-card.is-proceso-listo .btn-corregir {
+  color: #64748b;
+  border: 0;
+}
+.track-card.is-proceso-listo .btn-corregir:hover {
   color: #166534;
-  border-color: #86efac;
 }
 
 .track-card.is-urgent .btn-corregir {
-  background: #ffffff;
-  color: var(--navy);
-  border-color: var(--borde);
+  background: transparent;
+  color: var(--muted);
+  border: 0;
 }
 
 .flujo-pasar {
@@ -1486,7 +1576,7 @@
   padding: 1rem 1rem 1.05rem;
   border: 1px solid var(--borde);
   border-radius: 16px;
-  background: #f8fafc;
+  background: var(--card-2);
 }
 
 .flujo-pasar .flujo-paso-titulo {
@@ -1515,7 +1605,7 @@
 .flujo-tiempo>span:first-child {
   flex: 1;
   min-width: 0;
-  color: var(--navy);
+  color: var(--ink);
   font-size: 0.88rem;
   font-weight: 700;
 }
@@ -1528,8 +1618,8 @@
   font: inherit;
   font-weight: 700;
   text-align: center;
-  background: #fff;
-  color: var(--navy);
+  background: var(--card);
+  color: var(--ink);
 }
 
 .flujo-minutos:focus {
@@ -1547,8 +1637,8 @@
 
 .flujo-chip {
   border: 1px solid var(--borde);
-  background: #fff;
-  color: var(--navy);
+  background: var(--card);
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.4rem 0.8rem;
   font-family: var(--font-display);
@@ -1571,8 +1661,8 @@
   border-radius: 12px;
   padding: 0.45rem 0.7rem;
   font: inherit;
-  background: #fff;
-  color: var(--navy);
+  background: var(--card);
+  color: var(--ink);
 }
 
 .flujo-detalle:focus {
@@ -1644,6 +1734,7 @@
   font-weight: 700;
 }
 
+/* Listo para pasar: tarjeta y flujo en verde. */
 .track-card.is-proceso-listo {
   background: #ecfdf3;
   border-color: #86efac;
@@ -1664,7 +1755,7 @@
 .track-card.is-proceso-listo .badge-lavado,
 .track-card.is-proceso-listo .badge-armado,
 .track-card.is-proceso-listo .badge-esteril {
-  background: #fff;
+  background: var(--card);
   color: #166534;
   border: 1px solid #86efac;
 }
@@ -1746,13 +1837,13 @@
 }
 
 .track-card.is-urgent {
-  background: #ffffff;
+  background: var(--card);
   border: 1px solid #fecaca;
   box-shadow: 0 6px 18px rgba(185, 28, 28, 0.05);
 }
 
 .track-card.is-urgent .track-head h2 {
-  color: var(--navy);
+  color: var(--ink);
 }
 
 .track-card.is-urgent .track-head p,
@@ -1766,7 +1857,7 @@
 .track-card.is-urgent .badge-armado,
 .track-card.is-urgent .badge-esteril,
 .track-card.is-urgent .badge-listo {
-  background: #fff;
+  background: var(--card);
   color: #b91c1c;
   border: 1px solid #fca5a5;
 }
@@ -1778,8 +1869,8 @@
 }
 
 .track-card.is-urgent .badge:not(.badge-urgent):not(.badge-listo) {
-  background: #fff;
-  color: var(--navy);
+  background: var(--card);
+  color: var(--ink);
   border: 1px solid var(--borde);
 }
 
@@ -1842,7 +1933,7 @@
 }
 
 .track-card.is-urgent .track-facts div {
-  background: #f8fafc;
+  background: var(--card-2);
   border-color: var(--borde);
 }
 
@@ -1851,7 +1942,7 @@
 }
 
 .track-card.is-urgent .track-facts dd {
-  color: var(--navy);
+  color: var(--ink);
 }
 
 .track-card.is-proceso-listo:hover {
@@ -1874,7 +1965,7 @@
 .shell-ops .btn-ghost:hover,
 .flujo-modal .btn-ghost:hover {
   transform: translateY(-1px);
-  background: #f8fafc;
+  background: var(--card-2);
   border-color: #cbd5e1;
   text-decoration: none;
 }
@@ -1886,13 +1977,15 @@
 }
 
 .track-card.is-proceso-listo .btn-corregir:hover {
-  background: #f0fdf4;
-  border-color: #4ade80;
+  background: transparent;
+  border-color: transparent;
+  color: #166534;
 }
 
 .track-card.is-urgent .btn-corregir:hover {
-  background: #fff;
-  border-color: #f87171;
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1975,7 +2068,7 @@
   width: 100%;
   min-height: 52px;
   padding: 12px 15px;
-  background: #f8fafc;
+  background: var(--card-2);
   border: 1px solid #dce4ee;
   border-radius: 12px;
   color: #14294b;
@@ -1990,7 +2083,7 @@
 .recv-select:focus,
 .recv-input:focus {
   outline: 0;
-  background: #fff;
+  background: var(--card);
   border-color: #f36b2c;
   box-shadow: 0 0 0 3px rgba(243, 107, 44, .12);
 }

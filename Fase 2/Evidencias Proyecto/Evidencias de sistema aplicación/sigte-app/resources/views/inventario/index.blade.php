@@ -39,16 +39,7 @@ $totalElementos = collect($libros)->sum('tipos');
         </div>
         @include('partials.menu-rol')
 
-        <div class="sidebar-foot">
-            <div class="side-user">
-                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
-                <div>
-                    <strong>{{ $usuario['nombre'] }}</strong>
-                    <small>{{ $usuario['rol'] }}</small>
-                </div>
-            </div>
-            @include('partials.logout')
-        </div>
+        @include('partials.sidebar-foot')
     </aside>
 
     <main class="main inv-vista sala-{{ $sala }}">
@@ -334,7 +325,8 @@ $totalElementos = collect($libros)->sum('tipos');
                             </td>
                             @endif
                         </tr>
-                        @endforeach
+                        @empty
+                        @endforelse
 
                         <tr id="inv-sin-resultados" hidden>
                             <td colspan="{{ ($puedeReponer || ($esOperador && $sala === 'lavado')) ? 8 : 7 }}" class="text-center">
@@ -351,7 +343,7 @@ $totalElementos = collect($libros)->sum('tipos');
                 <div class="inv-paginacion-info">
                     <label for="inv-items-pagina">Elementos por página</label>
 
-                    <select id="inv-items-pagina">
+                    <select id="inv-items-pagina" data-sigte-lista="1">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>

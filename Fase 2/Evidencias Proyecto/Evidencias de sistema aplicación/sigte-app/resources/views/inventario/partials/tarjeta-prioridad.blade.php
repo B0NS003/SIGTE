@@ -79,7 +79,8 @@
                 Elementos por página
             </label>
 
-            <select id="inv-prioridades-items-pagina">
+            {{-- data-sigte-lista=1 evita el selector custom (rompe el change en paginación) --}}
+            <select id="inv-prioridades-items-pagina" data-sigte-lista="1">
                 <option value="5" selected>5</option>
                 <option value="10">10</option>
                 <option value="20">20</option>

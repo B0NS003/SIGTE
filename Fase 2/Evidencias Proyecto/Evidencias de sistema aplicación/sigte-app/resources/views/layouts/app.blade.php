@@ -8,6 +8,9 @@
     <script>
         (function () {
             try {
+                if (localStorage.getItem('sigte-tema') === 'oscuro') {
+                    document.documentElement.setAttribute('data-tema', 'oscuro');
+                }
                 var enLogin = window.location.pathname.indexOf('/login') !== -1;
                 if (enLogin) {
                     sessionStorage.removeItem('sigte-carga');
@@ -253,6 +256,7 @@
             });
         })();
     </script>
+    <script src="{{ asset('js/sigte-tema.js') }}?v={{ @filemtime(public_path('js/sigte-tema.js')) }}"></script>
     <script src="{{ asset('js/sigte-controles.js') }}?v={{ @filemtime(public_path('js/sigte-controles.js')) }}"></script>
 </body>
 </html>

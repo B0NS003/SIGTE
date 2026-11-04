@@ -39,7 +39,7 @@
     padding: 13px 14px;
     border: 1px solid #d4dfd9;
     border-radius: 11px;
-    background: #fff;
+    background: var(--card);
     color: inherit;
     font-family: inherit;
     font-size: 13px;

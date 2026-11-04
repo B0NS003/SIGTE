@@ -176,6 +176,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Desde "Prioridades de reposición" (?elemento=CODIGO) abrir el modal al llegar a la sala.
+    const codigoInicial = new URLSearchParams(window.location.search).get('elemento');
+    if (codigoInicial) {
+        const botonInicial = Array.prototype.find.call(botones, function (boton) {
+            return boton.dataset.codigo === codigoInicial;
+        });
+        if (botonInicial) {
+            abrirModal(botonInicial);
+        }
+    }
+
     cerrar.addEventListener('click', cerrarModal);
 
     const temporizadorFechaHora = setInterval(function () {

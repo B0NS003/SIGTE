@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
         /* Ocultar todas las filas primero. */
         filas.forEach(function (fila) {
             fila.hidden = true;
+            fila.classList.add('is-pagina-oculta');
         });
 
         /* Mostrar solamente las filas de la página actual. */
@@ -150,6 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .slice(inicio, fin)
             .forEach(function (fila) {
                 fila.hidden = false;
+                fila.classList.remove('is-pagina-oculta');
             });
 
         /* Mensaje cuando no hay resultados. */

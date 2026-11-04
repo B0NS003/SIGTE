@@ -171,24 +171,44 @@
             <summary>
                 <span class="track-summary-label">Más información</span>
             </summary>
-            <div class="track-detalle">
-                <div class="track-dato">
-                    <span>Actividad</span>
-                    <strong data-actividad>{{ $caja['actividad'] ?: 'Sin anotar' }}</strong>
-                </div>
-                <div class="track-dato">
-                    <span>Ubicación</span>
-                    <strong>{{ $caja['ubicacion'] }}</strong>
-                </div>
-                <div class="track-dato">
-                    <span>Desde</span>
-                    <strong>{{ $caja['hora'] }}</strong>
-                </div>
-                <div class="track-dato track-dato-wide">
-                    <span>Responsable</span>
-                    <strong>{{ $caja['operadora'] }}</strong>
-                </div>
-            </div>
+            <ul class="track-detalle" aria-label="Detalle de la caja">
+                <li class="track-dato">
+                    <span class="track-dato-icono" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 5h11M9 12h11M9 19h11"/>
+                            <path d="M4 5h.01M4 12h.01M4 19h.01"/>
+                        </svg>
+                    </span>
+                    <span class="track-dato-texto">
+                        <span class="track-dato-label">Actividad</span>
+                        <strong data-actividad>{{ $caja['actividad'] ?: 'Sin anotar' }}</strong>
+                    </span>
+                </li>
+                <li class="track-dato">
+                    <span class="track-dato-icono" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"/>
+                            <circle cx="12" cy="10" r="2.5"/>
+                        </svg>
+                    </span>
+                    <span class="track-dato-texto">
+                        <span class="track-dato-label">Ubicación</span>
+                        <strong>{{ $caja['ubicacion'] }}</strong>
+                    </span>
+                </li>
+                <li class="track-dato">
+                    <span class="track-dato-icono" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="8"/>
+                            <path d="M12 8v4.5l2.5 1.5"/>
+                        </svg>
+                    </span>
+                    <span class="track-dato-texto">
+                        <span class="track-dato-label">Desde</span>
+                        <strong>{{ $caja['hora'] }}</strong>
+                    </span>
+                </li>
+            </ul>
         </details>
         @if (($usuario['rol'] ?? '') === 'Operadora')
             <div class="track-card-actions">
