@@ -30,49 +30,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let botonAnterior = null;
 
-    let temporizadorConfirmacion;
-
     /* Zona horaria de Chile en automático */
     function actualizarFechaHoraModal() {
-        if (!fechaHoraModal) {
-            return;
-        }
-
-        const ahora = new Date();
-
-        const fecha = new Intl.DateTimeFormat('es-CL', {
-            timeZone: 'America/Santiago',
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        }).format(ahora);
-
-        const hora = new Intl.DateTimeFormat('es-CL', {
-            timeZone: 'America/Santiago',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).format(ahora);
-
-        const usuario = fechaHoraModal.dataset.usuario;
-
-        fechaHoraModal.textContent = `${usuario} · ${fecha} · ${hora}`;
+        actualizarFechaHoraCompartida(fechaHoraModal);
     }
 
     function mostrarConfirmacion(mensaje) {
-        if (!toastConfirmacion || !toastConfirmacionTexto) {
-            return;
-        }
-
-        clearTimeout(temporizadorConfirmacion);
-
-        toastConfirmacionTexto.textContent = mensaje;
-        toastConfirmacion.hidden = false;
-
-        temporizadorConfirmacion = setTimeout(function () {
-            toastConfirmacion.hidden = true;
-        }, 2000);
+        mostrarToastCompartido(
+            toastConfirmacion,
+            toastConfirmacionTexto,
+            mensaje
+        );
     }
 
     function validarCantidad() {
@@ -235,16 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'button[type="submit"], input[type="submit"]'
         );
 
-        const textoOriginal = botonEnviar
-            ? botonEnviar.textContent
-            : '';
-
-        if (botonEnviar) {
-            botonEnviar.disabled = true;
-            if (botonEnviar.tagName === 'BUTTON') {
-                botonEnviar.textContent = 'Registrando...';
-            }
-        }
+        const restaurarBoton = iniciarEnvioBoton(botonEnviar);
 
         try {
             const respuesta = await fetch(formularioReposicion.action, {
@@ -339,13 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             alert(error.message || 'Ocurrió un error al registrar la reposición.');
         } finally {
-            if (botonEnviar) {
-                botonEnviar.disabled = false;
-
-                if (botonEnviar.tagName === 'BUTTON') {
-                    botonEnviar.textContent = textoOriginal || 'Registrar';
-                }
-            }
+            restaurarBoton();
         }
     });
 

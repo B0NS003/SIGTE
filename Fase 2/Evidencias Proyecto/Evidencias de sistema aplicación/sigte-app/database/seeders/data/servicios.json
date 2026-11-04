@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "codigo": "pabellon",
+    "nombre": "Pabellon"
+  },
+  {
+    "id": 2,
+    "codigo": "dental",
+    "nombre": "Dental"
+  },
+  {
+    "id": 3,
+    "codigo": "maternidad",
+    "nombre": "Maternidad"
+  },
+  {
+    "id": 4,
+    "codigo": "urgencia",
+    "nombre": "Urgencia"
+  },
+  {
+    "id": 5,
+    "codigo": "uci",
+    "nombre": "UCI"
+  },
+  {
+    "id": 6,
+    "codigo": "curaciones",
+    "nombre": "Curaciones"
+  },
+  {
+    "id": 7,
+    "codigo": "general",
+    "nombre": "General"
+  },
+  {
+    "id": 8,
+    "codigo": "otro",
+    "nombre": "Otro servicio"
+  }
+]

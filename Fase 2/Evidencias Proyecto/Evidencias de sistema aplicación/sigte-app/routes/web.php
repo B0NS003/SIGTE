@@ -42,7 +42,9 @@ Route::middleware('auth')->group(function () {
         # Inventario
         Route::get('/consulta/inventario', [InventarioController::class, 'inventario'])->name('mockups.inventario');
         Route::post('/consulta/inventario/reposicion', [InventarioController::class, 'registrarReposicion'])->name('mockups.inventario.reponer');
+        Route::post('/consulta/inventario/consumo', [InventarioController::class, 'registrarConsumo'])->name('mockups.inventario.consumir');
         Route::get('/consulta/inventario/{sala}/{codigo}/historial', [InventarioController::class, 'historialElemento'])->name('mockups.inventario.historial');
+        Route::get('/consulta/inventario/{sala}/{codigo}/historial-consumos', [InventarioController::class, 'historialConsumos'])->name('mockups.inventario.historial-consumos');
 
         Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('mockups.usuarios');
         Route::get('/admin/turnos', [AdminController::class, 'turnos'])->name('mockups.turnos');

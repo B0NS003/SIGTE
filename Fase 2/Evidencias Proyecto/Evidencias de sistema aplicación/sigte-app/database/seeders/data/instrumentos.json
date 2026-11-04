@@ -1,0 +1,1248 @@
+[
+  {
+    "id": 2190,
+    "nombre": "Farabeuf",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2191,
+    "nombre": "Separador Punta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2192,
+    "nombre": "Valva de Pared",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2193,
+    "nombre": "Pinza Backausse",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2194,
+    "nombre": "Pinza Anatómica Larga",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2195,
+    "nombre": "Pinza Anatómica Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2196,
+    "nombre": "Pinza Quirúrgica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2197,
+    "nombre": "Pinza Babcock",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2198,
+    "nombre": "Pinza Foerster",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2199,
+    "nombre": "Pinza Kocher Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2200,
+    "nombre": "Pinza Kelly Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2201,
+    "nombre": "Tijera de Disección Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2202,
+    "nombre": "Tijera de Hilo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2203,
+    "nombre": "Disectores",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2204,
+    "nombre": "Porta Agujas",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2205,
+    "nombre": "Mango Bisturí",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2206,
+    "nombre": "Pinza Anatómica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2207,
+    "nombre": "Pinza Crile",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2208,
+    "nombre": "Tijera de Disección",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2209,
+    "nombre": "Separador Richardson",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2210,
+    "nombre": "Separador Ancho (Roux)",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2211,
+    "nombre": "Separador Puntas",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 2212,
+    "nombre": "Cable de Fibra",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2213,
+    "nombre": "Cable Monopolar",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2214,
+    "nombre": "Hook",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2215,
+    "nombre": "Pinza de Fijación + Goma Blanca",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2216,
+    "nombre": "Pinza Berci (Facias)",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2217,
+    "nombre": "Aspirador",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2218,
+    "nombre": "Punzón Vesicular",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2219,
+    "nombre": "Pinza Fenestrada",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2220,
+    "nombre": "Pinzas Dobles Fenestradas",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2221,
+    "nombre": "Maryland",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2222,
+    "nombre": "Grasper",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2223,
+    "nombre": "Endo Click",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2224,
+    "nombre": "Tijera",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2225,
+    "nombre": "Pinzas Intestino",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2226,
+    "nombre": "Pinza Toma Vesícula",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 2
+  },
+  {
+    "id": 2227,
+    "nombre": "Clamp Recto",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2228,
+    "nombre": "Porta Aguja",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2229,
+    "nombre": "Mosquito Curvo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2230,
+    "nombre": "Pinza Babcock",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2231,
+    "nombre": "Disector",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2232,
+    "nombre": "Pinza Backhaus",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2233,
+    "nombre": "Copela",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2234,
+    "nombre": "Aspirador Fenestrado",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2235,
+    "nombre": "Mango Bisturí #3",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2236,
+    "nombre": "Diver",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2237,
+    "nombre": "Valva de Pared",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2238,
+    "nombre": "Pinza Anatómica Larga",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2239,
+    "nombre": "Pinza Anatómica Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2240,
+    "nombre": "Pinza Quirúrgica Mediana",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2241,
+    "nombre": "Pinza Quirúrgica Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2242,
+    "nombre": "Kelly Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2243,
+    "nombre": "Kelly Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2244,
+    "nombre": "Mosquito Curvo Mediano",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2245,
+    "nombre": "Mosquito Curvo Pequeño",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2246,
+    "nombre": "Pinza Foerster",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2247,
+    "nombre": "Separador Farabeuf",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2248,
+    "nombre": "Pinza Torácica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2249,
+    "nombre": "Valva Maleable",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2250,
+    "nombre": "Tijera de Disección",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2251,
+    "nombre": "Clamps",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2252,
+    "nombre": "Tijera de Hilo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 3
+  },
+  {
+    "id": 2253,
+    "nombre": "Farabeuf",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2254,
+    "nombre": "Deaver",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2255,
+    "nombre": "Sonda Acanalada",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2256,
+    "nombre": "Aspirador Fenestrado",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2257,
+    "nombre": "Ligadura (Piezas)",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2258,
+    "nombre": "Estilete",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2259,
+    "nombre": "Cucharilla",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2260,
+    "nombre": "Pinza Backausse",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2261,
+    "nombre": "Mosquito Curvo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2262,
+    "nombre": "Pinza Anatómica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2263,
+    "nombre": "Pinza Quirúrgica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2264,
+    "nombre": "Pinza Babcock",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2265,
+    "nombre": "Pinza Foerster",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2266,
+    "nombre": "Pinza Kocher Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2267,
+    "nombre": "Pinza Kelly Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2268,
+    "nombre": "Pinza Kelly Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2269,
+    "nombre": "Disector",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2270,
+    "nombre": "Tijera Metzenbaum",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2271,
+    "nombre": "Tijera de Hilo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2272,
+    "nombre": "Porta Aguja",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2273,
+    "nombre": "Mango Bisturí",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2274,
+    "nombre": "Anoscopio",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2275,
+    "nombre": "Pinza Anatómica Larga",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2276,
+    "nombre": "Pinza Anatómica Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2277,
+    "nombre": "Disector (TK 12306-23 12317-21)",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2278,
+    "nombre": "Tijera Metzenbaum Mediana",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2279,
+    "nombre": "Tijera Metzenbaum Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2280,
+    "nombre": "Mango Bisturí N° 3",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2281,
+    "nombre": "Mango Bisturí N° 4",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 4
+  },
+  {
+    "id": 2282,
+    "nombre": "Valva de Pared",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2283,
+    "nombre": "Valva Maleable",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2284,
+    "nombre": "Valva Mikulicz",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2285,
+    "nombre": "Deaver",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2286,
+    "nombre": "Satinsky",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2287,
+    "nombre": "Backhaus",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2288,
+    "nombre": "Kelly Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2289,
+    "nombre": "Disectores",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2290,
+    "nombre": "Kocher Recta Larga",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2291,
+    "nombre": "Foerster",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2292,
+    "nombre": "Babcock",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2293,
+    "nombre": "Pinza Corazón",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2294,
+    "nombre": "Farabeuf",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2295,
+    "nombre": "Mango Bisturí #3",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2296,
+    "nombre": "Mango Bisturí #4",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2297,
+    "nombre": "Tijera de Disección",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2298,
+    "nombre": "Tijera Mayo Larga",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2299,
+    "nombre": "Tijera Mayo Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2300,
+    "nombre": "Pinza Anatómica Larga",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2301,
+    "nombre": "Pinza Anatómica Corta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2302,
+    "nombre": "Pinza Quirúrgica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2303,
+    "nombre": "Porta Agujas",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 5
+  },
+  {
+    "id": 2304,
+    "nombre": "Separador Farabeuf",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2305,
+    "nombre": "Pinza Backausse",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2306,
+    "nombre": "Pinza Anatómica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2307,
+    "nombre": "Pinza Quirúrgica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2308,
+    "nombre": "Pinza Adson",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2309,
+    "nombre": "Sonda Acanalada",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2310,
+    "nombre": "Tijera de Disección",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2311,
+    "nombre": "Tijera de Hilo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2312,
+    "nombre": "Porta Aguja",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2313,
+    "nombre": "Pinza Babcock",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2314,
+    "nombre": "Pinza Kelly Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2315,
+    "nombre": "Pinza Kelly Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2316,
+    "nombre": "Mango Bisturí",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2317,
+    "nombre": "Pinza Mosquito Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2318,
+    "nombre": "Pinza Mosquito Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2319,
+    "nombre": "Disector Curvo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2320,
+    "nombre": "Pinza Foerster",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2321,
+    "nombre": "Pinza Disector",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2322,
+    "nombre": "Separador de Párpados",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2323,
+    "nombre": "Mango Bisturí #3",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2324,
+    "nombre": "Pinza Mosquito Curva 14 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2325,
+    "nombre": "Pinza Backausse 9 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2326,
+    "nombre": "Separador Farabeuf 12 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2327,
+    "nombre": "Pinza Kelly Curva 14 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2328,
+    "nombre": "Pinza de Disección 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2329,
+    "nombre": "Pinza Babcock 15,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2330,
+    "nombre": "Porta Aguja Mayo 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2331,
+    "nombre": "Pinza Mosquito Curva 10 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2332,
+    "nombre": "Pinza Foerster Recta 20,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2333,
+    "nombre": "Pinza Mosquito Recta 12 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2334,
+    "nombre": "Pinza Adson Anatómica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2335,
+    "nombre": "Pinza Adson de Disección 12 cm con Dientes",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2336,
+    "nombre": "Tijera Mayo Curva 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2337,
+    "nombre": "Pinza Anatómica 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2338,
+    "nombre": "Pinza Kelly Recta 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2339,
+    "nombre": "Pinza Kocher Recta 14 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2340,
+    "nombre": "Tijera Mayo Recta 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2341,
+    "nombre": "Pinza Allis 15,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2342,
+    "nombre": "Cubeta Redonda",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2343,
+    "nombre": "Sonda Acanalada 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2344,
+    "nombre": "Pinza Babcock 16 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2345,
+    "nombre": "Mango Bisturí #3 de 12 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2346,
+    "nombre": "Pinza Mosquito Curva 12 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2347,
+    "nombre": "Pinza Adson Anatómica 12 cm sin Dientes",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2348,
+    "nombre": "Pinza Kelly Hemostática Recta 14 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2349,
+    "nombre": "Pinza Quirúrgica 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2350,
+    "nombre": "Pinza Kocher Recta 14,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2351,
+    "nombre": "Pinza Disector 13,5 cm",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 6
+  },
+  {
+    "id": 2352,
+    "nombre": "Tijera de Disección",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2353,
+    "nombre": "Tijera de Hilo",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2354,
+    "nombre": "Pinza Mosquito Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2355,
+    "nombre": "Pinza Kelly Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2356,
+    "nombre": "Pinza Backausse",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2357,
+    "nombre": "Pinza Adson Anatómica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2358,
+    "nombre": "Pinza Adson sin Diente",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2359,
+    "nombre": "Pinza Mosquito Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2360,
+    "nombre": "Pinza Anatómica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2361,
+    "nombre": "Pinza Kelly Recta",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2362,
+    "nombre": "Pinza Adson Quirúrgica",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2363,
+    "nombre": "Pinza Kocher Curva",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2364,
+    "nombre": "Mango Bisturí N° 3",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2365,
+    "nombre": "Pinza Foerster",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2366,
+    "nombre": "Pinza Adson con Diente",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  },
+  {
+    "id": 2367,
+    "nombre": "Porta Aguja",
+    "tamano": "",
+    "codigo_fabricante": "",
+    "tipo_conjunto_id": 7
+  }
+]
