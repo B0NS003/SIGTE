@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "codigo": "APENDICE",
+    "nombre_conjunto": "Apendice",
+    "servicio_id": 1
+  },
+  {
+    "id": 2,
+    "codigo": "BARIATRICA",
+    "nombre_conjunto": "Bariatrica",
+    "servicio_id": 1
+  },
+  {
+    "id": 3,
+    "codigo": "GASTRO",
+    "nombre_conjunto": "Gastro",
+    "servicio_id": 1
+  },
+  {
+    "id": 4,
+    "codigo": "PROCTOLOGIA",
+    "nombre_conjunto": "Proctologia",
+    "servicio_id": 1
+  },
+  {
+    "id": 5,
+    "codigo": "COLON",
+    "nombre_conjunto": "Colon",
+    "servicio_id": 1
+  },
+  {
+    "id": 6,
+    "codigo": "NIÑO",
+    "nombre_conjunto": "Niño",
+    "servicio_id": 1
+  },
+  {
+    "id": 7,
+    "codigo": "FIMOSIS",
+    "nombre_conjunto": "Fimosis",
+    "servicio_id": 1
+  },
+  {
+    "id": 8,
+    "codigo": "CVC",
+    "nombre_conjunto": "CVC",
+    "servicio_id": 1
+  },
+  {
+    "id": 9,
+    "codigo": "CAJA RINOSEPTOPLASTIA",
+    "nombre_conjunto": "Caja rinoseptoplastia",
+    "servicio_id": 1
+  },
+  {
+    "id": 10,
+    "codigo": "SHAVER STRYKER + FIBRA",
+    "nombre_conjunto": "Shaver Stryker + fibra",
+    "servicio_id": 1
+  },
+  {
+    "id": 11,
+    "codigo": "CAJA NUEVA HERNIA",
+    "nombre_conjunto": "Caja nueva hernia",
+    "servicio_id": 1
+  },
+  {
+    "id": 12,
+    "codigo": "COLE-LAP",
+    "nombre_conjunto": "COLE-LAP",
+    "servicio_id": 1
+  },
+  {
+    "id": 13,
+    "codigo": "BASE LAPAROSCOPICA",
+    "nombre_conjunto": "Base laparoscopica",
+    "servicio_id": 1
+  },
+  {
+    "id": 14,
+    "codigo": "VESICULA",
+    "nombre_conjunto": "Vesicula",
+    "servicio_id": 1
+  },
+  {
+    "id": 15,
+    "codigo": "HISTERECTOMIAS LAP",
+    "nombre_conjunto": "Histerectomias LAP",
+    "servicio_id": 1
+  }
+]
