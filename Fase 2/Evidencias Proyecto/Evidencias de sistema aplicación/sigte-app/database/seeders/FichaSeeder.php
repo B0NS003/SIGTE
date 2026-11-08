@@ -5,161 +5,116 @@ namespace Database\Seeders;
 use App\Models\Ficha;
 use App\Models\FichaInstrumento;
 use App\Models\Instrumento;
+use App\Models\TipoConjunto;
 use Illuminate\Database\Seeder;
 
+/** Catálogo desde JSON de fichas_catalogo / instrumentos / tipo_conjunto. */
 class FichaSeeder extends Seeder
 {
     public function run(): void
     {
-        $ruta = database_path('seeders/data/fichas.json');
-        if (! is_file($ruta)) {
+        $tiposJson = $this->leer('tipo_conjunto.json');
+        $fichasJson = $this->leer('fichas_catalogo.json');
+        $instrumentosJson = $this->leer('instrumentos.json');
+        $lineasJson = $this->leer('ficha_instrumentos.json');
+
+        if ($tiposJson === null || $fichasJson === null || $instrumentosJson === null || $lineasJson === null) {
             return;
         }
 
-        $fichas = json_decode((string) file_get_contents($ruta), true);
-        if (! is_array($fichas)) {
-            return;
-        }
-
-        foreach ($fichas as $ficha) {
-            $nombre = $this->nombre($ficha['nombre'] ?? '');
-            if ($nombre === '') {
-                continue;
-            }
-
-            $registro = Ficha::query()->updateOrCreate(
-                ['codigo' => $ficha['codigo']],
+        /** @var array<int, int> $mapaTipos id JSON → id BD */
+        $mapaTipos = [];
+        foreach ($tiposJson as $tipo) {
+            $registro = TipoConjunto::query()->updateOrCreate(
+                ['codigo' => (string) $tipo['codigo']],
                 [
-                    'nombre' => $nombre,
-                    'numero' => ($ficha['numero'] ?? '') !== '' ? (string) $ficha['numero'] : null,
-                    'codigo_referencia' => ($ficha['codigo_referencia'] ?? '') !== '' ? (string) $ficha['codigo_referencia'] : null,
-                    'tipo' => ($ficha['tipo'] ?? 'caja') === 'set' ? 'set' : 'caja',
-                    'area' => $this->area((string) ($ficha['hoja'] ?? '')),
+                    'nombre_conjunto' => (string) $tipo['nombre_conjunto'],
+                    'servicio_id' => $tipo['servicio_id'] ?? null,
                 ]
             );
+            $mapaTipos[(int) $tipo['id']] = (int) $registro->id;
+        }
 
-            $registro->items()->delete();
-            $orden = 0;
-            foreach ($ficha['items'] ?? [] as $item) {
-                $instrumentoNombre = trim((string) ($item['nombre'] ?? ''));
-                if ($instrumentoNombre === '') {
-                    continue;
-                }
-                $instrumento = Instrumento::query()->firstOrCreate(
-                    [
-                        'nombre' => mb_substr($instrumentoNombre, 0, 160),
-                        'tamano' => mb_substr(trim((string) ($item['tamano'] ?? '')), 0, 40),
-                        'codigo_fabricante' => mb_substr(trim((string) ($item['codigo'] ?? '')), 0, 80),
-                    ]
-                );
-                FichaInstrumento::query()->updateOrCreate(
-                    [
-                        'ficha_id' => $registro->id,
-                        'instrumento_id' => $instrumento->id,
-                    ],
-                    [
-                        'cantidad' => max(1, (int) ($item['cantidad'] ?? 1)),
-                        'orden' => $orden,
-                    ]
-                );
-                $orden++;
+        $instrumentosNecesarios = collect($lineasJson)
+            ->pluck('instrumento_id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->all();
+
+        $porIdJson = collect($instrumentosJson)->keyBy(fn ($i) => (int) $i['id']);
+
+        /** @var array<int, int> $mapaInstrumentos */
+        $mapaInstrumentos = [];
+        foreach ($instrumentosNecesarios as $idJson) {
+            $dato = $porIdJson->get($idJson);
+            if (! is_array($dato)) {
+                continue;
             }
+            $tipoId = isset($dato['tipo_conjunto_id'])
+                ? ($mapaTipos[(int) $dato['tipo_conjunto_id']] ?? null)
+                : null;
+
+            $atributos = [
+                'nombre' => mb_substr((string) ($dato['nombre'] ?? 'Instrumento'), 0, 160),
+                'tamano' => mb_substr((string) ($dato['tamano'] ?? ''), 0, 40),
+                'codigo_fabricante' => mb_substr((string) ($dato['codigo_fabricante'] ?? ''), 0, 80),
+                'tipo_conjunto_id' => $tipoId,
+            ];
+
+            $registro = Instrumento::query()->updateOrCreate(
+                $atributos,
+                []
+            );
+            $mapaInstrumentos[$idJson] = (int) $registro->id;
+        }
+
+        /** @var array<int, int> $mapaFichas */
+        $mapaFichas = [];
+        foreach ($fichasJson as $ficha) {
+            $tipoId = $mapaTipos[(int) ($ficha['tipo_conjunto_id'] ?? 0)] ?? null;
+            $registro = Ficha::query()->updateOrCreate(
+                ['codigo' => (string) $ficha['codigo']],
+                [
+                    'nombre' => mb_substr((string) $ficha['nombre'], 0, 160),
+                    'tipo' => (($ficha['tipo'] ?? 'caja') === 'set') ? 'set' : 'caja',
+                    'servicio_id' => $ficha['servicio_id'] ?? null,
+                    'tipo_conjunto_id' => $tipoId,
+                    'guia_visual' => (bool) ($ficha['guia_visual'] ?? false),
+                ]
+            );
+            $registro->items()->delete();
+            $mapaFichas[(int) $ficha['id']] = (int) $registro->id;
+        }
+
+        foreach ($lineasJson as $linea) {
+            $fichaId = $mapaFichas[(int) $linea['ficha_id']] ?? null;
+            $instrumentoId = $mapaInstrumentos[(int) $linea['instrumento_id']] ?? null;
+            if ($fichaId === null || $instrumentoId === null) {
+                continue;
+            }
+            $tipoId = isset($linea['tipo_conjunto_id'])
+                ? ($mapaTipos[(int) $linea['tipo_conjunto_id']] ?? null)
+                : null;
+
+            FichaInstrumento::query()->create([
+                'ficha_id' => $fichaId,
+                'instrumento_id' => $instrumentoId,
+                'tipo_conjunto_id' => $tipoId,
+                'cantidad' => max(1, (int) ($linea['cantidad'] ?? 1)),
+                'orden' => (int) ($linea['orden'] ?? 0),
+            ]);
         }
     }
 
-    private function area(string $hoja): string
+    /** @return list<array<string, mixed>>|null */
+    private function leer(string $archivo): ?array
     {
-        $clave = mb_strtoupper(trim(preg_replace('/\s+/u', ' ', $hoja) ?? ''));
-        if ($clave === '' || preg_match('/^HOJA\d+$/u', $clave) === 1) {
-            return 'Cirugía general';
+        $ruta = database_path('seeders/data/'.$archivo);
+        if (! is_file($ruta)) {
+            return null;
         }
+        $datos = json_decode((string) file_get_contents($ruta), true);
 
-        return self::AREAS[$clave] ?? 'Cirugía general';
-    }
-
-    /** @var array<string, string> */
-    private const AREAS = [
-        'APENDICE' => 'Cirugía general',
-        'FIMOSIS' => 'Cirugía general',
-        'CVC' => 'Cirugía general',
-        'CAJA NUEVA HERNIA' => 'Cirugía general',
-        'CAJA HERNIA INFANTIL Y ADULTO' => 'Cirugía general',
-        'REVISION' => 'Cirugía general',
-        'FINOQUETO' => 'Cirugía general',
-        'DR. VILLARROEL' => 'Cirugía general',
-        'CAJA DR. MORALES' => 'Cirugía general',
-        'GASTRO' => 'Digestiva',
-        'PROCTOLOGIA' => 'Digestiva',
-        'COLON' => 'Digestiva',
-        'COLE - LAP' => 'Digestiva',
-        'COLE-LAP ANTIGUAS' => 'Digestiva',
-        'BASE LAPAROSCOPICA' => 'Digestiva',
-        'VESICULA' => 'Digestiva',
-        'COLEDOCO' => 'Digestiva',
-        'BARIATRICA' => 'Bariátrica',
-        'ACCESORIOS BARIATRICA' => 'Bariátrica',
-        'NIÑO' => 'Niño',
-        'RN CATETER UMBILICAL' => 'Niño',
-        'HISTERECTOMIAS LAP' => 'Ginecología y obstetricia',
-        'BASES GINECOLOGICAS' => 'Ginecología y obstetricia',
-        'FIBRA Y OPTICAS GINE' => 'Ginecología y obstetricia',
-        'HISTEROSCOPIA' => 'Ginecología y obstetricia',
-        'RASPADO' => 'Ginecología y obstetricia',
-        'PROLAPSO O CERCLAJE' => 'Ginecología y obstetricia',
-        'HISTERECTOMIA' => 'Ginecología y obstetricia',
-        'CESAREA' => 'Ginecología y obstetricia',
-        'CAJA CIRUGÍA VASCULAR' => 'Cirugía vascular',
-        'CIRUGIA VASCULAR' => 'Cirugía vascular',
-        'SET CINCELES' => 'Cirugía vascular',
-        'UROLOGIA' => 'Urología',
-        'RTU' => 'Urología',
-        'URETERORRENOSCOPIO' => 'Urología',
-        'URETERO SEMIRIGIDO' => 'Urología',
-        'TOT' => 'Urología',
-        'SHAVER STRYKER + FIBRA' => 'Otorrino',
-        'ADENOAMIGDALAS' => 'Otorrino',
-        'OTORRINO' => 'Otorrino',
-        'RINOPLASTIA' => 'Otorrino',
-        'TRAUMATOLOGIA' => 'Traumatología',
-        'OPTICAS TRAUMA' => 'Traumatología',
-        'TMT MENOR1,2,3' => 'Traumatología',
-        'ARTROSCOPIA' => 'Traumatología',
-        'STRIKER, OPTICA Y TROCAR' => 'Traumatología',
-        'GRANDES FRAGMENTOS' => 'Traumatología',
-        'DHS' => 'Traumatología',
-        'P. FRAGM ANTIGUA' => 'Traumatología',
-        'P. FRAGMENTOS' => 'Traumatología',
-        'CAJA VITUS' => 'Traumatología',
-        'CLAVO AFFIXUS' => 'Traumatología',
-        'CAJA ZIPTIGHT' => 'Traumatología',
-        'SET DE CADERA I' => 'Traumatología',
-        'SET DE CADERA II' => 'Traumatología',
-        'SET DE CADERA ANTHOLOGY' => 'Traumatología',
-        'DR.CONTRERAS' => 'Traumatología',
-        'PLASTICA' => 'Cirugía plástica',
-        'CAJA CIRUGÍA PLASTICA NUEVA' => 'Cirugía plástica',
-        'DERMATOMO HUMECA' => 'Cirugía plástica',
-        'CAJA CHALAZIÓN OFT.' => 'Oftalmología',
-        'OFTAL. PTERIGION 01 Y CAJA SOS' => 'Oftalmología',
-        'OFTALMOLOGIA 2-6 CATARATAS' => 'Oftalmología',
-        'ESTRABISMO' => 'Oftalmología',
-        'PERIODONCIA' => 'Dental y maxilofacial',
-        'CAJAS ROJAS DE IMPLANTES' => 'Dental y maxilofacial',
-        'CIRUGIA DENTAL' => 'Dental y maxilofacial',
-        'CIRUGIA DENTOALVEOLAR' => 'Dental y maxilofacial',
-        'ORTOGNATICA - TRAUMA' => 'Dental y maxilofacial',
-        'CAJA CIRUGÍA ORTOGNÁTICA' => 'Dental y maxilofacial',
-        'BIOMATERIALES' => 'Dental y maxilofacial',
-    ];
-
-    private function nombre(string $nombre): string
-    {
-        $nombre = trim(preg_replace('/\s+/u', ' ', $nombre) ?? '');
-        $nombre = preg_replace('/^\*?\s*nombre\s*[:\-–—]+\s*caja\s*:\s*/iu', '', $nombre) ?? $nombre;
-        $nombre = preg_replace('/^\*?\s*nombre\s+caja\s*:\s*/iu', '', $nombre) ?? $nombre;
-        $nombre = preg_replace('/^\*?\s*nombre\s*[:\-–—]+\s*/iu', '', $nombre) ?? $nombre;
-        $nombre = preg_replace('/^\*?\s*nombre\s+/iu', '', $nombre) ?? $nombre;
-
-        return mb_substr(trim($nombre), 0, 160);
+        return is_array($datos) ? $datos : null;
     }
 }

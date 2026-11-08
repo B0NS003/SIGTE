@@ -1,0 +1,305 @@
+/* TRANSICIÓN ENTRE INVENTARIO Y REGISTRO
+   Permite cambiar de vista con un desplazamiento lateral. */
+
+/* CONTENEDOR PRINCIPAL DE AMBAS VISTAS */
+.inv-vistas-contenedor {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* VISTA DE INVENTARIO Y VISTA DE REGISTRO */
+.inv-vistas-contenedor > .inv-book,
+.inv-vistas-contenedor > .inv-registro-vista {
+    width: 100%;
+    min-width: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* VISTA DE INVENTARIO: POSICIÓN INICIAL */
+.inv-vistas-contenedor > .inv-book {
+    position: relative;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* VISTA DE REGISTRO: OCULTA A LA DERECHA */
+.inv-vistas-contenedor > .inv-registro-vista {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* AL ABRIR EL REGISTRO: DESPLAZAR INVENTARIO A LA IZQUIERDA */
+.inv-vistas-contenedor.mostrar-registro > .inv-book {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* AL ABRIR EL REGISTRO: MOSTRAR LA NUEVA VISTA */
+.inv-vistas-contenedor.mostrar-registro > .inv-registro-vista {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* CABECERA DEL REGISTRO */
+.inv-registro-cabecera {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.inv-registro-cabecera .inv-quien {
+    margin-bottom: 0.75rem;
+}
+
+.inv-volver-inventario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border: 1px solid #2563eb;
+    border-radius: 10px;
+    padding: 0.65rem 1.1rem;
+    background: #2563eb;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.inv-volver-inventario:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.inv-volver-inventario:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.3);
+    outline-offset: 3px;
+}
+
+/* CONTENIDO DEL REGISTRO */
+.inv-registro-contenido {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+    gap: 1.5rem;
+}
+
+.inv-registro-elemento {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+}
+
+.inv-registro-stock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.inv-registro-stock > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.inv-campo-movimiento {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+}
+
+.inv-campo-movimiento input,
+.inv-campo-movimiento select,
+.inv-campo-movimiento textarea {
+    width: 100%;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.75rem;
+    font: inherit;
+}
+
+.inv-registro-historial {
+    padding: 1rem;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+}
+
+/* TARJETAS DEL HISTORIAL */
+#inv-movimiento-historial-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+.inv-historial-movimiento {
+    padding: 0.9rem;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--card);
+}
+
+.inv-historial-movimiento strong {
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.inv-historial-movimiento p {
+    margin: 0.35rem 0;
+}
+
+.inv-historial-movimiento small {
+    color: var(--texto-secundario);
+}
+
+/* MENSAJES Y VALIDACIONES */
+#inv-movimiento-error {
+    color: var(--peligro, #c0392b);
+    margin: 0;
+}
+
+#inv-movimiento-mensaje {
+    margin-top: 0.85rem;
+    font-weight: 600;
+}
+
+/* BOTÓN DE REGISTRO */
+#inv-movimiento-guardar {
+    border: 0;
+    border-radius: 10px;
+    padding: 0.8rem 1.2rem;
+    background: #e58a35;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* BOTÓN DESHABILITADO */
+#inv-movimiento-guardar:disabled {
+    background: #d5d5d5;
+    color: #555555;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* BOTÓN HABILITADO */
+#inv-movimiento-guardar:not(:disabled):hover {
+    background: #cf7424;
+}
+
+/* COLOR DE LA FRANJA SUPERIOR SEGÚN LA SALA */
+.inv-vista.sala-lavado .inv-registro-vista {
+    border-top: 4px solid var(--sala-lavado);
+}
+
+.inv-vista.sala-armado .inv-registro-vista {
+    border-top: 4px solid var(--sala-armado);
+}
+
+.inv-vista.sala-esteril .inv-registro-vista {
+    border-top: 4px solid var(--sala-esteril);
+}
+
+/* SELECTOR PERSONALIZADO DE TIPO DE MOVIMIENTO */
+.inv-selector-personalizado {
+    position: relative;
+    width: 100%;
+}
+
+/* BOTÓN DEL SELECTOR */
+.inv-selector-boton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 52px;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--texto);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* FLECHA DEL SELECTOR */
+.inv-selector-boton svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.2s ease;
+}
+
+/* ESTADO ABIERTO */
+.inv-selector-boton[aria-expanded="true"] {
+    border-color: var(--texto-secundario);
+}
+
+.inv-selector-boton[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+/* MENÚ DESPLEGABLE */
+.inv-selector-opciones {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: 20;
+    width: 100%;
+    padding: 0.4rem;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--card);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* OPCIONES DEL MENÚ */
+.inv-selector-opciones button {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--texto);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.inv-selector-opciones button:hover {
+    background: var(--fondo, #f5f6f8);
+}
+
+/* OCULTAR LAS OPCIONES CUANDO EL SELECTOR ESTÁ CERRADO */
+.inv-selector-opciones[hidden] {
+    display: none !important;
+}
+
+/* OCULTAR EL SELECT ORIGINAL */
+#inv-movimiento-tipo[hidden] {
+    display: none !important;
+}

@@ -16,6 +16,7 @@ class AccesoPorRol
      */
     private const RUTAS = [
         'mockups.recepcion' => [Rol::OPERADOR],
+        'mockups.recepcion.guardar' => [Rol::OPERADOR],
         'mockups.avanzar' => [Rol::OPERADOR],
         'mockups.avanzar.guardar' => [Rol::OPERADOR],
         'mockups.retroceder' => [Rol::OPERADOR],
@@ -26,18 +27,26 @@ class AccesoPorRol
         'mockups.entrega.registrar' => [Rol::OPERADOR],
         'mockups.catalogo' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.fichas.guardar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.fichas.actualizar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.instrumentos.guardar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.instrumentos.actualizar' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
 
         /** Inventario */
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario.reponer' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.inventario.minimo' => [Rol::ENFERMERA],
         'mockups.inventario.historial' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.inventario.movimiento' => [Rol::OPERADOR],
+        'mockups.inventario.historial-consumos' => [Rol::OPERADOR],
 
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],
+        'mockups.reportes.exportar' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],
-        'mockups.historial_entregas' => [Rol::ADMINISTRADORA],
+        'mockups.historial_entregas' => [Rol::ADMINISTRADORA, Rol::ENFERMERA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
         'mockups.turnos' => [Rol::ADMINISTRADORA],
         'mockups.turnos.asignar' => [Rol::ADMINISTRADORA],
@@ -135,6 +144,14 @@ class AccesoPorRol
         return [
             [
                 'grupo' => 'Mi trabajo',
+                'ruta' => 'mockups.recepcion',
+                'texto' => 'Recepción',
+                'icono' => 'recepcion',
+                'params' => [],
+                'roles' => $operacion,
+            ],
+            [
+                'grupo' => 'Mi trabajo',
                 'grupos' => [Rol::ADMINISTRADORA => 'Gestión'],
                 'ruta' => 'mockups.panel',
                 'texto' => 'Inicio',
@@ -154,14 +171,6 @@ class AccesoPorRol
                     Rol::ADMINISTRADORA => 'inicio',
                     Rol::SECRETARIA => 'inicio',
                 ],
-            ],
-            [
-                'grupo' => 'Mi trabajo',
-                'ruta' => 'mockups.recepcion',
-                'texto' => 'Recepción',
-                'icono' => 'recepcion',
-                'params' => [],
-                'roles' => $operacion,
             ],
             [
                 'grupo' => 'Mi trabajo',
@@ -194,6 +203,14 @@ class AccesoPorRol
                 'texto' => 'Flujo de cajas',
                 'icono' => 'flujo',
                 'params' => ['rol' => Rol::OPERADOR],
+                'roles' => [Rol::ENFERMERA],
+            ],
+            [
+                'grupo' => 'Consulta',
+                'ruta' => 'mockups.historial_entregas',
+                'texto' => 'Historial de entregas',
+                'icono' => 'historial',
+                'params' => [],
                 'roles' => [Rol::ENFERMERA],
             ],
             [
@@ -263,7 +280,7 @@ class AccesoPorRol
             [
                 'grupo' => 'Gestión',
                 'ruta' => 'mockups.custodia',
-                'texto' => 'Custodia',
+                'texto' => 'Auditoría',
                 'icono' => 'custodia',
                 'params' => [],
                 'roles' => [Rol::ADMINISTRADORA],

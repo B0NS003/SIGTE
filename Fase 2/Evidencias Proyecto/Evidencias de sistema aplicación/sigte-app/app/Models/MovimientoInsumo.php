@@ -10,6 +10,11 @@ class MovimientoInsumo extends Model
     public const ENTRADA = 'entrada';
     public const SALIDA = 'salida';
 
+    // TIPOS DE ENTRADA EN INVENTARIO
+    public const CONSUMO = 'consumo';
+    public const USO = 'uso';
+    public const DEVOLUCION = 'devolucion';
+
     protected $table = 'movimientos_inventario';
 
     protected $fillable = [
@@ -39,6 +44,13 @@ class MovimientoInsumo extends Model
 
     public function etiquetaTipo(): string
     {
-        return $this->tipo === self::ENTRADA ? 'Entrada' : 'Salida';
+        return match ($this->tipo) {
+            self::CONSUMO => 'Consumo',
+            self::USO => 'Uso',
+            self::DEVOLUCION => 'Devolución',
+            self::ENTRADA => 'Entrada',
+            self::SALIDA => 'Salida',
+            default => 'Movimiento',
+        };
     }
 }

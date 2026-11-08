@@ -1,8 +1,11 @@
 @extends('layouts.app')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/inventario.css') }}?v={{ @filemtime(public_path('css/inventario.css')) }}">
-<link rel="stylesheet" href="{{ asset('css/inventario/modal-reposicion.css') }}?v={{ filemtime(public_path('css/inventario/modal-reposicion.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/inventario/tarjeta-prioridad.css') }}?v={{ @filemtime(public_path('css/inventario/tarjeta-prioridad.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/inventario/registro-movimiento.css') }}?v={{ @filemtime(public_path('css/inventario/registro-movimiento.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/inventario/configurar-minimo.css') }}?v={{ @filemtime(public_path('css/inventario/configurar-minimo.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/inventario/modal-reposicion.css') }}?v={{ @filemtime(public_path('css/inventario/modal-reposicion.css')) }}">
 @endpush
 
 @push('scripts')
@@ -12,7 +15,10 @@
 <script src="{{ asset('js/inventario/tarjeta-prioridad.js') }}?v={{ @filemtime(public_path('js/inventario/tarjeta-prioridad.js')) }}"></script>
 @endif
 
-<script src="{{ asset('js/inventario/modal-reposicion.js') }}?v={{ filemtime(public_path('js/inventario/modal-reposicion.js')) }}" defer></script>
+<script src="{{ asset('js/inventario/modal-utils.js') }}?v={{ @filemtime(public_path('js/inventario/modal-utils.js')) }}"></script>
+<script src="{{ asset('js/inventario/modal-reposicion.js') }}?v={{ @filemtime(public_path('js/inventario/modal-reposicion.js')) }}" defer></script>
+<script src="{{ asset('js/inventario/registro-movimiento.js') }}?v={{ @filemtime(public_path('js/inventario/registro-movimiento.js')) }}" defer></script>
+<script src="{{ asset('js/inventario/configurar-minimo.js') }}?v={{ @filemtime(public_path('js/inventario/configurar-minimo.js')) }}" defer></script>
 @endpush
 
 @section('title', 'SIGTE — Inventario')
@@ -33,16 +39,7 @@ $totalElementos = collect($libros)->sum('tipos');
         </div>
         @include('partials.menu-rol')
 
-        <div class="sidebar-foot">
-            <div class="side-user">
-                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
-                <div>
-                    <strong>{{ $usuario['nombre'] }}</strong>
-                    <small>{{ $usuario['rol'] }}</small>
-                </div>
-            </div>
-            @include('partials.logout')
-        </div>
+        @include('partials.sidebar-foot')
     </aside>
 
     <main class="main inv-vista sala-{{ $sala }}">
@@ -136,137 +133,146 @@ $totalElementos = collect($libros)->sum('tipos');
         @include('inventario.partials.tarjeta-prioridad')
         @else
 
-        <section class="panel list inv-book sala-{{ $sala }}">
-            <div class="panel-head">
-                <div>
-                    <h2 class="inv-titulo">
-                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
-                            <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
-                        </svg>
-                        {{ $salas[$sala] }}
-                    </h2>
+        <div class="inv-vistas-contenedor" id="inv-vistas-contenedor">
+
+            <section class="panel list inv-book sala-{{ $sala }}">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="inv-titulo">
+                            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                                <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                            </svg>
+                            {{ $salas[$sala] }}
+                        </h2>
+                    </div>
+                    <ul class="inv-resumen">
+                        <li>
+                            <strong id="inv-total-stock">{{ $resumen['en_almacen'] }}</strong>
+                            unidades
+                        </li>
+                        <li>
+                            <strong id="inv-total-proceso">{{ $resumen['en_proceso'] }}</strong>
+                            en proceso
+                        </li>
+                        <li id="inv-alerta-resumen" class="{{ $resumen['bajo_minimo'] > 0 ? 'is-alert' : '' }}">
+                            <strong id="inv-total-bajo">{{ $resumen['bajo_minimo'] }}</strong>
+                            bajo mínimo
+                        </li>
+                    </ul>
                 </div>
-                <ul class="inv-resumen">
-                    <li>
-                        <strong id="inv-total-stock">{{ $resumen['en_almacen'] }}</strong>
-                        unidades
-                    </li>
-                    <li>
-                        <strong id="inv-total-proceso">{{ $resumen['en_proceso'] }}</strong>
-                        en proceso
-                    </li>
-                    <li id="inv-alerta-resumen" class="{{ $resumen['bajo_minimo'] > 0 ? 'is-alert' : '' }}">
-                        <strong id="inv-total-bajo">{{ $resumen['bajo_minimo'] }}</strong>
-                        bajo mínimo
-                    </li>
-                </ul>
-            </div>
 
-            <form method="GET"
-                action="{{ route('mockups.inventario') }}"
-                class="inv-busqueda"
-                id="form-busqueda-inventario"
-                role="search">
+                <!-- BUSCADOR DEL INVENTARIO -->
+                <div class="inv-barra-herramientas">
 
-                <input type="hidden" name="sala" value="{{ $sala }}">
+                    <form method="GET"
+                        action="{{ route('mockups.inventario') }}"
+                        class="inv-busqueda"
+                        id="form-busqueda-inventario"
+                        role="search">
 
-                <!-- ICONO DE LUPA -->
-                <label class="field inv-campo-busqueda" for="busqueda-inventario">
+                        <input type="hidden" name="sala" value="{{ $sala }}">
 
-                    <svg class="inv-icono-busqueda" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="11" cy="11" r="6.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8" />
-                        <path d="M16 16l4.5 4.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round" />
-                    </svg>
+                        <!-- ICONO DE LUPA -->
+                        <label class="field inv-campo-busqueda" for="busqueda-inventario">
 
-                    <span class="sr-only">Buscar por código, nombre o ubicación</span>
+                            <svg class="inv-icono-busqueda" viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="6.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8" />
+                                <path d="M16 16l4.5 4.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round" />
+                            </svg>
 
-                    <input
-                        type="search"
-                        id="busqueda-inventario"
-                        name="q"
-                        value="{{ $busqueda ?? '' }}"
-                        placeholder="Buscar por código, nombre o ubicación"
-                        autocomplete="off">
+                            <span class="sr-only">Buscar por código, nombre o ubicación</span>
 
-                    <!-- X PARA LIMPIAR -->
-                    <button
-                        type="button"
-                        class="inv-limpiar-busqueda"
-                        id="inv-limpiar-busqueda"
-                        aria-label="Limpiar búsqueda"
-                        title="Limpiar búsqueda"
-                        hidden>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 7l10 10M17 7L7 17"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round" />
-                        </svg>
-                    </button>
+                            <input
+                                type="search"
+                                id="busqueda-inventario"
+                                name="q"
+                                value="{{ $busqueda ?? '' }}"
+                                placeholder="Buscar por código, nombre o ubicación"
+                                autocomplete="off">
 
-                </label>
+                            <!-- X PARA LIMPIAR -->
+                            <button
+                                type="button"
+                                class="inv-limpiar-busqueda"
+                                id="inv-limpiar-busqueda"
+                                aria-label="Limpiar búsqueda"
+                                title="Limpiar búsqueda"
+                                hidden>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M7 7l10 10M17 7L7 17"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </button>
 
-            </form>
+                        </label>
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Ubicación</th>
-                            <th>Stock</th>
-                            <th>Mínimo</th>
-                            <th>En proceso</th>
-                            <th>Estado</th>
+                    </form>
 
-                            <!-- ESTE BOTÓN SOLO APARECE PARA ADMIN Y ENFERMERA -->
-                            @if ($puedeReponer)
-                            <th>Acción</th>
-                            @endif
-                        </tr>
-                    </thead>
+                </div>
 
-                    <tbody id="cuerpo-inventario">
-                        @forelse ($items as $item)
-                        <tr
-                            class="stock-{{ $item['estado'] }}"
-                            data-stock="{{ $item['stock'] }}"
-                            data-en-proceso="{{ $item['en_proceso'] }}"
-                            data-estado="{{ $item['estado'] }}">
-                            <td><strong>{{ $item['codigo'] }}</strong></td>
-                            <td>{{ $item['nombre'] }}</td>
-                            <td>{{ $item['ubicacion'] }}</td>
-                            <td>{{ $item['stock'] }}</td>
-                            <td>{{ $item['minimo'] }}</td>
-                            <td>{{ $item['en_proceso'] }}</td>
-                            <td>
-                                @if ($item['estado'] === 'ok')
-                                <span class="pill pill-ok">
-                                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                    OK
-                                </span>
-                                @elseif ($item['estado'] === 'bajo')
-                                <span class="pill pill-warn">Bajo mínimo</span>
-                                @else
-                                <span class="pill pill-danger">Crítico</span>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Ubicación</th>
+                                <th>Stock</th>
+                                <th>Mínimo</th>
+                                <th>En proceso</th>
+                                <th>Estado</th>
+
+                                @if ($puedeReponer || ($esOperador && in_array($sala, ['lavado', 'armado'])))
+                                <th>Acción</th>
                                 @endif
-                            </td>
+                            </tr>
+                        </thead>
 
-                            <!-- BOTÓN DE EDITAR ELEMENTOS -->
-                            @if ($puedeReponer)
+                        <tbody id="cuerpo-inventario">
+                            @forelse ($items as $item)
+                            <tr
+                                class="stock-{{ $item['estado'] }}"
+                                data-stock="{{ $item['stock'] }}"
+                                data-en-proceso="{{ $item['en_proceso'] }}"
+                                data-estado="{{ $item['estado'] }}">
+                                <td><strong>{{ $item['codigo'] }}</strong></td>
+                                <td>{{ $item['nombre'] }}</td>
+                                <td>{{ $item['ubicacion'] }}</td>
+                                <td>{{ $item['stock'] }}</td>
+                                <td data-minimo-celda>{{ $item['minimo'] }}</td>
+                                <td>{{ $item['en_proceso'] }}</td>
+                                <td>
+                                    @if ($item['estado'] === 'ok')
+                                    <span class="pill pill-ok">
+                                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        OK
+                                    </span>
+                                    @elseif ($item['estado'] === 'bajo')
+                                    <span class="pill pill-warn">Bajo mínimo</span>
+                                    @else
+                                    <span class="pill pill-danger">Crítico</span>
+                                    @endif
+                                </td>
+
+                                <!-- ACCIONES SEGÚN EL ROL -->
+                                @if ($puedeReponer || ($esOperador && in_array($sala, ['lavado', 'armado'])))
                                 <td class="inv-accion">
+
+                                    <!-- ADMINISTRADORA Y ENFERMERA: REPOSICIÓN -->
+                                    @if ($puedeReponer)
                                     <button
                                         type="button"
                                         class="inv-editar-stock"
@@ -288,65 +294,121 @@ $totalElementos = collect($libros)->sum('tipos');
                                                 stroke="currentColor"
                                                 stroke-width="1.75"
                                                 stroke-linecap="round" />
-                                            </svg>
-                                        </button>
-                                    </td>
-                            @endif
-                        </tr>
-                        @endforeach
+                                        </svg>
+                                    </button>
 
-                        <tr id="inv-sin-resultados" hidden>
-                            <td colspan="{{ $puedeReponer ? 8 : 7 }}" class="text-center">
-                                No se encontraron elementos que coincidan con tu búsqueda.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                    <!-- CONFIGURAR MÍNIMO: SOLO ENFERMERA -->
+                                    @if ($esEnfermera && in_array($sala, ['lavado', 'armado', 'esteril']))
+                                    <button
+                                        type="button"
+                                        class="inv-configurar-minimo"
+                                        data-codigo="{{ $item['codigo'] }}"
+                                        data-sala="{{ $item['sala'] }}"
+                                        data-nombre="{{ $item['nombre'] }}"
+                                        data-stock="{{ $item['stock'] }}"
+                                        data-minimo="{{ $item['minimo'] }}"
+                                        aria-label="Configurar mínimo de {{ $item['nombre'] }}"
+                                        title="Configurar mínimo">
+                                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M4 7h16M4 17h16M9 4v6m6 4v6"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.75"
+                                                stroke-linecap="round" />
+                                        </svg>
+                                    </button>
+                                    @endif
 
-            <!-- PAGINACIÓN -->
-            <div class="inv-paginacion" id="inv-paginacion">
+                                    <!-- OPERADOR: REGISTRAR MOVIMIENTO-->
+                                    @elseif ($esOperador && in_array($sala, ['lavado', 'armado']))
+                                    <button
+                                        type="button"
+                                        class="inv-abrir-movimiento"
+                                        data-codigo="{{ $item['codigo'] }}"
+                                        data-sala="{{ $item['sala'] }}"
+                                        data-nombre="{{ $item['nombre'] }}"
+                                        data-stock="{{ $item['stock'] }}"
+                                        data-en-proceso="{{ $item['en_proceso'] }}"
+                                        data-minimo="{{ $item['minimo'] }}"
+                                        aria-label="Registrar movimiento de {{ $item['nombre'] }}"
+                                        title="Registrar movimiento">
+                                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 15.5v4z"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.75"
+                                                stroke-linejoin="round" />
+                                            <path d="m14.5 7.5 2 2"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.75"
+                                                stroke-linecap="round" />
+                                        </svg>
+                                    </button>
+                                    @endif
 
-                <div class="inv-paginacion-info">
-                    <label for="inv-items-pagina">Elementos por página</label>
+                                </td>
+                                @endif
+                            </tr>
+                            @empty
+                            @endforelse
 
-                    <select id="inv-items-pagina">
-                        <option value="5" selected>5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
+                            <tr id="inv-sin-resultados" hidden>
+                                <td colspan="{{ ($puedeReponer || ($esOperador && in_array($sala, ['lavado', 'armado']))) ? 8 : 7 }}" class="text-center">
+                                    No se encontraron elementos que coincidan con tu búsqueda.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="inv-paginacion-controles">
+                <!-- PAGINACIÓN -->
+                <div class="inv-paginacion" id="inv-paginacion">
 
-                    <span class="inv-rango" id="inv-rango">
-                        0–0 de 0
-                    </span>
+                    <div class="inv-paginacion-info">
+                        <label for="inv-items-pagina">Elementos por página</label>
 
-                    <button
-                        type="button"
-                        class="inv-pagina-btn"
-                        id="inv-pagina-anterior"
-                        aria-label="Página anterior">
-                        ‹
-                    </button>
+                        <select id="inv-items-pagina" data-sigte-lista="1">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
 
-                    <div class="inv-paginas" id="inv-paginas"></div>
+                    <div class="inv-paginacion-controles">
 
-                    <button
-                        type="button"
-                        class="inv-pagina-btn"
-                        id="inv-pagina-siguiente"
-                        aria-label="Página siguiente">
-                        ›
-                    </button>
+                        <span class="inv-rango" id="inv-rango">
+                            0–0 de 0
+                        </span>
+
+                        <button
+                            type="button"
+                            class="inv-pagina-btn"
+                            id="inv-pagina-anterior"
+                            aria-label="Página anterior">
+                            ‹
+                        </button>
+
+                        <div class="inv-paginas" id="inv-paginas"></div>
+
+                        <button
+                            type="button"
+                            class="inv-pagina-btn"
+                            id="inv-pagina-siguiente"
+                            aria-label="Página siguiente">
+                            ›
+                        </button>
+
+                    </div>
 
                 </div>
 
-            </div>
+            </section>
 
-        </section>
+            @include('inventario.partials.registro-movimiento')
+            @include('inventario.partials.configurar-minimo')
+        </div>
         @endif
 
     </main>

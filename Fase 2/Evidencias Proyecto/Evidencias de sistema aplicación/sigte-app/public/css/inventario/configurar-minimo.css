@@ -1,0 +1,169 @@
+/* TRANSICIÓN ENTRE INVENTARIO Y CONFIGURACIÓN DE MÍNIMOS */
+
+/* CONTENEDOR */
+.inv-vistas-contenedor {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* VISTAS */
+.inv-vistas-contenedor > .inv-book,
+.inv-vistas-contenedor > #inv-vista-minimo {
+    width: 100%;
+    min-width: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* INVENTARIO: POSICIÓN INICIAL */
+.inv-vistas-contenedor > .inv-book {
+    position: relative;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* CONFIGURACIÓN: OCULTA A LA DERECHA */
+.inv-vistas-contenedor > #inv-vista-minimo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ABRIR CONFIGURACIÓN: INVENTARIO HACIA LA IZQUIERDA */
+.inv-vistas-contenedor.mostrar-minimo > .inv-book {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ABRIR CONFIGURACIÓN: MOSTRAR FORMULARIO */
+.inv-vistas-contenedor.mostrar-minimo > #inv-vista-minimo {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* BOTÓN VOLVER */
+.inv-volver-inventario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--navy);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.inv-volver-inventario:hover {
+    background: #243f70;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.inv-volver-inventario:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+/* TARJETA DEL ELEMENTO SELECCIONADO */
+.inv-minimo-vista .inv-registro-elemento {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px;
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+}
+
+/* NOMBRE DEL ELEMENTO */
+.inv-minimo-vista #minimo-nombre {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+/* INDICADORES DE STOCK Y MÍNIMO */
+.inv-minimo-vista .inv-registro-stock {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.inv-minimo-vista .inv-registro-stock > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    background: var(--card-2);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+}
+
+.inv-minimo-vista .inv-registro-stock span {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.inv-minimo-vista .inv-registro-stock strong {
+    color: var(--ink);
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+/* ESTADO DE ERROR DEL CAMPO DE MÍNIMO */
+.inv-minimo-vista #minimo-nuevo.is-invalid {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* MENSAJE DE ERROR */
+.inv-minimo-vista #minimo-error {
+    margin-top: 0.4rem;
+    color: #dc2626;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* MANTENER EL BORDE ROJO MIENTRAS EL CAMPO ESTÁ SELECCIONADO */
+.inv-minimo-vista #minimo-nuevo.is-invalid:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    outline: none;
+}
+
+/* BOTÓN GUARDAR MÍNIMO */
+.inv-minimo-vista #inv-guardar-minimo {
+    width: auto;
+    min-width: 150px;
+    padding: 0.75rem 1.8rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MENSAJE DE ERROR AL CONFIGURAR EL MÍNIMO */
+.inv-minimo-vista #inv-toast-minimo.inv-toast-minimo--error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+/* ICONO DEL MENSAJE DE ERROR */
+.inv-minimo-vista #inv-toast-minimo.inv-toast-minimo--error .sigte-icon {
+    color: #dc2626;
+}

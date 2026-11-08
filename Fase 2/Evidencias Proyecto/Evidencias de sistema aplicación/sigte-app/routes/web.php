@@ -9,14 +9,12 @@ use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 
-# si no esta autenticado, se redirige a la pagina de login
 Route::middleware('guest')->group(function () {
     Route::get('/', fn () => redirect()->route('login'));
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-# si esta autenticado, se redirige a la pagina de panel
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -25,6 +23,7 @@ Route::middleware('auth')->group(function () {
             ->whereIn('rol', ['administradora', 'enfermera', 'operador', 'secretaria'])
             ->name('mockups.panel');
         Route::get('/operador/recepcion', [FlujoController::class, 'recepcion'])->name('mockups.recepcion');
+        Route::post('/operador/recepcion', [FlujoController::class, 'guardarRecepcion'])->name('mockups.recepcion.guardar');
         Route::get('/operador/avanzar', [FlujoController::class, 'avanzar'])->name('mockups.avanzar');
         Route::post('/operador/avanzar', [FlujoController::class, 'guardarAvance'])->name('mockups.avanzar.guardar');
         Route::post('/operador/retroceder', [FlujoController::class, 'guardarRetroceso'])->name('mockups.retroceder');
@@ -35,12 +34,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/operador/entrega', [FlujoController::class, 'registrarEntrega'])->name('mockups.entrega.registrar');
         Route::get('/consulta/catalogo', [CatalogoController::class, 'catalogo'])->name('mockups.catalogo');
         Route::get('/admin/catalogo', [CatalogoController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
+        Route::post('/admin/catalogo/fichas', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.guardar');
+        Route::put('/admin/catalogo/fichas/{ficha}', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.actualizar');
+        Route::post('/admin/catalogo/instrumentos', [CatalogoController::class, 'guardarInstrumento'])->name('mockups.catalogo.instrumentos.guardar');
         Route::get('/consulta/catalogo/{codigo}', [CatalogoController::class, 'ficha'])->name('mockups.ficha');
 
         # Inventario
         Route::get('/consulta/inventario', [InventarioController::class, 'inventario'])->name('mockups.inventario');
         Route::post('/consulta/inventario/reposicion', [InventarioController::class, 'registrarReposicion'])->name('mockups.inventario.reponer');
+        Route::post('/consulta/inventario/minimo', [InventarioController::class, 'configurarMinimo'])->name('mockups.inventario.minimo');
+        Route::post('/consulta/inventario/movimiento', [InventarioController::class, 'registrarMovimiento'])->name('mockups.inventario.movimiento');
         Route::get('/consulta/inventario/{sala}/{codigo}/historial', [InventarioController::class, 'historialElemento'])->name('mockups.inventario.historial');
+        Route::get('/consulta/inventario/{sala}/{codigo}/historial-consumos', [InventarioController::class, 'historialConsumos'])->name('mockups.inventario.historial-consumos');
 
         Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('mockups.usuarios');
         Route::get('/admin/turnos', [AdminController::class, 'turnos'])->name('mockups.turnos');
@@ -49,11 +54,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/usuarios/{user}', [AdminController::class, 'actualizarUsuario'])->name('mockups.usuarios.actualizar');
         Route::post('/admin/usuarios/{user}/estado', [AdminController::class, 'cambiarEstadoUsuario'])->name('mockups.usuarios.estado');
         Route::get('/admin/reportes', [AdminController::class, 'reportes'])->name('mockups.reportes');
+        Route::get('/admin/reportes/exportar', [AdminController::class, 'exportarReportes'])->name('mockups.reportes.exportar');
         Route::get('/admin/entregas', [AdminController::class, 'historialEntregas'])->name('mockups.historial_entregas');
         Route::get('/admin/custodia', [AdminController::class, 'custodia'])->name('mockups.custodia');
         Route::get('/admin/alertas', [AdminController::class, 'alertas'])->name('mockups.alertas');
         Route::get('/enfermera/cierre-turno', [EnfermeraController::class, 'cierreTurno'])->name('mockups.cierre_turno');
-
+        Route::put('/admin/catalogo/instrumentos/{instrumento}',[CatalogoController::class, 'actualizarInstrumento'])->name('mockups.catalogo.instrumentos.actualizar');
         Route::get('/secretaria/produccion', [SecretariaController::class, 'produccion'])->name('secretaria.produccion');
         Route::post('/secretaria/produccion', [SecretariaController::class, 'guardarProduccion'])->name('secretaria.produccion.guardar');
         Route::get('/secretaria/insumos', [SecretariaController::class, 'insumos'])->name('secretaria.insumos');

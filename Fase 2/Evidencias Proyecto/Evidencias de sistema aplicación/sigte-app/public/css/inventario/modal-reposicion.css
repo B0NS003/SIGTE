@@ -23,7 +23,7 @@
 
     overflow-y: auto;
 
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--borde);
     border-top: 4px solid var(--navy);
     border-radius: 18px;
@@ -50,7 +50,7 @@
     border-radius: 50%;
 
     background: #f1f5f9;
-    color: var(--navy);
+    color: var(--ink);
 
     font-size: 1.5rem;
     line-height: 1;
@@ -91,29 +91,6 @@ body.inv-modal-abierto {
     overflow: hidden;
 }
 
-@media (max-width: 700px) {
-
-    .inv-modal-contenido {
-        width: calc(100% - 1rem);
-        max-height: calc(100vh - 1rem);
-        margin: 0.5rem auto;
-        padding: 1rem;
-    }
-
-    .inv-reposicion-fila {
-        grid-template-columns: 1fr;
-    }
-
-    .inv-modal-acciones {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .inv-modal-acciones .btn {
-        width: 100%;
-    }
-}
-
 /* MODAL DE REPOSICIÓN: REGISTRO + HISTORIAL */
 .inv-modal-contenido {
     width: min(920px, calc(100% - 2rem));
@@ -148,7 +125,7 @@ body.inv-modal-abierto {
 /* Títulos */
 .inv-modal-seccion-titulo {
     margin: 0 0 1.2rem;
-    color: var(--navy);
+    color: var(--ink);
     font-size: 1.35rem;
     line-height: 1.2;
 }
@@ -266,54 +243,18 @@ body.inv-modal-abierto {
     border-radius: 25px !important;
 }
 
-/* MENSAJE VERDE DE CONFIRMACIÓN DE REPOSICIÓN */
-.inv-toast-confirmacion {
-    position: fixed;
-    top: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1100;
-
+/* MODAL DE CONFIGURACIÓN DE MÍNIMOS */
+.inv-minimo-acciones {
     display: flex;
+    justify-content: flex-end;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-
-    width: max-content;
-    max-width: calc(100% - 32px);
-    box-sizing: border-box;
-    padding: 12px 18px;
-
-    border: 1px solid #a7e4c0;
-    border-radius: 12px;
-
-    background: #eafaf0;
-    color: #17663a;
-
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-
-    font-size: 0.9rem;
-    font-weight: 600;
-    line-height: 1.4;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--borde);
 }
 
-.inv-toast-confirmacion .sigte-icon {
-    width: 22px;
-    height: 22px;
-    flex: 0 0 auto;
-    color: #15803d;
-}
-
-.inv-toast-confirmacion[hidden] {
-    display: none !important;
-}
-
-/* Ajuste para pantallas pequeñas */
-@media (max-width: 480px) {
-    .inv-toast-confirmacion {
-        top: 12px;
-        max-width: calc(100% - 24px);
-        padding: 10px 14px;
-        font-size: 0.84rem;
-    }
+.inv-minimo-acciones .btn {
+    width: auto;
+    margin: 0;
 }

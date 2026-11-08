@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\ElementoInventario;
 use App\Models\Reposicion;
+use App\Models\MovimientoInsumo;
 use App\Models\Rol;
+use App\Models\User;
+use App\Support\Auditoria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -103,6 +106,7 @@ class InventarioController extends Controller
             'rol' => $rol,
             'esAdministradora' => $rol === Rol::ADMINISTRADORA,
             'esEnfermera' => $rol === Rol::ENFERMERA,
+            'esOperador' => $rol === Rol::OPERADOR,
             'puedeReponer' => in_array($rol, [Rol::ENFERMERA, Rol::ADMINISTRADORA], true),
             'elemento' => trim((string) request()->query('elemento', '')),
             'busqueda' => $busqueda,
@@ -200,6 +204,12 @@ class InventarioController extends Controller
         }
 
         $elemento->refresh();
+        Auditoria::registrar(
+            'Registró reposición',
+            'inventario',
+            $elemento->codigo,
+            '+'.$datos['cantidad'].' unidades · stock '.$elemento->stock,
+        );
         $mensaje = 'Reposición registrada. '.$elemento->nombre.' quedó en '.$elemento->stock.' unidades.';
         if ($teniaAlerta && ! $elemento->tieneAlertaStock()) {
             $mensaje .= ' La alerta de stock quedó desactivada.';
@@ -227,7 +237,249 @@ class InventarioController extends Controller
             ])
             ->with('ok', $mensaje);
     }
+
+
+    /* CONFIGURAR MÍNIMO DE UN ELEMENTO */
+    public function configurarMinimo(Request $request): JsonResponse
+    {
+        $usuario = Auth::user();
+
+        // LA ENFERMERA PUEDE CUMPLIR CON ESTA ACCIÓN
+        if (! $usuario instanceof User || ! $usuario->isEnfermera()) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No tienes permiso para configurar mínimos.',
+            ], 403);
+        }
+
+        $datos = $request->validate([
+            'sala' => ['required', 'in:lavado,armado,esteril'],
+            'codigo' => ['required', 'string'],
+            'minimo' => ['required', 'integer', 'min:0', 'max:9999'],
+        ], [
+            'sala.required' => 'No se pudo identificar la sala.',
+            'sala.in' => 'La configuración de mínimos no está habilitada para esta sala.',
+            'codigo.required' => 'No se pudo identificar el elemento.',
+            'minimo.required' => 'Ingresa un mínimo válido.',
+            'minimo.integer' => 'El mínimo debe ser un número entero.',
+            'minimo.min' => 'El mínimo no puede ser negativo.',
+            'minimo.max' => 'El mínimo no puede superar las 9999 unidades.',
+        ]);
+
+        $elemento = ElementoInventario::query()
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $datos['sala']))
+            ->where('codigo', $datos['codigo'])
+            ->first();
+
+        if ($elemento === null) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No se encontró el elemento seleccionado.',
+            ], 422);
+        }
+
+        try {
+            $resultado = DB::transaction(function () use ($elemento, $datos) {
+                $bloqueado = ElementoInventario::query()
+                    ->whereKey($elemento->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $minimoAnterior = (int) $bloqueado->minimo;
+                $minimoNuevo = (int) $datos['minimo'];
+
+                // SI NO HAY CAMBIOS, NO SE ACTUALIZA NI SE REGISTRA AUDITORÍA
+                if ($minimoAnterior === $minimoNuevo) {
+                    return [
+                        'elemento' => $bloqueado,
+                        'minimoAnterior' => $minimoAnterior,
+                        'cambio' => false,
+                    ];
+                }
+
+                $bloqueado->minimo = $minimoNuevo;
+                $bloqueado->save();
+
+                return [
+                    'elemento' => $bloqueado,
+                    'minimoAnterior' => $minimoAnterior,
+                    'cambio' => true,
+                ];
+            });
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No fue posible guardar el mínimo. Inténtalo nuevamente.',
+            ], 500);
+        }
+
+        $elemento = $resultado['elemento'];
+
+        // CONFIRMAR SIN REGISTRAR UNA MODIFICACIÓN INNECESARIA
+        if (! $resultado['cambio']) {
+            return response()->json([
+                'ok' => true,
+                'mensaje' => 'La configuración se mantiene en '
+                    . $elemento->minimo . ' unidades.',
+                'elemento' => [
+                    'codigo' => $elemento->codigo,
+                    'sala' => $elemento->codigoSala(),
+                    'stock' => (int) $elemento->stock,
+                    'minimo' => (int) $elemento->minimo,
+                ],
+            ]);
+        }
+
+        Auditoria::registrar(
+            'Configuró mínimo',
+            'inventario',
+            $elemento->codigo,
+            'Mínimo anterior: ' . $resultado['minimoAnterior']
+                . ' · nuevo mínimo: ' . $elemento->minimo,
+        );
+
+        return response()->json([
+            'ok' => true,
+            'mensaje' => 'El mínimo de ' . $elemento->nombre . ' se actualizó correctamente.',
+            'elemento' => [
+                'codigo' => $elemento->codigo,
+                'sala' => $elemento->codigoSala(),
+                'stock' => (int) $elemento->stock,
+                'minimo' => (int) $elemento->minimo,
+            ],
+        ]);
+    }
     
+    /* MODAL DEL ROL OPERADOR PARA EL REGISTRO DEL MOVIMIENTO */
+    public function registrarMovimiento(Request $request): JsonResponse
+    {
+        $datos = $request->validate([
+            'sala' => ['required', 'in:lavado,armado'],
+            'elemento' => ['required', 'string'],
+            'tipo' => ['required', 'in:consumo,uso,devolucion'],
+            'cantidad' => ['required', 'integer', 'min:1', 'max:9999'],
+            'observacion' => ['nullable', 'string', 'max:255'],
+        ], [
+            'sala.required' => 'No se pudo identificar la sala.',
+            'sala.in' => 'La sala seleccionada no permite registrar movimientos.',
+            'elemento.required' => 'No se pudo identificar el insumo.',
+            'tipo.required' => 'Selecciona un tipo de movimiento.',
+            'tipo.in' => 'Selecciona un tipo de movimiento válido.',
+            'cantidad.required' => 'Ingresa una cantidad válida.',
+            'cantidad.integer' => 'Ingresa una cantidad válida.',
+            'cantidad.min' => 'La cantidad debe ser al menos 1.',
+            'cantidad.max' => 'La cantidad no puede superar las 9999 unidades.',
+            'observacion.max' => 'La observación no puede superar los 255 caracteres.',
+        ]);
+
+        $elemento = ElementoInventario::query()
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $datos['sala']))
+            ->where('codigo', $datos['elemento'])
+            ->first();
+
+        if ($elemento === null) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No se encontró el insumo seleccionado.',
+            ], 422);
+        }
+
+        try {
+            $elemento = DB::transaction(function () use ($elemento, $datos) {
+                $bloqueado = ElementoInventario::query()
+                    ->whereKey($elemento->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $cantidad = (int) $datos['cantidad'];
+                $tipo = $datos['tipo'];
+
+                if (in_array($tipo, ['consumo', 'uso'], true)) {
+                    if ($cantidad > $bloqueado->stock) {
+                        throw new \DomainException(
+                            'No hay suficientes unidades disponibles. Stock actual: ' . $bloqueado->stock . '.'
+                        );
+                    }
+
+                    $bloqueado->stock -= $cantidad;
+
+                    if ($tipo === 'uso') {
+                        $bloqueado->en_proceso += $cantidad;
+                    }
+                }
+
+                if ($tipo === 'devolucion') {
+                    if ($cantidad > $bloqueado->en_proceso) {
+                        throw new \DomainException(
+                            'La cantidad supera las unidades en proceso. Actualmente hay ' . $bloqueado->en_proceso . '.'
+                        );
+                    }
+
+                    $bloqueado->stock += $cantidad;
+                    $bloqueado->en_proceso -= $cantidad;
+                }
+
+                $bloqueado->save();
+
+                MovimientoInsumo::query()->create([
+                    'elemento_inventario_id' => $bloqueado->id,
+                    'tipo' => match ($tipo) {
+                        'consumo' => MovimientoInsumo::CONSUMO,
+                        'uso' => MovimientoInsumo::USO,
+                        'devolucion' => MovimientoInsumo::DEVOLUCION,
+                    },
+                    'cantidad' => $cantidad,
+                    'observacion' => $datos['observacion'] ?? null,
+                    'user_id' => Auth::id(),
+                ]);
+
+                return $bloqueado;
+            });
+        } catch (\DomainException $e) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => $e->getMessage(),
+            ], 422);
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No fue posible registrar el movimiento. El inventario no cambió.',
+            ], 500);
+        }
+
+        $etiquetas = [
+            'consumo' => 'Consumo',
+            'uso' => 'Uso',
+            'devolucion' => 'Devolución',
+        ];
+
+        Auditoria::registrar(
+            'Registró ' . strtolower($etiquetas[$datos['tipo']]),
+            'inventario',
+            $elemento->codigo,
+            'Movimiento: ' . $etiquetas[$datos['tipo']]
+                . ' · ' . $datos['cantidad'] . ' unidades'
+                . ' · stock ' . $elemento->stock
+                . ' · en proceso ' . $elemento->en_proceso,
+        );
+
+        return response()->json([
+            'ok' => true,
+            'mensaje' => $etiquetas[$datos['tipo']] . ' registrado correctamente.',
+            'elemento' => [
+                'stock' => (int) $elemento->stock,
+                'en_proceso' => (int) $elemento->en_proceso,
+                'minimo' => (int) $elemento->minimo,
+                'codigo' => $elemento->codigo,
+                'sala' => $elemento->codigoSala(),
+            ],
+        ]);
+    }
+
     public function historialElemento(string $sala, string $codigo)
     {
 
@@ -253,6 +505,41 @@ class InventarioController extends Controller
         return response()->json([
             'elemento' => $elemento->nombre,
             'historial' => $reposiciones,
+        ]);
+    }
+
+    /* HISTORIAL DEL MODAL DEL OPERADOR CON LOS TIPOS DE MOVIMIENTOS*/
+    public function historialConsumos(string $sala, string $codigo): JsonResponse
+    {
+        $elemento = ElementoInventario::query()
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $sala))
+            ->where('codigo', $codigo)
+            ->firstOrFail();
+
+        $movimientos = MovimientoInsumo::query()
+            ->with('autor')
+            ->where('elemento_inventario_id', $elemento->id)
+            ->whereIn('tipo', [
+                MovimientoInsumo::CONSUMO,
+                MovimientoInsumo::USO,
+                MovimientoInsumo::DEVOLUCION,
+            ])
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(fn(MovimientoInsumo $movimiento) => [
+                'tipo' => $movimiento->etiquetaTipo(),
+                'cantidad' => $movimiento->cantidad,
+                'observacion' => $movimiento->observacion,
+                'fecha' => $movimiento->created_at
+                    ->timezone('America/Santiago')
+                    ->format('d/m/Y · H:i'),
+                'autor' => $movimiento->autor?->name ?? 'Sin usuario',
+            ]);
+
+        return response()->json([
+            'elemento' => $elemento->nombre,
+            'historial' => $movimientos,
         ]);
     }
 }
