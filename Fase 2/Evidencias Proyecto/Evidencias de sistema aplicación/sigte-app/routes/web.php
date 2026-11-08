@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('mockups.usuarios');
         Route::get('/admin/turnos', [AdminController::class, 'turnos'])->name('mockups.turnos');
+        Route::get('/admin/turnos/pdf', [AdminController::class, 'exportarTurnosPdf'])->name('mockups.turnos.pdf');
+        Route::get('/admin/turnos/excel', [AdminController::class, 'exportarTurnosExcel'])->name('mockups.turnos.excel');
         Route::post('/admin/turnos', [AdminController::class, 'asignarTurno'])->name('mockups.turnos.asignar');
         Route::post('/admin/usuarios', [AdminController::class, 'guardarUsuario'])->name('mockups.usuarios.guardar');
         Route::post('/admin/usuarios/{user}', [AdminController::class, 'actualizarUsuario'])->name('mockups.usuarios.actualizar');

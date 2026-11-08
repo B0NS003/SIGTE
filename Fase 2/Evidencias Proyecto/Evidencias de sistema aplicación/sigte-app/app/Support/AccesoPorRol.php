@@ -48,6 +48,8 @@ class AccesoPorRol
         'mockups.historial_entregas' => [Rol::ADMINISTRADORA, Rol::ENFERMERA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
         'mockups.turnos' => [Rol::ADMINISTRADORA],
+        'mockups.turnos.pdf' => [Rol::ADMINISTRADORA],
+        'mockups.turnos.excel' => [Rol::ADMINISTRADORA],
         'mockups.turnos.asignar' => [Rol::ADMINISTRADORA],
         'mockups.usuarios.guardar' => [Rol::ADMINISTRADORA],
         'mockups.usuarios.actualizar' => [Rol::ADMINISTRADORA],

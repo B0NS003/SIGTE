@@ -13,15 +13,22 @@ use App\Models\Rol;
 use App\Models\User;
 use App\Support\Auditoria;
 use App\Support\CadenaCustodia;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -82,6 +89,11 @@ class AdminController extends Controller
 
     public function asignarTurno(Request $request): JsonResponse
     {
+        $turno = $request->input('turno');
+        if ($turno === '' || $turno === null) {
+            $request->merge(['turno' => null]);
+        }
+
         $datos = $request->validate([
             'personal_id' => ['required', 'integer', 'exists:personal,id'],
             'turno' => ['nullable', Rule::in(array_keys(Personal::TURNOS))],
@@ -90,21 +102,210 @@ class AdminController extends Controller
         $persona = Personal::query()->findOrFail($datos['personal_id']);
         $antes = $persona->turno;
         $persona->turno = $datos['turno'] ?? null;
+        if ($antes !== $persona->turno) {
+            $persona->turno_asignado_at = $persona->turno === null
+                ? null
+                : now();
+        }
         $persona->save();
 
         if ($antes !== $persona->turno) {
             $etiqueta = $persona->turno === null
                 ? 'Sin asignar'
                 : (Personal::TURNOS[$persona->turno]['etiqueta'] ?? $persona->turno);
+            $cuando = $persona->turno_asignado_at
+                ? $persona->turno_asignado_at->timezone('America/Santiago')->format('d/m/Y H:i')
+                : now()->timezone('America/Santiago')->format('d/m/Y H:i');
             Auditoria::registrar(
                 $persona->turno === null ? 'Quitó turno' : 'Asignó turno',
                 'turnos',
                 $persona->nombre,
-                'Turno '.$etiqueta,
+                'Turno '.$etiqueta.' · '.$cuando,
             );
         }
 
-        return response()->json(['ok' => true, 'turno' => $persona->turno]);
+        return response()->json([
+            'ok' => true,
+            'turno' => $persona->turno,
+            'turno_asignado_at' => $persona->turno_asignado_at
+                ? $persona->turno_asignado_at->timezone('America/Santiago')->toIso8601String()
+                : null,
+        ]);
+    }
+
+    public function exportarTurnosPdf(): Response
+    {
+        $datos = $this->datosExportacionTurnos();
+        $nombre = 'sigte-turnos-'.$datos['fecha_archivo'].'.pdf';
+
+        return Pdf::loadView('admin.turnos-pdf', [
+            'porTurno' => $datos['por_turno'],
+            'turnoVigente' => $datos['turno_vigente'],
+            'fecha' => $datos['fecha_generacion'],
+            'hora' => $datos['hora_generacion'],
+            'fechaAsignacion' => $datos['fecha_asignacion'],
+            'horaAsignacion' => $datos['hora_asignacion'],
+            'total' => $datos['total'],
+        ])->setPaper('letter', 'portrait')->download($nombre);
+    }
+
+    public function exportarTurnosExcel(): StreamedResponse
+    {
+        $datos = $this->datosExportacionTurnos();
+        $nombre = 'sigte-turnos-'.$datos['fecha_archivo'].'.xlsx';
+
+        $libro = new Spreadsheet;
+        $hoja = $libro->getActiveSheet();
+        $hoja->setTitle('Turnos');
+
+        $hoja->setCellValue('A1', 'SIGTE — Asignación de turnos del puesto');
+        $hoja->mergeCells('A1:E1');
+        $hoja->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        $hoja->setCellValue(
+            'A2',
+            $datos['fecha_asignacion']
+                ? 'Fecha de la asignación: '.$datos['fecha_asignacion'].($datos['hora_asignacion'] ? ' '.$datos['hora_asignacion'] : '')
+                : 'Fecha de la asignación: Sin asignaciones con fecha registrada'
+        );
+        $hoja->mergeCells('A2:E2');
+
+        $hoja->setCellValue(
+            'A3',
+            'Excel generado el '.$datos['fecha_generacion'].' a las '.$datos['hora_generacion'].' · America/Santiago'
+        );
+        $hoja->mergeCells('A3:E3');
+
+        $etiquetaVigente = match ($datos['turno_vigente']) {
+            'manana' => 'Mañana',
+            'tarde' => 'Tarde',
+            default => 'Noche',
+        };
+        $hoja->setCellValue(
+            'A4',
+            'Personal en nómina: '.$datos['total'].' · Turno vigente ahora: '.$etiquetaVigente
+        );
+        $hoja->mergeCells('A4:E4');
+
+        $hoja->fromArray(['#', 'Nombre', 'Turno', 'Horario', 'Asignado el'], null, 'A6');
+        $hoja->getStyle('A6:E6')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '1A5F7A'],
+            ],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+        ]);
+
+        $fila = 7;
+        $indice = 1;
+        foreach ($datos['por_turno'] as $bloque) {
+            foreach ($bloque['personas'] as $persona) {
+                $hoja->fromArray([
+                    $indice,
+                    $persona['nombre'],
+                    $bloque['etiqueta'],
+                    $bloque['horario'],
+                    $persona['asignado_el'] ?? '—',
+                ], null, 'A'.$fila);
+                $fila++;
+                $indice++;
+            }
+        }
+
+        if ($indice === 1) {
+            $hoja->setCellValue('A7', 'Sin personal en la nómina.');
+            $hoja->mergeCells('A7:E7');
+            $fila = 8;
+        }
+
+        $ultimaFila = max(7, $fila - 1);
+        $hoja->getStyle('A6:E'.$ultimaFila)->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => 'C9D5DC'],
+                ],
+            ],
+        ]);
+        $hoja->getStyle('A7:A'.$ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        foreach (range('A', 'E') as $columna) {
+            $hoja->getColumnDimension($columna)->setAutoSize(true);
+        }
+
+        return response()->streamDownload(function () use ($libro) {
+            (new Xlsx($libro))->save('php://output');
+            $libro->disconnectWorksheets();
+        }, $nombre, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    /**
+     * @return array{
+     *     por_turno: Collection<string, array{etiqueta: string, horario: string, personas: Collection<int, array{nombre: string, asignado_el: ?string}>, total: int}>,
+     *     turno_vigente: string,
+     *     fecha_generacion: string,
+     *     hora_generacion: string,
+     *     fecha_asignacion: ?string,
+     *     hora_asignacion: ?string,
+     *     fecha_archivo: string,
+     *     total: int
+     * }
+     */
+    private function datosExportacionTurnos(): array
+    {
+        $nomina = Personal::query()->orderBy('nombre')->get();
+        $momento = now()->timezone('America/Santiago');
+        $turnoVigente = Personal::turnoVigente($momento);
+
+        $ultimaAsignacion = $nomina
+            ->filter(fn (Personal $persona) => $persona->turno !== null && $persona->turno_asignado_at !== null)
+            ->sortByDesc(fn (Personal $persona) => $persona->turno_asignado_at->getTimestamp())
+            ->first()
+            ?->turno_asignado_at
+            ?->timezone('America/Santiago');
+
+        $secciones = ['' => [
+            'etiqueta' => 'Sin asignar',
+            'horario' => 'Pendientes de asignar',
+        ]] + collect(Personal::TURNOS)
+            ->map(fn (array $turno) => [
+                'etiqueta' => $turno['etiqueta'],
+                'horario' => $turno['horario'],
+            ])
+            ->all();
+
+        $porTurno = collect($secciones)->map(function (array $meta, string $clave) use ($nomina) {
+            $personas = $nomina
+                ->where('turno', $clave === '' ? null : $clave)
+                ->values()
+                ->map(fn (Personal $persona) => [
+                    'nombre' => $persona->nombre,
+                    'asignado_el' => $persona->turno_asignado_at
+                        ? $persona->turno_asignado_at->timezone('America/Santiago')->format('d/m/Y H:i')
+                        : null,
+                ]);
+
+            return [
+                'etiqueta' => $meta['etiqueta'],
+                'horario' => $meta['horario'],
+                'personas' => $personas,
+                'total' => $personas->count(),
+            ];
+        });
+
+        return [
+            'por_turno' => $porTurno,
+            'turno_vigente' => $turnoVigente,
+            'fecha_generacion' => $momento->format('d/m/Y'),
+            'hora_generacion' => $momento->format('H:i'),
+            'fecha_asignacion' => $ultimaAsignacion?->format('d/m/Y'),
+            'hora_asignacion' => $ultimaAsignacion?->format('H:i'),
+            'fecha_archivo' => $ultimaAsignacion?->format('Y-m-d') ?? $momento->format('Y-m-d'),
+            'total' => $nomina->count(),
+        ];
     }
 
     public function guardarUsuario(Request $request): RedirectResponse

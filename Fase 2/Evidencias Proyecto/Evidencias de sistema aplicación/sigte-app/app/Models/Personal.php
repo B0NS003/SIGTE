@@ -23,6 +23,7 @@ class Personal extends Model
         'email',
         'grupo',
         'turno',
+        'turno_asignado_at',
         'activo',
     ];
 
@@ -31,6 +32,7 @@ class Personal extends Model
         return [
             'activo' => 'boolean',
             'grupo' => 'integer',
+            'turno_asignado_at' => 'datetime',
         ];
     }
 

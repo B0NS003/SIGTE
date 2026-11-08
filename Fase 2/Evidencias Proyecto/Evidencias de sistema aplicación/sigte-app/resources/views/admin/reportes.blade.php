@@ -146,11 +146,13 @@
                     $trazaPaleta = ['#4e74d9', '#78b9f5', '#f5c44b', '#f48aa4', '#a98add', '#9edb91', '#f3a66e'];
                     $trazaSegmentos = [];
                     $trazaAcumulado = 0;
-                    foreach ($trazaTipos as $indiceTipo => $grupoTipo) {
+                    $trazaIndiceColor = 0;
+                    foreach ($trazaTipos as $grupoTipo) {
                         $trazaParte = $trazaTotal ? $grupoTipo->count() / $trazaTotal * 100 : 0;
-                        $trazaColor = $trazaPaleta[$indiceTipo % count($trazaPaleta)];
+                        $trazaColor = $trazaPaleta[$trazaIndiceColor % count($trazaPaleta)];
                         $trazaSegmentos[] = $trazaColor . ' ' . $trazaAcumulado . '% ' . ($trazaAcumulado + $trazaParte) . '%';
                         $trazaAcumulado += $trazaParte;
+                        $trazaIndiceColor++;
                     }
                     $trazaDona = $trazaTotal ? 'conic-gradient(' . implode(', ', $trazaSegmentos) . ')' : '#e2e8f0';
                     $trazaPorDia = $trazaRegistros->groupBy(fn ($m) => (string) ($m['fecha'] ?? 'Sin fecha'))->map->count();
