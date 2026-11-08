@@ -1905,7 +1905,7 @@
     transform: none;
   }
 }
-/* Recepción desde catálogo (flujo-tarjetas) */
+/* Recepciï¿½n desde catï¿½logo (flujo-tarjetas) */
 .recv-catalogo-layout {
   grid-template-columns: minmax(0, 1.12fr) minmax(310px, .88fr);
   gap: 18px;
@@ -2090,7 +2090,7 @@
   }
 }
 
-/* Confirmación y errores visibles al registrar una recepción */
+/* Confirmaciï¿½n y errores visibles al registrar una recepciï¿½n */
 .recv-notificacion {
   display: flex;
   align-items: flex-start;

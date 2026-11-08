@@ -28,8 +28,8 @@ class CadenaCustodia
         $cajas = Caja::query()
             ->with([
                 'responsable:id,name,email',
-                'persona:id,nombre',
-                'anotaciones' => fn ($q) => $q->with(['autor:id,name,email', 'persona:id,nombre'])->orderBy('id'),
+                'servicioClinico:id,nombre',
+                'anotaciones' => fn ($q) => $q->with(['autor:id,name,email'])->orderBy('id'),
                 'retrocesos' => fn ($q) => $q->with(['autor:id,name,email'])->orderBy('id'),
             ])
             ->where('codigo', 'ilike', '%'.$codigo.'%')
@@ -85,7 +85,7 @@ class CadenaCustodia
             $eventos[] = [
                 'momento' => $caja->entregado_at,
                 'tipo' => 'Entrega',
-                'de' => self::nombreActor($entrega?->actor, $caja->persona?->nombre),
+                'de' => self::nombreActor($entrega?->actor),
                 'a' => '—',
                 'nota' => $entrega?->detalle ?? ('Entregada a '.$caja->servicio),
             ];
@@ -142,7 +142,7 @@ class CadenaCustodia
         return [
             'momento' => $nota->created_at ?? now(),
             'tipo' => $tipo,
-            'de' => self::nombreActor($nota->autor, $nota->persona?->nombre),
+            'de' => self::nombreActor($nota->autor),
             'a' => '—',
             'nota' => $texto !== '' ? $texto : 'Sin detalle',
         ];
