@@ -29,17 +29,7 @@
             </div>
         </div>
         @include('partials.menu-rol')
-
-        <div class="sidebar-foot">
-            <div class="side-user">
-                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
-                <div>
-                    <strong>{{ $usuario['nombre'] }}</strong>
-                    <small>{{ $usuario['rol'] }}</small>
-                </div>
-            </div>
-            @include('partials.logout')
-        </div>
+        @include('partials.sidebar-foot')
     </aside>
 
     <main class="main">
@@ -71,32 +61,32 @@
                 @if ($servicio !== '')
                     <input type="hidden" name="servicio" value="{{ $servicio }}">
                 @endif
-                <button class="btn btn-dark" type="submit">Buscar</button>
+                <button class="btn btn-dark ops-search-go" type="submit">Buscar</button>
                 @if ($hay_filtros)
-                    <a class="btn btn-ghost" href="{{ route('mockups.catalogo') }}">Limpiar</a>
+                    <a class="ops-search-clear" href="{{ route('mockups.catalogo') }}">Limpiar</a>
                 @endif
             </div>
         </form>
 
-        <p class="ops-filter-label">
-            <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4.5 6.5h15l-5.6 6.6V18l-3.8 1.8v-6.7L4.5 6.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-            </svg>
-            Filtrar por área
-        </p>
         <div class="ops-filters" aria-label="Filtrar por área">
             <a
                 class="ops-filter {{ $servicio === '' ? 'is-active' : '' }}"
                 href="{{ $urlCatalogo(null) }}"
             >
-                Todos <em>{{ $total_servicios }}</em>
+                <span>Todos</span>
+                <em>{{ $total_servicios }}</em>
             </a>
             @foreach ($servicios as $opcion)
                 <a
                     class="ops-filter {{ $servicio === $opcion ? 'is-active' : '' }}"
                     href="{{ $urlCatalogo($opcion) }}"
                 >
-                    {{ $opcion }} <em>{{ $conteo_servicios[$opcion] ?? 0 }}</em>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="5" y="3" width="14" height="18" rx="1.5"/>
+                        <path d="M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1M10 21v-3h4v3"/>
+                    </svg>
+                    <span>{{ $opcion }}</span>
+                    <em>{{ $conteo_servicios[$opcion] ?? 0 }}</em>
                 </a>
             @endforeach
         </div>

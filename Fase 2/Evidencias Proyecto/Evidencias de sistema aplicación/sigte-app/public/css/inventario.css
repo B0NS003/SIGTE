@@ -4,7 +4,7 @@
   gap: 0.4rem;
   margin: 0;
 }
-.inv-titulo .sigte-icon { color: var(--navy); flex: 0 0 auto; }
+.inv-titulo .sigte-icon { color: var(--ink); flex: 0 0 auto; }
 .inv-libros {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -15,7 +15,7 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--borde);
   border-radius: 16px;
   padding: 1rem 1.05rem 0.9rem;
@@ -38,7 +38,7 @@
   font-family: var(--font-display);
   font-size: 2rem;
   line-height: 1;
-  color: var(--navy);
+  color: var(--ink);
 }
 .inv-libro em {
   display: block;
@@ -85,10 +85,59 @@
 .act-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
 .act-lista li {
     display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline;
-    padding: 0.55rem 0.7rem; border: 1px solid var(--borde); border-radius: 0.7rem; background: #fff;
+    padding: 0.55rem 0.7rem; border: 1px solid var(--borde); border-radius: 0.7rem; background: var(--card);
 }
-.act-lista strong { color: var(--navy); font-size: 0.92rem; }
+.act-lista strong { color: var(--ink); font-size: 0.92rem; }
 .act-lista span { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+
+/* HISTORIAL DE CONSUMOS: PRESENTACIÓN DE REGISTROS */
+#inv-consumo-historial-lista .inv-consumo-historial-item {
+    display: block;
+    padding: 0.75rem;
+}
+
+#inv-consumo-historial-lista .inv-consumo-historial-cabecera {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+#inv-consumo-historial-lista .inv-consumo-historial-detalle {
+    color: var(--ink);
+    font-size: 0.92rem;
+}
+
+#inv-consumo-historial-lista .inv-consumo-historial-fecha {
+    color: var(--muted);
+    font-size: 0.78rem;
+    white-space: normal;
+}
+
+#inv-consumo-historial-lista .inv-consumo-historial-observacion {
+    margin-top: 0.65rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 0.55rem;
+    background: #f5f7f8;
+}
+
+#inv-consumo-historial-lista .inv-consumo-historial-etiqueta {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: normal;
+}
+
+#inv-consumo-historial-lista .inv-consumo-historial-texto {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
 
 /* COLOR DE FILA SEGÚN ESTADO */
 .list tbody tr.stock-ok td {
@@ -157,7 +206,7 @@
 }
 .inv-paso { margin-bottom: 0.2rem; }
 .inv-vista.sala-todos .inv-paso,
-.inv-vista.sala-todos .inv-elige > p { color: var(--navy); }
+.inv-vista.sala-todos .inv-elige > p { color: var(--ink); }
 .inv-vista.sala-lavado .inv-paso,
 .inv-vista.sala-lavado .inv-elige > p { color: var(--sala-lavado); }
 .inv-vista.sala-armado .inv-paso,
@@ -181,8 +230,8 @@
     border: 1px solid var(--borde);
     border-top: 4px solid var(--borde);
     border-radius: 14px;
-    background: #fff;
-    color: var(--navy);
+    background: var(--card);
+    color: var(--ink);
     text-decoration: none;
     box-shadow: 0 3px 12px rgba(11, 31, 75, 0.04);
     transition: box-shadow 0.18s ease, transform 0.18s ease,
@@ -191,8 +240,8 @@
 
 .inv-switch-item:hover {
     text-decoration: none;
-    color: var(--navy);
-    background: #fff;
+    color: var(--ink);
+    background: var(--card);
     transform: translateY(-2px);
     box-shadow: 0 7px 18px rgba(11, 31, 75, 0.09);
 }
@@ -234,13 +283,13 @@
 }
 
 .inv-switch-item.sala-todos {
-    border-top-color: var(--navy);
+    border-top-color: var(--ink);
 }
 
 /* TARJETA SELECCIONADA */
 .inv-switch-item.is-active {
-    background: #fff;
-    color: var(--navy);
+    background: var(--card);
+    color: var(--ink);
 }
 
 .inv-switch-item.sala-lavado.is-active {
@@ -262,8 +311,8 @@
 }
 
 .inv-switch-item.sala-todos.is-active {
-    border-color: var(--navy);
-    border-top-color: var(--navy);
+    border-color: var(--ink);
+    border-top-color: var(--ink);
     box-shadow: 0 0 0 2px var(--navy);
 }
 
@@ -276,7 +325,7 @@
   color: var(--muted);
   font-size: 0.8rem;
 }
-.inv-resumen strong { color: var(--navy); font-size: 1rem; margin-right: 0.15rem; }
+.inv-resumen strong { color: var(--ink); font-size: 1rem; margin-right: 0.15rem; }
 .inv-resumen .is-alert, .inv-resumen .is-alert strong { color: #9a3412; }
 
 /* BUSCADOR DE INVENTARIO */
@@ -401,6 +450,12 @@
 }
 
 /* PAGINACIÓN DEL INVENTARIO */
+/* Filas fuera de la página actual (display de tabla no respeta [hidden] a veces). */
+#cuerpo-inventario tr[hidden],
+#cuerpo-inventario tr.is-pagina-oculta {
+  display: none !important;
+}
+
 .inv-paginacion {
     display: flex;
     align-items: center;
@@ -428,8 +483,8 @@
     padding: 0.35rem 1.7rem 0.35rem 0.55rem;
     border: 1px solid var(--borde);
     border-radius: 8px;
-    background: #fff;
-    color: var(--navy);
+    background: var(--card);
+    color: var(--ink);
     font-size: 0.78rem;
     cursor: pointer;
 }
@@ -459,8 +514,8 @@
     border: 1px solid var(--borde);
     border-radius: 8px;
 
-    background: #fff;
-    color: var(--navy);
+    background: var(--card);
+    color: var(--ink);
 
     font-size: 0.82rem;
     font-weight: 600;
@@ -476,31 +531,44 @@
 
 .inv-pagina-btn:hover:not(:disabled),
 .inv-pagina-numero:hover {
-    background: #f8fafc;
-    border-color: var(--navy);
+    background: var(--card-2);
+    border-color: var(--ink);
 }
 
 /* COLOR UNIFORME DE PAGINACIÓN */
 .inv-pagina-numero.is-active {
     background: var(--navy);
-    border-color: var(--navy);
+    border-color: var(--ink);
     color: #fff;
 }
 
 /* BOTÓN ACCIÓN DEL INVENTARIO */
-.inv-editar-stock {
+.inv-editar-stock,
+.inv-registrar-consumo {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 34px;
     height: 28px;
-    background-color: var(--navy);
+    background-color: var(--ink);
     color: #ffffff;
     border: none;
     border-radius: 6px;
     box-shadow: none;
     padding: 0;
     cursor: pointer;
+}
+
+.inv-editar-stock:hover,
+.inv-registrar-consumo:hover {
+    background-color: var(--ink);
+    color: #ffffff;
+}
+
+.inv-editar-stock:focus-visible,
+.inv-registrar-consumo:focus-visible {
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
 }
 
 /* CAMPANITA DE ALERTAS EN LA TARJETA PRINCIPAL */
@@ -520,7 +588,7 @@
     flex-shrink: 0;
     width: 32px;
     height: 32px;
-    color: var(--navy);
+    color: var(--ink);
     background: #eef3fb;
     border: 1px solid #d5dfef;
     border-radius: 50%;
@@ -549,4 +617,75 @@
     font-weight: 700;
     line-height: 1;
     box-sizing: border-box;
+}
+
+/*  MENSAJE DE CONFIRMACIÓN COMPARTIDO */
+.inv-toast-confirmacion {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: max-content;
+    max-width: calc(100% - 32px);
+    box-sizing: border-box;
+    padding: 12px 18px;
+
+    border: 1px solid #a7e4c0;
+    border-radius: 12px;
+
+    background: #eafaf0;
+    color: #17663a;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Icono de confirmación */
+.inv-toast-confirmacion .sigte-icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    color: #15803d;
+}
+
+/* Ocultar el mensaje */
+.inv-toast-confirmacion[hidden] {
+    display: none !important;
+}
+
+/* Entrada suave hacia abajo */
+.inv-toast-confirmacion:not([hidden]) {
+    animation: toastEntrada 0.35s ease-out both;
+}
+
+@keyframes toastEntrada {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 480px) {
+    .inv-toast-confirmacion {
+        top: 12px;
+        max-width: calc(100% - 24px);
+        padding: 10px 14px;
+        font-size: 0.84rem;
+    }
 }

@@ -29,7 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const fin = Math.min(inicio + cantidad, total);
 
             tarjetas.forEach(function (tarjeta, indice) {
-                tarjeta.hidden = indice < inicio || indice >= fin;
+                const fuera = indice < inicio || indice >= fin;
+                tarjeta.hidden = fuera;
+                tarjeta.classList.toggle('is-pagina-oculta', fuera);
             });
 
             rangoPrioridades.textContent = total > 0

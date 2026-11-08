@@ -1,0 +1,11 @@
+[
+  {
+    "id": 228,
+    "codigo": "AP-01",
+    "nombre": "Apéndice #01",
+    "tipo": "caja",
+    "servicio_id": 1,
+    "tipo_conjunto_id": 1,
+    "guia_visual": false
+  }
+]

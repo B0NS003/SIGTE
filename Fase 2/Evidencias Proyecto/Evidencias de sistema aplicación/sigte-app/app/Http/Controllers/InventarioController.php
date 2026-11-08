@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\ElementoInventario;
 use App\Models\Reposicion;
+use App\Models\MovimientoInsumo;
 use App\Models\Rol;
 use App\Support\Auditoria;
 use Illuminate\Http\JsonResponse;
@@ -104,6 +105,7 @@ class InventarioController extends Controller
             'rol' => $rol,
             'esAdministradora' => $rol === Rol::ADMINISTRADORA,
             'esEnfermera' => $rol === Rol::ENFERMERA,
+            'esOperador' => $rol === Rol::OPERADOR,
             'puedeReponer' => in_array($rol, [Rol::ENFERMERA, Rol::ADMINISTRADORA], true),
             'elemento' => trim((string) request()->query('elemento', '')),
             'busqueda' => $busqueda,
@@ -234,6 +236,96 @@ class InventarioController extends Controller
             ])
             ->with('ok', $mensaje);
     }
+
+    /* MODAL DEL ROL OPERADOR PARA EL CONSUMO */
+    public function registrarConsumo(Request $request): JsonResponse
+    {
+        $datos = $request->validate([
+            'sala' => ['required', 'in:lavado'],
+            'elemento' => ['required', 'string'],
+            'cantidad' => ['required', 'integer', 'min:1', 'max:9999'],
+            'observacion' => ['nullable', 'string', 'max:255'],
+        ], [
+            'sala.required' => 'No se pudo identificar la sala.',
+            'sala.in' => 'El consumo solo está disponible en la sala de lavado.',
+            'elemento.required' => 'No se pudo identificar el insumo.',
+            'cantidad.required' => 'Ingresa una cantidad válida.',
+            'cantidad.integer' => 'Ingresa una cantidad válida.',
+            'cantidad.min' => 'Ingresa una cantidad válida.',
+            'cantidad.max' => 'La cantidad no puede superar las 9999 unidades.',
+            'observacion.max' => 'La observación no puede superar los 255 caracteres.',
+        ]);
+
+        $elemento = ElementoInventario::query()
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $datos['sala']))
+            ->where('codigo', $datos['elemento'])
+            ->first();
+
+        if ($elemento === null) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No se encontró el insumo seleccionado.',
+            ], 422);
+        }
+
+        try {
+            $elemento = DB::transaction(function () use ($elemento, $datos) {
+                $bloqueado = ElementoInventario::query()
+                    ->whereKey($elemento->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($datos['cantidad'] > $bloqueado->stock) {
+                    throw new \DomainException(
+                        'No hay suficientes unidades disponibles. Stock actual: ' . $bloqueado->stock . '.'
+                    );
+                }
+
+                $bloqueado->stock -= $datos['cantidad'];
+                $bloqueado->save();
+
+                MovimientoInsumo::query()->create([
+                    'elemento_inventario_id' => $bloqueado->id,
+                    'tipo' => MovimientoInsumo::SALIDA,
+                    'cantidad' => $datos['cantidad'],
+                    'observacion' => $datos['observacion'] ?? null,
+                    'user_id' => Auth::id(),
+                ]);
+
+                return $bloqueado;
+            });
+        } catch (\DomainException $e) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => $e->getMessage(),
+            ], 422);
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'No fue posible registrar el consumo. El stock no cambió.',
+            ], 500);
+        }
+
+        Auditoria::registrar(
+            'Registró consumo',
+            'inventario',
+            $elemento->codigo,
+            '-' . $datos['cantidad'] . ' unidades · stock ' . $elemento->stock,
+        );
+
+        return response()->json([
+            'ok' => true,
+            'mensaje' => 'Consumo registrado. ' . $elemento->nombre . ' quedó en ' . $elemento->stock . ' unidades.',
+            'elemento' => [
+                'stock' => (int) $elemento->stock,
+                'minimo' => (int) $elemento->minimo,
+                'codigo' => $elemento->codigo,
+                'sala' => $elemento->codigoSala(),
+            ],
+        ]);
+    }
     
     public function historialElemento(string $sala, string $codigo)
     {
@@ -260,6 +352,36 @@ class InventarioController extends Controller
         return response()->json([
             'elemento' => $elemento->nombre,
             'historial' => $reposiciones,
+        ]);
+    }
+
+    /* HISTORIAL DEL MODAL DEL OPERADOR */
+    public function historialConsumos(string $sala, string $codigo): JsonResponse
+    {
+        $elemento = ElementoInventario::query()
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $sala))
+            ->where('codigo', $codigo)
+            ->firstOrFail();
+
+        $consumos = MovimientoInsumo::query()
+            ->with('autor')
+            ->where('elemento_inventario_id', $elemento->id)
+            ->where('tipo', MovimientoInsumo::SALIDA)
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(fn(MovimientoInsumo $movimiento) => [
+                'cantidad' => $movimiento->cantidad,
+                'observacion' => $movimiento->observacion,
+                'fecha' => $movimiento->created_at
+                    ->timezone('America/Santiago')
+                    ->format('d/m/Y · H:i'),
+                'autor' => $movimiento->autor?->name ?? 'Sin usuario',
+            ]);
+
+        return response()->json([
+            'elemento' => $elemento->nombre,
+            'historial' => $consumos,
         ]);
     }
 }

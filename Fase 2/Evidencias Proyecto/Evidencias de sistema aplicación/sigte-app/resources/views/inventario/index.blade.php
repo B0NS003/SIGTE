@@ -1,8 +1,10 @@
 @extends('layouts.app')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/inventario.css') }}?v={{ @filemtime(public_path('css/inventario.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/inventario/modal-reposicion.css') }}?v={{ filemtime(public_path('css/inventario/modal-reposicion.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/inventario/tarjeta-prioridad.css') }}?v={{ @filemtime(public_path('css/inventario/tarjeta-prioridad.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/inventario/modal-consumo.css') }}?v={{ @filemtime(public_path('css/inventario/modal-consumo.css')) }}">
 @endpush
 
 @push('scripts')
@@ -12,7 +14,11 @@
 <script src="{{ asset('js/inventario/tarjeta-prioridad.js') }}?v={{ @filemtime(public_path('js/inventario/tarjeta-prioridad.js')) }}"></script>
 @endif
 
+<script src="{{ asset('js/inventario/modal-utils.js') }}?v={{ @filemtime(public_path('js/inventario/modal-utils.js')) }}"></script>
+
 <script src="{{ asset('js/inventario/modal-reposicion.js') }}?v={{ filemtime(public_path('js/inventario/modal-reposicion.js')) }}" defer></script>
+
+<script src="{{ asset('js/inventario/modal-consumo.js') }}?v={{ @filemtime(public_path('js/inventario/modal-consumo.js')) }}" defer></script>
 @endpush
 
 @section('title', 'SIGTE — Inventario')
@@ -33,16 +39,7 @@ $totalElementos = collect($libros)->sum('tipos');
         </div>
         @include('partials.menu-rol')
 
-        <div class="sidebar-foot">
-            <div class="side-user">
-                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
-                <div>
-                    <strong>{{ $usuario['nombre'] }}</strong>
-                    <small>{{ $usuario['rol'] }}</small>
-                </div>
-            </div>
-            @include('partials.logout')
-        </div>
+        @include('partials.sidebar-foot')
     </aside>
 
     <main class="main inv-vista sala-{{ $sala }}">
@@ -163,59 +160,64 @@ $totalElementos = collect($libros)->sum('tipos');
                 </ul>
             </div>
 
-            <form method="GET"
-                action="{{ route('mockups.inventario') }}"
-                class="inv-busqueda"
-                id="form-busqueda-inventario"
-                role="search">
+            <!-- BUSCADOR DEL INVENTARIO -->
+            <div class="inv-barra-herramientas">
 
-                <input type="hidden" name="sala" value="{{ $sala }}">
+                <form method="GET"
+                    action="{{ route('mockups.inventario') }}"
+                    class="inv-busqueda"
+                    id="form-busqueda-inventario"
+                    role="search">
 
-                <!-- ICONO DE LUPA -->
-                <label class="field inv-campo-busqueda" for="busqueda-inventario">
+                    <input type="hidden" name="sala" value="{{ $sala }}">
 
-                    <svg class="inv-icono-busqueda" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="11" cy="11" r="6.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8" />
-                        <path d="M16 16l4.5 4.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round" />
-                    </svg>
+                    <!-- ICONO DE LUPA -->
+                    <label class="field inv-campo-busqueda" for="busqueda-inventario">
 
-                    <span class="sr-only">Buscar por código, nombre o ubicación</span>
-
-                    <input
-                        type="search"
-                        id="busqueda-inventario"
-                        name="q"
-                        value="{{ $busqueda ?? '' }}"
-                        placeholder="Buscar por código, nombre o ubicación"
-                        autocomplete="off">
-
-                    <!-- X PARA LIMPIAR -->
-                    <button
-                        type="button"
-                        class="inv-limpiar-busqueda"
-                        id="inv-limpiar-busqueda"
-                        aria-label="Limpiar búsqueda"
-                        title="Limpiar búsqueda"
-                        hidden>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 7l10 10M17 7L7 17"
+                        <svg class="inv-icono-busqueda" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="6.5"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="1.8" />
+                            <path d="M16 16l4.5 4.5"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
                                 stroke-linecap="round" />
                         </svg>
-                    </button>
 
-                </label>
+                        <span class="sr-only">Buscar por código, nombre o ubicación</span>
 
-            </form>
+                        <input
+                            type="search"
+                            id="busqueda-inventario"
+                            name="q"
+                            value="{{ $busqueda ?? '' }}"
+                            placeholder="Buscar por código, nombre o ubicación"
+                            autocomplete="off">
+
+                        <!-- X PARA LIMPIAR -->
+                        <button
+                            type="button"
+                            class="inv-limpiar-busqueda"
+                            id="inv-limpiar-busqueda"
+                            aria-label="Limpiar búsqueda"
+                            title="Limpiar búsqueda"
+                            hidden>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 7l10 10M17 7L7 17"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </button>
+
+                    </label>
+
+                </form>
+
+            </div>
 
             <div class="table-wrap">
                 <table>
@@ -229,8 +231,7 @@ $totalElementos = collect($libros)->sum('tipos');
                             <th>En proceso</th>
                             <th>Estado</th>
 
-                            <!-- ESTE BOTÓN SOLO APARECE PARA ADMIN Y ENFERMERA -->
-                            @if ($puedeReponer)
+                            @if ($puedeReponer || ($esOperador && $sala === 'lavado'))
                             <th>Acción</th>
                             @endif
                         </tr>
@@ -264,39 +265,71 @@ $totalElementos = collect($libros)->sum('tipos');
                                 @endif
                             </td>
 
-                            <!-- BOTÓN DE EDITAR ELEMENTOS -->
-                            @if ($puedeReponer)
-                                <td class="inv-accion">
-                                    <button
-                                        type="button"
-                                        class="inv-editar-stock"
-                                        data-codigo="{{ $item['codigo'] }}"
-                                        data-sala="{{ $item['sala'] }}"
-                                        data-nombre="{{ $item['nombre'] }}"
-                                        data-stock="{{ $item['stock'] }}"
-                                        data-minimo="{{ $item['minimo'] }}"
-                                        aria-label="Registrar reposición de {{ $item['nombre'] }}"
-                                        title="Registrar reposición">
-                                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path d="M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 15.5v4z"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.75"
-                                                stroke-linejoin="round" />
-                                            <path d="m14.5 7.5 2 2"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.75"
-                                                stroke-linecap="round" />
-                                            </svg>
-                                        </button>
-                                    </td>
+                            <!-- ACCIONES SEGÚN EL ROL -->
+                            @if ($puedeReponer || ($esOperador && $sala === 'lavado'))
+                            <td class="inv-accion">
+
+                                <!-- ADMINISTRADORA Y ENFERMERA: REPOSICIÓN -->
+                                @if ($puedeReponer)
+                                <button
+                                    type="button"
+                                    class="inv-editar-stock"
+                                    data-codigo="{{ $item['codigo'] }}"
+                                    data-sala="{{ $item['sala'] }}"
+                                    data-nombre="{{ $item['nombre'] }}"
+                                    data-stock="{{ $item['stock'] }}"
+                                    data-minimo="{{ $item['minimo'] }}"
+                                    aria-label="Registrar reposición de {{ $item['nombre'] }}"
+                                    title="Registrar reposición">
+                                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 15.5v4z"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.75"
+                                            stroke-linejoin="round" />
+                                        <path d="m14.5 7.5 2 2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.75"
+                                            stroke-linecap="round" />
+                                    </svg>
+                                </button>
+
+                                <!-- OPERADOR: REGISTRAR CONSUMO -->
+                                @elseif ($esOperador && $sala === 'lavado')
+                                <button
+                                    type="button"
+                                    class="inv-registrar-consumo"
+                                    data-codigo="{{ $item['codigo'] }}"
+                                    data-sala="{{ $item['sala'] }}"
+                                    data-nombre="{{ $item['nombre'] }}"
+                                    data-stock="{{ $item['stock'] }}"
+                                    data-minimo="{{ $item['minimo'] }}"
+                                    aria-label="Registrar consumo de {{ $item['nombre'] }}"
+                                    title="Registrar consumo">
+                                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 15.5v4z"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.75"
+                                            stroke-linejoin="round" />
+                                        <path d="m14.5 7.5 2 2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.75"
+                                            stroke-linecap="round" />
+                                    </svg>
+                                </button>
+                                @endif
+
+                            </td>
                             @endif
                         </tr>
-                        @endforeach
+                        @empty
+                        @endforelse
 
                         <tr id="inv-sin-resultados" hidden>
-                            <td colspan="{{ $puedeReponer ? 8 : 7 }}" class="text-center">
+                            <td colspan="{{ ($puedeReponer || ($esOperador && $sala === 'lavado')) ? 8 : 7 }}" class="text-center">
                                 No se encontraron elementos que coincidan con tu búsqueda.
                             </td>
                         </tr>
@@ -310,7 +343,7 @@ $totalElementos = collect($libros)->sum('tipos');
                 <div class="inv-paginacion-info">
                     <label for="inv-items-pagina">Elementos por página</label>
 
-                    <select id="inv-items-pagina">
+                    <select id="inv-items-pagina" data-sigte-lista="1">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -353,5 +386,6 @@ $totalElementos = collect($libros)->sum('tipos');
 </div>
 
 @include('inventario.partials.modal-reposicion')
+@include('inventario.partials.modal-consumo')
 
 @endsection

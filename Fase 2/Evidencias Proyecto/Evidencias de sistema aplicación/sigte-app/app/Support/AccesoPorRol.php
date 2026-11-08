@@ -37,6 +37,8 @@ class AccesoPorRol
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario.reponer' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.inventario.historial' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'mockups.inventario.consumir' => [Rol::OPERADOR],
+        'mockups.inventario.historial-consumos' => [Rol::OPERADOR],
 
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
@@ -141,6 +143,14 @@ class AccesoPorRol
         return [
             [
                 'grupo' => 'Mi trabajo',
+                'ruta' => 'mockups.recepcion',
+                'texto' => 'Recepción',
+                'icono' => 'recepcion',
+                'params' => [],
+                'roles' => $operacion,
+            ],
+            [
+                'grupo' => 'Mi trabajo',
                 'grupos' => [Rol::ADMINISTRADORA => 'Gestión'],
                 'ruta' => 'mockups.panel',
                 'texto' => 'Inicio',
@@ -160,14 +170,6 @@ class AccesoPorRol
                     Rol::ADMINISTRADORA => 'inicio',
                     Rol::SECRETARIA => 'inicio',
                 ],
-            ],
-            [
-                'grupo' => 'Mi trabajo',
-                'ruta' => 'mockups.recepcion',
-                'texto' => 'Recepción',
-                'icono' => 'recepcion',
-                'params' => [],
-                'roles' => $operacion,
             ],
             [
                 'grupo' => 'Mi trabajo',

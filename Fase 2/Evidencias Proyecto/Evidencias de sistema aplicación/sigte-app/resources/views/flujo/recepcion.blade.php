@@ -8,10 +8,11 @@
   <aside class="sidebar">
     <div class="logo-wrap"><img src="{{ asset('images/logo-hospital-circular.png') }}" alt="Logo hospital"><div><div class="logo">SIG<span>TE</span></div><div class="logo-sub">Operación</div></div></div>
     @include('partials.menu-rol')
-    <div class="sidebar-foot"><div class="side-user"><div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div><div><strong>{{ $usuario['nombre'] }}</strong><small>{{ $usuario['rol'] }}</small></div></div>@include('partials.logout')</div>
+    @include('partials.sidebar-foot')
   </aside>
   <main class="main">
     <div class="main-top"><div><p class="eyebrow">Área sucia · recepción</p><h1>Nueva recepción</h1><p class="main-sub">Selecciona el servicio, tipo de conjunto y caja desde el catálogo. Luego registra quién entrega el material.</p></div><div class="main-actions"><a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">Volver al flujo</a></div></div>
+    @include('flujo.partials.puesto')
     @if (session('recepcion_ok'))
       <section class="recv-notificacion recv-notificacion-exito" role="status" aria-live="polite">
         <div class="recv-notificacion-icono" aria-hidden="true">✓</div>
@@ -31,7 +32,7 @@
           <p>No se guardó ninguna caja. Revisa lo siguiente e inténtalo nuevamente:</p>
           <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
           @if ($errors->has('puesto'))
-            <a class="recv-notificacion-enlace" href="{{ route('mockups.panel', 'operador') }}">Ir al flujo y seleccionar responsable del puesto →</a>
+            <p class="recv-notificacion-enlace" style="margin-top:8px">Elige la cuenta del puesto arriba e inténtalo de nuevo.</p>
           @endif
         </div>
       </section>

@@ -1,0 +1,130 @@
+[
+  {
+    "id": 7477,
+    "ficha_id": 228,
+    "instrumento_id": 2190,
+    "cantidad": 2,
+    "orden": 1,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7478,
+    "ficha_id": 228,
+    "instrumento_id": 2191,
+    "cantidad": 2,
+    "orden": 2,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7479,
+    "ficha_id": 228,
+    "instrumento_id": 2192,
+    "cantidad": 1,
+    "orden": 3,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7480,
+    "ficha_id": 228,
+    "instrumento_id": 2193,
+    "cantidad": 5,
+    "orden": 4,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7481,
+    "ficha_id": 228,
+    "instrumento_id": 2194,
+    "cantidad": 1,
+    "orden": 5,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7482,
+    "ficha_id": 228,
+    "instrumento_id": 2195,
+    "cantidad": 1,
+    "orden": 6,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7483,
+    "ficha_id": 228,
+    "instrumento_id": 2196,
+    "cantidad": 2,
+    "orden": 7,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7484,
+    "ficha_id": 228,
+    "instrumento_id": 2197,
+    "cantidad": 2,
+    "orden": 8,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7485,
+    "ficha_id": 228,
+    "instrumento_id": 2198,
+    "cantidad": 1,
+    "orden": 9,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7486,
+    "ficha_id": 228,
+    "instrumento_id": 2199,
+    "cantidad": 1,
+    "orden": 10,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7487,
+    "ficha_id": 228,
+    "instrumento_id": 2200,
+    "cantidad": 6,
+    "orden": 11,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7488,
+    "ficha_id": 228,
+    "instrumento_id": 2201,
+    "cantidad": 2,
+    "orden": 12,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7489,
+    "ficha_id": 228,
+    "instrumento_id": 2202,
+    "cantidad": 1,
+    "orden": 13,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7490,
+    "ficha_id": 228,
+    "instrumento_id": 2203,
+    "cantidad": 2,
+    "orden": 14,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7491,
+    "ficha_id": 228,
+    "instrumento_id": 2204,
+    "cantidad": 2,
+    "orden": 15,
+    "tipo_conjunto_id": 1
+  },
+  {
+    "id": 7492,
+    "ficha_id": 228,
+    "instrumento_id": 2205,
+    "cantidad": 1,
+    "orden": 16,
+    "tipo_conjunto_id": 1
+  }
+]

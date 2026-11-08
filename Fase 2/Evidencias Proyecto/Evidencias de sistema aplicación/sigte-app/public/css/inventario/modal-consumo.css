@@ -1,0 +1,71 @@
+/* OBSERVACIÓN DEL CONSUMO */
+.inv-modal-observacion {
+    margin-top: 22px;
+}
+
+.inv-observacion-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+}
+
+.inv-observacion-encabezado .field-label {
+    margin: 0;
+}
+
+.inv-observacion-opcional {
+    color: #64756d;
+    background: #edf3ef;
+    border-radius: 99px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.inv-observacion-ayuda {
+    color: #687971;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0 0 11px;
+}
+
+#inv-consumo-observacion {
+    display: block;
+    width: 100%;
+    min-height: 104px;
+    resize: vertical;
+    padding: 13px 14px;
+    border: 1px solid #d4dfd9;
+    border-radius: 11px;
+    background: var(--card);
+    color: inherit;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+#inv-consumo-observacion::placeholder {
+    color: #9aa8a0;
+}
+
+#inv-consumo-observacion:focus {
+    border-color: #245b52;
+    box-shadow: 0 0 0 3px rgb(36 91 82 / 17%);
+}
+
+.inv-observacion-pie {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 8px;
+    color: #75847c;
+    font-size: 10px;
+}
+
+#inv-consumo-contador {
+    font-variant-numeric: tabular-nums;
+}

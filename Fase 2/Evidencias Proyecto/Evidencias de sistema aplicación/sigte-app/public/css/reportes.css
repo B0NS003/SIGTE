@@ -1,0 +1,1665 @@
+/* SIGTE — Estilos exclusivos del módulo de reportes */
+.reportes-pagina {
+    min-width: 0;
+}
+
+.reportes-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #dce3ed;
+    border-radius: 20px;
+    margin: 0 0 22px;
+}
+
+.reportes-tab {
+    flex: 1;
+    min-width: 0;
+    padding: 17px 10px;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: #00143b;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+
+.reportes-tab:hover:not(.activo) {
+    background: #f1f5f9;
+}
+
+.reportes-tab.activo {
+    background: #ea5415;
+    color: #fff;
+}
+
+.reportes-tab:focus-visible {
+    outline: 3px solid #0b6fa4;
+    outline-offset: 2px;
+}
+
+.reportes-panel[hidden] {
+    display: none !important;
+}
+
+.reportes-panel {
+    margin-top: 20px;
+}
+
+.reportes-section-head,
+.reportes-subtitulo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 17px;
+}
+
+.reportes-section-head h2 {
+    margin: 0 0 5px;
+    font-size: 21px;
+    color: #00143b;
+}
+
+.reportes-section-head p,
+.reportes-subtitulo p {
+    margin: 0;
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.reportes-bloque {
+    padding: 22px;
+    margin-bottom: 18px;
+}
+
+.reportes-bloque h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    color: #00143b;
+}
+
+.reportes-filtros {
+    padding: 20px 22px;
+}
+
+.reportes-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.3fr auto;
+    align-items: end;
+    gap: 14px;
+}
+
+.reportes-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #00143b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.reportes-campo input,
+.reportes-campo select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 43px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    padding: 9px 11px;
+    background: #fff;
+    color: #00143b;
+    font: inherit;
+    font-weight: 400;
+}
+
+.reportes-consultar {
+    min-height: 43px;
+    white-space: nowrap;
+}
+
+.reportes-ayuda,
+.reportes-nota {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.reportes-ayuda {
+    margin: 13px 0 0;
+}
+
+.reportes-nota {
+    margin: 4px 0 16px;
+}
+
+.reportes-chip {
+    display: inline-block;
+    flex-shrink: 0;
+    padding: 6px 11px;
+    background: #e8f1fa;
+    color: #17436d;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.reportes-chip-pendiente {
+    background: #fff4e8;
+    color: #995000;
+}
+
+.reportes-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 13px;
+    margin: 15px 0 22px;
+}
+
+.reportes-resumen-externo {
+    margin: 0 0 18px;
+}
+
+.reportes-kpi {
+    min-width: 0;
+    padding: 18px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.reportes-kpi span {
+    font-size: 13px;
+    color: #475569;
+}
+
+.reportes-kpi strong {
+    font-size: 27px;
+    color: #00143b;
+}
+
+.reportes-kpi small {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.reportes-tabla {
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+}
+
+.reportes-tabla table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.reportes-tabla th {
+    background: #f1f5f9;
+    color: #00143b;
+    text-align: left;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.reportes-tabla th,
+.reportes-tabla td {
+    padding: 13px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+
+.reportes-tabla tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.reportes-vacio {
+    color: #64748b;
+    text-align: center;
+    padding: 25px 15px !important;
+}
+
+.reportes-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 22px;
+    margin-top: 16px;
+}
+
+.reportes-pie strong {
+    color: #00143b;
+}
+
+.reportes-pie p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.reportes-exportar {
+    display: flex;
+    gap: 9px;
+}
+
+.reportes-exportar button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.reportes-estado {
+    padding: 20px;
+}
+
+@media (max-width: 1050px) {
+    .reportes-campos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .reportes-tabs {
+        flex-direction: column;
+    }
+
+    .reportes-tab {
+        padding: 13px;
+    }
+
+    .reportes-campos,
+    .reportes-resumen {
+        grid-template-columns: 1fr;
+    }
+
+    .reportes-section-head,
+    .reportes-subtitulo,
+    .reportes-pie {
+        flex-direction: column;
+    }
+
+    .reportes-exportar {
+        width: 100%;
+    }
+
+    .reportes-exportar button {
+        flex: 1;
+    }
+
+    .reportes-bloque,
+    .reportes-filtros {
+        padding: 15px;
+    }
+}
+
+
+/* Vista de producción rediseñada — conserva las reglas existentes de SIGTE */
+.reportes-pagina .reportes-tabs {
+    margin-bottom: 14px;
+    border-radius: 16px;
+    padding: 6px
+}
+
+.reportes-pagina .reportes-tab {
+    padding: 13px 10px;
+    border-radius: 12px
+}
+
+.reportes-pagina .reportes-filtros {
+    padding: 16px 20px;
+    margin-bottom: 14px
+}
+
+.reportes-pagina .reportes-filtros .reportes-section-head {
+    margin-bottom: 12px
+}
+
+.reportes-pagina .reportes-filtros .reportes-section-head h2 {
+    font-size: 17px
+}
+
+.reportes-pagina .reportes-panel {
+    margin-top: 14px
+}
+
+.reportes-pagina .reportes-titulo-modulo {
+    margin-bottom: 12px
+}
+
+.reportes-pagina .reportes-titulo-modulo h2 {
+    font-size: 22px
+}
+
+.reportes-pagina .reportes-bloque-moderno {
+    padding: 10px;
+    margin-bottom: 14px;
+    border-radius: 16px
+}
+
+.reportes-banda {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 15px;
+    background: #fff2e6;
+    border-radius: 11px;
+    margin-bottom: 10px
+}
+
+.reportes-banda h3 {
+    font-size: 16px;
+    margin: 0;
+    white-space: nowrap
+}
+
+.reportes-banda-icono {
+    color: #ed650a;
+    font-size: 22px;
+    vertical-align: middle;
+    margin-right: 5px
+}
+
+.reportes-banda>span {
+    font-size: 12px;
+    color: #475569;
+    text-align: right
+}
+
+.reportes-produccion-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(260px, .95fr);
+    gap: 20px;
+    padding: 0 12px 8px
+}
+
+.reportes-produccion-principal {
+    min-width: 0
+}
+
+.reportes-distribucion {
+    min-width: 0;
+    border-left: 1px solid #e2e8f0;
+    padding: 8px 8px 8px 20px
+}
+
+.reportes-resumen-compacto {
+    gap: 10px;
+    margin: 0 0 14px
+}
+
+.reportes-resumen-compacto .reportes-kpi {
+    min-height: 86px;
+    padding: 13px 15px;
+    border: 0;
+    gap: 3px
+}
+
+.reportes-resumen-compacto .reportes-kpi span {
+    font-size: 12px;
+    color: #193452
+}
+
+.reportes-resumen-compacto .reportes-kpi strong {
+    font-size: 26px;
+    line-height: 1.2
+}
+
+.reportes-resumen-compacto .reportes-kpi small {
+    font-size: 10px
+}
+
+.reportes-kpi-azul {
+    background: linear-gradient(120deg, #f0f8ff, #e5f1ff)
+}
+
+.reportes-kpi-verde {
+    background: linear-gradient(120deg, #f2fbf0, #e8f6e8)
+}
+
+.reportes-kpi-violeta {
+    background: linear-gradient(120deg, #f6f2ff, #ede8fb)
+}
+
+.reportes-titulo-detalle {
+    font-size: 13px;
+    color: #00143b;
+    margin: 8px 0 10px;
+    font-weight: 750
+}
+
+.reportes-etapas {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    margin-bottom: 12px
+}
+
+.reportes-etapa {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 9px 3px;
+    border-radius: 10px;
+    text-align: center;
+    background: #e8f4ff
+}
+
+.reportes-etapa span {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+    color: #17324e
+}
+
+.reportes-etapa strong {
+    font-size: 20px;
+    color: #00143b
+}
+
+.reportes-etapa-1 {
+    background: #eaf5ff
+}
+
+.reportes-etapa-2 {
+    background: #fff5dc
+}
+
+.reportes-etapa-3 {
+    background: #ffedf1
+}
+
+.reportes-etapa-4 {
+    background: #f1ebff
+}
+
+.reportes-etapa-5 {
+    background: #eaf8eb
+}
+
+.reportes-etapa-flecha {
+    align-self: center;
+    color: #4599de;
+    font-size: 21px;
+    font-weight: 800
+}
+
+.reportes-tabla-compacta th,
+.reportes-tabla-compacta td {
+    padding: 8px 12px;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.reportes-punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 9px;
+    flex-shrink: 0
+}
+
+.reportes-grafico-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    min-height: 215px
+}
+
+.reportes-dona {
+    width: 185px;
+    height: 185px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0
+}
+
+.reportes-dona-centro {
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}
+
+.reportes-dona-centro strong {
+    font-size: 29px;
+    color: #00143b;
+    line-height: 1.1
+}
+
+.reportes-dona-centro span {
+    font-size: 13px;
+    color: #475569
+}
+
+.reportes-leyenda {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 110px;
+    flex: 1
+}
+
+.reportes-leyenda>div {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #193452;
+    gap: 3px
+}
+
+.reportes-leyenda>div>span:nth-child(2) {
+    flex: 1
+}
+
+.reportes-leyenda strong {
+    color: #00143b
+}
+
+.reportes-mensual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 0 12px 8px
+}
+
+.reportes-mensual-grid>div {
+    min-width: 0
+}
+
+.reportes-grafico-pendiente {
+    min-height: 115px;
+    border: 1px dashed #d5dfec;
+    border-radius: 11px;
+    background: repeating-linear-gradient(0deg, #f8fafc 0, #f8fafc 27px, #e9eff5 28px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px
+}
+
+.reportes-pagina .reportes-pie {
+    padding: 15px 20px
+}
+
+@media(max-width:1200px) {
+    .reportes-produccion-grid {
+        grid-template-columns: 1fr
+    }
+
+    .reportes-distribucion {
+        border-left: 0;
+        border-top: 1px solid #e2e8f0;
+        padding: 14px 0
+    }
+
+    .reportes-grafico-area {
+        justify-content: flex-start
+    }
+
+    .reportes-mensual-grid {
+        grid-template-columns: 1fr
+    }
+}
+
+@media(max-width:650px) {
+    .reportes-banda {
+        align-items: flex-start;
+        flex-direction: column
+    }
+
+    .reportes-banda>span {
+        text-align: left
+    }
+
+    .reportes-etapas {
+        flex-wrap: wrap
+    }
+
+    .reportes-etapa {
+        flex: 1 1 26%
+    }
+
+    .reportes-etapa-flecha {
+        display: none
+    }
+
+    .reportes-grafico-area {
+        flex-wrap: wrap
+    }
+
+    .reportes-resumen-compacto {
+        grid-template-columns: 1fr
+    }
+
+    .reportes-produccion-grid,
+    .reportes-mensual-grid {
+        padding: 0 3px 8px
+    }
+}
+
+/* Iconos SVG locales: sin librerías externas ni fuentes adicionales */
+.reportes-icono {
+    display: block;
+    width: 23px;
+    height: 23px;
+    flex-shrink: 0
+}
+
+.reportes-banda-icono .reportes-icono {
+    width: 20px;
+    height: 20px
+}
+
+.reportes-resumen-compacto .reportes-kpi {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 13px
+}
+
+.reportes-kpi-icono {
+    width: 29px;
+    height: 29px;
+    flex-shrink: 0
+}
+
+.reportes-kpi-azul .reportes-kpi-icono {
+    color: #439ef4
+}
+
+.reportes-kpi-verde .reportes-kpi-icono {
+    color: #16a34a
+}
+
+.reportes-kpi-violeta .reportes-kpi-icono {
+    color: #9863dc
+}
+
+.reportes-kpi-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0
+}
+
+.reportes-etapa {
+    flex-direction: row;
+    gap: 7px;
+    min-height: 57px;
+    padding: 7px 5px
+}
+
+.reportes-etapa-icono {
+    width: 25px;
+    height: 25px;
+    color: #3895ee
+}
+
+.reportes-etapa-2 .reportes-etapa-icono {
+    color: #efad22
+}
+
+.reportes-etapa-3 .reportes-etapa-icono {
+    color: #ee7491
+}
+
+.reportes-etapa-4 .reportes-etapa-icono {
+    color: #9969db
+}
+
+.reportes-etapa-5 .reportes-etapa-icono {
+    color: #2db45c
+}
+
+.reportes-etapa-texto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0
+}
+
+@media(max-width:900px) {
+    .reportes-etapa {
+        flex-direction: column
+    }
+
+    .reportes-resumen-compacto .reportes-kpi {
+        gap: 7px
+    }
+
+    .reportes-kpi-icono {
+        width: 23px;
+        height: 23px
+    }
+}
+
+/* Cabecera de sección compacta: icono y título en una misma línea */
+.reportes-pagina .reportes-banda {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-height: 43px;
+    padding: 7px 14px;
+    margin-bottom: 10px;
+    border-radius: 11px;
+}
+
+.reportes-pagina .reportes-banda h3 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.25;
+    white-space: normal;
+}
+
+.reportes-pagina .reportes-banda-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+    margin: 0;
+    line-height: 1;
+}
+
+.reportes-pagina .reportes-banda-icono .reportes-icono {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+.reportes-pagina .reportes-banda>.reportes-banda-descripcion {
+    justify-self: center;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+@media (max-width: 760px) {
+    .reportes-pagina .reportes-banda {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .reportes-pagina .reportes-banda>.reportes-banda-descripcion {
+        justify-self: start;
+        text-align: left;
+    }
+}
+
+/* Flujo horizontal compacto con tarjetas en forma de chevrón */
+.reportes-pagina .reportes-etapas {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+    margin: 0 0 12px;
+    flex-wrap: nowrap;
+}
+
+.reportes-pagina .reportes-etapa {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 47px;
+    min-height: 47px;
+    padding: 5px 11px 5px 13px;
+    box-sizing: border-box;
+    border-radius: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%, 10px 50%);
+}
+
+.reportes-pagina .reportes-etapa:first-child {
+    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
+    border-radius: 8px 0 0 8px;
+    padding-left: 7px;
+}
+
+.reportes-pagina .reportes-etapa:last-of-type {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10px 50%);
+    border-radius: 0 8px 8px 0;
+    padding-right: 5px;
+}
+
+.reportes-pagina .reportes-etapa-icono {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+}
+
+.reportes-pagina .reportes-etapa-texto {
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 0;
+    line-height: 1.1;
+}
+
+.reportes-pagina .reportes-etapa-texto span {
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+
+.reportes-pagina .reportes-etapa-texto strong {
+    font-size: 17px;
+    line-height: 1.15;
+}
+
+.reportes-pagina .reportes-etapa-flecha {
+    flex: 0 0 12px;
+    width: 12px;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+    color: #348ee8;
+}
+
+.reportes-pagina .reportes-etapa-flecha:nth-of-type(8) {
+    color: #f0a11b;
+}
+
+.reportes-pagina .reportes-etapa-flecha:nth-of-type(10) {
+    color: #d74b91;
+}
+
+.reportes-pagina .reportes-etapa-flecha:nth-of-type(12) {
+    color: #22a75b;
+}
+
+@media (max-width: 720px) {
+    .reportes-pagina .reportes-etapas {
+        overflow-x: auto;
+        padding-bottom: 7px;
+    }
+
+    .reportes-pagina .reportes-etapa {
+        flex: 0 0 110px;
+    }
+
+    .reportes-pagina .reportes-etapa-flecha {
+        display: flex;
+        flex: 0 0 12px;
+    }
+}
+
+/* Trazabilidad: diseño específico. No modifica las pestañas ni la producción. */
+.reportes-traza-encabezado {
+    margin: 12px 0 14px;
+    align-items: center;
+}
+
+.reportes-traza-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reportes-traza-titulo>.reportes-icono {
+    width: 32px;
+    height: 32px;
+    color: #243b85;
+}
+
+.reportes-traza-titulo h2 {
+    font-size: 23px;
+}
+
+.reportes-traza-panel {
+    padding: 16px;
+    margin-bottom: 14px;
+    border-radius: 16px;
+}
+
+.reportes-traza-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, .9fr);
+    gap: 18px;
+}
+
+.reportes-traza-izquierda {
+    min-width: 0;
+}
+
+.reportes-traza-kpis {
+    margin: 0 0 12px;
+    gap: 10px;
+}
+
+.reportes-traza-kpis .reportes-kpi {
+    flex-direction: row;
+    align-items: center;
+    min-height: 78px;
+    border: 0;
+    padding: 12px;
+    gap: 12px;
+}
+
+.reportes-traza-kpis .reportes-kpi span {
+    font-size: 12px;
+    color: #193452;
+}
+
+.reportes-traza-kpis .reportes-kpi strong {
+    font-size: 27px;
+    line-height: 1.1;
+}
+
+.reportes-traza-kpis .reportes-kpi small {
+    font-size: 10px;
+}
+
+.reportes-kpi-naranja {
+    background: linear-gradient(120deg, #fff6ec, #fff0e2);
+}
+
+.reportes-kpi-naranja .reportes-kpi-icono {
+    color: #ee791a;
+}
+
+.reportes-traza-serie {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px;
+    min-width: 0;
+}
+
+.reportes-traza-serie h3,
+.reportes-traza-derecha h3 {
+    font-size: 15px;
+    color: #00143b;
+    margin: 0 0 12px;
+}
+
+.reportes-traza-barras {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    height: 175px;
+    overflow-x: auto;
+    padding: 8px 4px 0;
+    border-bottom: 1px solid #dbe4f1;
+}
+
+.reportes-traza-barra-col {
+    flex: 1 0 44px;
+    min-width: 44px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+}
+
+.reportes-traza-barra-col strong {
+    color: #243b85;
+    font-size: 11px;
+}
+
+.reportes-traza-barra {
+    width: min(70%, 38px);
+    background: linear-gradient(180deg, #9c79ed, #d6c7ff);
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+}
+
+.reportes-traza-barra-col span {
+    font-size: 10px;
+    color: #64748b;
+    white-space: nowrap;
+    padding-bottom: 4px;
+}
+
+.reportes-traza-sin-datos {
+    min-height: 160px;
+    display: grid;
+    place-items: center;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+}
+
+.reportes-traza-derecha {
+    border-left: 1px solid #e2e8f0;
+    padding: 8px 4px 8px 20px;
+    min-width: 0;
+}
+
+.reportes-traza-distribucion {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+}
+
+.reportes-traza-dona {
+    width: 170px;
+    height: 170px;
+}
+
+.reportes-traza-leyenda {
+    display: flex;
+    flex: 1 1 140px;
+    flex-direction: column;
+    gap: 11px;
+    min-width: 135px;
+}
+
+.reportes-traza-leyenda>div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #193452;
+}
+
+.reportes-traza-leyenda>div>span:nth-child(2) {
+    flex: 1;
+    overflow-wrap: anywhere;
+}
+
+.reportes-traza-leyenda strong {
+    color: #00143b;
+    white-space: nowrap;
+}
+
+.reportes-traza-detalle {
+    padding: 18px;
+    border-radius: 16px;
+}
+
+.reportes-traza-detalle-cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.reportes-traza-detalle-cabecera>.reportes-icono {
+    color: #ed650a;
+    width: 28px;
+    height: 28px;
+}
+
+.reportes-traza-detalle-cabecera h3 {
+    margin: 0 0 3px;
+}
+
+.reportes-traza-detalle-cabecera .reportes-nota {
+    margin: 0;
+}
+
+.reportes-traza-tabla td {
+    vertical-align: middle;
+}
+
+.reportes-traza-usuario {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.reportes-traza-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #e6ecfc;
+    color: #233f89;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.reportes-traza-accion {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #e9f3ff;
+    color: #1b568c;
+    font-weight: 700;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+    .reportes-traza-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reportes-traza-derecha {
+        border-left: 0;
+        border-top: 1px solid #e2e8f0;
+        padding: 16px 0 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .reportes-traza-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .reportes-traza-panel {
+        padding: 12px;
+    }
+
+    .reportes-traza-detalle {
+        padding: 12px;
+    }
+}
+
+/* Entregas: diseño independiente de Producción y Trazabilidad */
+.reportes-entregas-encabezado {
+    align-items: center;
+    margin: 10px 0 14px
+}
+
+.reportes-entregas-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px
+}
+
+.reportes-entregas-titulo>.reportes-icono {
+    width: 34px;
+    height: 34px;
+    color: #ee6415
+}
+
+.reportes-entregas-titulo h2 {
+    font-size: 23px
+}
+
+.reportes-entregas-kpis {
+    display: grid;
+    grid-template-columns: 1.3fr .85fr .85fr;
+    gap: 14px;
+    margin-bottom: 14px
+}
+
+.reportes-entregas-kpi {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 106px;
+    box-sizing: border-box;
+    padding: 17px 20px;
+    border: 1px solid #dce5f0;
+    border-radius: 17px;
+    background: #fff;
+    min-width: 0
+}
+
+.reportes-entregas-kpi>svg.reportes-icono {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0
+}
+
+.reportes-entregas-kpi>div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0
+}
+
+.reportes-entregas-kpi span {
+    font-size: 14px;
+    color: #00143b;
+    font-weight: 650
+}
+
+.reportes-entregas-kpi strong {
+    font-size: 34px;
+    line-height: 1.15;
+    color: #00143b
+}
+
+.reportes-entregas-kpi small {
+    font-size: 11px;
+    color: #64748b
+}
+
+.reportes-entregas-kpi-principal {
+    background: linear-gradient(120deg, #fff0df, #fffaf3);
+    border-color: #fce8d3
+}
+
+.reportes-entregas-bandeja {
+    width: 145px;
+    max-width: 35%;
+    height: auto;
+    flex-shrink: 0;
+    filter: drop-shadow(0 7px 5px #6c7d8a22)
+}
+
+.reportes-entregas-kpi-operaciones {
+    background: linear-gradient(115deg, #fff, #eff6ff)
+}
+
+.reportes-entregas-kpi-operaciones>svg {
+    color: #2684ec
+}
+
+.reportes-entregas-kpi-servicios {
+    background: linear-gradient(115deg, #fff, #f5f0ff)
+}
+
+.reportes-entregas-kpi-servicios>svg {
+    color: #a36be7
+}
+
+.reportes-entregas-analitica {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px
+}
+
+.reportes-entregas-card {
+    min-width: 0;
+    padding: 17px 20px;
+    border-radius: 17px
+}
+
+.reportes-entregas-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+    color: #00143b;
+    font-size: 16px
+}
+
+.reportes-entregas-card h3>.reportes-icono {
+    width: 23px;
+    height: 23px;
+    color: #ed650a
+}
+
+.reportes-entregas-servicio-fila {
+    display: grid;
+    grid-template-columns: minmax(95px, 1.15fr) auto minmax(60px, 1.4fr) 46px;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+    font-size: 12px;
+    color: #00143b
+}
+
+.reportes-entregas-servicio-nombre {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere
+}
+
+.reportes-entregas-servicio-nombre i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0
+}
+
+.reportes-entregas-servicio-cantidad {
+    white-space: nowrap;
+    font-weight: 650
+}
+
+.reportes-entregas-progreso {
+    height: 14px;
+    background: #e9eff7;
+    border-radius: 20px;
+    overflow: hidden
+}
+
+.reportes-entregas-progreso span {
+    display: block;
+    height: 100%;
+    border-radius: 20px
+}
+
+.reportes-entregas-servicio-fila>strong {
+    text-align: right;
+    background: #e9f2ff;
+    border-radius: 20px;
+    padding: 4px;
+    font-size: 11px
+}
+
+.reportes-entregas-calendario {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 7px;
+    margin: 8px 0 12px
+}
+
+.reportes-entregas-dia {
+    aspect-ratio: 1.7;
+    min-height: 26px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    background: rgba(248, 109, 20, calc(.10 + var(--entregas-intensidad) * .83));
+    color: #793c15;
+    font-size: 11px
+}
+
+.reportes-entregas-leyenda-calendario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 10px
+}
+
+.reportes-entregas-leyenda-calendario span {
+    width: 16px;
+    height: 10px;
+    border-radius: 3px;
+    background: #ffeadb
+}
+
+.reportes-entregas-leyenda-calendario span:nth-of-type(2) {
+    background: #ffbf91
+}
+
+.reportes-entregas-leyenda-calendario span:nth-of-type(3) {
+    background: #fb8b4a
+}
+
+.reportes-entregas-leyenda-calendario span:nth-of-type(4) {
+    background: #f06a17
+}
+
+.reportes-entregas-datos-dia {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0
+}
+
+.reportes-entregas-datos-dia>div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.reportes-entregas-datos-dia span {
+    font-size: 11px;
+    color: #475569
+}
+
+.reportes-entregas-datos-dia strong {
+    font-size: 19px;
+    color: #00143b
+}
+
+.reportes-entregas-datos-dia small {
+    font-size: 11px;
+    color: #ee6415
+}
+
+.reportes-entregas-inferior {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 14px
+}
+
+.reportes-entregas-card-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px
+}
+
+.reportes-entregas-card-cabecera h3 {
+    margin-bottom: 12px
+}
+
+.reportes-entregas-tabla th,
+.reportes-entregas-tabla td {
+    padding: 10px 11px;
+    font-size: 12px;
+    vertical-align: middle
+}
+
+.reportes-entregas-codigo {
+    display: inline-block;
+    border-radius: 20px;
+    background: #e8f0fb;
+    color: #163b70;
+    padding: 5px 9px;
+    font-weight: 750;
+    white-space: nowrap
+}
+
+.reportes-entregas-ultimas .reportes-nota {
+    margin: 12px 0 0
+}
+
+.reportes-entregas-estado {
+    display: flex;
+    align-items: center
+}
+
+.reportes-entregas-estado-interior {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding: 17px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #edfbee, #f6fff7)
+}
+
+.reportes-entregas-bandeja-estado {
+    width: 125px;
+    max-width: 35%;
+    flex-shrink: 0;
+    filter: drop-shadow(0 5px 5px #53766022)
+}
+
+.reportes-entregas-estado h3 {
+    margin: 0 0 8px
+}
+
+.reportes-entregas-estado p {
+    margin: 0 0 8px;
+    color: #17324e;
+    font-size: 13px;
+    line-height: 1.5
+}
+
+.reportes-entregas-estado small {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.4;
+    display: block
+}
+
+.reportes-entregas-vacio {
+    padding: 30px 12px;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px
+}
+
+@media(max-width:1150px) {
+
+    .reportes-entregas-analitica,
+    .reportes-entregas-inferior {
+        grid-template-columns: 1fr
+    }
+
+    .reportes-entregas-kpis {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .reportes-entregas-kpi-principal {
+        grid-column: 1/-1
+    }
+}
+
+@media(max-width:650px) {
+    .reportes-entregas-kpis {
+        grid-template-columns: 1fr
+    }
+
+    .reportes-entregas-kpi-principal {
+        grid-column: auto
+    }
+
+    .reportes-entregas-card {
+        padding: 14px
+    }
+
+    .reportes-entregas-servicio-fila {
+        grid-template-columns: 1fr auto 42px;
+        gap: 8px
+    }
+
+    .reportes-entregas-progreso {
+        grid-column: 1/-1;
+        grid-row: 2
+    }
+
+    .reportes-entregas-servicio-fila>strong {
+        grid-column: 3;
+        grid-row: 1
+    }
+
+    .reportes-entregas-servicio-cantidad {
+        grid-column: 2;
+        grid-row: 1
+    }
+
+    .reportes-entregas-estado-interior {
+        flex-direction: column;
+        align-items: flex-start
+    }
+
+    .reportes-entregas-bandeja-estado {
+        max-width: 100%
+    }
+}
+
+/* Imagen real de caja de instrumental quirúrgico en la tarjeta de entregas */
+.reportes-entregas-kpi-principal img.reportes-entregas-bandeja {
+    width: 185px;
+    max-width: 39%;
+    height: 112px;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 7px 8px #6c7d8a30)
+}
+
+@media(max-width:650px) {
+    .reportes-entregas-kpi-principal img.reportes-entregas-bandeja {
+        width: 135px;
+        height: 95px;
+        max-width: 42%
+    }
+}
+
+/* Imagen real de instrumental en la tarjeta Estado del período */
+.reportes-entregas-estado-interior {
+    position: relative;
+    min-height: 178px;
+    padding: 20px 24px;
+    gap: 20px;
+    background: linear-gradient(110deg, #edf9ef 0%, #f4fff5 100%);
+    overflow: hidden;
+}
+
+.reportes-entregas-estado-interior img.reportes-entregas-bandeja-estado {
+    display: block;
+    width: 175px;
+    height: 135px;
+    max-width: 42%;
+    object-fit: contain;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 7px 6px rgba(42, 64, 58, .17));
+}
+
+.reportes-entregas-estado-interior>div {
+    min-width: 0;
+    flex: 1;
+}
+
+.reportes-entregas-estado h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #091d4b;
+}
+
+.reportes-entregas-estado p {
+    font-size: 14px;
+}
+
+@media (max-width: 650px) {
+    .reportes-entregas-estado-interior {
+        flex-direction: row;
+        align-items: center;
+        padding: 15px;
+        gap: 12px;
+    }
+
+    .reportes-entregas-estado-interior img.reportes-entregas-bandeja-estado {
+        width: 112px;
+        height: 105px;
+        max-width: 36%;
+    }
+
+    .reportes-entregas-estado h3 {
+        font-size: 16px;
+    }
+}
