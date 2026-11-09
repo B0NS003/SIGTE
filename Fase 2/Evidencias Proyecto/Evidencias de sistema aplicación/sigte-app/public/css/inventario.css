@@ -542,9 +542,10 @@
     color: #fff;
 }
 
-/* BOTÓN ACCIÓN DEL INVENTARIO */
+/* BOTONES DE ACCIÓN DEL INVENTARIO */
 .inv-editar-stock,
-.inv-registrar-consumo {
+.inv-registrar-consumo,
+.inv-configurar-minimo {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -560,13 +561,15 @@
 }
 
 .inv-editar-stock:hover,
-.inv-registrar-consumo:hover {
+.inv-registrar-consumo:hover,
+.inv-configurar-minimo:hover {
     background-color: var(--ink);
     color: #ffffff;
 }
 
 .inv-editar-stock:focus-visible,
-.inv-registrar-consumo:focus-visible {
+.inv-registrar-consumo:focus-visible,
+.inv-configurar-minimo:focus-visible {
     outline: 2px solid var(--navy);
     outline-offset: 2px;
 }

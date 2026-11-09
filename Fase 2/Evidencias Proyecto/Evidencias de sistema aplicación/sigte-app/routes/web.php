@@ -42,7 +42,8 @@ Route::middleware('auth')->group(function () {
         # Inventario
         Route::get('/consulta/inventario', [InventarioController::class, 'inventario'])->name('mockups.inventario');
         Route::post('/consulta/inventario/reposicion', [InventarioController::class, 'registrarReposicion'])->name('mockups.inventario.reponer');
-        Route::post('/consulta/inventario/consumo', [InventarioController::class, 'registrarConsumo'])->name('mockups.inventario.consumir');
+        Route::post('/consulta/inventario/minimo', [InventarioController::class, 'configurarMinimo'])->name('mockups.inventario.minimo');
+        Route::post('/consulta/inventario/movimiento', [InventarioController::class, 'registrarMovimiento'])->name('mockups.inventario.movimiento');
         Route::get('/consulta/inventario/{sala}/{codigo}/historial', [InventarioController::class, 'historialElemento'])->name('mockups.inventario.historial');
         Route::get('/consulta/inventario/{sala}/{codigo}/historial-consumos', [InventarioController::class, 'historialConsumos'])->name('mockups.inventario.historial-consumos');
 

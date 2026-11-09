@@ -91,29 +91,6 @@ body.inv-modal-abierto {
     overflow: hidden;
 }
 
-@media (max-width: 700px) {
-
-    .inv-modal-contenido {
-        width: calc(100% - 1rem);
-        max-height: calc(100vh - 1rem);
-        margin: 0.5rem auto;
-        padding: 1rem;
-    }
-
-    .inv-reposicion-fila {
-        grid-template-columns: 1fr;
-    }
-
-    .inv-modal-acciones {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .inv-modal-acciones .btn {
-        width: 100%;
-    }
-}
-
 /* MODAL DE REPOSICIÓN: REGISTRO + HISTORIAL */
 .inv-modal-contenido {
     width: min(920px, calc(100% - 2rem));
@@ -264,4 +241,20 @@ body.inv-modal-abierto {
 
 .inv-cantidad-campo label.field input#cantidad {
     border-radius: 25px !important;
+}
+
+/* MODAL DE CONFIGURACIÓN DE MÍNIMOS */
+.inv-minimo-acciones {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--borde);
+}
+
+.inv-minimo-acciones .btn {
+    width: auto;
+    margin: 0;
 }
