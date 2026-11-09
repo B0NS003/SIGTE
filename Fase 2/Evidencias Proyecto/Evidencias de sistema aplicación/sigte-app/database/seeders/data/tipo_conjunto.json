@@ -1,92 +1,482 @@
 [
-  {
-    "id": 1,
-    "codigo": "APENDICE",
-    "nombre_conjunto": "Apendice",
-    "servicio_id": 1
-  },
-  {
-    "id": 2,
-    "codigo": "BARIATRICA",
-    "nombre_conjunto": "Bariatrica",
-    "servicio_id": 1
-  },
-  {
-    "id": 3,
-    "codigo": "GASTRO",
-    "nombre_conjunto": "Gastro",
-    "servicio_id": 1
-  },
-  {
-    "id": 4,
-    "codigo": "PROCTOLOGIA",
-    "nombre_conjunto": "Proctologia",
-    "servicio_id": 1
-  },
-  {
-    "id": 5,
-    "codigo": "COLON",
-    "nombre_conjunto": "Colon",
-    "servicio_id": 1
-  },
-  {
-    "id": 6,
-    "codigo": "NIÑO",
-    "nombre_conjunto": "Niño",
-    "servicio_id": 1
-  },
-  {
-    "id": 7,
-    "codigo": "FIMOSIS",
-    "nombre_conjunto": "Fimosis",
-    "servicio_id": 1
-  },
-  {
-    "id": 8,
-    "codigo": "CVC",
-    "nombre_conjunto": "CVC",
-    "servicio_id": 1
-  },
-  {
-    "id": 9,
-    "codigo": "CAJA RINOSEPTOPLASTIA",
-    "nombre_conjunto": "Caja rinoseptoplastia",
-    "servicio_id": 1
-  },
-  {
-    "id": 10,
-    "codigo": "SHAVER STRYKER + FIBRA",
-    "nombre_conjunto": "Shaver Stryker + fibra",
-    "servicio_id": 1
-  },
-  {
-    "id": 11,
-    "codigo": "CAJA NUEVA HERNIA",
-    "nombre_conjunto": "Caja nueva hernia",
-    "servicio_id": 1
-  },
-  {
-    "id": 12,
-    "codigo": "COLE-LAP",
-    "nombre_conjunto": "COLE-LAP",
-    "servicio_id": 1
-  },
-  {
-    "id": 13,
-    "codigo": "BASE LAPAROSCOPICA",
-    "nombre_conjunto": "Base laparoscopica",
-    "servicio_id": 1
-  },
-  {
-    "id": 14,
-    "codigo": "VESICULA",
-    "nombre_conjunto": "Vesicula",
-    "servicio_id": 1
-  },
-  {
-    "id": 15,
-    "codigo": "HISTERECTOMIAS LAP",
-    "nombre_conjunto": "Histerectomias LAP",
-    "servicio_id": 1
-  }
+    {
+        "id": 1,
+        "codigo": "APENDICE",
+        "nombre_conjunto": "Apendice",
+        "servicio_id": 1
+    },
+    {
+        "id": 2,
+        "codigo": "BARIATRICA",
+        "nombre_conjunto": "Bariatrica",
+        "servicio_id": 1
+    },
+    {
+        "id": 3,
+        "codigo": "GASTRO",
+        "nombre_conjunto": "Gastro",
+        "servicio_id": 1
+    },
+    {
+        "id": 4,
+        "codigo": "PROCTOLOGIA",
+        "nombre_conjunto": "Proctologia",
+        "servicio_id": 1
+    },
+    {
+        "id": 5,
+        "codigo": "COLON",
+        "nombre_conjunto": "Colon",
+        "servicio_id": 1
+    },
+    {
+        "id": 6,
+        "codigo": "NIÑO",
+        "nombre_conjunto": "Niño",
+        "servicio_id": 1
+    },
+    {
+        "id": 7,
+        "codigo": "FIMOSIS",
+        "nombre_conjunto": "Fimosis",
+        "servicio_id": 1
+    },
+    {
+        "id": 8,
+        "codigo": "CVC",
+        "nombre_conjunto": "CVC",
+        "servicio_id": 1
+    },
+    {
+        "id": 9,
+        "codigo": "CAJA RINOSEPTOPLASTIA",
+        "nombre_conjunto": "Caja rinoseptoplastia",
+        "servicio_id": 1
+    },
+    {
+        "id": 10,
+        "codigo": "SHAVER STRYKER + FIBRA",
+        "nombre_conjunto": "Shaver Stryker + fibra",
+        "servicio_id": 1
+    },
+    {
+        "id": 11,
+        "codigo": "CAJA NUEVA HERNIA",
+        "nombre_conjunto": "Caja nueva hernia",
+        "servicio_id": 1
+    },
+    {
+        "id": 12,
+        "codigo": "COLE-LAP",
+        "nombre_conjunto": "COLE-LAP",
+        "servicio_id": 1
+    },
+    {
+        "id": 13,
+        "codigo": "BASE LAPAROSCOPICA",
+        "nombre_conjunto": "Base laparoscopica",
+        "servicio_id": 1
+    },
+    {
+        "id": 14,
+        "codigo": "VESICULA",
+        "nombre_conjunto": "Vesicula",
+        "servicio_id": 1
+    },
+    {
+        "id": 15,
+        "codigo": "HISTERECTOMIAS LAP",
+        "nombre_conjunto": "Histerectomias LAP",
+        "servicio_id": 1
+    },
+    {
+        "id": 16,
+        "codigo": "CIRUGÍA VASCULAR",
+        "nombre_conjunto": "Cirugía Vascular",
+        "servicio_id": 1
+    },
+    {
+        "id": 17,
+        "codigo": "P. FRAGM ANTIGUA",
+        "nombre_conjunto": "P. Fragm Antigua",
+        "servicio_id": 1
+    },
+    {
+        "id": 18,
+        "codigo": "OFTALMOLOGIA 2-6 CATARATAS",
+        "nombre_conjunto": "Oftalmología 2-6 CATARATAS",
+        "servicio_id": 1
+    },
+    {
+        "id": 19,
+        "codigo": "BIOMATERIALES",
+        "nombre_conjunto": "Biomateriales",
+        "servicio_id": 1
+    },
+    {
+        "id": 20,
+        "codigo": "FINOQUETO",
+        "nombre_conjunto": "Finoqueto",
+        "servicio_id": 1
+    },
+    {
+        "id": 21,
+        "codigo": "BASES GINECOLOGICAS",
+        "nombre_conjunto": "Bases Ginecologicas",
+        "servicio_id": 1
+    },
+    {
+        "id": 22,
+        "codigo": "DHS",
+        "nombre_conjunto": "DHS",
+        "servicio_id": 1
+    },
+    {
+        "id": 23,
+        "codigo": "STRIKER, OPTICA Y TROCAR",
+        "nombre_conjunto": "Striker, Óptica y Trocar",
+        "servicio_id": 1
+    },
+    {
+        "id": 24,
+        "codigo": "PEQUEÑO FRAGMENTO TECNOME.",
+        "nombre_conjunto": "Pequeño Fragmento Tecnome.",
+        "servicio_id": 1
+    },
+    {
+        "id": 25,
+        "codigo": "PLASTICA INFANTIL NUEVA",
+        "nombre_conjunto": "Plástica Infantil Nueva",
+        "servicio_id": 1
+    },
+    {
+        "id": 26,
+        "codigo": "ARTROSCOPIA",
+        "nombre_conjunto": "Artroscopia",
+        "servicio_id": 1
+    },
+    {
+        "id": 27,
+        "codigo": "PRUEBA FEMORAL RODILLA VANGUARD",
+        "nombre_conjunto": "Prueba Femoral Rodilla Vanguard",
+        "servicio_id": 1
+    },
+    {
+        "id": 28,
+        "codigo": "CIRUGIA DENTOALVEOLAR",
+        "nombre_conjunto": "Cirugía Dentoalveolar",
+        "servicio_id": 2
+    },
+    {
+        "id": 29,
+        "codigo": "URETERO SEMIRIGIDO",
+        "nombre_conjunto": "Uretero Semirigido",
+        "servicio_id": 1
+    },
+    {
+        "id": 30,
+        "codigo": "OTORRINO",
+        "nombre_conjunto": "Otorrino",
+        "servicio_id": 1
+    },
+    {
+        "id": 31,
+        "codigo": "CAJA CIRUGÍA PLASTICA NUEVA",
+        "nombre_conjunto": "Caja Cirugía Plástica Nueva",
+        "servicio_id": 1
+    },
+    {
+        "id": 32,
+        "codigo": "TRAUMATOLOGIA",
+        "nombre_conjunto": "Traumatología",
+        "servicio_id": 1
+    },
+    {
+        "id": 33,
+        "codigo": "HISTERECTOMIA",
+        "nombre_conjunto": "Histerectomía",
+        "servicio_id": 1
+    },
+    {
+        "id": 34,
+        "codigo": "COLEDOCO",
+        "nombre_conjunto": "Colédoco",
+        "servicio_id": 1
+    },
+    {
+        "id": 35,
+        "codigo": "VITUS",
+        "nombre_conjunto": "Vitus",
+        "servicio_id": 1
+    },
+    {
+        "id": 36,
+        "codigo": "ACCESORIOS BARIATRICA",
+        "nombre_conjunto": "Accesorios Bariátrica",
+        "servicio_id": 1
+    },
+    {
+        "id": 37,
+        "codigo": "DR.VILLARROEL",
+        "nombre_conjunto": "Dr. Villarroel",
+        "servicio_id": 1
+    },
+    {
+        "id": 38,
+        "codigo": "SET DE CADERA I",
+        "nombre_conjunto": "SET De cadera I",
+        "servicio_id": 1
+    },
+    {
+        "id": 39,
+        "codigo": "HERNIA INFANTIL Y ADULTO",
+        "nombre_conjunto": "Hernia Infantil y Adulto",
+        "servicio_id": 1
+    },
+    {
+        "id": 40,
+        "codigo": "OFTAL. PTERIGION 01 Y CAJA SOS",
+        "nombre_conjunto": "OFTAL. Pterigión 01 y Caja SOS",
+        "servicio_id": 1
+    },
+    {
+        "id": 41,
+        "codigo": "RASPADO",
+        "nombre_conjunto": "Raspado",
+        "servicio_id": 1
+    },
+    {
+        "id": 42,
+        "codigo": "BACKAUSSE",
+        "nombre_conjunto": "Backausse",
+        "servicio_id": 1
+    },
+    {
+        "id": 43,
+        "codigo": "OPTICAS TRAUMA",
+        "nombre_conjunto": "Ópticas Trauma",
+        "servicio_id": 1
+    },
+    {
+        "id": 44,
+        "codigo": "REVISION",
+        "nombre_conjunto": "Revisión",
+        "servicio_id": 3
+    },
+    {
+        "id": 45,
+        "codigo": "P. FRAGMENTOS",
+        "nombre_conjunto": "P. Fragmentos",
+        "servicio_id": 1
+    },
+    {
+        "id": 46,
+        "codigo": "SET CINCELES",
+        "nombre_conjunto": "Set Cinceles",
+        "servicio_id": 1
+    },
+    {
+        "id": 47,
+        "codigo": "FIBRA Y OPTICAS GINE",
+        "nombre_conjunto": "Fibra y Ópticas Gine",
+        "servicio_id": 1
+    },
+    {
+        "id": 48,
+        "codigo": "ORTOGNATICA - TRAUMA",
+        "nombre_conjunto": "Ortognatica - Trauma",
+        "servicio_id": 1
+    },
+    {
+        "id": 49,
+        "codigo": "BLOCK DE CORTE VANGUARD PREMIER",
+        "nombre_conjunto": "Block de Corte Vanguard Premier",
+        "servicio_id": 1
+    },
+    {
+        "id": 50,
+        "codigo": "PERIODONCIA",
+        "nombre_conjunto": "Periodoncia",
+        "servicio_id": 2
+    },
+    {
+        "id": 51,
+        "codigo": "COLE-LAP ANTIGUAS",
+        "nombre_conjunto": "COLE-LAP Antiguas",
+        "servicio_id": 1
+    },
+    {
+        "id": 52,
+        "codigo": "UROLOGIA",
+        "nombre_conjunto": "Urología",
+        "servicio_id": 1
+    },
+    {
+        "id": 53,
+        "codigo": "CIRUGIA MENOR TRAUMA",
+        "nombre_conjunto": "Cirugía Menor Trauma",
+        "servicio_id": 1
+    },
+    {
+        "id": 54,
+        "codigo": "CIGURIA DENTAL",
+        "nombre_conjunto": "Cirugía Dental",
+        "servicio_id": 2
+    },
+    {
+        "id": 55,
+        "codigo": "Set de cadera Anthology",
+        "nombre_conjunto": "SET de Cadera Anthology",
+        "servicio_id": 1
+    },
+    {
+        "id": 56,
+        "codigo": "CHALAZIÓN OFT.",
+        "nombre_conjunto": "Chalazión OFT",
+        "servicio_id": 1
+    },
+    {
+        "id": 57,
+        "codigo": "SET DE CADERA II",
+        "nombre_conjunto": "SET De cadera II",
+        "servicio_id": 1
+    },
+    {
+        "id": 58,
+        "codigo": "RINOPLASTIA",
+        "nombre_conjunto": "Rinoplastia",
+        "servicio_id": 1
+    },
+    {
+        "id": 59,
+        "codigo": "RN CATETER UMBILICAL",
+        "nombre_conjunto": "RN CATETER UMBILICAL",
+        "servicio_id": 3
+    },
+    {
+        "id": 60,
+        "codigo": "CAJA DR.MORALES",
+        "nombre_conjunto": "Caja Dr. Morales",
+        "servicio_id": 1
+    },
+    {
+        "id": 61,
+        "codigo": "CESAREA",
+        "nombre_conjunto": "Cesárea",
+        "servicio_id": 1
+    },
+    {
+        "id": 62,
+        "codigo": "TOT",
+        "nombre_conjunto": "TOT",
+        "servicio_id": 1
+    },
+    {
+        "id": 63,
+        "codigo": "CAJA ZIPTIGHT",
+        "nombre_conjunto": "Caja Ziptigh",
+        "servicio_id": 1
+    },
+    {
+        "id": 64,
+        "codigo": "RTU",
+        "nombre_conjunto": "RTU",
+        "servicio_id": 1
+    },
+    {
+        "id": 65,
+        "codigo": "CAJAS OFTALMO NUEVAS 7-11",
+        "nombre_conjunto": "Cajas Oftalmo Nuevas 7-11",
+        "servicio_id": 1
+    },
+    {
+        "id": 66,
+        "codigo": "PROLAPSO O CERCLAJE",
+        "nombre_conjunto": "Prolapso o Cerclaje",
+        "servicio_id": 1
+    },
+    {
+        "id": 67,
+        "codigo": "CIRUGÍA ORTOGNÁTICA",
+        "nombre_conjunto": "Cirugía ortognática",
+        "servicio_id": 1
+    },
+    {
+        "id": 68,
+        "codigo": "INST. COMPOSITE LCA",
+        "nombre_conjunto": "Inst. Composite LCA",
+        "servicio_id": 1
+    },
+    {
+        "id": 69,
+        "codigo": "BLOCK DE CORTE FEMORAL",
+        "nombre_conjunto": "Block de Corte Femoral",
+        "servicio_id": 1
+    },
+    {
+        "id": 70,
+        "codigo": "URETERORRENOSCOPIO",
+        "nombre_conjunto": "Ureterorrenoscopio",
+        "servicio_id": 1
+    },
+    {
+        "id": 71,
+        "codigo": "HISTEROSCOPIA",
+        "nombre_conjunto": "Histeroscopia",
+        "servicio_id": 1
+    },
+    {
+        "id": 72,
+        "codigo": "DERMATOMO HUMECA",
+        "nombre_conjunto": "Dermatomo Humeca",
+        "servicio_id": 1
+    },
+    {
+        "id": 73,
+        "codigo": "TMT MENOR",
+        "nombre_conjunto": "TMT Menor",
+        "servicio_id": 1
+    },
+    {
+        "id": 74,
+        "codigo": "GRANDES FRAGMENTOS",
+        "nombre_conjunto": "Grandes Fragmentos",
+        "servicio_id": 1
+    },
+    {
+        "id": 75,
+        "codigo": "CLAVO AFFIXUS",
+        "nombre_conjunto": "Clavo Affixus",
+        "servicio_id": 1
+    },
+    {
+        "id": 76,
+        "codigo": "PLASTICA",
+        "nombre_conjunto": "Plástica",
+        "servicio_id": 1
+    },
+    {
+        "id": 77,
+        "codigo": "ESTRABISMO",
+        "nombre_conjunto": "Estrabismo",
+        "servicio_id": 1
+    },
+    {
+        "id": 78,
+        "codigo": "ADENOAMIGDALAS",
+        "nombre_conjunto": "Adenomegalias",
+        "servicio_id": 1
+    },
+    {
+        "id": 79,
+        "codigo": "CAJAS ROJAS DE IMPLANTES",
+        "nombre_conjunto": "Cajas Rojas de Implantes",
+        "servicio_id": 2
+    },
+    {
+        "id": 80,
+        "codigo": "DR.CONTRERAS",
+        "nombre_conjunto": "Dr. Contreras",
+        "servicio_id": 1
+    }
 ]

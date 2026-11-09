@@ -1,11 +1,1892 @@
 [
-  {
-    "id": 228,
-    "codigo": "AP-01",
-    "nombre": "Apéndice #01",
-    "tipo": "caja",
-    "servicio_id": 1,
-    "tipo_conjunto_id": 1,
-    "guia_visual": false
-  }
+    {
+        "id": 228,
+        "codigo": "AP-01",
+        "nombre": "Apéndice #01",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 229,
+        "codigo": "AP-02",
+        "nombre": "Apéndice #02",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 230,
+        "codigo": "AP-03",
+        "nombre": "Apéndice #03",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 231,
+        "codigo": "AP-04",
+        "nombre": "Apéndice #04",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 232,
+        "codigo": "AP-05",
+        "nombre": "Apéndice #05",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 233,
+        "codigo": "AP-06",
+        "nombre": "Apéndice #06",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 234,
+        "codigo": "AP-07",
+        "nombre": "Apéndice #07",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 1,
+        "guia_visual": false
+    },
+    {
+        "id": 235,
+        "codigo": "BARIATRICA-01",
+        "nombre": "Bariatrica #01",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 2,
+        "guia_visual": false
+    },
+    {
+        "id": 236,
+        "codigo": "GAS-01",
+        "nombre": "Gastro N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 3,
+        "guia_visual": false
+    },
+    {
+        "id": 272,
+        "codigo": "VES-01",
+        "nombre": "Vesícula Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 14,
+        "guia_visual": false
+    },
+    {
+        "id": 237,
+        "codigo": "GAS-02",
+        "nombre": "Gastro nueva",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 3,
+        "guia_visual": false
+    },
+    {
+        "id": 238,
+        "codigo": "PROCT-01",
+        "nombre": "Proctología Nº 1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 4,
+        "guia_visual": false
+    },
+    {
+        "id": 239,
+        "codigo": "PROCT-02",
+        "nombre": "Proctología Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 4,
+        "guia_visual": false
+    },
+    {
+        "id": 240,
+        "codigo": "COLON-01",
+        "nombre": "Colon N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 5,
+        "guia_visual": false
+    },
+    {
+        "id": 241,
+        "codigo": "NIÑO-01",
+        "nombre": "Niño #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 6,
+        "guia_visual": false
+    },
+    {
+        "id": 242,
+        "codigo": "NIÑO-02",
+        "nombre": "Niño #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 6,
+        "guia_visual": false
+    },
+    {
+        "id": 243,
+        "codigo": "NIÑO-03",
+        "nombre": "Niño #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 6,
+        "guia_visual": false
+    },
+    {
+        "id": 244,
+        "codigo": "NIÑO-04",
+        "nombre": "Niño #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 6,
+        "guia_visual": false
+    },
+    {
+        "id": 273,
+        "codigo": "VES-02",
+        "nombre": "Vesícula Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 14,
+        "guia_visual": false
+    },
+    {
+        "id": 274,
+        "codigo": "VES-03",
+        "nombre": "Vesícula Nº3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 14,
+        "guia_visual": false
+    },
+    {
+        "id": 245,
+        "codigo": "NIÑO-05",
+        "nombre": "Niño #5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 6,
+        "guia_visual": false
+    },
+    {
+        "id": 277,
+        "codigo": "BLG-01",
+        "nombre": "Base laparoscopica ginecologia #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 21,
+        "guia_visual": false
+    },
+    {
+        "id": 278,
+        "codigo": "BLG-02",
+        "nombre": "Base laparoscopica ginecologia #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 21,
+        "guia_visual": false
+    },
+    {
+        "id": 279,
+        "codigo": "OPTG-1",
+        "nombre": "Óptica Ginecología 0°#1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 47,
+        "guia_visual": false
+    },
+    {
+        "id": 280,
+        "codigo": "OPTG-2",
+        "nombre": "Óptica Ginecología 0°#2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 47,
+        "guia_visual": false
+    },
+    {
+        "id": 281,
+        "codigo": "OPTG-3",
+        "nombre": "Óptica ginecología 30° #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 47,
+        "guia_visual": false
+    },
+    {
+        "id": 246,
+        "codigo": "NIÑO-06",
+        "nombre": "Niño #6",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 6,
+        "guia_visual": false
+    },
+    {
+        "id": 282,
+        "codigo": "OPTG-4",
+        "nombre": "Óptica ginecología 30° #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 47,
+        "guia_visual": false
+    },
+    {
+        "id": 247,
+        "codigo": "FIM-01",
+        "nombre": "Fimosis #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 7,
+        "guia_visual": false
+    },
+    {
+        "id": 248,
+        "codigo": "FIM-02",
+        "nombre": "Fimosis #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 7,
+        "guia_visual": false
+    },
+    {
+        "id": 249,
+        "codigo": "FIM-03",
+        "nombre": "Fimosis #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 7,
+        "guia_visual": false
+    },
+    {
+        "id": 250,
+        "codigo": "CVC",
+        "nombre": "CVC",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 8,
+        "guia_visual": false
+    },
+    {
+        "id": 251,
+        "codigo": "RINO-01",
+        "nombre": "Rinoseptoplastía de Felipe Salinas",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 9,
+        "guia_visual": false
+    },
+    {
+        "id": 252,
+        "codigo": "SSF-01",
+        "nombre": "Shaver Stryiker + Fibra #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 10,
+        "guia_visual": false
+    },
+    {
+        "id": 253,
+        "codigo": "SSF-02",
+        "nombre": "Shaver Stryiker + Fibra #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 10,
+        "guia_visual": false
+    },
+    {
+        "id": 254,
+        "codigo": "SSF-03",
+        "nombre": "Shaver Stryiker + Fibra #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 10,
+        "guia_visual": false
+    },
+    {
+        "id": 255,
+        "codigo": "SSF-04",
+        "nombre": "Shaver Stryiker + Fibra #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 10,
+        "guia_visual": false
+    },
+    {
+        "id": 256,
+        "codigo": "HEN-01",
+        "nombre": "Hernia #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 11,
+        "guia_visual": false
+    },
+    {
+        "id": 257,
+        "codigo": "HEN-02",
+        "nombre": "Hernia #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 11,
+        "guia_visual": false
+    },
+    {
+        "id": 258,
+        "codigo": "COLE-01",
+        "nombre": "COLE-LAP #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 259,
+        "codigo": "COLE-02",
+        "nombre": "COLE-LAP #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 260,
+        "codigo": "COLE-03",
+        "nombre": "COLE-LAP #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 261,
+        "codigo": "COLE-04",
+        "nombre": "COLE-LAP #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 262,
+        "codigo": "COLE-05",
+        "nombre": "COLE-LAP #5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 263,
+        "codigo": "COLE-06",
+        "nombre": "COLE-LAP #6",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 264,
+        "codigo": "COLE-07",
+        "nombre": "COLE-LAP #7",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 265,
+        "codigo": "COLE-08",
+        "nombre": "Apendice Laparo",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 266,
+        "codigo": "COLE-09",
+        "nombre": "COLE-LAP XL",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 12,
+        "guia_visual": false
+    },
+    {
+        "id": 267,
+        "codigo": "LAPO-01",
+        "nombre": "Base Laparoscopica N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 13,
+        "guia_visual": false
+    },
+    {
+        "id": 268,
+        "codigo": "LAPO-02",
+        "nombre": "Base Laparoscopica N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 13,
+        "guia_visual": false
+    },
+    {
+        "id": 269,
+        "codigo": "LAPO-03",
+        "nombre": "Base Laparoscopica N°3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 13,
+        "guia_visual": false
+    },
+    {
+        "id": 270,
+        "codigo": "LAPO-04",
+        "nombre": "Base Laparoscopica N°4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 13,
+        "guia_visual": false
+    },
+    {
+        "id": 271,
+        "codigo": "LAPO-05",
+        "nombre": "Base Laparoscopica N°5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 13,
+        "guia_visual": false
+    },
+    {
+        "id": 283,
+        "codigo": "OPTG-5",
+        "nombre": "Fibra Ginecología #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 47,
+        "guia_visual": false
+    },
+    {
+        "id": 284,
+        "codigo": "OPTG-6",
+        "nombre": "Fibra Ginecología #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 47,
+        "guia_visual": false
+    },
+    {
+        "id": 285,
+        "codigo": "HISTEROSC-01",
+        "nombre": "Histeroscopia #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 71,
+        "guia_visual": false
+    },
+    {
+        "id": 286,
+        "codigo": "HISTEROSC-02",
+        "nombre": "Histeroscopia #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 71,
+        "guia_visual": false
+    },
+    {
+        "id": 287,
+        "codigo": "RASP-01",
+        "nombre": "Raspado #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 41,
+        "guia_visual": false
+    },
+    {
+        "id": 288,
+        "codigo": "RASP-02",
+        "nombre": "Raspado #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 41,
+        "guia_visual": false
+    },
+    {
+        "id": 289,
+        "codigo": "RASP-03",
+        "nombre": "Raspado #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 41,
+        "guia_visual": false
+    },
+    {
+        "id": 290,
+        "codigo": "RASP-04",
+        "nombre": "Raspado #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 41,
+        "guia_visual": false
+    },
+    {
+        "id": 291,
+        "codigo": "PROCER-1",
+        "nombre": "Prolapso o Cerclaje #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 66,
+        "guia_visual": false
+    },
+    {
+        "id": 275,
+        "codigo": "HISTELAPO-01",
+        "nombre": "Histerectomia laparoscopica #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 15,
+        "guia_visual": false
+    },
+    {
+        "id": 276,
+        "codigo": "HISTELAPO-02",
+        "nombre": "Histerectomia laparoscopica #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 15,
+        "guia_visual": false
+    },
+    {
+        "id": 292,
+        "codigo": "HISTERECTOMIA-01",
+        "nombre": "Histerectomía N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 33,
+        "guia_visual": false
+    },
+    {
+        "id": 293,
+        "codigo": "HISTERECTOMIA-02",
+        "nombre": "Histerectomía N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 33,
+        "guia_visual": false
+    },
+    {
+        "id": 294,
+        "codigo": "HISTERECTOMIA-03",
+        "nombre": "Histerectomía Vaginal N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 33,
+        "guia_visual": false
+    },
+    {
+        "id": 295,
+        "codigo": "HISTERECTOMIA-04",
+        "nombre": "Histerectomía Vaginal N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 33,
+        "guia_visual": false
+    },
+    {
+        "id": 296,
+        "codigo": "HISTERECTOMIA-05",
+        "nombre": "Histerectomía Abdominal N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 33,
+        "guia_visual": false
+    },
+    {
+        "id": 297,
+        "codigo": "CESAREA-01",
+        "nombre": "Cesárea N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 298,
+        "codigo": "CESAREA-02",
+        "nombre": "Cesárea N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 299,
+        "codigo": "CESAREA-03",
+        "nombre": "Cesárea N°3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 300,
+        "codigo": "CESAREA-04",
+        "nombre": "Cesárea N°4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 301,
+        "codigo": "CESAREA-05",
+        "nombre": "Cesárea N°5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 302,
+        "codigo": "CESAREA-06",
+        "nombre": "Cesárea N°6",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 303,
+        "codigo": "CESAREA-07",
+        "nombre": "Cesárea N°7",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 304,
+        "codigo": "CESAREA-08",
+        "nombre": "Cesárea N°8",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 61,
+        "guia_visual": false
+    },
+    {
+        "id": 305,
+        "codigo": "CIRUVASCU-01",
+        "nombre": "Cirugía Vascular #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 16,
+        "guia_visual": false
+    },
+    {
+        "id": 306,
+        "codigo": "CIRUVASCU-02",
+        "nombre": "Cirugía Vascular #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 16,
+        "guia_visual": false
+    },
+    {
+        "id": 307,
+        "codigo": "CIRUVASCU-03",
+        "nombre": "Cirugía Vascular #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 16,
+        "guia_visual": false
+    },
+    {
+        "id": 308,
+        "codigo": "CINCELES-01",
+        "nombre": "Set de Cinceles #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 46,
+        "guia_visual": false
+    },
+    {
+        "id": 309,
+        "codigo": "REVISION-01",
+        "nombre": "Revisión",
+        "tipo": "caja",
+        "servicio_id": 3,
+        "tipo_conjunto_id": 44,
+        "guia_visual": false
+    },
+    {
+        "id": 310,
+        "codigo": "REVISION-02",
+        "nombre": "Revisión Parto N°1",
+        "tipo": "caja",
+        "servicio_id": 3,
+        "tipo_conjunto_id": 44,
+        "guia_visual": false
+    },
+    {
+        "id": 311,
+        "codigo": "REVISION-03",
+        "nombre": "Revisión Parto N°2",
+        "tipo": "caja",
+        "servicio_id": 3,
+        "tipo_conjunto_id": 44,
+        "guia_visual": false
+    },
+    {
+        "id": 312,
+        "codigo": "DERMAHU-01",
+        "nombre": "Dermatomo Humeca",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 72,
+        "guia_visual": false
+    },
+    {
+        "id": 313,
+        "codigo": "UROLOGIA-01",
+        "nombre": "Urología Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 314,
+        "codigo": "UROLOGIA-02",
+        "nombre": "Uretrotomo",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 315,
+        "codigo": "UROLOGIA-03",
+        "nombre": "Dilatadores Urologia",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 316,
+        "codigo": "UROLOGIA-04",
+        "nombre": "Uretrotomia Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 317,
+        "codigo": "UROLOGIA-05",
+        "nombre": "Cistoscopio Flexible",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 318,
+        "codigo": "UROLOGIA-06",
+        "nombre": "Accesorios Cistoscopio Flexible",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 319,
+        "codigo": "UROLOGIA-07",
+        "nombre": "Dilatadores Urologicos",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 320,
+        "codigo": "UROLOGIA-08",
+        "nombre": "Urologia-Cistoscopio Rígido 19 con Pinza Cuerpo Extraño Biopsia",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 52,
+        "guia_visual": false
+    },
+    {
+        "id": 321,
+        "codigo": "RTU-01",
+        "nombre": "RTU N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 64,
+        "guia_visual": false
+    },
+    {
+        "id": 322,
+        "codigo": "RTU-02",
+        "nombre": "RTU Bipolar N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 64,
+        "guia_visual": false
+    },
+    {
+        "id": 323,
+        "codigo": "RTU-03",
+        "nombre": "RTU Bipolar N°3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 64,
+        "guia_visual": false
+    },
+    {
+        "id": 324,
+        "codigo": "RTU-04",
+        "nombre": "Base RTU N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 64,
+        "guia_visual": false
+    },
+    {
+        "id": 325,
+        "codigo": "RTU-05",
+        "nombre": "Urologica (Calculo) #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 64,
+        "guia_visual": false
+    },
+    {
+        "id": 326,
+        "codigo": "URETERORRENOSCOPIO-01",
+        "nombre": "Ureterorrenoscopio",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 70,
+        "guia_visual": false
+    },
+    {
+        "id": 327,
+        "codigo": "URETERORRENOSCOPIO-02",
+        "nombre": "Rejilla Metalica Ureterorrenoscopio",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 70,
+        "guia_visual": false
+    },
+    {
+        "id": 328,
+        "codigo": "URETERORRENOSCOPIO-03",
+        "nombre": "Caja Tapa Azul Ureterorrenoscopio",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 70,
+        "guia_visual": false
+    },
+    {
+        "id": 329,
+        "codigo": "URETEROSEMI-01",
+        "nombre": "Uretero Semirigido UMS",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 29,
+        "guia_visual": false
+    },
+    {
+        "id": 330,
+        "codigo": "PLASTICA-01",
+        "nombre": "Cirugía Plástica Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 76,
+        "guia_visual": false
+    },
+    {
+        "id": 331,
+        "codigo": "PLASTICA-02",
+        "nombre": "Cirugía Plástica Infantil Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 76,
+        "guia_visual": false
+    },
+    {
+        "id": 332,
+        "codigo": "PLASTICA-03",
+        "nombre": "Cirugía Plástica Infantil Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 76,
+        "guia_visual": false
+    },
+    {
+        "id": 333,
+        "codigo": "PLASTICA-04",
+        "nombre": "Rinoplastia",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 76,
+        "guia_visual": false
+    },
+    {
+        "id": 334,
+        "codigo": "RNCATE-01",
+        "nombre": "RN Catéter Umbilical",
+        "tipo": "caja",
+        "servicio_id": 3,
+        "tipo_conjunto_id": 59,
+        "guia_visual": false
+    },
+    {
+        "id": 335,
+        "codigo": "RNCATE-02",
+        "nombre": "L Catéter Umbilical",
+        "tipo": "caja",
+        "servicio_id": 3,
+        "tipo_conjunto_id": 59,
+        "guia_visual": false
+    },
+    {
+        "id": 336,
+        "codigo": "ADENOAMIGDALAS-01",
+        "nombre": "Adenoamigdala #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 337,
+        "codigo": "ADENOAMIGDALAS-02",
+        "nombre": "Adenoamigdala #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 338,
+        "codigo": "ADENOAMIGDALAS-03",
+        "nombre": "Adenoamigdala #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 339,
+        "codigo": "ADENOAMIGDALAS-04",
+        "nombre": "Adenoamigdala #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 340,
+        "codigo": "ADENOAMIGDALAS-05",
+        "nombre": "Adenoamigdala #5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 341,
+        "codigo": "ADENOAMIGDALAS-06",
+        "nombre": "Adenoamigdala #6",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 342,
+        "codigo": "ADENOAMIGDALAS-07",
+        "nombre": "Adenoamigdala #7",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 78,
+        "guia_visual": false
+    },
+    {
+        "id": 343,
+        "codigo": "OTORRINO-01",
+        "nombre": "Otorrino Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 30,
+        "guia_visual": false
+    },
+    {
+        "id": 344,
+        "codigo": "OTORRINO-02",
+        "nombre": "Otorrino Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 30,
+        "guia_visual": false
+    },
+    {
+        "id": 345,
+        "codigo": "OTORRINO-03",
+        "nombre": "Otorrino Nº3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 30,
+        "guia_visual": false
+    },
+    {
+        "id": 346,
+        "codigo": "TRAUMATOLOGIA-01",
+        "nombre": "Traumatología Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 32,
+        "guia_visual": false
+    },
+    {
+        "id": 347,
+        "codigo": "TRAUMATOLOGIA-02",
+        "nombre": "Traumatología Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 32,
+        "guia_visual": false
+    },
+    {
+        "id": 348,
+        "codigo": "TRAUMATOLOGIA-03",
+        "nombre": "Traumatología Nº3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 32,
+        "guia_visual": false
+    },
+    {
+        "id": 349,
+        "codigo": "TRAUMATOLOGIA-04",
+        "nombre": "Traumatología Nº4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 32,
+        "guia_visual": false
+    },
+    {
+        "id": 350,
+        "codigo": "TRAUMATOLOGIA-05",
+        "nombre": "Traumatología Chica Nº5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 32,
+        "guia_visual": false
+    },
+    {
+        "id": 351,
+        "codigo": "TRAUMATOLOGIA-06",
+        "nombre": "Traumatología Nº6",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 32,
+        "guia_visual": false
+    },
+    {
+        "id": 352,
+        "codigo": "OPTITRAU-01",
+        "nombre": "Caja Óptica Nº 3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 43,
+        "guia_visual": false
+    },
+    {
+        "id": 353,
+        "codigo": "OPTITRAU-02",
+        "nombre": "Caja Stryker # 5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 43,
+        "guia_visual": false
+    },
+    {
+        "id": 354,
+        "codigo": "TMTMENOR-01",
+        "nombre": "Cirugía Menor Traumatología N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 73,
+        "guia_visual": false
+    },
+    {
+        "id": 355,
+        "codigo": "TMTMENOR-02",
+        "nombre": "Cirugía Menor Traumatología N°2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 73,
+        "guia_visual": false
+    },
+    {
+        "id": 356,
+        "codigo": "TMTMENOR-03",
+        "nombre": "Cirugía Menor Traumatología N°3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 73,
+        "guia_visual": false
+    },
+    {
+        "id": 357,
+        "codigo": "ARTROSCOPIA-01",
+        "nombre": "Artroscopia Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 26,
+        "guia_visual": false
+    },
+    {
+        "id": 358,
+        "codigo": "ARTROSCOPIA-02",
+        "nombre": "Artroscopia Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 26,
+        "guia_visual": false
+    },
+    {
+        "id": 359,
+        "codigo": "ARTROSCOPIA-03",
+        "nombre": "Artroscopia Nº3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 26,
+        "guia_visual": false
+    },
+    {
+        "id": 360,
+        "codigo": "ARTROSCOPIA-04",
+        "nombre": "Artroscopia Nº4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 26,
+        "guia_visual": false
+    },
+    {
+        "id": 361,
+        "codigo": "ARTROSCOPIA-05",
+        "nombre": "Caja Instrumental Reich Pinzas Artroscópicas",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 26,
+        "guia_visual": false
+    },
+    {
+        "id": 362,
+        "codigo": "ARTROSCOPIA-06",
+        "nombre": "Caja Instrumental Reich Artroscopia",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 26,
+        "guia_visual": false
+    },
+    {
+        "id": 363,
+        "codigo": "SOT-01",
+        "nombre": "Shaver + Fibra #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 23,
+        "guia_visual": false
+    },
+    {
+        "id": 364,
+        "codigo": "SOT-02",
+        "nombre": "Shaver + Fibra #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 23,
+        "guia_visual": false
+    },
+    {
+        "id": 365,
+        "codigo": "SOT-03",
+        "nombre": "Óptica - Obturador Stryker #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 23,
+        "guia_visual": false
+    },
+    {
+        "id": 366,
+        "codigo": "SOT-04",
+        "nombre": "Óptica - Obturador Stryker #5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 23,
+        "guia_visual": false
+    },
+    {
+        "id": 367,
+        "codigo": "DRCONTRERAS-01",
+        "nombre": "Osteosíntesis Dr. Contreras",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 80,
+        "guia_visual": false
+    },
+    {
+        "id": 368,
+        "codigo": "FINOQUETO-01",
+        "nombre": "Finochietto Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 20,
+        "guia_visual": false
+    },
+    {
+        "id": 369,
+        "codigo": "FINOQUETO-02",
+        "nombre": "Finochietto Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 20,
+        "guia_visual": false
+    },
+    {
+        "id": 370,
+        "codigo": "COLEDOCO-01",
+        "nombre": "Colédoco Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 34,
+        "guia_visual": false
+    },
+    {
+        "id": 371,
+        "codigo": "COLEDOCO-02",
+        "nombre": "Colédoco Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 34,
+        "guia_visual": false
+    },
+    {
+        "id": 372,
+        "codigo": "COLEDOCO-03",
+        "nombre": "Colédoco Nº3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 34,
+        "guia_visual": false
+    },
+    {
+        "id": 373,
+        "codigo": "CIRUMT-01",
+        "nombre": "Cirugia Menor Nº1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 53,
+        "guia_visual": false
+    },
+    {
+        "id": 374,
+        "codigo": "CIRUMT-02",
+        "nombre": "Cirugia Menor Nº2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 53,
+        "guia_visual": false
+    },
+    {
+        "id": 375,
+        "codigo": "OPTITRAU-03",
+        "nombre": "Caja Stryker Nº 2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 43,
+        "guia_visual": false
+    },
+    {
+        "id": 376,
+        "codigo": "DRVILLARROEL-01",
+        "nombre": "Dr. Villarroel #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 37,
+        "guia_visual": false
+    },
+    {
+        "id": 377,
+        "codigo": "DRVILLARROEL-02",
+        "nombre": "Dr. Villarroel #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 37,
+        "guia_visual": false
+    },
+    {
+        "id": 378,
+        "codigo": "DRMORALES-01",
+        "nombre": "Dr. Morales",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 60,
+        "guia_visual": false
+    },
+    {
+        "id": 379,
+        "codigo": "ICLCA-01",
+        "nombre": "Inventario De Instrumental Composite (Lca)",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 68,
+        "guia_visual": false
+    },
+    {
+        "id": 380,
+        "codigo": "TOT-01",
+        "nombre": "TOT",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 62,
+        "guia_visual": false
+    },
+    {
+        "id": 381,
+        "codigo": "CCOFT-01",
+        "nombre": "Chalazión Oftalmología #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 56,
+        "guia_visual": false
+    },
+    {
+        "id": 382,
+        "codigo": "CCOFT-02",
+        "nombre": "Chalazión Oftalmología #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 56,
+        "guia_visual": false
+    },
+    {
+        "id": 383,
+        "codigo": "OFTALPC-01",
+        "nombre": "Pterigion y SOS",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 40,
+        "guia_visual": false
+    },
+    {
+        "id": 384,
+        "codigo": "OFTALPC-02",
+        "nombre": "Pterigion",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 40,
+        "guia_visual": false
+    },
+    {
+        "id": 385,
+        "codigo": "OFTA26CATA-01",
+        "nombre": "Oftalmología #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 18,
+        "guia_visual": false
+    },
+    {
+        "id": 386,
+        "codigo": "OFTA26CATA-02",
+        "nombre": "Oftalmología #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 18,
+        "guia_visual": false
+    },
+    {
+        "id": 387,
+        "codigo": "OFTA26CATA-03",
+        "nombre": "Oftalmología #4",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 18,
+        "guia_visual": false
+    },
+    {
+        "id": 388,
+        "codigo": "OFTA26CATA-04",
+        "nombre": "Oftalmología #5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 18,
+        "guia_visual": false
+    },
+    {
+        "id": 389,
+        "codigo": "OFTA711NV-01",
+        "nombre": "Oftalmología #7",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 65,
+        "guia_visual": false
+    },
+    {
+        "id": 390,
+        "codigo": "OFTA711NV-02",
+        "nombre": "Oftalmología #8",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 65,
+        "guia_visual": false
+    },
+    {
+        "id": 391,
+        "codigo": "OFTA711NV-03",
+        "nombre": "Oftalmología #9",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 65,
+        "guia_visual": false
+    },
+    {
+        "id": 392,
+        "codigo": "OFTA711NV-04",
+        "nombre": "Oftalmología #10",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 65,
+        "guia_visual": false
+    },
+    {
+        "id": 393,
+        "codigo": "OFTA711NV-05",
+        "nombre": "Oftalmología #11",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 65,
+        "guia_visual": false
+    },
+    {
+        "id": 394,
+        "codigo": "BACK-01",
+        "nombre": "Backausse #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 42,
+        "guia_visual": false
+    },
+    {
+        "id": 395,
+        "codigo": "ESTRA-01",
+        "nombre": "Estrabismo #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 77,
+        "guia_visual": false
+    },
+    {
+        "id": 396,
+        "codigo": "HEIA-01",
+        "nombre": "Caja de Niño #5",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 39,
+        "guia_visual": false
+    },
+    {
+        "id": 397,
+        "codigo": "RINOPLASTIA-01",
+        "nombre": "Rinoplastia N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 58,
+        "guia_visual": false
+    },
+    {
+        "id": 398,
+        "codigo": "ACCESBARI-01",
+        "nombre": "Accesorios Bariátrica N°1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 36,
+        "guia_visual": false
+    },
+    {
+        "id": 399,
+        "codigo": "GF-01",
+        "nombre": "Grandes Fragmentos",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 74,
+        "guia_visual": false
+    },
+    {
+        "id": 400,
+        "codigo": "PIN-01",
+        "nombre": "Caja Cirugía Infantil #1 (Nueva)",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 25,
+        "guia_visual": false
+    },
+    {
+        "id": 401,
+        "codigo": "PIN-02",
+        "nombre": "Caja Cirugía Infantil #2 (Nueva)",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 25,
+        "guia_visual": false
+    },
+    {
+        "id": 402,
+        "codigo": "CCPN-01",
+        "nombre": "Caja Cirugía Plástica (Nueva)",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 31,
+        "guia_visual": false
+    },
+    {
+        "id": 403,
+        "codigo": "PERIODONCIA-01",
+        "nombre": "Periodoncia Casette Quirúrgico",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 50,
+        "guia_visual": false
+    },
+    {
+        "id": 404,
+        "codigo": "PERIODONCIA-02",
+        "nombre": "Periodoncia Bandeja",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 50,
+        "guia_visual": false
+    },
+    {
+        "id": 405,
+        "codigo": "PERIODONCIA-03",
+        "nombre": "Periodoncia Caja",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 50,
+        "guia_visual": false
+    },
+    {
+        "id": 406,
+        "codigo": "CRI-01",
+        "nombre": "Caja Roja De Implantes N°1",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 79,
+        "guia_visual": false
+    },
+    {
+        "id": 407,
+        "codigo": "CRI-02",
+        "nombre": "Caja Roja De Implantes N°2",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 79,
+        "guia_visual": false
+    },
+    {
+        "id": 408,
+        "codigo": "CDCD-01",
+        "nombre": "Caja De Cirugía Dental",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 54,
+        "guia_visual": false
+    },
+    {
+        "id": 409,
+        "codigo": "CIRUDENT-01",
+        "nombre": "Caja Cirugía Dentoalveolar",
+        "tipo": "caja",
+        "servicio_id": 2,
+        "tipo_conjunto_id": 28,
+        "guia_visual": false
+    },
+    {
+        "id": 410,
+        "codigo": "ORTOT-01",
+        "nombre": "Caja N°1 Cirugía Maxilofacial Ortognática - Trauma",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 48,
+        "guia_visual": false
+    },
+    {
+        "id": 411,
+        "codigo": "CCORTOG-01",
+        "nombre": "Caja Cirugia Ortognatica",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 67,
+        "guia_visual": false
+    },
+    {
+        "id": 412,
+        "codigo": "BIO-01",
+        "nombre": "Biomateriales",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 19,
+        "guia_visual": false
+    },
+    {
+        "id": 413,
+        "codigo": "DHS-01",
+        "nombre": "DHS",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 22,
+        "guia_visual": false
+    },
+    {
+        "id": 414,
+        "codigo": "FRAGMAN-01",
+        "nombre": "Pequeños Fragmentos Antigua",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 17,
+        "guia_visual": false
+    },
+    {
+        "id": 415,
+        "codigo": "VITUS-01",
+        "nombre": "Caja Clavo Vitus 28 Piezas",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 35,
+        "guia_visual": false
+    },
+    {
+        "id": 416,
+        "codigo": "VITUS-02",
+        "nombre": "Caja Clavo Vitus 23 Piezas",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 35,
+        "guia_visual": false
+    },
+    {
+        "id": 417,
+        "codigo": "CPEFT-01",
+        "nombre": "Caja Pequeno Fragmento Tecnomedical",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 24,
+        "guia_visual": false
+    },
+    {
+        "id": 418,
+        "codigo": "PFRAG-01",
+        "nombre": "Inventario Pequenos Fragmentos",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 45,
+        "guia_visual": false
+    },
+    {
+        "id": 419,
+        "codigo": "COLE-10",
+        "nombre": "COLE-LAP V",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 51,
+        "guia_visual": false
+    },
+    {
+        "id": 420,
+        "codigo": "COLE-11",
+        "nombre": "COLE-LAP VI",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 51,
+        "guia_visual": false
+    },
+    {
+        "id": 421,
+        "codigo": "COLE-12",
+        "nombre": "COLE-LAP VII",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 51,
+        "guia_visual": false
+    },
+    {
+        "id": 422,
+        "codigo": "COLE-13",
+        "nombre": "COLE-LAP VIII",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 51,
+        "guia_visual": false
+    },
+    {
+        "id": 423,
+        "codigo": "CLAFFIXUS-01",
+        "nombre": "Caja Clavo Affixus #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 75,
+        "guia_visual": false
+    },
+    {
+        "id": 424,
+        "codigo": "CLAFFIXUS-02",
+        "nombre": "Caja Clavo Affixus #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 75,
+        "guia_visual": false
+    },
+    {
+        "id": 425,
+        "codigo": "CLAFFIXUS-03",
+        "nombre": "Caja Clavo Affixus #3",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 75,
+        "guia_visual": false
+    },
+    {
+        "id": 426,
+        "codigo": "BDCF-01",
+        "nombre": "Inst. Cajón Intercondilio Vanguard Premier",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 69,
+        "guia_visual": false
+    },
+    {
+        "id": 427,
+        "codigo": "ZIPTIGHT-01",
+        "nombre": "Caja Ziptight",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 63,
+        "guia_visual": false
+    },
+    {
+        "id": 428,
+        "codigo": "PFRV-01",
+        "nombre": "Pruebas Femorales C\/ Estab. Posterior PS Vanguard",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 27,
+        "guia_visual": false
+    },
+    {
+        "id": 429,
+        "codigo": "CADERA-01",
+        "nombre": "SET De Cadera N°1 #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 430,
+        "codigo": "CADERA-02",
+        "nombre": "SET De Cadera N°2 #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 431,
+        "codigo": "CADERA-03",
+        "nombre": "SET De Cadera N°1 #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 432,
+        "codigo": "CADERA-04",
+        "nombre": "SET De Cadera N°2 #1",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 433,
+        "codigo": "CADERA-05",
+        "nombre": "SET De Cadera N°1 #1 FRESAS Y COTILO",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 434,
+        "codigo": "CADERA-06",
+        "nombre": "SET De Cadera N°3 #2",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 435,
+        "codigo": "CADERA-07",
+        "nombre": "SET De Cadera N°1 #1 Pruebas Acetabulares",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 38,
+        "guia_visual": false
+    },
+    {
+        "id": 436,
+        "codigo": "BDCVP-01",
+        "nombre": "Block De Corte Vanguard Premier",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 49,
+        "guia_visual": false
+    },
+    {
+        "id": 437,
+        "codigo": "CADERA-08",
+        "nombre": "SET De Cadera Anthology",
+        "tipo": "caja",
+        "servicio_id": 1,
+        "tipo_conjunto_id": 55,
+        "guia_visual": false
+    }
 ]

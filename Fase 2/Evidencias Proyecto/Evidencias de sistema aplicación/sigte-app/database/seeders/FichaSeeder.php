@@ -7,6 +7,8 @@ use App\Models\FichaInstrumento;
 use App\Models\Instrumento;
 use App\Models\TipoConjunto;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /** Catálogo desde JSON de fichas_catalogo / instrumentos / tipo_conjunto. */
 class FichaSeeder extends Seeder
@@ -22,62 +24,65 @@ class FichaSeeder extends Seeder
             return;
         }
 
-        /** @var array<int, int> $mapaTipos id JSON → id BD */
+        $this->limpiarCatalogo();
+
         $mapaTipos = [];
         foreach ($tiposJson as $tipo) {
-            $registro = TipoConjunto::query()->updateOrCreate(
-                ['codigo' => (string) $tipo['codigo']],
-                [
-                    'nombre_conjunto' => (string) $tipo['nombre_conjunto'],
-                    'servicio_id' => $tipo['servicio_id'] ?? null,
-                ]
-            );
+            $registro = TipoConjunto::query()->create([
+                'codigo' => (string) $tipo['codigo'],
+                'nombre_conjunto' => (string) $tipo['nombre_conjunto'],
+                'servicio_id' => $tipo['servicio_id'] ?? null,
+            ]);
             $mapaTipos[(int) $tipo['id']] = (int) $registro->id;
         }
 
-        $instrumentosNecesarios = collect($lineasJson)
-            ->pluck('instrumento_id')
-            ->map(fn ($id) => (int) $id)
-            ->unique()
-            ->all();
-
         $porIdJson = collect($instrumentosJson)->keyBy(fn ($i) => (int) $i['id']);
-
-        /** @var array<int, int> $mapaInstrumentos */
         $mapaInstrumentos = [];
-        foreach ($instrumentosNecesarios as $idJson) {
+
+        foreach (collect($lineasJson)->pluck('instrumento_id')->map(fn ($id) => (int) $id)->unique() as $idJson) {
             $dato = $porIdJson->get($idJson);
             if (! is_array($dato)) {
                 continue;
             }
+
+            $nombre = mb_substr(trim((string) ($dato['nombre'] ?? 'Instrumento')), 0, 160);
+            $tamano = mb_substr(trim((string) ($dato['tamano'] ?? '')), 0, 40);
+            $codigoFab = mb_substr(trim((string) ($dato['codigo_fabricante'] ?? '')), 0, 80);
             $tipoId = isset($dato['tipo_conjunto_id'])
                 ? ($mapaTipos[(int) $dato['tipo_conjunto_id']] ?? null)
                 : null;
 
-            $registro = Instrumento::query()->create([
-                'nombre' => mb_substr((string) ($dato['nombre'] ?? 'Instrumento'), 0, 160),
-                'tamano' => mb_substr((string) ($dato['tamano'] ?? ''), 0, 40),
-                'codigo_fabricante' => mb_substr((string) ($dato['codigo_fabricante'] ?? ''), 0, 80),
-                'tipo_conjunto_id' => $tipoId,
-            ]);
+            $clave = mb_strtolower($nombre).'|'.$tamano.'|'.$codigoFab;
+            if (isset($mapaInstrumentos['__por_clave'][$clave])) {
+                $mapaInstrumentos[$idJson] = $mapaInstrumentos['__por_clave'][$clave];
+                continue;
+            }
+
+            $registro = Instrumento::query()->firstOrCreate(
+                [
+                    'nombre' => $nombre,
+                    'tamano' => $tamano,
+                    'codigo_fabricante' => $codigoFab,
+                ],
+                ['tipo_conjunto_id' => $tipoId]
+            );
+
+            $mapaInstrumentos['__por_clave'][$clave] = (int) $registro->id;
             $mapaInstrumentos[$idJson] = (int) $registro->id;
         }
+        unset($mapaInstrumentos['__por_clave']);
 
-        /** @var array<int, int> $mapaFichas */
         $mapaFichas = [];
         foreach ($fichasJson as $ficha) {
             $tipoId = $mapaTipos[(int) ($ficha['tipo_conjunto_id'] ?? 0)] ?? null;
-            $registro = Ficha::query()->updateOrCreate(
-                ['codigo' => (string) $ficha['codigo']],
-                [
-                    'nombre' => mb_substr((string) $ficha['nombre'], 0, 160),
-                    'tipo' => (($ficha['tipo'] ?? 'caja') === 'set') ? 'set' : 'caja',
-                    'servicio_id' => $ficha['servicio_id'] ?? null,
-                    'tipo_conjunto_id' => $tipoId,
-                    'guia_visual' => (bool) ($ficha['guia_visual'] ?? false),
-                ]
-            );
-            $registro->items()->delete();
+            $registro = Ficha::query()->create([
+                'codigo' => (string) $ficha['codigo'],
+                'nombre' => mb_substr((string) $ficha['nombre'], 0, 160),
+                'tipo' => (($ficha['tipo'] ?? 'caja') === 'set') ? 'set' : 'caja',
+                'servicio_id' => $ficha['servicio_id'] ?? null,
+                'tipo_conjunto_id' => $tipoId,
+                'guia_visual' => (bool) ($ficha['guia_visual'] ?? false),
+            ]);
             $mapaFichas[(int) $ficha['id']] = (int) $registro->id;
         }
 
@@ -87,17 +92,28 @@ class FichaSeeder extends Seeder
             if ($fichaId === null || $instrumentoId === null) {
                 continue;
             }
-            $tipoId = isset($linea['tipo_conjunto_id'])
-                ? ($mapaTipos[(int) $linea['tipo_conjunto_id']] ?? null)
-                : null;
 
             FichaInstrumento::query()->create([
                 'ficha_id' => $fichaId,
                 'instrumento_id' => $instrumentoId,
-                'tipo_conjunto_id' => $tipoId,
+                'tipo_conjunto_id' => isset($linea['tipo_conjunto_id'])
+                    ? ($mapaTipos[(int) $linea['tipo_conjunto_id']] ?? null)
+                    : null,
                 'cantidad' => max(1, (int) ($linea['cantidad'] ?? 1)),
                 'orden' => (int) ($linea['orden'] ?? 0),
             ]);
+        }
+    }
+
+    private function limpiarCatalogo(): void
+    {
+        if (Schema::hasTable('cajas') && Schema::hasColumn('cajas', 'ficha_id')) {
+            DB::table('cajas')->update(['ficha_id' => null]);
+        }
+        foreach (['ficha_instrumentos', 'tipo_conjunto_instrumentos', 'catalogo_instrumentos', 'catalogo_cajas', 'instrumentos', 'fichas', 'tipo_conjunto'] as $tabla) {
+            if (Schema::hasTable($tabla)) {
+                DB::table($tabla)->delete();
+            }
         }
     }
 
