@@ -1,0 +1,49 @@
+# Producción (OVH + dominio esterilizacionsanjose.cl)
+# Uso: docker compose -f docker-compose.prod.yml up -d --build
+#
+# Diferencias vs local:
+# - App en puerto 80 (HTTP)
+# - Postgres NO expuesto a internet
+# - Sin montar la carpeta del host (usa lo construido en la imagen)
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sigte-app
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sigte
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: sigte-db
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-sigte}
+      POSTGRES_USER: ${DB_USERNAME:-sigte}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sigte}
+    volumes:
+      - sigte_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - sigte
+    restart: unless-stopped
+
+networks:
+  sigte:
+    driver: bridge
+
+volumes:
+  sigte_pgdata:

@@ -26,6 +26,7 @@ class Caja extends Model
         'actividad',
         'urgente',
         'responsable_id',
+        'personal_id',
         'etapa_desde',
         'proceso_desde',
         'proceso_hasta',
@@ -61,6 +62,11 @@ class Caja extends Model
     public function responsable(): BelongsTo
     {
         return $this->belongsTo(User::class, 'responsable_id');
+    }
+
+    public function persona(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 
     public function anotaciones(): HasMany

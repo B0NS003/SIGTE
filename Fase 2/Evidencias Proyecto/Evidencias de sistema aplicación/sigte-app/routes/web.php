@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/custodia', [AdminController::class, 'custodia'])->name('mockups.custodia');
         Route::get('/admin/alertas', [AdminController::class, 'alertas'])->name('mockups.alertas');
         Route::get('/enfermera/cierre-turno', [EnfermeraController::class, 'cierreTurno'])->name('mockups.cierre_turno');
+        Route::post('/enfermera/cierre-turno', [EnfermeraController::class, 'guardarCierreTurno'])->name('mockups.cierre_turno.guardar');
         Route::put('/admin/catalogo/instrumentos/{instrumento}',[CatalogoController::class, 'actualizarInstrumento'])->name('mockups.catalogo.instrumentos.actualizar');
         Route::get('/secretaria/produccion', [SecretariaController::class, 'produccion'])->name('secretaria.produccion');
         Route::post('/secretaria/produccion', [SecretariaController::class, 'guardarProduccion'])->name('secretaria.produccion.guardar');

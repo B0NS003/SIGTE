@@ -11,6 +11,7 @@ use App\Models\Ficha;
 use App\Models\Servicio;
 use App\Models\TipoConjunto;
 use App\Models\Insumo;
+use App\Models\Personal;
 use App\Models\Rol;
 use App\Models\User;
 use App\Http\Controllers\Concerns\ConsultaDeCajas;
@@ -600,9 +601,11 @@ class FlujoController extends Controller
             $nota = DB::transaction(function () use ($caja, $texto, $actividad, $minutos, $marca) {
                 $nota = $caja->anotaciones()->create([
                     'user_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'] ?? null,
                     'texto' => $texto,
                 ]);
                 $caja->responsable_id = $marca['user_id'];
+                $caja->personal_id = $marca['personal_id'] ?? null;
                 $caja->actividad = mb_substr($actividad, 0, 80);
                 if ($minutos !== null) {
                     $caja->sumarProceso((int) $minutos);
@@ -860,7 +863,7 @@ class FlujoController extends Controller
                 'estado' => 'Entregada a '.$datos['servicio'],
                 'ubicacion' => 'Ventanilla de entrega',
                 'responsable_id' => $marca['user_id'],
-                'personal_id' => $marca['personal_id'],
+                'personal_id' => $marca['personal_id'] ?? null,
             ])->save();
 
             EntregaCaja::query()->create([
@@ -925,13 +928,18 @@ class FlujoController extends Controller
         return null;
     }
 
-    /** @return array{user_id: int|null} */
+    /** @return array{user_id: int|null, personal_id: int|null} */
     private function marca(): array
     {
         $quien = User::quienRegistra();
+        $userId = $quien?->id ?? Auth::id();
+        $personalId = $userId
+            ? Personal::query()->where('user_id', $userId)->value('id')
+            : null;
 
         return [
-            'user_id' => $quien?->id ?? Auth::id(),
+            'user_id' => $userId,
+            'personal_id' => $personalId,
         ];
     }
 

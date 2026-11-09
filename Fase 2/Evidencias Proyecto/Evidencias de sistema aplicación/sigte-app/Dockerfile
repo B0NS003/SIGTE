@@ -16,8 +16,14 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN if [ -f composer.json ]; then composer install --no-interaction --prefer-dist --optimize-autoloader; fi \
-    && chown -R www-data:www-data storage bootstrap/cache || true
+RUN mkdir -p \
+      storage/framework/sessions \
+      storage/framework/views \
+      storage/framework/cache/data \
+      storage/logs \
+      bootstrap/cache \
+    && if [ -f composer.json ]; then composer install --no-interaction --prefer-dist --optimize-autoloader; fi \
+    && chown -R www-data:www-data storage bootstrap/cache
 
 COPY docker/php/performance.ini /usr/local/etc/php/conf.d/zz-performance.ini
 

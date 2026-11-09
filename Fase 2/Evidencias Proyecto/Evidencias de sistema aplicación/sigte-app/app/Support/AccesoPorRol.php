@@ -43,6 +43,7 @@ class AccesoPorRol
 
         'mockups.alertas' => [Rol::ENFERMERA, Rol::ADMINISTRADORA],
         'mockups.cierre_turno' => [Rol::ENFERMERA],
+        'mockups.cierre_turno.guardar' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],
         'mockups.reportes.exportar' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],

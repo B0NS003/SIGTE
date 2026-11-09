@@ -12,6 +12,7 @@ class CajaRetroceso extends Model
     protected $fillable = [
         'caja_id',
         'user_id',
+        'personal_id',
         'etapa_desde',
         'etapa_hacia',
         'motivo',
@@ -25,5 +26,10 @@ class CajaRetroceso extends Model
     public function autor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function persona(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 }
