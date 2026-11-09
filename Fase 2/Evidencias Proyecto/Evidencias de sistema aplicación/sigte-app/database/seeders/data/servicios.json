@@ -38,5 +38,75 @@
     "id": 8,
     "codigo": "otro",
     "nombre": "Otro servicio"
+  },
+  {
+    "id": 9,
+    "codigo": "uti",
+    "nombre": "UTI"
+  },
+  {
+    "id": 10,
+    "codigo": "cirugia",
+    "nombre": "Cirugía"
+  },
+  {
+    "id": 11,
+    "codigo": "medicina",
+    "nombre": "Medicina"
+  },
+  {
+    "id": 12,
+    "codigo": "pediatria",
+    "nombre": "Pediatría"
+  },
+  {
+    "id": 13,
+    "codigo": "pensionado",
+    "nombre": "Pensionado"
+  },
+  {
+    "id": 14,
+    "codigo": "rn",
+    "nombre": "RN"
+  },
+  {
+    "id": 15,
+    "codigo": "parto",
+    "nombre": "Parto"
+  },
+  {
+    "id": 16,
+    "codigo": "cae",
+    "nombre": "CAE"
+  },
+  {
+    "id": 17,
+    "codigo": "poligine",
+    "nombre": "Poligine"
+  },
+  {
+    "id": 18,
+    "codigo": "sedile",
+    "nombre": "Sedile"
+  },
+  {
+    "id": 19,
+    "codigo": "endoscopia",
+    "nombre": "Endoscopía"
+  },
+  {
+    "id": 20,
+    "codigo": "hospitalizacion_domiciliaria",
+    "nombre": "Hospitalización Domiciliaria"
+  },
+  {
+    "id": 21,
+    "codigo": "gestion_camas",
+    "nombre": "Gestión de Camas"
+  },
+  {
+    "id": 22,
+    "codigo": "laboratorio",
+    "nombre": "Laboratorio"
   }
 ]

@@ -42,6 +42,8 @@ class DatabaseSeeder extends Seeder
         $this->call(FichaSeeder::class);
         $this->limpiarFlujo();
         $this->simularDosSemanas();
+        $this->sembrarMaterialesProduccion();
+        $this->sembrarRegistrosProduccion();
     }
 
     private function sembrarRoles(): void
@@ -694,4 +696,71 @@ class DatabaseSeeder extends Seeder
 
         return preg_replace('/[^a-z]/', '', $texto) ?: 'persona';
     }
+
+    // REPORTES TIMEEEEE
+
+    
+    private function sembrarMaterialesProduccion(): void
+    {
+        $ruta = database_path('seeders/data/materiales_produccion.json');
+
+        $materiales = json_decode(
+            file_get_contents($ruta),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        foreach (array_chunk($materiales, 500) as $grupo) {
+            DB::table('materiales_produccion')->upsert(
+                $grupo,
+                ['id'],
+                ['nombre', 'categoria', 'activo', 'updated_at']
+            );
+        }
+
+        DB::statement("
+            SELECT setval(
+                pg_get_serial_sequence('materiales_produccion', 'id'),
+                (SELECT MAX(id) FROM materiales_produccion)
+            )
+        ");
+    }
+
+    private function sembrarRegistrosProduccion(): void
+    {
+        $ruta = database_path('seeders/data/registros_produccion.json');
+
+        $registros = json_decode(
+            file_get_contents($ruta),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        foreach (array_chunk($registros, 500) as $grupo) {
+            DB::table('registros_produccion')->upsert(
+                $grupo,
+                ['id'],
+                [
+                    'fecha',
+                    'servicio_id',
+                    'material_id',
+                    'cantidad',
+                    'factor_litros',
+                    'user_id',
+                    'observacion',
+                    'updated_at'
+                ]
+            );
+        }
+
+        DB::statement("
+            SELECT setval(
+                pg_get_serial_sequence('registros_produccion', 'id'),
+                (SELECT MAX(id) FROM registros_produccion)
+            )
+        ");
+    }
+
 }

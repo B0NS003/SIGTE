@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ConsumoServicio;
 use App\Models\Insumo;
 use App\Models\MovimientoInsumo;
+use App\Models\MaterialProduccion;
+use App\Models\RegistroProduccion;
 use App\Models\Servicio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,6 +41,9 @@ class SecretariaController extends Controller
             'usuario' => $this->usuarioSesion(),
             'servicios' => ConsumoServicio::servicios(),
             'consumos' => $consumos,
+            'materiales_produccion' => MaterialProduccion::query()->where('activo', true)->orderBy('nombre')->get(),
+            'servicios_produccion' => Servicio::query()->get(),
+            'registros_produccion' => RegistroProduccion::query()->with(['material', 'servicio'])->orderByDesc('fecha')->orderByDesc('id')->limit(100)->get(),
             'editando' => $editando,
             'periodo_form' => $periodo ? Carbon::parse($periodo)->format('Y-m') : now()->format('Y-m'),
         ]);
@@ -46,6 +51,12 @@ class SecretariaController extends Controller
 
     public function guardarProduccion(Request $request): RedirectResponse
     {
+        // El nuevo formulario diario envía material_id. El formulario mensual
+        // existente sigue funcionando mientras se actualizan las vistas.
+        if ($request->has('material_id')) {
+            return $this->guardarProduccionDiaria($request);
+        }
+
         $datos = $request->validate([
             'servicio' => ['required', 'string', 'in:'.implode(',', ConsumoServicio::servicios())],
             'periodo' => ['required', 'date_format:Y-m'],
@@ -99,6 +110,47 @@ class SecretariaController extends Controller
                 'periodo' => $datos['periodo'],
             ])
             ->with('ok', 'Consumo de '.$datos['servicio'].' '.$accion.' para '.ConsumoServicio::etiquetaPeriodo($periodo).'.');
+    }
+
+    private function guardarProduccionDiaria(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'fecha' => ['required', 'date_format:Y-m-d'],
+            'servicio_id' => ['required', 'integer', 'exists:servicios,id'],
+            'material_id' => ['required', 'integer', 'exists:materiales_produccion,id'],
+            'cantidad' => ['required', 'integer', 'min:1'],
+            'factor_litros' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:99999999.99'],
+            'observacion' => ['nullable', 'string', 'max:255'],
+        ], [
+            'fecha.required' => 'Indica la fecha de producción.',
+            'servicio_id.required' => 'Selecciona un servicio clínico.',
+            'material_id.required' => 'Selecciona un material.',
+            'cantidad.required' => 'Indica la cantidad producida.',
+            'cantidad.min' => 'La cantidad debe ser mayor que cero.',
+            'factor_litros.required' => 'Indica el factor de litros del material.',
+            'factor_litros.gt' => 'El factor de litros debe ser mayor que cero.',
+            'factor_litros.decimal' => 'El factor admite hasta dos decimales.',
+        ]);
+
+        $material = MaterialProduccion::query()->findOrFail($datos['material_id']);
+        if (! $material->activo) {
+            return back()->withInput()->withErrors([
+                'material_id' => 'El material seleccionado no está activo.',
+            ]);
+        }
+
+        RegistroProduccion::query()->create([
+            'fecha' => $datos['fecha'],
+            'servicio_id' => $datos['servicio_id'],
+            'material_id' => $material->id,
+            'cantidad' => $datos['cantidad'],
+            'factor_litros' => $datos['factor_litros'],
+            'user_id' => Auth::id(),
+            'observacion' => $datos['observacion'] ?? null,
+        ]);
+
+        return redirect()->route('secretaria.produccion')
+            ->with('ok', 'Producción diaria registrada correctamente.');
     }
 
     public function insumos(): View
@@ -172,6 +224,7 @@ class SecretariaController extends Controller
         $periodo = $this->periodoDesdeRequest($request->query('periodo'))
             ?? now()->startOfMonth()->toDateString();
         $filas = $this->filasReporte($periodo);
+        $diarios = $this->filasProduccionDiaria($periodo);
 
         return view('secretaria.reportes', [
             'usuario' => $this->usuarioSesion(),
@@ -180,6 +233,9 @@ class SecretariaController extends Controller
             'filas' => $filas,
             'total_consumo' => $filas->sum('consumo'),
             'total_litros' => $filas->sum('litros'),
+            'registros_diarios' => $diarios,
+            'total_unidades_diarias' => $diarios->sum('cantidad'),
+            'total_litros_diarios' => $diarios->sum(fn ($fila) => $fila->litros),
         ]);
     }
 
@@ -242,6 +298,19 @@ class SecretariaController extends Controller
     /**
      * @return \Illuminate\Support\Collection<int, ConsumoServicio>
      */
+    private function filasProduccionDiaria(string $periodo)
+    {
+        $inicio = Carbon::parse($periodo)->startOfMonth()->toDateString();
+        $fin = Carbon::parse($periodo)->endOfMonth()->toDateString();
+
+        return RegistroProduccion::query()
+            ->with(['material', 'servicio'])
+            ->whereBetween('fecha', [$inicio, $fin])
+            ->orderBy('fecha')
+            ->orderBy('servicio_id')
+            ->get();
+    }
+
     private function filasReporte(string $periodo)
     {
         return ConsumoServicio::query()

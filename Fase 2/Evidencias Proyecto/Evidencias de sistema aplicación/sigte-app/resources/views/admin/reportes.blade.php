@@ -38,18 +38,24 @@
 
         <form class="panel reportes-filtros" method="GET" action="{{ route('mockups.reportes') }}">
             <div class="reportes-section-head"><div><h2>Filtros del reporte</h2><p>Selecciona el período para consultar los registros disponibles.</p></div></div>
-            <div class="reportes-campos">
+            <div class="reportes-campos reportes-campos-produccion">
                 <label class="reportes-campo">Desde<input type="date" name="desde" value="{{ $filtros['desde'] }}" required></label>
                 <label class="reportes-campo">Hasta<input type="date" name="hasta" value="{{ $filtros['hasta'] }}" required></label>
-                <label class="reportes-campo">Tipo de movimiento<select name="tipo">
+                <label class="reportes-campo reportes-filtro-tipo">Tipo de movimiento<select name="tipo">
                     <option value="">Todos los tipos</option>
                     @foreach ($tipos_auditoria as $clave => $nombre)
                         <option value="{{ $clave }}" @selected($filtros['tipo'] === $clave)>{{ $nombre }}</option>
                     @endforeach
                 </select></label>
+                <label class="reportes-campo reportes-filtro-servicio">Servicio<select name="servicio">
+                    <option value="">Todos los servicios</option>
+                    @foreach ($servicios_produccion as $servicio)
+                        <option value="{{ $servicio->id }}" @selected(($filtros['servicio'] ?? null) === (int) $servicio->id)>{{ $servicio->nombre }}</option>
+                    @endforeach
+                </select></label>
                 <button class="btn btn-dark reportes-consultar" type="submit">Consultar registros</button>
             </div>
-            <p class="reportes-ayuda">El filtro de tipo se aplica a los movimientos de auditoría. Los filtros por servicio y por caja se conectarán en una etapa posterior.</p>
+            <p class="reportes-ayuda">Los litros se calculan desde los registros diarios de producción. El tipo de movimiento solo se aplica a Trazabilidad.</p>
         </form>
 
         @if ($falla)
@@ -122,17 +128,63 @@
 
                 <article class="panel reportes-bloque reportes-bloque-moderno">
                     <div class="reportes-banda"><h3><span class="reportes-banda-icono"><svg class="reportes-icono " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span> 2. Producción mensual por servicio</h3><span>Consumos y litros registrados por secretaría, agrupados por mes</span></div>
-                    <div class="reportes-mensual-grid">
-                        <div>
-                            <div class="reportes-resumen reportes-resumen-compacto">
-                                <div class="reportes-kpi reportes-kpi-azul"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg><div class="reportes-kpi-texto"><span>Servicios con registros</span><strong>—</strong></div></div>
-                                <div class="reportes-kpi reportes-kpi-verde"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg><div class="reportes-kpi-texto"><span>Consumo total</span><strong>—</strong></div></div>
-                                <div class="reportes-kpi reportes-kpi-violeta"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a8 8 0 0 0 8-8c0-4-8-12-8-12S4 10 4 14a8 8 0 0 0 8 8Z"/></svg><div class="reportes-kpi-texto"><span>Litros totales</span><strong>—</strong></div></div>
-                            </div>
-                            <h4 class="reportes-titulo-detalle">Consumo por servicio (período)</h4>
-                            <div class="reportes-grafico-pendiente"><span>Gráfico disponible cuando se conecten los datos de ConsumoServicio.</span></div>
+                    <div class="reportes-resumen reportes-resumen-compacto reportes-produccion-kpis">
+                        <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Servicios con registros</span><strong>{{ number_format($produccion['servicios'], 0, ',', '.') }}</strong></div></div>
+                        <div class="reportes-kpi reportes-kpi-verde"><div class="reportes-kpi-texto"><span>Unidades procesadas</span><strong>{{ number_format($produccion['cantidad'], 0, ',', '.') }}</strong></div></div>
+                        <div class="reportes-kpi reportes-kpi-violeta"><div class="reportes-kpi-texto"><span>Litros totales</span><strong>{{ number_format($produccion['litros'], 2, ',', '.') }} L</strong></div></div>
+                        <div class="reportes-kpi reportes-kpi-naranja"><div class="reportes-kpi-texto"><span>Materiales distintos</span><strong>{{ number_format($produccion['materiales'], 0, ',', '.') }}</strong></div></div>
+                    </div>
+                    <div class="reportes-produccion-analitica">
+                        <div class="reportes-produccion-card">
+                            <h4 class="reportes-titulo-detalle">Litros por servicio (período)</h4>
+                            @php $maxLitrosServicio = max(1, (float) $produccion['por_servicio']->max('litros')); @endphp
+                            @forelse ($produccion['por_servicio'] as $servicio)
+                                <div class="reportes-produccion-barra-fila">
+                                    <span title="{{ $servicio->nombre }}">{{ $servicio->nombre }}</span>
+                                    <div class="reportes-produccion-barra-fondo"><div style="width: {{ round(((float) $servicio->litros / $maxLitrosServicio) * 100, 2) }}%"></div></div>
+                                    <strong>{{ number_format($servicio->litros, 2, ',', '.') }} L</strong>
+                                </div>
+                            @empty
+                                <p class="reportes-vacio">No hay registros de producción para este período.</p>
+                            @endforelse
                         </div>
-                        <div class="reportes-tabla reportes-tabla-compacta"><table><thead><tr><th>Mes</th><th>Servicio</th><th>Consumo</th><th>Litros</th></tr></thead><tbody><tr><td colspan="4" class="reportes-vacio">Los registros de ConsumoServicio se incorporarán aquí. No se muestran cifras ficticias.</td></tr></tbody></table></div>
+                        <div class="reportes-produccion-card">
+                            <h4 class="reportes-titulo-detalle">Evolución mensual de litros</h4>
+                            @php $maxLitrosMes = max(1, (float) $produccion['por_mes']->max('litros')); @endphp
+                            @if ($produccion['por_mes']->isNotEmpty())
+                                <div class="reportes-produccion-meses">
+                                    @foreach ($produccion['por_mes'] as $mes)
+                                        <div class="reportes-produccion-mes" title="{{ $mes->mes }}: {{ number_format($mes->litros, 2, ',', '.') }} litros">
+                                            <strong>{{ number_format($mes->litros, 0, ',', '.') }} L</strong>
+                                            <div class="reportes-produccion-mes-columna"><span style="height: {{ max(2, round(((float) $mes->litros / $maxLitrosMes) * 100, 2)) }}%"></span></div>
+                                            <small>{{ $mes->mes }}</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="reportes-vacio">No hay registros para graficar en el período seleccionado.</p>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="reportes-produccion-card reportes-produccion-detalle">
+                        <h4 class="reportes-titulo-detalle">Detalle mensual por servicio</h4>
+                        <div class="reportes-tabla reportes-tabla-compacta">
+                            <table>
+                                <thead><tr><th>Mes</th><th>Servicio</th><th>Unidades</th><th>Litros</th></tr></thead>
+                                <tbody>
+                                    @forelse ($produccion['detalle'] as $fila)
+                                        <tr>
+                                            <td>{{ $fila->mes }}</td>
+                                            <td>{{ $fila->servicio }}</td>
+                                            <td>{{ number_format($fila->cantidad, 0, ',', '.') }}</td>
+                                            <td>{{ number_format($fila->litros, 2, ',', '.') }} L</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="4" class="reportes-vacio">No hay registros de producción para las fechas y el servicio seleccionados.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </article>
             </section>
@@ -352,8 +404,17 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.reportes-tab');
     const panels = document.querySelectorAll('.reportes-panel');
+    function ajustarFiltros(tab) {
+        const produccion = tab === 'produccion';
+        const tipo = document.querySelector('.reportes-filtro-tipo');
+        const servicio = document.querySelector('.reportes-filtro-servicio');
+        if (tipo) tipo.hidden = tab !== 'trazabilidad';
+        if (servicio) servicio.hidden = !produccion;
+    }
+    ajustarFiltros('produccion');
     tabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
+            ajustarFiltros(tab.dataset.tab);
             tabs.forEach(function (item) {
                 const active = item === tab;
                 item.classList.toggle('activo', active);

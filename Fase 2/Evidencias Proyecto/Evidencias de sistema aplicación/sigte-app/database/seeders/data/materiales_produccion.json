@@ -1,0 +1,658 @@
+[
+  {
+    "id": 4,
+    "nombre": "Individual",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 5,
+    "nombre": "Curacion",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 6,
+    "nombre": "CVC",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 7,
+    "nombre": "ESV",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 8,
+    "nombre": "Delantal Individual",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 9,
+    "nombre": "Toruleros",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 10,
+    "nombre": "Riñon",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 11,
+    "nombre": "Bandeja",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 12,
+    "nombre": "Sutura",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 13,
+    "nombre": "Suturas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 14,
+    "nombre": "Especulo",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 15,
+    "nombre": "Gasa Branula",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 16,
+    "nombre": "Cajas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 17,
+    "nombre": "Paquete ropa CVC",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 18,
+    "nombre": "P. Partos",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 19,
+    "nombre": "Paquete  ropa CVC",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 20,
+    "nombre": "Bandejas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 21,
+    "nombre": "P. Paños",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 22,
+    "nombre": "P. Delantales",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 23,
+    "nombre": "Cajas chicas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 24,
+    "nombre": "Cole Lap",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 25,
+    "nombre": "Raquideas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 26,
+    "nombre": "Conos",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 27,
+    "nombre": "Individuales",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 28,
+    "nombre": "Frasco Vidrio",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 29,
+    "nombre": "R. Nacido",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 30,
+    "nombre": "C. Parto",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 31,
+    "nombre": "P. Kelly/tubos",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 32,
+    "nombre": "Epidural",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 33,
+    "nombre": "Saca Corchete",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 34,
+    "nombre": "P. Paños dental",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 35,
+    "nombre": "Pinzas de endoscopia",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 36,
+    "nombre": "Delantal individual",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 37,
+    "nombre": "sutura",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 38,
+    "nombre": "P. Laparoscopia",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 39,
+    "nombre": "Cajas Trauma+ Motor",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 40,
+    "nombre": "C. laringo/P. kelly",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 41,
+    "nombre": "Revision",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 42,
+    "nombre": "Mamaderas Chicas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 43,
+    "nombre": "Mamaderas Grandes",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 44,
+    "nombre": "Pinzas cuerpo extraño",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 45,
+    "nombre": "Tórulas Otorrino/ GINE",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 46,
+    "nombre": "Frascos",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 47,
+    "nombre": "Lavatorio",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 48,
+    "nombre": "T. grupo",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 49,
+    "nombre": "Alforjas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 50,
+    "nombre": "Paquetes Chicos",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 51,
+    "nombre": "Paquetes Grandes",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 52,
+    "nombre": "suturas prestamo",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 53,
+    "nombre": "Torulero",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 54,
+    "nombre": "Pañales",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 55,
+    "nombre": "Individual + (Hojas de La.)",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 56,
+    "nombre": "P. ropa Anestesia",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 57,
+    "nombre": "pqte. R.n",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 58,
+    "nombre": "Gasas Branulas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 59,
+    "nombre": "Paquete de anestesia",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 60,
+    "nombre": "Caja Sola",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 61,
+    "nombre": "B. Torula/hulitos",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 62,
+    "nombre": "Cordonetes",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 63,
+    "nombre": "caja",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 64,
+    "nombre": "P. Otorrino",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 65,
+    "nombre": "P.Paños",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 66,
+    "nombre": "P. Paños/anestesia",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 67,
+    "nombre": "Caja maxilo , Ortognatica , Caja Trauma",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 68,
+    "nombre": "Trampa agua",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 69,
+    "nombre": "Tira Valvas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 70,
+    "nombre": "Molto",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 71,
+    "nombre": "Branulas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 72,
+    "nombre": "P.CVC",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 73,
+    "nombre": "TórulasOtorrino/G",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 74,
+    "nombre": "D.Individual",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 75,
+    "nombre": "P. Lap",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 76,
+    "nombre": "C. Trauma+ Motor",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 77,
+    "nombre": "Paquete de Anestesia",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 78,
+    "nombre": "P. CVC",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 79,
+    "nombre": "EVC",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 80,
+    "nombre": "Tórulas",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 81,
+    "nombre": "Paquete de cvc",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 82,
+    "nombre": "Pqte. R.n",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 83,
+    "nombre": "Paquete ropa cvc",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 84,
+    "nombre": "Paquete de ropa cvc",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  },
+  {
+    "id": 85,
+    "nombre": "Paquete  Paño",
+    "categoria": "sin_clasificar",
+    "activo": true,
+    "created_at": "2026-11-09 15:38:20.000",
+    "updated_at": "2026-11-09 15:38:20.000"
+  }
+]

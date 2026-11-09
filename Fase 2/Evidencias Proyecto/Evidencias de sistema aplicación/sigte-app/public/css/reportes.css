@@ -1,4 +1,3 @@
-/* SIGTE — Estilos exclusivos del módulo de reportes */
 .reportes-pagina {
     min-width: 0;
 }
@@ -1661,5 +1660,410 @@
 
     .reportes-entregas-estado h3 {
         font-size: 16px;
+    }
+}
+
+/* Secretaría: registro diario y reportes. Reglas acotadas para no alterar Administración. */
+.reportes-secretaria {
+    min-width: 0;
+}
+
+.reportes-secretaria .sp-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(240px, .75fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.reportes-secretaria .sp-lateral {
+    display: grid;
+    gap: 16px;
+}
+
+.reportes-secretaria .sp-card {
+    padding: 22px;
+    border-radius: 15px;
+}
+
+.reportes-secretaria .sp-seccion {
+    margin-top: 18px;
+}
+
+.reportes-secretaria .sp-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.reportes-secretaria .sp-encabezado h2,
+.reportes-secretaria .sp-lateral h2 {
+    margin: 0 0 6px;
+    font-size: 19px;
+    color: #00143b;
+}
+
+.reportes-secretaria .sp-encabezado p,
+.reportes-secretaria .sp-lateral p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.reportes-secretaria .sp-lateral p+p {
+    margin-top: 12px;
+}
+
+.reportes-secretaria .sp-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.reportes-secretaria .sp-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.reportes-secretaria .sp-campo.sp-ancho,
+.reportes-secretaria .sp-ancho {
+    grid-column: 1/-1;
+}
+
+.reportes-secretaria .sp-campo label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #00143b;
+}
+
+.reportes-secretaria .sp-campo label span {
+    color: #c52626;
+}
+
+.reportes-secretaria .sp-campo input,
+.reportes-secretaria .sp-campo select,
+.reportes-secretaria .sp-campo textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    color: #00143b;
+    font: inherit;
+    font-size: 14px;
+}
+
+.reportes-secretaria .sp-campo textarea {
+    resize: vertical;
+}
+
+.reportes-secretaria .sp-campo input:focus,
+.reportes-secretaria .sp-campo select:focus,
+.reportes-secretaria .sp-campo textarea:focus {
+    outline: 2px solid #6ea9e4;
+    outline-offset: 1px;
+}
+
+.reportes-secretaria .sp-error {
+    color: #a51d25;
+    font-size: 12px;
+}
+
+.reportes-secretaria .sp-ayuda,
+.reportes-secretaria .sp-aviso {
+    display: block;
+    margin: 14px 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.reportes-secretaria .sp-acciones {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.reportes-secretaria .sp-acciones .btn,
+.reportes-secretaria .sp-filtro .btn {
+    width: auto;
+}
+
+.reportes-secretaria .sp-enlace {
+    display: inline-block;
+    margin-top: 16px;
+}
+
+.reportes-secretaria .sp-numero {
+    font-size: 32px !important;
+    font-weight: 800;
+    color: #00143b !important;
+}
+
+.reportes-secretaria .sp-alerta {
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.reportes-secretaria .sp-alerta-ok {
+    background: #edf8ef;
+    border: 1px solid #b8e0c2;
+    color: #176534;
+}
+
+.reportes-secretaria .sp-alerta-error {
+    background: #fff1f1;
+    border: 1px solid #f0b6b6;
+    color: #92232a;
+}
+
+.reportes-secretaria .sp-alerta ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+}
+
+.reportes-secretaria .sp-filtro {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.reportes-secretaria .sp-filtro .sp-campo {
+    min-width: 210px;
+}
+
+.reportes-secretaria .sp-titulo-reporte {
+    margin-top: 8px;
+}
+
+.reportes-secretaria .sp-resumen {
+    margin: 0 0 18px;
+}
+
+.reportes-secretaria .sp-total td {
+    background: #f1f5f9;
+    font-weight: 700;
+}
+
+.reportes-secretaria .sp-historico summary {
+    color: #00143b;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.reportes-secretaria .sp-historico[open] summary {
+    margin-bottom: 14px;
+}
+
+.reportes-secretaria .sp-tabla-historica {
+    margin-top: 18px;
+}
+
+.reportes-secretaria .reportes-tabla {
+    max-width: 100%;
+}
+
+.reportes-secretaria .reportes-tabla td {
+    overflow-wrap: anywhere;
+}
+
+@media(max-width:1000px) {
+    .reportes-secretaria .sp-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reportes-secretaria .sp-lateral {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media(max-width:650px) {
+    .reportes-secretaria .sp-card {
+        padding: 15px;
+    }
+
+    .reportes-secretaria .sp-form-grid,
+    .reportes-secretaria .sp-lateral {
+        grid-template-columns: 1fr;
+    }
+
+    .reportes-secretaria .sp-filtro .sp-campo {
+        width: 100%;
+    }
+}
+
+/* Administración — producción real agrupada por servicio y mes */
+.reportes-pagina .reportes-filtro-tipo[hidden],
+.reportes-pagina .reportes-filtro-servicio[hidden] {
+    display: none !important;
+}
+
+.reportes-pagina .reportes-produccion-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 0 12px;
+}
+
+.reportes-pagina .reportes-produccion-kpis .reportes-kpi {
+    min-height: 76px;
+}
+
+.reportes-pagina .reportes-produccion-kpis strong {
+    font-size: clamp(19px, 2vw, 26px);
+    overflow-wrap: anywhere;
+}
+
+.reportes-produccion-analitica {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 0 12px 15px;
+}
+
+.reportes-produccion-card {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.reportes-produccion-card .reportes-titulo-detalle {
+    margin: 0 0 18px;
+    font-size: 14px;
+}
+
+.reportes-produccion-barra-fila {
+    display: grid;
+    grid-template-columns: minmax(90px, 1fr) minmax(60px, 2fr) auto;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 12px;
+    color: #193452;
+}
+
+.reportes-produccion-barra-fila>span {
+    overflow-wrap: anywhere;
+}
+
+.reportes-produccion-barra-fila>strong {
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+.reportes-produccion-barra-fondo {
+    height: 12px;
+    border-radius: 10px;
+    background: #edf2f8;
+    overflow: hidden;
+}
+
+.reportes-produccion-barra-fondo>div {
+    height: 100%;
+    background: linear-gradient(90deg, #55a8f6, #2478d2);
+    border-radius: inherit;
+}
+
+.reportes-produccion-meses {
+    display: flex;
+    align-items: flex-end;
+    gap: 9px;
+    overflow-x: auto;
+    min-height: 195px;
+    padding: 12px 3px 3px;
+}
+
+.reportes-produccion-mes {
+    display: flex;
+    flex: 1 0 52px;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    height: 175px;
+    justify-content: flex-end;
+}
+
+.reportes-produccion-mes>strong {
+    font-size: 10px;
+    color: #193452;
+    white-space: nowrap;
+}
+
+.reportes-produccion-mes-columna {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 120px;
+    width: 32px;
+}
+
+.reportes-produccion-mes-columna span {
+    display: block;
+    width: 100%;
+    background: linear-gradient(180deg, #ad8bf1, #5e70d8);
+    border-radius: 5px 5px 0 0;
+}
+
+.reportes-produccion-mes>small {
+    color: #64748b;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.reportes-produccion-detalle {
+    margin: 0 12px 10px;
+}
+
+.reportes-produccion-detalle .reportes-tabla {
+    max-height: 350px;
+    overflow: auto;
+}
+
+.reportes-produccion-detalle thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+@media (max-width: 1050px) {
+    .reportes-pagina .reportes-produccion-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reportes-produccion-analitica {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .reportes-pagina .reportes-produccion-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .reportes-produccion-analitica {
+        padding: 0 3px 12px;
+    }
+
+    .reportes-produccion-detalle {
+        margin: 0 3px 8px;
+    }
+
+    .reportes-produccion-barra-fila {
+        grid-template-columns: minmax(65px, 1fr) minmax(50px, 1.5fr) auto;
+        gap: 6px;
     }
 }

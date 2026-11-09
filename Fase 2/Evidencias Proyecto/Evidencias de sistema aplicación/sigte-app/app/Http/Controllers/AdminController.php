@@ -22,6 +22,7 @@ use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -457,6 +458,7 @@ class AdminController extends Controller
             'por_tipo' => collect(),
             'entregas' => collect(),
             'en_flujo' => collect(),
+            'produccion' => $this->produccionVacia(),
         ];
 
         if (! $falla) {
@@ -480,6 +482,8 @@ class AdminController extends Controller
             'por_tipo' => $datos['por_tipo'],
             'entregas' => $datos['entregas'],
             'en_flujo' => $datos['en_flujo'],
+            'produccion' => $datos['produccion'],
+            'servicios_produccion' => DB::table('servicios')->orderBy('nombre')->get(['id', 'nombre']),
             'tipos_auditoria' => RegistroAuditoria::TIPOS,
         ]);
     }
@@ -550,6 +554,7 @@ class AdminController extends Controller
             'desde' => $desde,
             'hasta' => $hasta,
             'tipo' => $tipo,
+            'servicio' => $request->filled('servicio') && ctype_digit((string) $request->input('servicio')) ? (int) $request->input('servicio') : null,
         ];
     }
 
@@ -607,8 +612,70 @@ class AdminController extends Controller
             'por_tipo' => $porTipo,
             'entregas' => $entregas,
             'en_flujo' => $enFlujo,
+            'produccion' => $this->datosProduccion($filtros),
         ];
     }
+    private function produccionVacia(): array
+    {
+        return [
+            'servicios' => 0, 'cantidad' => 0, 'litros' => 0, 'materiales' => 0,
+            'por_servicio' => collect(), 'por_mes' => collect(), 'detalle' => collect(),
+        ];
+    }
+
+    private function datosProduccion(array $filtros): array
+    {
+        // Se utiliza únicamente registros_produccion: no se suman los
+        // agregados de consumos_servicio para evitar duplicar consumos.
+        $base = DB::table('registros_produccion as rp')
+            ->join('servicios as s', 's.id', '=', 'rp.servicio_id')
+            ->whereBetween('rp.fecha', [$filtros['desde'], $filtros['hasta']]);
+
+        if ($filtros['servicio'] !== null) {
+            $base->where('rp.servicio_id', $filtros['servicio']);
+        }
+
+        $resumen = (clone $base)->selectRaw(
+            'COUNT(DISTINCT rp.servicio_id) AS servicios, '.
+            'COUNT(DISTINCT rp.material_id) AS materiales, '.
+            'COALESCE(SUM(rp.cantidad), 0) AS cantidad, '.
+            'COALESCE(SUM(rp.cantidad * rp.factor_litros), 0) AS litros'
+        )->first();
+
+        $porServicio = (clone $base)
+            ->select('s.nombre')
+            ->selectRaw('SUM(rp.cantidad) AS cantidad, SUM(rp.cantidad * rp.factor_litros) AS litros')
+            ->groupBy('s.id', 's.nombre')
+            ->orderByDesc('litros')
+            ->get();
+
+        $porMes = (clone $base)
+            ->selectRaw("TO_CHAR(rp.fecha, 'YYYY-MM') AS mes")
+            ->selectRaw('SUM(rp.cantidad) AS cantidad, SUM(rp.cantidad * rp.factor_litros) AS litros')
+            ->groupByRaw("TO_CHAR(rp.fecha, 'YYYY-MM')")
+            ->orderBy('mes')
+            ->get();
+
+        $detalle = (clone $base)
+            ->selectRaw("TO_CHAR(rp.fecha, 'YYYY-MM') AS mes")
+            ->addSelect('s.nombre as servicio')
+            ->selectRaw('SUM(rp.cantidad) AS cantidad, SUM(rp.cantidad * rp.factor_litros) AS litros')
+            ->groupByRaw("TO_CHAR(rp.fecha, 'YYYY-MM'), s.id, s.nombre")
+            ->orderByDesc('mes')
+            ->orderBy('s.nombre')
+            ->get();
+
+        return [
+            'servicios' => (int) ($resumen->servicios ?? 0),
+            'materiales' => (int) ($resumen->materiales ?? 0),
+            'cantidad' => (int) ($resumen->cantidad ?? 0),
+            'litros' => (float) ($resumen->litros ?? 0),
+            'por_servicio' => $porServicio,
+            'por_mes' => $porMes,
+            'detalle' => $detalle,
+        ];
+    }
+
     public function historialEntregas(Request $request): View
     {
         $falla = $request->boolean('falla');
