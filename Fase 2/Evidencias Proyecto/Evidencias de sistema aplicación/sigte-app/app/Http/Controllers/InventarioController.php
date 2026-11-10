@@ -61,6 +61,16 @@ class InventarioController extends Controller
             ->paginate($cajasPorPagina, ['*'], 'cajas_page')
             ->appends(request()->except('cajas_page'));
 
+        $cajasArmado = Caja::query()
+            ->with([
+                'servicioClinico',
+                'ficha.items.instrumento',
+            ])
+            ->where('etapa', Caja::ETAPA_PREPARACION)
+            ->orderBy('codigo')
+            ->paginate($cajasPorPagina, ['*'], 'cajas_armado_page')
+            ->appends(request()->except('cajas_armado_page'));
+
         $salas = [
             'lavado' => 'Sala lavado',
             'armado' => 'Sala armado',
@@ -134,6 +144,7 @@ class InventarioController extends Controller
             'libros' => $libros,
             'items' => $filtrados,
             'cajasLavado' => $cajasLavado,
+            'cajasArmado' => $cajasArmado,
             'elementos' => $sala === 'todos'
                 ? []
                 : collect($items)->where('sala', $sala)->values()->all(),

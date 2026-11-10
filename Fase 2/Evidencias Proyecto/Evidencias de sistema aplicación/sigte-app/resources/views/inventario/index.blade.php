@@ -3,7 +3,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/inventario.css') }}?v={{ @filemtime(public_path('css/inventario.css')) }}">
 
-@if ($esAdministradora && $sala === 'lavado')
+@if ($esAdministradora && in_array($sala, ['lavado', 'armado']))
 <link rel="stylesheet" href="{{ asset('css/inventario/pestanas.css') }}?v={{ @filemtime(public_path('css/inventario/pestanas.css')) }}">
 @endif
 
@@ -16,7 +16,7 @@
 @push('scripts')
 <script src="{{ asset('js/inventario.js') }}?v={{ @filemtime(public_path('js/inventario.js')) }}"></script>
 
-@if ($esAdministradora && $sala === 'lavado')
+@if ($esAdministradora && in_array($sala, ['lavado', 'armado']))
 <script src="{{ asset('js/inventario/pestanas.js') }}?v={{ @filemtime(public_path('js/inventario/pestanas.js')) }}" defer></script>
 @endif
 
@@ -145,9 +145,9 @@ $totalElementos = collect($libros)->sum('tipos');
         <div class="inv-vistas-contenedor" id="inv-vistas-contenedor">
 
 
-            @if ($esAdministradora && $sala === 'lavado')
+            @if ($esAdministradora && in_array($sala, ['lavado', 'armado']))
 
-            <div class="inv-pestanas" role="tablist" aria-label="Inventario de Sala Lavado">
+            <div class="inv-pestanas" role="tablist" aria-label="Inventario de Sala {{ ucfirst($sala) }}">
 
                 <button
                     type="button"
@@ -179,7 +179,11 @@ $totalElementos = collect($libros)->sum('tipos');
                 role="tabpanel"
                 aria-labelledby="tab-cajas">
 
+                @if ($sala === 'lavado')
                 @include('inventario.partials.cajas-lavado')
+                @elseif ($sala === 'armado')
+                @include('inventario.partials.cajas-armado')
+                @endif
 
             </div>
 
@@ -200,12 +204,12 @@ $totalElementos = collect($libros)->sum('tipos');
                                     <path d="M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5H5V7A1.5 1.5 0 0 1 6.5 5.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
                                     <path d="M9 9.5h6M9 13h6M9 16.5h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
                                 </svg>
-                                {{ $sala === 'lavado' && $esAdministradora ? 'Insumos de Lavado' : $salas[$sala] }}
+                                {{ $esAdministradora && in_array($sala, ['lavado', 'armado']) ? 'Insumos de ' . ucfirst($sala) : $salas[$sala] }}
                             </h2>
 
-                            @if ($sala === 'lavado' && $esAdministradora)
+                            @if ($esAdministradora && in_array($sala, ['lavado', 'armado']))
                             <p class="main-sub">
-                                Consulta los insumos disponibles para las tareas de lavado y revisa sus niveles de stock y disponibilidad.
+                                Consulta los insumos disponibles para las tareas de {{ $sala }} y revisa sus niveles de stock y disponibilidad.
                             </p>
                             @endif
                         </div>
@@ -214,8 +218,9 @@ $totalElementos = collect($libros)->sum('tipos');
                                 <strong id="inv-total-stock">{{ $resumen['en_almacen'] }}</strong>
                                 unidades
                             </li>
-                            <li class="@if ($esAdministradora && $sala === 'lavado') inv-ocultar-proceso-lavado @endif">
-                                <strong id="inv-total-proceso">{{ $resumen['en_proceso'] }}</strong> en proceso
+                            <li>
+                                <strong id="inv-total-proceso">{{ $resumen['en_proceso'] }}</strong> 
+                                en proceso
                             </li>
                             <li id="inv-alerta-resumen" class="{{ $resumen['bajo_minimo'] > 0 ? 'is-alert' : '' }}">
                                 <strong id="inv-total-bajo">{{ $resumen['bajo_minimo'] }}</strong>
@@ -292,9 +297,7 @@ $totalElementos = collect($libros)->sum('tipos');
                                     <th>Ubicación</th>
                                     <th>Stock</th>
                                     <th>Mínimo</th>
-                                    <th class="@if ($esAdministradora && $sala === 'lavado') inv-ocultar-proceso-lavado @endif">
-                                        En proceso
-                                    </th>
+                                    <th>En proceso</th>
                                     <th>Estado</th>
 
                                     @if ($puedeReponer || ($esOperador && in_array($sala, ['lavado', 'armado'])))
@@ -315,9 +318,7 @@ $totalElementos = collect($libros)->sum('tipos');
                                     <td>{{ $item['ubicacion'] }}</td>
                                     <td>{{ $item['stock'] }}</td>
                                     <td data-minimo-celda>{{ $item['minimo'] }}</td>
-                                    <td class="@if ($esAdministradora && $sala === 'lavado') inv-ocultar-proceso-lavado @endif">
-                                        {{ $item['en_proceso'] }}
-                                    </td>
+                                    <td>{{ $item['en_proceso'] }}</td>
                                     <td>
                                         @if ($item['estado'] === 'ok')
                                         <span class="pill pill-ok">
@@ -472,7 +473,7 @@ $totalElementos = collect($libros)->sum('tipos');
 
                 </section>
 
-                @if ($esAdministradora && $sala === 'lavado')
+                @if ($esAdministradora && in_array($sala, ['lavado', 'armado']))
             </div>
             @endif
 

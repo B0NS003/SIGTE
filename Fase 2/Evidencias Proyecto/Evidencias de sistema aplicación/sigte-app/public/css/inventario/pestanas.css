@@ -1,4 +1,4 @@
-/* PESTAÑAS DEL INVENTARIO DE SALA LAVADO */
+/* PESTAÑAS DEL INVENTARIO DE SALA */
 .inv-pestanas {
     display: flex;
     align-items: center;
@@ -43,7 +43,7 @@
 }
 
 .inv-pestana:focus-visible {
-    outline: 2px solid var(--sala-lavado);
+    outline: 2px solid var(--navy);
     outline-offset: 3px;
 }
 
@@ -57,6 +57,10 @@
 
 .inv-cajas-lavado {
     border-top: 4px solid var(--sala-lavado);
+}
+
+.inv-cajas-armado {
+    border-top: 4px solid var(--sala-armado);
 }
 
 /* COMPOSICIÓN DE LAS CAJAS */
@@ -94,9 +98,4 @@
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-}
-
-/* OCULTAR EN PROCESO SOLO EN INSUMOS DE LAVADO */
-.inv-book.sala-lavado .inv-ocultar-proceso-lavado {
-    display: none !important;
 }
