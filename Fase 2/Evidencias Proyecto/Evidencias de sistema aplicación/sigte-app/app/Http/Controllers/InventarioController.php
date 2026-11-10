@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ResuelveUsuario;
+use App\Models\Caja;
 use App\Models\ElementoInventario;
 use App\Models\Reposicion;
 use App\Models\MovimientoInsumo;
@@ -27,7 +28,7 @@ class InventarioController extends Controller
             ->with('salaFisica')
             ->orderBy('nombre')
             ->get()
-            ->map(fn (ElementoInventario $elemento) => [
+            ->map(fn(ElementoInventario $elemento) => [
                 'sala' => $elemento->codigoSala(),
                 'codigo' => $elemento->codigo,
                 'nombre' => $elemento->nombre,
@@ -39,9 +40,27 @@ class InventarioController extends Controller
             ])
             ->all();
     }
+
     public function inventario(): View
     {
         $items = $this->inventarioItems();
+
+        $cajasPorPagina = (int) request()->query('cajas_per_page', 10);
+
+        if (! in_array($cajasPorPagina, [5, 10, 20, 50], true)) {
+            $cajasPorPagina = 10;
+        }
+
+        $cajasLavado = Caja::query()
+            ->with([
+                'servicioClinico',
+                'ficha.items.instrumento',
+            ])
+            ->where('etapa', Caja::ETAPA_LAVADO)
+            ->orderBy('codigo')
+            ->paginate($cajasPorPagina, ['*'], 'cajas_page')
+            ->appends(request()->except('cajas_page'));
+
         $salas = [
             'lavado' => 'Sala lavado',
             'armado' => 'Sala armado',
@@ -68,13 +87,13 @@ class InventarioController extends Controller
         $itemsSala = $sala === 'todos'
             ? collect()
             : collect($items)
-                ->where('sala', $sala)
-                ->sortBy(fn(array $item) => [
-                    'crítico' => 0,
-                    'bajo' => 1,
-                    'ok' => 2,
-                ][$item['estado']] ?? 9)
-                ->values();
+            ->where('sala', $sala)
+            ->sortBy(fn(array $item) => [
+                'crítico' => 0,
+                'bajo' => 1,
+                'ok' => 2,
+            ][$item['estado']] ?? 9)
+            ->values();
 
         $filtrados = $itemsSala->all();
 
@@ -114,6 +133,7 @@ class InventarioController extends Controller
             'salas' => $salas,
             'libros' => $libros,
             'items' => $filtrados,
+            'cajasLavado' => $cajasLavado,
             'elementos' => $sala === 'todos'
                 ? []
                 : collect($items)->where('sala', $sala)->values()->all(),
@@ -130,11 +150,11 @@ class InventarioController extends Controller
             'reposiciones' => $sala === 'todos'
                 ? collect()
                 : Reposicion::query()
-                    ->with(['elemento', 'autor'])
-                    ->whereHas('elemento.salaFisica', fn ($consulta) => $consulta->where('codigo', $sala))
-                    ->latest()
-                    ->limit(8)
-                    ->get(),
+                ->with(['elemento', 'autor'])
+                ->whereHas('elemento.salaFisica', fn($consulta) => $consulta->where('codigo', $sala))
+                ->latest()
+                ->limit(8)
+                ->get(),
         ]);
     }
 
@@ -155,7 +175,7 @@ class InventarioController extends Controller
         ]);
 
         $elemento = ElementoInventario::query()
-            ->whereHas('salaFisica', fn ($consulta) => $consulta->where('codigo', $datos['sala']))
+            ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $datos['sala']))
             ->where('codigo', $datos['elemento'])
             ->first();
 
@@ -208,13 +228,13 @@ class InventarioController extends Controller
             'Registró reposición',
             'inventario',
             $elemento->codigo,
-            '+'.$datos['cantidad'].' unidades · stock '.$elemento->stock,
+            '+' . $datos['cantidad'] . ' unidades · stock ' . $elemento->stock,
         );
-        $mensaje = 'Reposición registrada. '.$elemento->nombre.' quedó en '.$elemento->stock.' unidades.';
+        $mensaje = 'Reposición registrada. ' . $elemento->nombre . ' quedó en ' . $elemento->stock . ' unidades.';
         if ($teniaAlerta && ! $elemento->tieneAlertaStock()) {
             $mensaje .= ' La alerta de stock quedó desactivada.';
         } elseif ($teniaAlerta) {
-            $mensaje .= ' Sigue bajo el mínimo ('.$elemento->minimo.').';
+            $mensaje .= ' Sigue bajo el mínimo (' . $elemento->minimo . ').';
         }
 
         if ($request->expectsJson()) {
@@ -351,7 +371,7 @@ class InventarioController extends Controller
             ],
         ]);
     }
-    
+
     /* MODAL DEL ROL OPERADOR PARA EL REGISTRO DEL MOVIMIENTO */
     public function registrarMovimiento(Request $request): JsonResponse
     {
@@ -487,21 +507,21 @@ class InventarioController extends Controller
             ->whereHas('salaFisica', fn($consulta) => $consulta->where('codigo', $sala))
             ->where('codigo', $codigo)
             ->firstOrFail();
-            
+
         $reposiciones = Reposicion::query()
             ->with('autor')
             ->where('elemento_inventario_id', $elemento->id)
             ->latest()
             ->limit(5)
             ->get()
-            ->map(fn (Reposicion $reposicion) => [
+            ->map(fn(Reposicion $reposicion) => [
                 'cantidad' => $reposicion->cantidad,
                 'fecha' => $reposicion->created_at
                     ->timezone('America/Santiago')
                     ->format('d/m/Y · H:i'),
                 'autor' => $reposicion->autor?->name ?? 'Sin usuario',
             ]);
-            
+
         return response()->json([
             'elemento' => $elemento->nombre,
             'historial' => $reposiciones,
