@@ -27,12 +27,16 @@ use Illuminate\Support\Facades\DB;
  * catálogo/fichas y ~2 semanas de flujo (~130 cajas).
  *
  * php artisan db:seed
- * php artisan migrate:fresh --seed
+ * IMPORTANTE: run() elimina y recrea el flujo de demostracion.
+ * Para cargar solo litros, usar sembrarSoloProduccion() desde Tinker.
  */
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Validamos y completamos los servicios ANTES de modificar otras tablas.
+        // Los registros historicos usan los IDs originales de servicios.
+        $this->sembrarServiciosProduccion();
         $this->sembrarRoles();
         $this->sembrarCuentasDemo();
         $this->sembrarNomina();
@@ -699,7 +703,124 @@ class DatabaseSeeder extends Seeder
 
     // REPORTES TIMEEEEE
 
-    
+    /**
+     * Permite importar SOLO los datos de produccion desde Tinker sin ejecutar
+     * la simulacion del flujo ni borrar cajas, entregas o auditorias.
+     *
+     * php artisan tinker
+     * app(\Database\Seeders\DatabaseSeeder::class)->sembrarSoloProduccion();
+     */
+    public function sembrarSoloProduccion(): void
+    {
+        $this->sembrarServiciosProduccion();
+        $this->sembrarMaterialesProduccion();
+        $this->sembrarRegistrosProduccion();
+    }
+
+    /**
+     * Asegura que existan los servicios con sus IDs originales.
+     *
+     * Si falta algun ID, requiere servicios_produccion.json exportado desde
+     * la base de datos donde los reportes historicos ya funcionan.
+     * Nunca inventa nombres ni re-asigna IDs de los registros historicos.
+     */
+    private function sembrarServiciosProduccion(): void
+    {
+        $rutaRegistros = database_path('seeders/data/registros_produccion.json');
+        if (! is_file($rutaRegistros)) {
+            throw new \RuntimeException('No existe el archivo: '.$rutaRegistros);
+        }
+
+        $registros = json_decode(file_get_contents($rutaRegistros), true, 512, JSON_THROW_ON_ERROR);
+        $idsRequeridos = collect($registros)
+            ->pluck('servicio_id')
+            ->filter(fn ($id) => $id !== null)
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        $idsExistentes = DB::table('servicios')->whereIn('id', $idsRequeridos)->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+        $faltantes = array_values(array_diff($idsRequeridos, $idsExistentes));
+
+        $rutaServicios = database_path('seeders/data/servicios_produccion.json');
+        if (! is_file($rutaServicios)) {
+            if (count($faltantes) === 0) {
+                return;
+            }
+            throw new \RuntimeException(
+                'Faltan servicios con ID: '.implode(', ', $faltantes).'. '
+                .'Exporta la tabla servicios desde la BD original a '
+                .'database/seeders/data/servicios_produccion.json antes de sembrar produccion.'
+            );
+        }
+
+        $servicios = json_decode(file_get_contents($rutaServicios), true, 512, JSON_THROW_ON_ERROR);
+        if (! is_array($servicios)) {
+            throw new \RuntimeException('servicios_produccion.json no contiene un arreglo JSON valido.');
+        }
+
+        $porId = [];
+        foreach ($servicios as $fila) {
+            if (! is_array($fila) || ! isset($fila['id'], $fila['nombre'])) {
+                throw new \RuntimeException('Cada servicio debe incluir id y nombre.');
+            }
+            $id = (int) $fila['id'];
+            if (isset($porId[$id])) {
+                throw new \RuntimeException('ID de servicio repetido en el JSON: '.$id);
+            }
+            $porId[$id] = $fila;
+        }
+
+        $faltantesArchivo = array_values(array_diff($idsRequeridos, array_keys($porId)));
+        if ($faltantesArchivo !== []) {
+            throw new \RuntimeException(
+                'El catalogo de servicios no incluye los IDs historicos: '.implode(', ', $faltantesArchivo)
+            );
+        }
+
+        // Primero validamos TODO para no insertar servicios a medias.
+        foreach ($idsRequeridos as $id) {
+            $fila = $porId[$id];
+            $actual = DB::table('servicios')->where('id', $id)->first();
+            if ($actual !== null && $actual->nombre !== $fila['nombre']) {
+                throw new \RuntimeException(
+                    'El servicio ID '.$id.' tiene nombre "'.$actual->nombre.'" en esta BD '
+                    .'pero el historico espera "'.$fila['nombre'].'". Revisar IDs antes de importar.'
+                );
+            }
+            if ($actual === null) {
+                // Evita duplicar un servicio con otro ID (IDs desordenados entre PCs).
+                $mismoNombre = DB::table('servicios')
+                    ->where('nombre', $fila['nombre'])
+                    ->where('id', '!=', $id)
+                    ->first();
+                if ($mismoNombre !== null) {
+                    throw new \RuntimeException(
+                        'El servicio "'.$fila['nombre'].'" existe con ID '.$mismoNombre->id
+                        .' y el historico utiliza ID '.$id.'. Hay que reconciliar los IDs.'
+                    );
+                }
+            }
+        }
+
+        foreach ($idsRequeridos as $id) {
+            if (! in_array($id, $faltantes, true)) {
+                continue;
+            }
+            // La fila completa conserva cualquier columna obligatoria de la tabla.
+            DB::table('servicios')->insert($porId[$id]);
+        }
+
+        if ($faltantes !== []) {
+            // Al insertar IDs explicitos, sincronizamos la secuencia PostgreSQL.
+            DB::statement("SELECT setval(pg_get_serial_sequence('servicios', 'id'), (SELECT MAX(id) FROM servicios))");
+        }
+    }
+
     private function sembrarMaterialesProduccion(): void
     {
         $ruta = database_path('seeders/data/materiales_produccion.json');
