@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>SIGTE — Prueba de tipografías</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&family=Lexend:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=Exo+2:ital,wght@0,800;1,800&family=Space+Grotesk:wght@700&family=Outfit:wght@400;500;600;700;800&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&family=DM+Sans:wght@400;500;600;700;800&family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Barlow:ital,wght@0,800;1,800&family=Rubik:ital,wght@0,800;1,800&family=Red+Hat+Display:ital,wght@0,700;0,900;1,900&family=Red+Hat+Text:wght@400;500;700&family=Archivo:ital,wght@0,800;1,800&display=swap">
+<style>
+  :root { --naranja: #e85a1c; --navy: #0b1f4b; --muted: #64748b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 28px; background: #e9edf3; color: #1c1917; font-family: Inter, sans-serif; }
+  h2.seccion { margin: 0 0 6px; font: 700 15px Inter, sans-serif; color: var(--navy); letter-spacing: .02em; text-transform: uppercase; }
+  p.nota { margin: 0 0 14px; color: #475569; font: 500 13px Inter, sans-serif; }
+  .grilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .opcion { border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 8px 24px rgba(11,31,75,.08); }
+  .opcion.recomendada { outline: 3px solid var(--naranja); outline-offset: 2px; }
+  .nombre { padding: 10px 16px; font: 700 13px Inter, sans-serif; background: var(--navy); color: #fff; display: flex; justify-content: space-between; gap: 8px; }
+  .recomendada .nombre { background: var(--naranja); }
+  .nombre small { font-weight: 500; opacity: .85; }
+  .oscuro { padding: 20px 18px; background: #0d1524; color: #e8edf5; }
+  .pill { display: inline-block; padding: 4px 10px; border: 1px solid #c2410c; border-radius: 999px; color: #fdba74; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .marca { margin: 10px 0 4px; font-size: 38px; line-height: 1; color: #fff; }
+  .marca span { color: #f0702f; }
+  .lema { margin: 0; color: #aab6c7; font-size: 15px; line-height: 1.45; }
+  .claro { padding: 18px; background: #f4f6f9; }
+  .claro h1 { margin: 0; font-size: 26px; color: var(--navy); }
+  .sub { margin: 4px 0 14px; color: var(--muted); font-size: 14px; }
+  .tarjeta { padding: 14px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; }
+  .cab { display: flex; justify-content: space-between; gap: 8px; }
+  .cab h3 { margin: 0; font-size: 20px; color: var(--navy); }
+  .meta { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+  .meta b { color: var(--navy); }
+  .tiempo { text-align: right; }
+  .tiempo span { display: block; color: #64748b; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .tiempo strong { color: #c2410c; font-size: 15px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .dato { margin: 12px 0; }
+  .dato span { display: block; color: #94a3b8; font-size: 11px; font-weight: 600; }
+  .dato strong { color: var(--navy); font-size: 14px; }
+  .boton { display: inline-block; padding: 8px 12px; border-radius: 10px; background: var(--navy); color: #fff; font-size: 13px; font-weight: 700; }
+  .digitos { margin: 12px 0 0; color: #334155; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .marca, .cab h3, .claro h1, .tiempo strong { font-family: var(--display); font-weight: var(--peso-titulo, 700); }
+  .marca { font-weight: var(--peso-marca, 800); font-style: var(--estilo-marca, normal); }
+  .boton { font-family: var(--boton, var(--display)); }
+  .sub, .meta, .dato, .digitos, .pill, .lema, .tiempo span { font-family: var(--cuerpo); }
+  .marcas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .marcas .oscuro { border-radius: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; align-items: end; }
+  .marcas .marca { margin: 0; font-size: 42px; }
+  .marcas .leyenda { grid-column: 1 / -1; margin: 10px 0 0; color: #cbd5e1; font: 600 13px Inter, sans-serif; }
+  .marcas .tipo { color: #64748b; font: 500 11px Inter, sans-serif; }
+  .marcas .sin { color: #64748b; font: 500 12px Inter, sans-serif; align-self: center; }
+  .lecturas { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+  .lectura { padding: 16px; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px rgba(11,31,75,.06); }
+  .lectura h4 { margin: 0 0 10px; font: 700 13px Inter, sans-serif; color: var(--navy); }
+  .lectura p { margin: 0 0 6px; color: #334155; font-variant-numeric: tabular-nums; }
+  .lectura .t11 { font-size: 11px; color: #64748b; font-weight: 600; }
+  .lectura .t13 { font-size: 13px; }
+  .lectura .t15 { font-size: 15px; font-weight: 700; color: var(--navy); }
+</style>
+</head>
+<body>
+
+<h2 class="seccion">1 · Combinaciones completas</h2>
+<p class="nota">La marca va recta en todas; en la sección 2 están las versiones en cursiva. La de borde naranjo es mi recomendación.</p>
+<div class="grilla" id="combinaciones"></div>
+
+<h2 class="seccion">2 · La palabra SIGTE: recta y en cursiva</h2>
+<p class="nota">Sora, Space Grotesk y Outfit no tienen cursiva propia, por eso solo aparecen rectas.</p>
+<div class="marcas" id="marcas"></div>
+
+<h2 class="seccion">3 · Texto chico y números (lo que más se lee en el sistema)</h2>
+<p class="nota">Comparación de la letra de texto a 11, 13 y 15 px.</p>
+<div class="lecturas" id="lecturas"></div>
+
+<script>
+  var combinaciones = [
+    { id: 'R', nombre: 'Montserrat + Inter', nota: 'recomendada', display: 'Montserrat', cuerpo: 'Inter', boton: 'Inter', peso: 800, marca: 900, recomendada: true },
+    { id: 'A', nombre: 'Sora + Manrope', nota: 'actual', display: 'Sora', cuerpo: 'Manrope', peso: 700, marca: 700 },
+    { id: 'B', nombre: 'Montserrat + Roboto', display: 'Montserrat', cuerpo: 'Roboto', peso: 700, marca: 800 },
+    { id: 'C', nombre: 'Montserrat + Inter', nota: 'botones en Montserrat', display: 'Montserrat', cuerpo: 'Inter', peso: 700, marca: 800 },
+    { id: 'D', nombre: 'Plus Jakarta Sans', display: "'Plus Jakarta Sans'", cuerpo: "'Plus Jakarta Sans'", peso: 800, marca: 800 },
+    { id: 'E', nombre: 'Lexend + Source Sans 3', display: 'Lexend', cuerpo: "'Source Sans 3'", peso: 700, marca: 700 },
+    { id: 'F', nombre: 'Poppins + Inter', display: 'Poppins', cuerpo: 'Inter', boton: 'Inter', peso: 700, marca: 800 },
+    { id: 'G', nombre: 'Outfit + Inter', display: 'Outfit', cuerpo: 'Inter', boton: 'Inter', peso: 700, marca: 800 },
+    { id: 'H', nombre: 'DM Sans', display: "'DM Sans'", cuerpo: "'DM Sans'", peso: 700, marca: 800 },
+    { id: 'I', nombre: 'Figtree', display: 'Figtree', cuerpo: 'Figtree', peso: 800, marca: 800 },
+    { id: 'J', nombre: 'IBM Plex Sans', nota: 'técnica', display: "'IBM Plex Sans'", cuerpo: "'IBM Plex Sans'", peso: 700, marca: 700 },
+    { id: 'K', nombre: 'Red Hat Display + Text', display: "'Red Hat Display'", cuerpo: "'Red Hat Text'", peso: 700, marca: 900 }
+  ];
+
+  var marcas = [
+    { nombre: 'Sora Bold (actual)', familia: 'Sora', peso: 700, cursiva: false },
+    { nombre: 'Montserrat Black', familia: 'Montserrat', peso: 900, cursiva: true },
+    { nombre: 'Montserrat espaciada', familia: 'Montserrat', peso: 800, cursiva: true, espacio: '.12em' },
+    { nombre: 'Exo 2 (técnica)', familia: "'Exo 2'", peso: 800, cursiva: true },
+    { nombre: 'Plus Jakarta Sans', familia: "'Plus Jakarta Sans'", peso: 800, cursiva: true },
+    { nombre: 'Poppins', familia: 'Poppins', peso: 800, cursiva: true },
+    { nombre: 'Barlow (industrial)', familia: 'Barlow', peso: 800, cursiva: true },
+    { nombre: 'Rubik (redondeada)', familia: 'Rubik', peso: 800, cursiva: true },
+    { nombre: 'Red Hat Display', familia: "'Red Hat Display'", peso: 900, cursiva: true },
+    { nombre: 'Archivo', familia: 'Archivo', peso: 800, cursiva: true },
+    { nombre: 'Space Grotesk', familia: "'Space Grotesk'", peso: 700, cursiva: false },
+    { nombre: 'Outfit', familia: 'Outfit', peso: 800, cursiva: false }
+  ];
+
+  var lecturas = ['Inter', 'Manrope', 'Roboto', "'Source Sans 3'", "'DM Sans'", 'Figtree', "'IBM Plex Sans'", "'Plus Jakarta Sans'", "'Red Hat Text'", 'Poppins'];
+
+  function tarjeta(c) {
+    return '<article class="opcion' + (c.recomendada ? ' recomendada' : '') + '" style="--display:' + c.display + ';--cuerpo:' + c.cuerpo +
+      ';--boton:' + (c.boton || c.display) + ';--peso-titulo:' + c.peso + ';--peso-marca:' + c.marca + '">' +
+      '<div class="nombre">' + c.id + ' · ' + c.nombre + (c.nota ? ' <small>' + c.nota + '</small>' : '') + '</div>' +
+      '<div class="oscuro"><span class="pill">Servicio de esterilización</span><p class="marca">SIG<span>TE</span></p>' +
+      '<p class="lema">Trazabilidad del instrumental, de recepción a entrega.</p></div>' +
+      '<div class="claro"><h1>Flujo de cajas</h1><p class="sub">Revisa en qué etapa va cada caja.</p>' +
+      '<div class="tarjeta"><div class="cab"><div><h3>SET-073</h3><p class="meta">Dental · Sala lavado · <b>Felipe Sagredo L.</b></p></div>' +
+      '<div class="tiempo"><span>Proceso −2 h 20 min</span><strong>Quedan 55 min</strong></div></div>' +
+      '<div class="dato"><span>Actividad</span><strong>Lavadora · Esterilización · Muñoz</strong></div>' +
+      '<span class="boton">Pasar a Preparación</span>' +
+      '<p class="digitos">0123456789 · 12:45 · 179 h 15 min · CAJA-028</p></div></div></article>';
+  }
+
+  function marca(m) {
+    var base = 'font-family:' + m.familia + ';font-weight:' + m.peso + (m.espacio ? ';letter-spacing:' + m.espacio : '');
+    return '<div class="oscuro">' +
+      '<span class="tipo">Recta</span><span class="tipo">Cursiva</span>' +
+      '<p class="marca" style="' + base + '">SIG<span>TE</span></p>' +
+      (m.cursiva
+        ? '<p class="marca" style="' + base + ';font-style:italic">SIG<span>TE</span></p>'
+        : '<span class="sin">No tiene cursiva</span>') +
+      '<p class="leyenda">' + m.nombre + '</p></div>';
+  }
+
+  function lectura(f) {
+    return '<div class="lectura" style="font-family:' + f + '"><h4>' + f.replace(/'/g, '') + '</h4>' +
+      '<p class="t11">EN ESTA ETAPA DESDE · 02/11/2026 · 06:01</p>' +
+      '<p class="t13">Dental · Sala lavado · Inspección visual OK · 179 h 15 min</p>' +
+      '<p class="t15">SET-073 · Quedan 1 h 08 min</p></div>';
+  }
+
+  document.getElementById('combinaciones').innerHTML = combinaciones.map(tarjeta).join('');
+  document.getElementById('marcas').innerHTML = marcas.map(marca).join('');
+  document.getElementById('lecturas').innerHTML = lecturas.map(lectura).join('');
+</script>
+</body>
+</html>

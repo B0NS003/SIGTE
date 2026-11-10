@@ -7,11 +7,11 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #94a3b8;
+  color: var(--texto-4, #94a3b8);
   cursor: pointer;
 }
 
-.btn-ver-clave:hover { color: var(--navy); }
+.btn-ver-clave:hover { color: var(--ink); }
 
 .btn-ver-clave .icono-ojo {
   transform-origin: center;

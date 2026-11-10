@@ -1,9 +1,9 @@
 /* enfermera — mismos patrones visuales que recepción/entrega (sigte + flujo) */
 
-.ct-time { font-size: 0.75rem; font-weight: 700; color: var(--muted); padding-top: 0.1rem; }
-.ct-body strong { display: block; color: var(--ink); font-size: 0.9rem; }
-.ct-body span { display: block; font-size: 0.82rem; color: #334155; }
-.ct-body small { color: var(--muted); font-size: 0.75rem; }
+.ct-time { font-size: var(--fs-xs); font-weight: 700; color: var(--muted); padding-top: 0.1rem; }
+.ct-body strong { display: block; color: var(--ink); font-size: var(--fs-base); }
+.ct-body span { display: block; font-size: var(--fs-sm); color: var(--texto-2, #334155); }
+.ct-body small { color: var(--muted); font-size: var(--fs-xs); }
 
 .turno-banner {
   display: flex;
@@ -13,8 +13,8 @@
   padding: 1rem 1.15rem;
   margin-bottom: 1.1rem;
 }
-.turno-banner strong { display: block; color: var(--ink); font-size: 1.15rem; margin: 0.15rem 0; }
-.turno-banner small { color: var(--muted); font-size: 0.82rem; }
+.turno-banner strong { display: block; color: var(--ink); font-size: var(--fs-xl); margin: 0.15rem 0; }
+.turno-banner small { color: var(--muted); font-size: var(--fs-sm); }
 
 /* Campos compartidos (esta vista no carga flujo.css) */
 .cierre-form .field {
@@ -29,7 +29,7 @@
   border-radius: 14px;
   padding: 0.85rem 1rem;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   line-height: 1.45;
   resize: vertical;
   min-height: 88px;
@@ -41,7 +41,7 @@
 .recv-textarea:focus {
   outline: none;
   background: var(--card);
-  border-color: #fdba74;
+  border-color: var(--naranja-linea, #fdba74);
   box-shadow: 0 0 0 4px rgba(232, 90, 28, .12);
 }
 
@@ -52,7 +52,7 @@
 .recv-textarea.is-invalido,
 .recv-textarea.cierre-nota.is-invalido {
   border-color: #dc2626;
-  background: #fffafa;
+  background: var(--rojo-fondo, #fffafa);
 }
 
 .recv-checks {
@@ -83,7 +83,7 @@
 .recv-help {
   margin: 0;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: var(--fs-base);
   line-height: 1.45;
 }
 
@@ -96,18 +96,18 @@
 }
 
 .cierre-flash-ok {
-  border-color: #bbf7d0;
-  background: #f0fdf4;
+  border-color: var(--verde-linea, #bbf7d0);
+  background: var(--verde-fondo, #f0fdf4);
 }
 
 .cierre-flash-error {
-  border-color: #fecaca;
-  background: #fef2f2;
+  border-color: var(--rojo-linea, #fecaca);
+  background: var(--rojo-fondo, #fef2f2);
 }
 
 .cierre-flash-aviso {
-  border-color: #fed7aa;
-  background: #fff7ed;
+  border-color: var(--naranja-linea, #fed7aa);
+  background: var(--naranja-fondo, #fff7ed);
 }
 
 .cierre-layout {
@@ -142,13 +142,13 @@
 
 .cierre-revision-head h3 {
   margin: 0 0 0.25rem;
-  font-size: 0.98rem;
+  font-size: var(--fs-md);
   color: var(--ink);
 }
 
 .cierre-revision-head p {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: var(--fs-sm);
   color: var(--muted);
   line-height: 1.4;
 }
@@ -175,13 +175,13 @@
 }
 
 .cierre-bloque-head strong {
-  font-size: 0.88rem;
+  font-size: var(--fs-base);
   color: var(--ink);
 }
 
 .cierre-vacio {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: var(--fs-sm);
   color: var(--muted);
 }
 
@@ -213,7 +213,7 @@
 }
 
 .cierre-lista-codigo {
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ink);
@@ -221,8 +221,8 @@
 }
 
 .cierre-lista-texto {
-  font-size: 0.8rem;
-  color: #334155;
+  font-size: var(--fs-sm);
+  color: var(--texto-2, #334155);
   line-height: 1.35;
 }
 
@@ -242,7 +242,7 @@
 
 .cierre-pager-meta {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: var(--fs-sm);
   color: var(--muted);
   font-weight: 600;
 }
@@ -266,7 +266,7 @@
 }
 
 .cierre-pager-btn:hover:not(:disabled) {
-  border-color: #fdba74;
+  border-color: var(--naranja-linea, #fdba74);
 }
 
 .cierre-pager-btn:disabled {
@@ -286,8 +286,8 @@
 }
 
 .cierre-checks.is-invalido .recv-checks .check {
-  border-color: #fecaca;
-  background: #fffafa;
+  border-color: var(--rojo-linea, #fecaca);
+  background: var(--rojo-fondo, #fffafa);
 }
 
 .cierre-acciones {
@@ -330,18 +330,18 @@ html[data-tema="oscuro"] .recv-textarea {
 }
 
 html[data-tema="oscuro"] .recv-textarea:focus {
-  background: var(--card);
+  background: var(--superficie-3);
 }
 
 html[data-tema="oscuro"] .recv-textarea.is-invalido,
 html[data-tema="oscuro"] .cierre-checks.is-invalido .recv-checks .check {
-  background: color-mix(in srgb, var(--card) 85%, #7f1d1d);
-  border-color: #f87171;
+  background: var(--rojo-fondo);
+  border-color: var(--rojo-linea);
 }
 
 html[data-tema="oscuro"] .cierre-lista-texto,
 html[data-tema="oscuro"] .ct-body span {
-  color: #cbd5e1;
+  color: var(--texto-3);
 }
 
 @media (max-width: 960px) {

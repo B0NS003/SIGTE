@@ -46,6 +46,15 @@
         return $partes[0].' '.$apellido1.' '.$inicial.'.';
     };
     $responsableCorto = $nombreCorto($caja['operadora'] ?? null);
+    $hoy = now()->timezone('America/Santiago');
+    $desde = match ($caja['fecha'] ?? '—') {
+        '—' => '—',
+        $hoy->format('d/m/Y') => 'Hoy · '.$caja['hora'],
+        $hoy->copy()->subDay()->format('d/m/Y') => 'Ayer · '.$caja['hora'],
+        default => $caja['fecha'].' · '.$caja['hora'],
+    };
+    $pasoActual = ($pasos_etapa ?? [])[$claves[$caja['fase_idx']] ?? ''] ?? [];
+    $hayQueAnotar = $destinoNombre !== '' && (! empty($pasoActual['opciones']) || ! empty($pasoActual['tiempos']));
 @endphp
 
 <article
@@ -89,13 +98,21 @@
                     <span class="track-meta-sep" aria-hidden="true">·</span>
                     <span class="track-meta-sala">{{ $salaLabel[$sala] }}</span>
                 @endif
-                @if ($espera !== '')
-                    <span class="track-meta-sep" aria-hidden="true">·</span>
-                    <span class="track-meta-tiempo">{{ $espera }}</span>
-                @endif
                 <span class="track-meta-sep" aria-hidden="true">·</span>
                 <span class="track-meta-persona" title="{{ $caja['operadora'] }}">{{ $responsableCorto }}</span>
             </p>
+        </div>
+        <div
+            class="proceso{{ ! empty($caja['proceso_listo']) ? ' is-listo' : '' }}{{ $caja['proceso_hasta'] ? '' : ' is-sin-proceso' }}"
+            data-desde="{{ $caja['proceso_desde'] }}"
+            data-hasta="{{ $caja['proceso_hasta'] }}"
+            data-etapa-desde="{{ $caja['etapa_iso'] }}"
+            data-etapa-nombre="{{ $etapaActual }}"
+            @unless ($caja['proceso_hasta'] || $caja['etapa_iso']) hidden @endunless
+        >
+            <span class="proceso-etiqueta">{{ ! empty($caja['proceso_listo']) ? 'Listo, esperando' : ($caja['proceso_hasta'] ? 'Proceso' : 'En '.$etapaActual) }}</span>
+            <strong class="proceso-texto">{{ $caja['proceso_hasta'] ? '' : '+'.$espera }}</strong>
+            <span class="proceso-pista" aria-hidden="true"><span class="proceso-barra"></span></span>
         </div>
     </header>
 
@@ -156,16 +173,6 @@
         @endforeach
     </div>
 
-    <div
-        class="proceso{{ ! empty($caja['proceso_listo']) ? ' is-listo' : '' }}"
-        data-desde="{{ $caja['proceso_desde'] }}"
-        data-hasta="{{ $caja['proceso_hasta'] }}"
-        @unless ($caja['proceso_hasta']) hidden @endunless
-    >
-        <div class="proceso-pista" aria-hidden="true"><span class="proceso-barra"></span></div>
-        <p class="proceso-texto">{{ ! empty($caja['proceso_listo']) ? 'Listo para pasar' : 'En curso' }}</p>
-    </div>
-
     <div class="track-foot-bar">
         <details class="track-more">
             <summary>
@@ -204,8 +211,8 @@
                         </svg>
                     </span>
                     <span class="track-dato-texto">
-                        <span class="track-dato-label">Desde</span>
-                        <strong>{{ $caja['hora'] }}</strong>
+                        <span class="track-dato-label">En esta etapa desde</span>
+                        <strong>{{ $desde }}</strong>
                     </span>
                 </li>
             </ul>
@@ -220,9 +227,17 @@
                         Corregir
                     </button>
                 @endif
+                @if ($hayQueAnotar)
+                    <button class="btn btn-ghost btn-anotar" type="button" data-abrir="etapa" data-modo="anotar" data-caja="{{ $caja['id'] }}">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Anotar
+                    </button>
+                @endif
                 @if ($destinoNombre !== '')
-                    <button class="btn btn-dark" type="button" data-abrir="etapa" data-caja="{{ $caja['id'] }}">
-                        Pasar de etapa
+                    <button class="btn btn-dark btn-pasar" type="button" data-abrir="etapa" data-modo="pasar" data-caja="{{ $caja['id'] }}">
+                        Pasar a {{ $destinoNombre }}
                         <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>

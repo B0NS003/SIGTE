@@ -192,8 +192,8 @@
 
 /* BOTÓN DESHABILITADO */
 #inv-movimiento-guardar:disabled {
-    background: #d5d5d5;
-    color: #555555;
+    background: var(--linea-fuerte, #d5d5d5);
+    color: var(--texto-3, #555555);
     opacity: 1;
     cursor: not-allowed;
 }

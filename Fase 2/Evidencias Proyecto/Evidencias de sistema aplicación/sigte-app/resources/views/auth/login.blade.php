@@ -10,7 +10,8 @@
 <div class="auth">
     <section class="auth-form">
         <header class="auth-header">
-            <img class="auth-logo-top" src="{{ asset('images/logo-hospital.png') }}" alt="Hospital San José Melipilla">
+            <img class="auth-logo-top auth-logo-claro" src="{{ asset('images/logo-hospital.png') }}" alt="Hospital San José Melipilla">
+            <img class="auth-logo-top auth-logo-oscuro" src="{{ asset('images/logo-hospital-oscuro.png') }}" alt="Hospital San José Melipilla">
             <p class="auth-pill-inline">Servicio de esterilización</p>
             <p class="auth-product">SIG<span>TE</span></p>
             <p class="auth-tagline">Trazabilidad del instrumental, de recepción a entrega.</p>

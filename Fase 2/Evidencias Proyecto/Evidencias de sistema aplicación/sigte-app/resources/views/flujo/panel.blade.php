@@ -142,7 +142,7 @@
                 @endforeach
             </div>
 
-            @if ($hay_filtros)
+            @if ($busqueda !== '')
                 <p class="ops-result-meta">
                     {{ $total_consulta }} {{ $total_consulta === 1 ? 'caja encontrada' : 'cajas encontradas' }}
                     @if ($busqueda !== '')

@@ -34,7 +34,7 @@
 
 .inv-atencion li.inv-prioridad:hover {
     background: var(--card-2);
-    border-color: #cbd5e1;
+    border-color: var(--linea-fuerte, #cbd5e1);
     box-shadow: 0 4px 12px rgba(11, 31, 75, 0.05);
 }
 
@@ -57,7 +57,7 @@
     display: block;
     margin: 0;
     color: var(--ink);
-    font-size: 1rem;
+    font-size: var(--fs-lg);
     font-weight: 700;
     line-height: 1.4;
 }
@@ -65,7 +65,7 @@
 .inv-atencion .inv-prioridad-detalle {
     display: block;
     color: var(--muted);
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     line-height: 1.5;
 }
 
@@ -89,7 +89,7 @@
     border-radius: 8px;
     background: var(--navy);
     color: #ffffff;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
@@ -103,7 +103,7 @@
 }
 
 .inv-prioridad-reponer:focus-visible {
-    outline: 3px solid #93c5fd;
+    outline: 3px solid var(--azul-linea, #93c5fd);
     outline-offset: 3px;
 }
 
@@ -119,11 +119,11 @@
     }
 
     .inv-atencion .inv-prioridad-nombre {
-        font-size: 0.9rem;
+        font-size: var(--fs-base);
     }
 
     .inv-atencion .inv-prioridad-detalle {
-        font-size: 0.75rem;
+        font-size: var(--fs-xs);
         overflow-wrap: anywhere;
     }
 
@@ -135,6 +135,6 @@
 
     .inv-prioridad-reponer {
         padding: 8px 10px;
-        font-size: 0.75rem;
+        font-size: var(--fs-xs);
     }
 }

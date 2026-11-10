@@ -57,7 +57,7 @@
     border-radius: 8px;
     background: var(--navy);
     color: #ffffff;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
@@ -72,7 +72,7 @@
 }
 
 .inv-volver-inventario:focus-visible {
-    outline: 3px solid #93c5fd;
+    outline: 3px solid var(--azul-linea, #93c5fd);
     outline-offset: 3px;
 }
 
@@ -91,7 +91,7 @@
 .inv-minimo-vista #minimo-nombre {
     margin: 0;
     color: var(--ink);
-    font-size: 1.2rem;
+    font-size: var(--fs-2xl);
     font-weight: 700;
     line-height: 1.4;
 }
@@ -115,13 +115,13 @@
 
 .inv-minimo-vista .inv-registro-stock span {
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     font-weight: 500;
 }
 
 .inv-minimo-vista .inv-registro-stock strong {
     color: var(--ink);
-    font-size: 1.4rem;
+    font-size: var(--fs-3xl);
     font-weight: 700;
 }
 
@@ -134,8 +134,8 @@
 /* MENSAJE DE ERROR */
 .inv-minimo-vista #minimo-error {
     margin-top: 0.4rem;
-    color: #dc2626;
-    font-size: 0.875rem;
+    color: var(--rojo-texto, #dc2626);
+    font-size: var(--fs-base);
     font-weight: 500;
 }
 
@@ -158,12 +158,12 @@
 
 /* MENSAJE DE ERROR AL CONFIGURAR EL MÍNIMO */
 .inv-minimo-vista #inv-toast-minimo.inv-toast-minimo--error {
-    border-color: #fecaca;
-    background: #fef2f2;
-    color: #b91c1c;
+    border-color: var(--rojo-linea, #fecaca);
+    background: var(--rojo-fondo, #fef2f2);
+    color: var(--rojo-texto, #b91c1c);
 }
 
 /* ICONO DEL MENSAJE DE ERROR */
 .inv-minimo-vista #inv-toast-minimo.inv-toast-minimo--error .sigte-icon {
-    color: #dc2626;
+    color: var(--rojo-texto, #dc2626);
 }

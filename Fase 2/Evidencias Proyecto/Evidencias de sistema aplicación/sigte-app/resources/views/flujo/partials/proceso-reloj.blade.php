@@ -4,27 +4,58 @@
             (function () {
                 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-                function pad(n) {
-                    return n < 10 ? '0' + n : String(n);
+                function duracion(minutos) {
+                    if (minutos < 60) {
+                        return minutos + ' min';
+                    }
+                    var resto = minutos % 60;
+                    return Math.floor(minutos / 60) + ' h' + (resto ? ' ' + resto + ' min' : '');
                 }
 
-                function texto(ms) {
-                    if (ms <= 0) {
-                        return 'Listo para pasar';
+                function pintarEtapa(bloque, ahora) {
+                    var llegada = Date.parse(bloque.dataset.etapaDesde || '');
+                    bloque.classList.remove('is-listo');
+                    bloque.classList.add('is-sin-proceso');
+                    bloque.hidden = !llegada;
+                    if (!llegada) {
+                        return;
                     }
-                    var total = Math.ceil(ms / 1000);
-                    var min = Math.floor(total / 60);
-                    var seg = total % 60;
-                    return 'Quedan ' + min + ':' + pad(seg);
+                    var minutos = Math.max(Math.floor((ahora - llegada) / 60000), 0);
+                    bloque.querySelector('.proceso-etiqueta').textContent = 'En ' + bloque.dataset.etapaNombre;
+                    bloque.querySelector('.proceso-texto').textContent = minutos < 1 ? 'Recién llegada' : '+' + duracion(minutos);
+                    bloque.title = 'Tiempo desde que llegó a ' + bloque.dataset.etapaNombre;
+                }
+
+                function cuentaRegresiva(ms) {
+                    return 'Quedan ' + duracion(Math.ceil(ms / 60000));
+                }
+
+                function pintarTextos(bloque, total, hasta, ahora) {
+                    var anotado = Math.round(total / 60000);
+                    var etiqueta = bloque.querySelector('.proceso-etiqueta');
+                    var valor = bloque.querySelector('.proceso-texto');
+                    if (ahora < hasta) {
+                        etiqueta.textContent = 'Proceso −' + duracion(anotado);
+                        valor.textContent = cuentaRegresiva(hasta - ahora);
+                        bloque.title = duracion(anotado) + ' anotados; se van descontando';
+                        return;
+                    }
+                    var espera = Math.floor((ahora - hasta) / 60000);
+                    etiqueta.textContent = 'Listo, esperando';
+                    valor.textContent = espera < 1 ? 'Recién' : '+' + duracion(espera);
+                    bloque.title = 'Tiempo desde que terminó el proceso de ' + duracion(anotado);
                 }
 
                 function pintar(bloque, animar) {
                     var desde = Date.parse(bloque.dataset.desde || '');
                     var hasta = Date.parse(bloque.dataset.hasta || '');
+                    var ahora = Date.now();
                     if (!desde || !hasta) {
+                        pintarEtapa(bloque, ahora);
                         return;
                     }
-                    var ahora = Date.now();
+                    bloque.hidden = false;
+                    bloque.classList.remove('is-sin-proceso');
                     var total = Math.max(hasta - desde, 1);
                     var queda = Math.max(hasta - ahora, 0);
                     var pct = queda === 0 ? 100 : Math.min(100, Math.max(0, ((total - queda) / total) * 100));
@@ -32,7 +63,7 @@
                     var card = bloque.closest('.track-card');
                     var aviso = card ? card.querySelector('[data-proceso-listo]') : null;
                     bloque.classList.toggle('is-listo', queda === 0);
-                    bloque.querySelector('.proceso-texto').textContent = texto(queda);
+                    pintarTextos(bloque, total, hasta, ahora);
 
                     if (barra) {
                         if (animar && !reduce && typeof anime === 'function') {
@@ -73,9 +104,7 @@
                             anime.remove(nodo);
                             anime({
                                 targets: nodo,
-                                boxShadow: card.classList.contains('is-urgent')
-                                    ? ['0 0 0 3px rgba(185,28,28,.28)', '0 0 0 6px rgba(185,28,28,0)']
-                                    : ['0 0 0 3px rgba(22,163,74,.28)', '0 0 0 6px rgba(22,163,74,0)'],
+                                boxShadow: ['0 0 0 3px rgba(22,163,74,.28)', '0 0 0 6px rgba(22,163,74,0)'],
                                 loop: true,
                                 duration: 1100,
                                 easing: 'easeOutCubic'
@@ -95,7 +124,6 @@
                     }
                     bloque.dataset.desde = desde || '';
                     bloque.dataset.hasta = hasta || '';
-                    bloque.hidden = !hasta;
                     card.classList.remove('is-proceso-listo');
                     delete card.dataset.listoAnim;
                     var nodo = card.querySelector('.track-step.current .track-node');
@@ -122,9 +150,6 @@
 
                 function tick(animar) {
                     document.querySelectorAll('.proceso').forEach(function (bloque) {
-                        if (!bloque.dataset.hasta) {
-                            return;
-                        }
                         pintar(bloque, animar);
                     });
                 }
@@ -132,12 +157,7 @@
                 window.sigteProceso = { marcar: marcar };
                 tick(true);
                 window.setInterval(function () {
-                    document.querySelectorAll('.proceso').forEach(function (bloque) {
-                        if (!bloque.dataset.hasta) {
-                            return;
-                        }
-                        pintar(bloque, false);
-                    });
+                    tick(false);
                 }, 1000);
             })();
         </script>
