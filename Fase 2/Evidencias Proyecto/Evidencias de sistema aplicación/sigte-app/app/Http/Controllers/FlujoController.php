@@ -32,17 +32,6 @@ class FlujoController extends Controller
     use ConsultaDeCajas;
     use ResuelveUsuario;
 
-    private const SERVICIOS_ENTREGA = [
-        'Pabellon',
-        'Dental',
-        'Urgencia',
-        'Maternidad',
-        'UCI',
-        'Curaciones',
-        'General',
-        'Otro servicio',
-    ];
-
     /**
      * Lo que la jefatura puede ver con la etapa actual. No hay historial de pasos.
      *
@@ -769,7 +758,7 @@ class FlujoController extends Controller
             'usuario' => $this->usuarioSesion(),
             'listas' => $listas,
             'caja' => $caja,
-            'servicios' => self::SERVICIOS_ENTREGA,
+            'servicios' => Servicio::query()->orderBy('nombre')->pluck('nombre')->all(),
             'materiales' => [
                 'Paquete de ropa',
                 'Material de curación',
@@ -784,7 +773,7 @@ class FlujoController extends Controller
         $validador = \Illuminate\Support\Facades\Validator::make(
             $request->all(),
             [
-                'servicio' => ['required', 'string', \Illuminate\Validation\Rule::in(self::SERVICIOS_ENTREGA)],
+                'servicio' => ['required', 'string', \Illuminate\Validation\Rule::exists('servicios', 'nombre')],
                 'retira' => ['required', 'string', 'max:150'],
                 'cajas' => ['nullable', 'array'],
                 'cajas.*' => ['required', 'string', 'distinct'],
@@ -794,7 +783,7 @@ class FlujoController extends Controller
             ],
             [
                 'servicio.required' => 'Debes seleccionar el servicio que recibe la entrega.',
-                'servicio.in' => 'El servicio seleccionado no es válido.',
+                'servicio.exists' => 'El servicio seleccionado no está registrado.',
                 'retira.required' => 'Debes indicar quién recibe la entrega.',
                 'cajas.array' => 'La selección de cajas no es válida.',
                 'cajas.*.distinct' => 'No puedes seleccionar una misma caja más de una vez.',
@@ -852,55 +841,66 @@ class FlujoController extends Controller
 
         $marca = $this->marca();
         $ahora = now();
-        $entrega = DB::transaction(function () use ($datos, $material, $marca, $ahora, $cajas) {
-            $entrega = Entrega::query()->create([
-                'codigo' => Entrega::siguienteCodigo($ahora->copy()->timezone('America/Santiago')),
-                'servicio' => $datos['servicio'],
-                'recibe' => $datos['retira'],
-                'recibe_rol' => 'Personal del servicio',
-                'material' => $material,
-                'observacion' => $datos['obs'] ?? null,
-                'user_id' => $marca['user_id'],
-                'entregado_at' => $ahora,
-            ]);
 
-            foreach ($cajas as $caja) {
-                $caja->fill([
+        // Registrar la entrega y sus cajas de forma atómica.
+        // Si alguna operación falla, no quedan entregas sin cajas asociadas.
+        try {
+            $entrega = DB::transaction(function () use ($marca, $ahora, $datos, $material, $cajas) {
+                $entrega = Entrega::query()->create([
+                    'codigo' => Entrega::siguienteCodigo($ahora->copy()->timezone('America/Santiago')),
+                    'servicio' => $datos['servicio'],
+                    'recibe' => $datos['retira'],
+                    'recibe_rol' => 'Personal del servicio',
+                    'material' => $material,
+                    'observacion' => $datos['obs'] ?? null,
+                    'user_id' => $marca['user_id'],
                     'entregado_at' => $ahora,
-                    'estado' => 'Entregada a '.$datos['servicio'],
-                    'ubicacion' => 'Ventanilla de entrega',
-                    'responsable_id' => $marca['user_id'],
-                    'personal_id' => $marca['personal_id'] ?? null,
-                ])->save();
-
-                EntregaCaja::query()->create([
-                    'entrega_id' => $entrega->id,
-                    'caja_id' => $caja->id,
-                    'codigo' => $caja->codigo,
-                    'nombre' => str_starts_with(mb_strtoupper($caja->codigo), 'SET-')
-                        ? 'Set · '.$caja->servicio
-                        : 'Caja · '.$caja->servicio,
                 ]);
 
-                Auditoria::registrar(
-                    'Registró entrega',
-                    'entrega',
-                    $caja->codigo,
-                    'Retira '.$datos['retira'].' · '.$datos['servicio'].' · '.$entrega->codigo,
-                );
-            }
+                foreach ($cajas as $caja) {
+                    $caja->fill([
+                        'entregado_at' => $ahora,
+                        'estado' => 'Entregada a '.$datos['servicio'],
+                        'ubicacion' => 'Ventanilla de entrega',
+                        'responsable_id' => $marca['user_id'],
+                        'personal_id' => $marca['personal_id'] ?? null,
+                        'entrega_id' => $entrega->id,
+                    ])->save();
 
-            if ($cajas->isEmpty() && $material !== null) {
-                Auditoria::registrar(
-                    'Registró entrega',
-                    'entrega',
-                    $entrega->codigo,
-                    'Material · '.$material.' · Retira '.$datos['retira'].' · '.$datos['servicio'],
-                );
-            }
+                    EntregaCaja::query()->create([
+                        'entrega_id' => $entrega->id,
+                        'caja_id' => $caja->id,
+                        'codigo' => $caja->codigo,
+                        'nombre' => str_starts_with(mb_strtoupper($caja->codigo), 'SET-')
+                            ? 'Set · '.$caja->servicio
+                            : 'Caja · '.$caja->servicio,
+                    ]);
 
-            return $entrega;
-        });
+                    Auditoria::registrar(
+                        'Registró entrega',
+                        'entrega',
+                        $caja->codigo,
+                        'Retira '.$datos['retira'].' · '.$datos['servicio'].' · '.$entrega->codigo,
+                    );
+                }
+
+                if ($cajas->isEmpty() && $material !== null) {
+                    Auditoria::registrar(
+                        'Registró entrega',
+                        'entrega',
+                        $entrega->codigo,
+                        'Material · '.$material.' · Retira '.$datos['retira'].' · '.$datos['servicio'],
+                    );
+                }
+
+                return $entrega;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withInput()->withErrors([
+                'entrega' => 'No se pudo registrar la entrega. Comprueba los datos e inténtalo nuevamente.',
+            ]);
+        }
 
         return back()->with(
             'ok',
