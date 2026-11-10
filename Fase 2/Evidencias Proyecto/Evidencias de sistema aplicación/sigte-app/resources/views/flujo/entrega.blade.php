@@ -16,7 +16,17 @@
             </div>
         </div>
         @include('partials.menu-rol')
-        @include('partials.sidebar-foot')
+
+        <div class="sidebar-foot">
+            <div class="side-user">
+                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
+                <div>
+                    <strong>{{ $usuario['nombre'] }}</strong>
+                    <small>{{ $usuario['rol'] }}</small>
+                </div>
+            </div>
+            @include('partials.logout')
+        </div>
     </aside>
 
     <main class="main">
@@ -77,12 +87,9 @@
                         <select id="material" name="material" onchange="document.getElementById('otro-wrap').hidden = this.value !== 'otro'">
                             <option value="">Sin material extra</option>
                             @foreach ($materiales as $material)
-                            <option value="{{ $material }}"
-                                @selected(old('material')===$material)>
-                                {{ $material }}
-                            </option>
+                            <option value="{{ $material }}" @selected(old('material') === $material)>{{ $material }}</option>
                             @endforeach
-                            <option value="otro" @selected(old('material')==='otro' )>Otro</option>
+                            <option value="otro" @selected(old('material') === 'otro')>Otro</option>
                         </select>
                     </label>
 
@@ -100,7 +107,6 @@
                     @error('otro')
                     <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
-
                 </section>
 
                 <section>
@@ -126,19 +132,54 @@
                         </div>
                     </div>
 
-                    <label class="field-label" for="servicio">Servicio que lo recibe <span class="entrega-obligatorio" aria-label="Obligatorio">*</span></label>
-                    <label class="field field-select @error('servicio') entrega-campo-invalido @enderror">
-                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4.5 19.5v-9.2L12 4.8l7.5 5.5v9.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
-                            <path d="M9.5 19.5v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
-                        </svg>
-                        <select id="servicio" name="servicio">
-                            <option value="">Elige el servicio</option>
-                            @foreach ($servicios as $s)
-                            <option value="{{ $s }}" @selected(old('servicio', $caja['servicio'] ?? '') === $s)>{{ $s }}</option>
-                            @endforeach
-                        </select>
+                    <label class="field-label" id="entrega-servicio-etiqueta">
+                        Servicio que lo recibe
+                        <span class="entrega-obligatorio" aria-label="Obligatorio">*</span>
                     </label>
+
+                    <div class="entrega-servicio-control">
+                        {{-- Un único control visible: se evita duplicar el select del navegador y el menú personalizado. --}}
+                        <input type="hidden" id="servicio" name="servicio"
+                               value="{{ old('servicio', $caja['servicio'] ?? '') }}">
+
+                        <button type="button"
+                                id="entrega-servicio-toggle"
+                                class="entrega-servicio-toggle @error('servicio') entrega-campo-invalido @enderror"
+                                aria-labelledby="entrega-servicio-etiqueta entrega-servicio-valor"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                                aria-controls="entrega-servicio-lista"
+                                aria-required="true">
+                            <svg class="sigte-icon entrega-servicio-casa" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4.5 19.5v-9.2L12 4.8l7.5 5.5v9.2"
+                                      fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                                <path d="M9.5 19.5v-5h5v5"
+                                      fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                            </svg>
+                            <span id="entrega-servicio-valor">Elige el servicio</span>
+                            <svg class="entrega-servicio-flecha" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" fill="none"
+                                      stroke="currentColor" stroke-width="1.8"
+                                      stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+
+                        <div id="entrega-servicio-lista" class="entrega-servicio-lista" hidden>
+                            <input id="entrega-servicio-buscar" type="search"
+                                   placeholder="Buscar servicio..." aria-label="Buscar servicio"
+                                   autocomplete="off">
+                            <div class="entrega-servicio-opciones" role="listbox" aria-label="Servicios disponibles">
+                                @foreach ($servicios as $s)
+                                    <button type="button" role="option"
+                                            class="entrega-servicio-opcion"
+                                            data-value="{{ $s }}" aria-selected="false">{{ $s }}</button>
+                                @endforeach
+                            </div>
+                            <p id="entrega-servicio-vacio" hidden>No se encontraron servicios.</p>
+                        </div>
+                        <p id="entrega-servicio-error-js" class="entrega-error-campo"
+                           role="alert" hidden>Selecciona el servicio que recibe el material.</p>
+                    </div>
 
                     @error('servicio')
                     <p class="entrega-error-campo" role="alert">{{ $message }}</p>
@@ -158,7 +199,6 @@
                     @error('retira')
                     <p class="entrega-error-campo" role="alert">{{ $message }}</p>
                     @enderror
-
                 </section>
             </div>
 
@@ -201,5 +241,110 @@
         </form>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const campo = document.getElementById('servicio');
+    const toggle = document.getElementById('entrega-servicio-toggle');
+    const lista = document.getElementById('entrega-servicio-lista');
+    const buscador = document.getElementById('entrega-servicio-buscar');
+    const valor = document.getElementById('entrega-servicio-valor');
+    const vacio = document.getElementById('entrega-servicio-vacio');
+    const error = document.getElementById('entrega-servicio-error-js');
+    if (!campo || !toggle || !lista || !buscador || !valor || !vacio || !error) return;
+
+    const opciones = Array.from(lista.querySelectorAll('.entrega-servicio-opcion'));
+    const normalizar = texto => texto.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLocaleLowerCase('es').trim();
+
+    function sincronizar() {
+        const seleccionada = opciones.find(op => op.dataset.value === campo.value);
+        valor.textContent = seleccionada ? seleccionada.textContent.trim() : 'Elige el servicio';
+        toggle.classList.toggle('sin-seleccion', !seleccionada);
+        opciones.forEach(op => op.setAttribute('aria-selected', String(op === seleccionada)));
+        if (seleccionada) {
+            error.hidden = true;
+            toggle.classList.remove('entrega-campo-invalido');
+            toggle.removeAttribute('aria-invalid');
+        }
+    }
+
+    function filtrar() {
+        const texto = normalizar(buscador.value);
+        let disponibles = 0;
+        opciones.forEach(op => {
+            op.hidden = !normalizar(op.textContent).includes(texto);
+            if (!op.hidden) disponibles++;
+        });
+        vacio.hidden = disponibles > 0;
+    }
+
+    function cerrar() {
+        lista.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function abrir() {
+        lista.hidden = false;
+        toggle.setAttribute('aria-expanded', 'true');
+        buscador.value = '';
+        filtrar();
+        buscador.focus();
+    }
+
+    toggle.addEventListener('click', function () {
+        lista.hidden ? abrir() : cerrar();
+    });
+    buscador.addEventListener('input', filtrar);
+
+    opciones.forEach(op => {
+        op.addEventListener('click', function () {
+            campo.value = op.dataset.value;
+            campo.dispatchEvent(new Event('change', { bubbles: true }));
+            sincronizar();
+            cerrar();
+            toggle.focus();
+        });
+        op.addEventListener('keydown', function (evento) {
+            if (evento.key !== 'ArrowDown' && evento.key !== 'ArrowUp') return;
+            evento.preventDefault();
+            const visibles = opciones.filter(x => !x.hidden);
+            const indice = visibles.indexOf(op);
+            visibles[(indice + (evento.key === 'ArrowDown' ? 1 : -1) + visibles.length) % visibles.length]?.focus();
+        });
+    });
+
+    buscador.addEventListener('keydown', function (evento) {
+        if (evento.key === 'ArrowDown' || evento.key === 'Enter') {
+            const primera = opciones.find(x => !x.hidden);
+            if (primera) {
+                evento.preventDefault();
+                primera.focus();
+            }
+        }
+    });
+
+    document.addEventListener('click', function (evento) {
+        if (!toggle.contains(evento.target) && !lista.contains(evento.target)) cerrar();
+    });
+
+    document.addEventListener('keydown', function (evento) {
+        if (evento.key === 'Escape' && !lista.hidden) {
+            cerrar();
+            toggle.focus();
+        }
+    });
+
+    campo.closest('form')?.addEventListener('submit', function (evento) {
+        if (campo.value) return;
+        evento.preventDefault();
+        error.hidden = false;
+        toggle.classList.add('entrega-campo-invalido');
+        toggle.setAttribute('aria-invalid', 'true');
+        toggle.focus();
+    });
+
+    sincronizar();
+});
+</script>
 
 @endsection
