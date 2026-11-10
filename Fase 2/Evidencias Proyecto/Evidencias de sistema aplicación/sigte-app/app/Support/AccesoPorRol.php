@@ -266,14 +266,6 @@ class AccesoPorRol
             ],
             [
                 'grupo' => 'Gestión',
-                'ruta' => 'mockups.reportes',
-                'texto' => 'Reportes',
-                'icono' => 'reportes',
-                'params' => [],
-                'roles' => [Rol::ADMINISTRADORA],
-            ],
-            [
-                'grupo' => 'Gestión',
                 'ruta' => 'mockups.historial_entregas',
                 'texto' => 'Historial de entregas',
                 'icono' => 'historial',

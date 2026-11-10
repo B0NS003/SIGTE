@@ -1,42 +1,10 @@
-@extends('layouts.app')
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) }}">
-<link rel="stylesheet" href="{{ asset('css/reportes.css') }}?v={{ @filemtime(public_path('css/reportes.css')) }}">
-@endpush
-@section('title', 'SIGTE — Generación de reportes')
-@section('content')
-<div class="shell">
-    <aside class="sidebar">
-        <div class="logo-wrap">
-            <img src="{{ asset('images/logo-hospital-circular.png') }}" alt="Logo hospital">
-            <div><div class="logo">SIG<span>TE</span></div><div class="logo-sub">Administración</div></div>
-        </div>
-        @include('partials.menu-rol')
-        <div class="sidebar-foot">
-            <div class="side-user">
-                <div class="avatar">{{ strtoupper(substr($usuario['nombre'], 0, 1)) }}</div>
-                <div><strong>{{ $usuario['nombre'] }}</strong><small>{{ $usuario['rol'] }}</small></div>
-            </div>
-            @include('partials.logout')
-        </div>
-    </aside>
-    <main class="main reportes-pagina">
-        <div class="main-top">
-            <div>
-                <p class="eyebrow">Hospital San José de Melipilla</p>
-                <h1>Generación de reportes</h1>
-                <p class="main-sub">Consulta la producción, trazabilidad y entregas de la central.</p>
-            </div>
-            <div class="main-actions"><a class="btn btn-ghost" href="{{ route('mockups.panel', 'administradora') }}">Volver al resumen</a></div>
-        </div>
-
         <nav class="reportes-tabs" aria-label="Tipos de reportes" role="tablist">
             <button class="reportes-tab activo" type="button" role="tab" id="tab-produccion" aria-selected="true" aria-controls="panel-produccion" data-tab="produccion">Producción</button>
             <button class="reportes-tab" type="button" role="tab" id="tab-trazabilidad" aria-selected="false" aria-controls="panel-trazabilidad" data-tab="trazabilidad">Trazabilidad</button>
             <button class="reportes-tab" type="button" role="tab" id="tab-entregas" aria-selected="false" aria-controls="panel-entregas" data-tab="entregas">Entregas</button>
         </nav>
 
-        <form class="panel reportes-filtros" method="GET" action="{{ route('mockups.reportes') }}">
+        <form class="panel reportes-filtros" method="GET" action="{{ route('mockups.panel', 'administradora') }}">
             <div class="reportes-section-head"><div><h2>Filtros del reporte</h2><p>Selecciona el período para consultar los registros disponibles.</p></div></div>
             <div class="reportes-campos reportes-campos-produccion">
                 <label class="reportes-campo">Desde<input type="date" name="desde" value="{{ $filtros['desde'] }}" required></label>
@@ -398,8 +366,7 @@
                 <div class="reportes-exportar"><button class="btn" type="button" disabled title="Se habilitará al implementar la exportación XLSX">Exportar Excel</button><button class="btn" type="button" disabled title="Se habilitará al implementar la exportación PDF">Exportar PDF</button></div>
             </footer>
         @endif
-    </main>
-</div>
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.reportes-tab');
@@ -429,4 +396,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-@endsection
+@endpush

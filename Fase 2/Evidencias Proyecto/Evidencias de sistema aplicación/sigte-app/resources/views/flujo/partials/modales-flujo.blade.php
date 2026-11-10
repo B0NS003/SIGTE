@@ -382,15 +382,34 @@
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'X-CSRF-TOKEN': token
+                            'X-CSRF-TOKEN': token,
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
+                        credentials: 'same-origin',
                         body: JSON.stringify(datos)
                     }).then(function (respuesta) {
                         return respuesta.json().then(function (cuerpo) {
                             if (!respuesta.ok) {
-                                throw new Error(cuerpo.mensaje || 'No se pudo anotar.');
+                                throw new Error(
+                                    cuerpo.mensaje
+                                    || cuerpo.message
+                                    || (respuesta.status === 419
+                                        ? 'La sesión expiró. Recarga la página e intenta de nuevo.'
+                                        : 'No se pudo anotar.')
+                                );
                             }
                             return cuerpo;
+                        }).catch(function (error) {
+                            if (error instanceof Error && error.message && error.message !== 'Unexpected end of JSON input') {
+                                throw error;
+                            }
+                            if (respuesta.status === 419) {
+                                throw new Error('La sesión expiró. Recarga la página e intenta de nuevo.');
+                            }
+                            if (respuesta.redirected || respuesta.status === 302 || respuesta.status === 403) {
+                                throw new Error('No tienes permiso para anotar con esta cuenta. Entra como operadora.');
+                            }
+                            throw new Error('No se pudo anotar.');
                         });
                     }).then(function (nota) {
                         notas[id] = notas[id] || [];

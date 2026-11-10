@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIGTE')</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v={{ @filemtime(public_path('favicon.png')) }}">
     <script>
         (function () {
             try {
@@ -30,18 +31,19 @@
     <div id="sigte-carga" class="sigte-carga" role="status" aria-live="polite" aria-busy="false" hidden>
         <div class="sigte-carga-panel">
             <div class="sigte-carga-card">
-                <div class="sigte-carga-logo-wrap">
-                    <svg class="sigte-carga-ring" viewBox="0 0 88 88" aria-hidden="true">
-                        <circle class="sigte-carga-ring-fondo" cx="44" cy="44" r="38"></circle>
-                        <circle class="sigte-carga-ring-trazo" cx="44" cy="44" r="38"></circle>
-                    </svg>
-                    <img
-                        class="sigte-carga-logo"
-                        src="{{ asset('images/logo-hospital-circular.png') }}"
-                        alt=""
-                        width="64"
-                        height="64"
-                    >
+                <div class="sigte-carga-logo-wrap" aria-hidden="true">
+                    <span class="sigte-carga-halo"></span>
+                    <div class="sigte-carga-marca">
+                        @foreach ([1, 2, 3] as $figura)
+                            <img
+                                class="sigte-carga-figura"
+                                src="{{ asset('images/logo-sigte-figura-'.$figura.'.png') }}"
+                                alt=""
+                                width="80"
+                                height="80"
+                            >
+                        @endforeach
+                    </div>
                 </div>
 
                 <svg class="sigte-carga-word" viewBox="0 0 220 48" aria-hidden="true">
@@ -64,9 +66,9 @@
         (function () {
             var capa = document.getElementById('sigte-carga');
             var panel = capa ? capa.querySelector('.sigte-carga-panel') : null;
-            var ring = capa ? capa.querySelector('.sigte-carga-ring-trazo') : null;
+            var figuras = capa ? capa.querySelectorAll('.sigte-carga-figura') : [];
+            var halo = capa ? capa.querySelector('.sigte-carga-halo') : null;
             var letras = capa ? capa.querySelectorAll('.sigte-carga-letras') : [];
-            var logo = capa ? capa.querySelector('.sigte-carga-logo') : null;
             if (!capa || !panel) {
                 return;
             }
@@ -86,35 +88,36 @@
             }
 
             function estadoListoVisual() {
-                if (ring && typeof ring.getTotalLength === 'function') {
-                    ring.style.strokeDasharray = String(ring.getTotalLength());
-                    ring.style.strokeDashoffset = '0';
+                figuras.forEach(function (figura) {
+                    figura.style.opacity = '1';
+                    figura.style.transform = 'none';
+                });
+                if (halo) {
+                    halo.style.opacity = '1';
+                    halo.style.transform = 'none';
                 }
                 letras.forEach(function (letra) {
                     letra.style.opacity = '1';
                     letra.style.transform = 'translateY(0)';
                 });
-                if (logo) {
-                    logo.style.opacity = '1';
-                    logo.style.transform = 'scale(1)';
-                }
                 panel.style.opacity = '1';
+                capa.classList.add('is-vivo');
             }
 
             function prepararDibujo() {
-                if (ring && typeof ring.getTotalLength === 'function') {
-                    var largoRing = ring.getTotalLength();
-                    ring.style.strokeDasharray = String(largoRing);
-                    ring.style.strokeDashoffset = String(largoRing);
+                capa.classList.remove('is-vivo');
+                figuras.forEach(function (figura) {
+                    figura.style.opacity = '0';
+                    figura.style.transform = 'translateY(18px) scale(0.86)';
+                });
+                if (halo) {
+                    halo.style.opacity = '0';
+                    halo.style.transform = 'scale(0.5)';
                 }
                 letras.forEach(function (letra) {
                     letra.style.opacity = '0';
                     letra.style.transform = 'translateY(8px)';
                 });
-                if (logo) {
-                    logo.style.opacity = '0';
-                    logo.style.transform = 'scale(0.92)';
-                }
                 panel.style.opacity = '1';
                 dibujoListo = false;
                 saliendo = false;
@@ -122,44 +125,61 @@
             }
 
             function dibujarMarca(alTerminar) {
-                if (reduce || !animeOk) {
+                var terminado = false;
+                var piezas = [halo].concat(
+                    Array.prototype.slice.call(figuras),
+                    Array.prototype.slice.call(letras)
+                ).filter(Boolean);
+
+                function terminar() {
+                    if (terminado) {
+                        return;
+                    }
+                    terminado = true;
+                    if (animeOk) {
+                        anime.remove(piezas);
+                    }
                     estadoListoVisual();
                     dibujoListo = true;
                     if (alTerminar) {
                         alTerminar();
                     }
+                }
+
+                // Con la pestaña oculta el navegador pausa requestAnimationFrame y anime.js no avanza.
+                if (reduce || !animeOk || document.hidden) {
+                    terminar();
                     return;
                 }
 
-                var piezas = [ring, logo].concat(Array.prototype.slice.call(letras)).filter(Boolean);
+                window.setTimeout(terminar, 2600);
                 anime.remove(piezas);
                 anime.timeline({
                     easing: 'easeOutCubic',
-                    complete: function () {
-                        dibujoListo = true;
-                        if (alTerminar) {
-                            alTerminar();
-                        }
-                    }
+                    complete: terminar
                 })
                     .add({
-                        targets: logo,
+                        targets: halo,
                         opacity: [0, 1],
-                        scale: [0.92, 1],
-                        duration: 420
+                        scale: [0.5, 1],
+                        duration: 560
                     })
                     .add({
-                        targets: ring,
-                        strokeDashoffset: [anime.setDashoffset, 0],
-                        duration: 860
-                    }, '-=240')
+                        targets: figuras,
+                        opacity: [0, 1],
+                        translateY: [18, 0],
+                        scale: [0.86, 1],
+                        delay: anime.stagger(150),
+                        duration: 680,
+                        easing: 'easeOutBack'
+                    }, '-=420')
                     .add({
                         targets: letras,
                         opacity: [0, 1],
                         translateY: [8, 0],
-                        delay: anime.stagger(70),
+                        delay: anime.stagger(80),
                         duration: 420
-                    }, '-=420');
+                    }, '-=360');
             }
 
             function salir() {

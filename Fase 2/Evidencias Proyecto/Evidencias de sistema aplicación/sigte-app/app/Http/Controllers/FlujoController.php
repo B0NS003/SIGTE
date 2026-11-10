@@ -18,6 +18,7 @@ use App\Http\Controllers\Concerns\ConsultaDeCajas;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Support\AccesoPorRol;
 use App\Support\Auditoria;
+use App\Support\ReporteAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,17 @@ class FlujoController extends Controller
 {
     use ConsultaDeCajas;
     use ResuelveUsuario;
+
+    private const SERVICIOS_ENTREGA = [
+        'Pabellon',
+        'Dental',
+        'Urgencia',
+        'Maternidad',
+        'UCI',
+        'Curaciones',
+        'General',
+        'Otro servicio',
+    ];
 
     /**
      * Lo que la jefatura puede ver con la etapa actual. No hay historial de pasos.
@@ -284,6 +296,7 @@ class FlujoController extends Controller
                     'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
                     'hora' => now()->timezone('America/Santiago')->format('H:i'),
                 ],
+                'reporte' => $rol === Rol::ADMINISTRADORA ? ReporteAdmin::vista($request) : null,
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');
@@ -756,14 +769,7 @@ class FlujoController extends Controller
             'usuario' => $this->usuarioSesion(),
             'listas' => $listas,
             'caja' => $caja,
-            'servicios' => [
-                'Pabellon',
-                'Urgencia',
-                'Maternidad',
-                'UCI',
-                'Curaciones',
-                'Otro servicio',
-            ],
+            'servicios' => self::SERVICIOS_ENTREGA,
             'materiales' => [
                 'Paquete de ropa',
                 'Material de curación',
@@ -778,7 +784,7 @@ class FlujoController extends Controller
         $validador = \Illuminate\Support\Facades\Validator::make(
             $request->all(),
             [
-                'servicio' => ['required', 'string', 'in:Pabellon,Urgencia,Maternidad,UCI,Curaciones,Otro servicio'],
+                'servicio' => ['required', 'string', \Illuminate\Validation\Rule::in(self::SERVICIOS_ENTREGA)],
                 'retira' => ['required', 'string', 'max:150'],
                 'cajas' => ['nullable', 'array'],
                 'cajas.*' => ['required', 'string', 'distinct'],
@@ -846,51 +852,55 @@ class FlujoController extends Controller
 
         $marca = $this->marca();
         $ahora = now();
-        $entrega = Entrega::query()->create([
-            'codigo' => Entrega::siguienteCodigo($ahora->copy()->timezone('America/Santiago')),
-            'servicio' => $datos['servicio'],
-            'recibe' => $datos['retira'],
-            'recibe_rol' => 'Personal del servicio',
-            'material' => $material,
-            'observacion' => $datos['obs'] ?? null,
-            'user_id' => $marca['user_id'],
-            'entregado_at' => $ahora,
-        ]);
-
-        foreach ($cajas as $caja) {
-            $caja->fill([
+        $entrega = DB::transaction(function () use ($datos, $material, $marca, $ahora, $cajas) {
+            $entrega = Entrega::query()->create([
+                'codigo' => Entrega::siguienteCodigo($ahora->copy()->timezone('America/Santiago')),
+                'servicio' => $datos['servicio'],
+                'recibe' => $datos['retira'],
+                'recibe_rol' => 'Personal del servicio',
+                'material' => $material,
+                'observacion' => $datos['obs'] ?? null,
+                'user_id' => $marca['user_id'],
                 'entregado_at' => $ahora,
-                'estado' => 'Entregada a '.$datos['servicio'],
-                'ubicacion' => 'Ventanilla de entrega',
-                'responsable_id' => $marca['user_id'],
-                'personal_id' => $marca['personal_id'] ?? null,
-            ])->save();
-
-            EntregaCaja::query()->create([
-                'entrega_id' => $entrega->id,
-                'caja_id' => $caja->id,
-                'codigo' => $caja->codigo,
-                'nombre' => str_starts_with(mb_strtoupper($caja->codigo), 'SET-')
-                    ? 'Set · '.$caja->servicio
-                    : 'Caja · '.$caja->servicio,
             ]);
 
-            Auditoria::registrar(
-                'Registró entrega',
-                'entrega',
-                $caja->codigo,
-                'Retira '.$datos['retira'].' · '.$datos['servicio'].' · '.$entrega->codigo,
-            );
-        }
+            foreach ($cajas as $caja) {
+                $caja->fill([
+                    'entregado_at' => $ahora,
+                    'estado' => 'Entregada a '.$datos['servicio'],
+                    'ubicacion' => 'Ventanilla de entrega',
+                    'responsable_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'] ?? null,
+                ])->save();
 
-        if ($cajas->isEmpty() && $material !== null) {
-            Auditoria::registrar(
-                'Registró entrega',
-                'entrega',
-                $entrega->codigo,
-                'Material · '.$material.' · Retira '.$datos['retira'].' · '.$datos['servicio'],
-            );
-        }
+                EntregaCaja::query()->create([
+                    'entrega_id' => $entrega->id,
+                    'caja_id' => $caja->id,
+                    'codigo' => $caja->codigo,
+                    'nombre' => str_starts_with(mb_strtoupper($caja->codigo), 'SET-')
+                        ? 'Set · '.$caja->servicio
+                        : 'Caja · '.$caja->servicio,
+                ]);
+
+                Auditoria::registrar(
+                    'Registró entrega',
+                    'entrega',
+                    $caja->codigo,
+                    'Retira '.$datos['retira'].' · '.$datos['servicio'].' · '.$entrega->codigo,
+                );
+            }
+
+            if ($cajas->isEmpty() && $material !== null) {
+                Auditoria::registrar(
+                    'Registró entrega',
+                    'entrega',
+                    $entrega->codigo,
+                    'Material · '.$material.' · Retira '.$datos['retira'].' · '.$datos['servicio'],
+                );
+            }
+
+            return $entrega;
+        });
 
         return back()->with(
             'ok',
