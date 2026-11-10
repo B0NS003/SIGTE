@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'acceso' => AsegurarAccesoPorRol::class,
         ]);
         $middleware->redirectGuestsTo('/login');
+        $middleware->trustProxies(at: '*');
         $middleware->redirectUsersTo(function () {
             $rol = auth()->user()?->nombreRol() ?? 'operador';
 

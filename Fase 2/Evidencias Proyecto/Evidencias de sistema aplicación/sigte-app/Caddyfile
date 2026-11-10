@@ -1,0 +1,4 @@
+esterilizacionsanjose.cl, www.esterilizacionsanjose.cl {
+	encode gzip
+	reverse_proxy app:80
+}

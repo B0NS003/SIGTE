@@ -1,21 +1,35 @@
-# Producción (OVH + dominio esterilizacionsanjose.cl)
-# Uso: docker compose -f docker-compose.prod.yml up -d --build
-#
-# Diferencias vs local:
-# - App en puerto 80 (HTTP)
-# - Postgres NO expuesto a internet
-# - Sin montar la carpeta del host (usa lo construido en la imagen)
+# Producción: Caddy (HTTPS) + app + Postgres
+# docker compose -f docker-compose.prod.yml up -d --build
 
 services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: sigte-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - sigte
+    restart: unless-stopped
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: sigte-app
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     env_file:
       - .env
+    volumes:
+      - ./.env:/var/www/html/.env
     depends_on:
       db:
         condition: service_healthy
@@ -26,6 +40,8 @@ services:
   db:
     image: postgres:16-alpine
     container_name: sigte-db
+    ports:
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_DB: ${DB_DATABASE:-sigte}
       POSTGRES_USER: ${DB_USERNAME:-sigte}
@@ -47,3 +63,5 @@ networks:
 
 volumes:
   sigte_pgdata:
+  caddy_data:
+  caddy_config:
