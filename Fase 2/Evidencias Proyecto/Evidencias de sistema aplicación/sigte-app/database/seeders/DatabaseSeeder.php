@@ -720,7 +720,7 @@ class DatabaseSeeder extends Seeder
     /**
      * Asegura que existan los servicios con sus IDs originales.
      *
-     * Si falta algun ID, requiere servicios_produccion.json exportado desde
+     * Si falta algun ID, requiere servicios.json exportado desde
      * la base de datos donde los reportes historicos ya funcionan.
      * Nunca inventa nombres ni re-asigna IDs de los registros historicos.
      */
@@ -746,7 +746,7 @@ class DatabaseSeeder extends Seeder
             ->all();
         $faltantes = array_values(array_diff($idsRequeridos, $idsExistentes));
 
-        $rutaServicios = database_path('seeders/data/servicios_produccion.json');
+        $rutaServicios = database_path('seeders/data/servicios.json');
         if (! is_file($rutaServicios)) {
             if (count($faltantes) === 0) {
                 return;
@@ -754,13 +754,13 @@ class DatabaseSeeder extends Seeder
             throw new \RuntimeException(
                 'Faltan servicios con ID: '.implode(', ', $faltantes).'. '
                 .'Exporta la tabla servicios desde la BD original a '
-                .'database/seeders/data/servicios_produccion.json antes de sembrar produccion.'
+                .'database/seeders/data/servicios.json antes de sembrar produccion.'
             );
         }
 
         $servicios = json_decode(file_get_contents($rutaServicios), true, 512, JSON_THROW_ON_ERROR);
         if (! is_array($servicios)) {
-            throw new \RuntimeException('servicios_produccion.json no contiene un arreglo JSON valido.');
+            throw new \RuntimeException('servicios.json no contiene un arreglo JSON valido.');
         }
 
         $porId = [];
