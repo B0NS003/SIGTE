@@ -1,0 +1,1474 @@
+/* Panel del operador: tablero, tarjetas de caja, modales y reloj. Se carga después de comun.css. */
+/* Avance de etapa */
+#etapa-anotar[hidden],
+#etapa-pasar[hidden],
+#etapa-resumen[hidden],
+#etapa-chips[hidden] {
+    display: none !important;
+}
+
+/* Modo oscuro del flujo: etapas, tarjetas de caja, nodos y barra de avance */
+html[data-tema="oscuro"] .ops-etapa--recepcion {
+    --etapa-acento: #f26d72;
+    --etapa-acento-suave: rgba(242, 109, 114, 0.1);
+}
+html[data-tema="oscuro"] .ops-etapa--lavado {
+    --etapa-acento: #f27a4e;
+    --etapa-acento-suave: rgba(242, 122, 78, 0.1);
+}
+html[data-tema="oscuro"] .ops-etapa--preparacion {
+    --etapa-acento: #f5894a;
+    --etapa-acento-suave: rgba(245, 137, 74, 0.1);
+}
+html[data-tema="oscuro"] .ops-etapa--esterilizacion {
+    --etapa-acento: #f2a05e;
+    --etapa-acento-suave: rgba(242, 160, 94, 0.1);
+}
+html[data-tema="oscuro"] .ops-etapa--almacen {
+    --etapa-acento: #f4b46c;
+    --etapa-acento-suave: rgba(244, 180, 108, 0.09);
+}
+html[data-tema="oscuro"] .ops-etapa--entrega {
+    --etapa-acento: #e59a75;
+    --etapa-acento-suave: rgba(229, 154, 117, 0.09);
+}
+html[data-tema="oscuro"] .ops-etapa {
+    background: var(--card);
+    box-shadow: none;
+}
+html[data-tema="oscuro"] .ops-etapa-head {
+    background: var(--card);
+}
+html[data-tema="oscuro"] .ops-etapa[open] > .ops-etapa-head {
+    border-bottom-color: var(--linea);
+    background: linear-gradient(90deg, var(--etapa-acento-suave) 0%, var(--card) 60%);
+}
+html[data-tema="oscuro"] .track-card {
+    background: var(--card-2);
+    box-shadow: none;
+}
+html[data-tema="oscuro"] .track-card:hover {
+    border-color: var(--linea-fuerte);
+}
+html[data-tema="oscuro"] .track-card .field {
+    background: var(--superficie-3);
+}
+html[data-tema="oscuro"] .proceso-pista {
+    background: var(--linea-fuerte);
+}
+html[data-tema="oscuro"] .track-summary-label,
+html[data-tema="oscuro"] .track-more summary {
+    color: var(--naranja-texto);
+}
+html[data-tema="oscuro"] .proceso-barra {
+    background: linear-gradient(90deg, #d9561a 0%, #fdaa6e 35%, #f0702f 55%, #fb9a5e 75%, #d9561a 100%);
+    background-size: 220% 100%;
+    box-shadow: none;
+    animation: track-line-flow 1.35s linear infinite;
+}
+html[data-tema="oscuro"] .track-card.is-proceso-listo {
+    background: var(--verde-fondo);
+    border-color: var(--verde-linea);
+    box-shadow: none;
+}
+html[data-tema="oscuro"] .proceso.is-listo .proceso-barra,
+html[data-tema="oscuro"] .track-card.is-proceso-listo .track-line.done {
+    background: linear-gradient(90deg, #15803d, #4ade80, #22c55e, #15803d);
+    background-size: 220% 100%;
+}
+html[data-tema="oscuro"] .track-card.is-proceso-listo .track-node {
+    background: var(--card);
+    border-color: var(--verde-linea);
+    color: var(--verde-texto);
+}
+html[data-tema="oscuro"] .track-card.is-proceso-listo .track-line {
+    background: var(--superficie-3);
+}
+html[data-tema="oscuro"] .track-card.is-proceso-listo .track-step.done .track-node,
+html[data-tema="oscuro"] .track-card.is-proceso-listo .track-step.current .track-node {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: #fff;
+}
+html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-node {
+    background: var(--card);
+    border-color: var(--linea-fuerte);
+    color: var(--texto-4);
+}
+html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-line {
+    background: var(--linea-fuerte);
+}
+
+/* Operator tracking board */
+.ops-board {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-3);
+}
+.ops-toolbar {
+    margin: 0 0 1rem;
+    padding: var(--esp-3) var(--esp-4) var(--esp-3);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card);
+    box-shadow: var(--sombra-1);
+}
+.ops-consulta {
+    margin: 0;
+}
+.ops-search {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-2) var(--esp-3);
+    align-items: center;
+}
+.ops-search-go {
+    min-height: var(--alto-md);
+    padding: var(--esp-2) var(--esp-4);
+    border-radius: var(--radio-md);
+}
+.ops-search-clear {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    padding: var(--esp-1) 0;
+}
+.ops-search-clear:hover {
+    color: var(--naranja-oscuro);
+    border-bottom-color: var(--naranja-linea);
+    text-decoration: none;
+}
+.ops-search-field {
+    flex: 1 1 16rem;
+    min-width: 12rem;
+    min-height: var(--alto-md);
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    border: 1.5px solid var(--borde);
+    border-radius: var(--radio-md);
+    padding: 0 var(--esp-4);
+    background: var(--card);
+    color: var(--texto-3);
+    box-shadow: var(--sombra-1);
+}
+.ops-search-field:focus-within {
+    outline: none;
+    border-color: var(--naranja);
+    background: var(--card);
+    box-shadow: var(--foco);
+    color: var(--naranja-oscuro);
+}
+.ops-search input[type="search"] {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    padding: var(--esp-2) 0;
+    font: inherit;
+    font-size: var(--fs-md);
+    color: var(--ink);
+    background: transparent;
+}
+.ops-search input[type="search"]:focus {
+    outline: none;
+}
+.ops-filters {
+    margin: 0.7rem 0 0;
+}
+.ops-result-meta {
+    margin: 0.55rem 0 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+}
+.ops-etapa {
+    --etapa-acento: var(--naranja);
+    --etapa-acento-suave: var(--naranja-suave);
+    margin: 0;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card);
+    box-shadow: var(--sombra-1);
+    overflow: clip;
+    border-left: var(--franja) solid var(--linea-fuerte);
+}
+.ops-etapa+.ops-etapa {
+    margin-top: 0.15rem;
+}
+
+/* Contorno + título del bloque por etapa (escala naranja logo HSJM; no tarjetas internas). */
+.ops-etapa--recepcion {
+    --etapa-acento: #C1272D;
+    --etapa-acento-suave: #fdf0f0;
+}
+.ops-etapa--lavado {
+    --etapa-acento: #E34E26;
+    --etapa-acento-suave: #fff0eb;
+}
+.ops-etapa--preparacion {
+    --etapa-acento: #F26522;
+    --etapa-acento-suave: #fff3eb;
+}
+.ops-etapa--esterilizacion {
+    --etapa-acento: #E8873A;
+    --etapa-acento-suave: #fff6ed;
+}
+.ops-etapa--almacen {
+    --etapa-acento: #F0A04B;
+    --etapa-acento-suave: #fff8f0;
+}
+.ops-etapa--entrega {
+    --etapa-acento: #D9774A;
+    --etapa-acento-suave: #faf3ef;
+}
+.ops-etapa[open] {
+    border-left-color: var(--etapa-acento);
+    box-shadow: var(--sombra-1);
+}
+.ops-etapa-head {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3) var(--esp-4);
+    padding: var(--esp-3) var(--esp-4);
+    cursor: pointer;
+    list-style: none;
+    background: var(--card);
+    border-bottom: 1px solid transparent;
+}
+.ops-etapa[open]>.ops-etapa-head {
+    border-bottom-color: var(--linea);
+    background: linear-gradient(90deg, var(--etapa-acento-suave) 0%, var(--card) 42%);
+}
+.ops-etapa-head::-webkit-details-marker {
+    display: none;
+}
+.ops-etapa-head h2::before {
+    content: "";
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-right: 0.45rem;
+    border-right: 2px solid var(--etapa-acento);
+    border-bottom: 2px solid var(--etapa-acento);
+    transform: rotate(-45deg);
+    vertical-align: 0.12rem;
+}
+.ops-etapa[open]>.ops-etapa-head h2::before {
+    transform: rotate(45deg);
+    vertical-align: 0.2rem;
+}
+.ops-etapa-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    color: var(--ink);
+}
+.ops-etapa-resumen {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--esp-3);
+    margin-left: auto;
+}
+.ops-etapa-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-1);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: 1;
+}
+.ops-etapa-chip svg {
+    width: var(--icono-sm);
+    height: var(--icono-sm);
+    flex-shrink: 0;
+}
+.ops-etapa-chip em {
+    font-style: normal;
+    font-weight: 800;
+    color: inherit;
+    font-variant-numeric: tabular-nums;
+}
+.ops-etapa-chip-total {
+    color: var(--texto-3);
+    font-weight: 600;
+}
+.ops-etapa-chip-urgent {
+    color: var(--naranja-oscuro);
+}
+.ops-etapa-chip-listo {
+    color: var(--teal-texto);
+}
+.ops-etapa-chip.is-empty {
+    color: var(--texto-4);
+    opacity: 1;
+}
+.ops-etapa-panel {
+    padding: var(--esp-2) var(--esp-3) var(--esp-2);
+    background: var(--card);
+}
+.ops-etapa-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--esp-3);
+    margin: 0;
+    align-items: start;
+}
+
+/* Dos por fila; si hay más, el bloque de la etapa scrollea sin mezclarse con la siguiente */
+.ops-etapa-list.is-kds {
+    max-height: min(30rem, 58vh);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 0.15rem var(--esp-1) var(--esp-3) 0.05rem;
+    border-radius: var(--radio-md);
+    background: linear-gradient(var(--superficie-2) 30%, rgba(248, 250, 252, 0)),
+    linear-gradient(rgba(248, 250, 252, 0), var(--superficie-2) 70%) 0 100%,
+    linear-gradient(var(--superficie-3), var(--superficie-3)) 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 18px, 100% 22px, 100% 1px;
+    background-attachment: local, local, scroll;
+    scrollbar-width: thin;
+    scrollbar-color: #fdba74 #eef2f7;
+    -webkit-overflow-scrolling: touch;
+}
+.ops-etapa-list.is-kds::-webkit-scrollbar {
+    width: 0.45rem;
+}
+.ops-etapa-list.is-kds::-webkit-scrollbar-thumb {
+    background: var(--naranja-linea);
+    border-radius: var(--radio-pill);
+}
+.ops-etapa-list.is-kds::-webkit-scrollbar-track {
+    background: var(--superficie-3);
+    border-radius: var(--radio-pill);
+}
+.ops-etapa-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--esp-1) var(--esp-4);
+    margin-top: 0.55rem;
+    padding: var(--esp-2) var(--esp-1) 0.15rem;
+    border-top: 1px solid var(--linea);
+}
+.ops-etapa-foot p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+.ops-etapa-foot strong {
+    color: var(--ink);
+    font-weight: 800;
+}
+.ops-etapa-next span {
+    color: var(--naranja-oscuro);
+    font-weight: 800;
+}
+.ops-etapa-list>.track-card {
+    min-width: 0;
+    height: 100%;
+    animation: track-card-in 0.22s ease both;
+}
+.ops-etapa-list>.track-card .track-pipe {
+    gap: 0.1rem;
+    margin: 0.45rem 0 0.35rem;
+}
+.ops-etapa-list>.track-card .track-step {
+    width: 4.35rem;
+}
+.ops-etapa-list>.track-card .track-label {
+    font-size: var(--fs-2xs);
+    max-width: none;
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+    hyphens: auto;
+}
+.ops-etapa-list>.track-card .track-node {
+    width: 2rem;
+    height: 2rem;
+}
+.ops-etapa-list>.track-card .track-node svg {
+    width: 1rem;
+    height: 1rem;
+}
+.ops-etapa-list>.track-card .track-line {
+    min-width: 0.35rem;
+    flex: 1 1 0.35rem;
+}
+.ops-etapa-list>.track-card .track-meta {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.ops-etapa-list>.track-card .track-detalle {
+    max-width: none;
+}
+@media (max-width: 900px) {
+    .ops-etapa-list,
+    .ops-etapa-list.is-kds {
+        grid-template-columns: 1fr;
+    }
+}
+.ops-empty {
+    margin: 0;
+    padding: var(--esp-5) var(--esp-4);
+    color: var(--muted);
+    font-size: var(--fs-md);
+    background: var(--card);
+    border: 1px dashed var(--borde);
+    border-radius: var(--radio-md);
+    text-align: center;
+}
+.ops-empty strong {
+    display: block;
+    color: var(--ink);
+    font-size: var(--fs-lg);
+    margin-bottom: 0.35rem;
+}
+.ops-empty p {
+    margin: 0;
+}
+.ops-empty a {
+    color: var(--naranja-oscuro);
+    font-weight: 700;
+}
+.track-card {
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    padding: var(--esp-4) var(--esp-4) var(--esp-4);
+    box-shadow: var(--sombra-1);
+    transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.track-card:hover {
+    border-color: var(--linea-fuerte);
+    box-shadow: var(--sombra-realce);
+}
+.track-head {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--esp-3) var(--esp-4);
+    align-items: flex-start;
+    margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+}
+.track-head-main {
+    min-width: 0;
+    flex: 1 1 12rem;
+}
+.track-title {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    flex-wrap: wrap;
+}
+.track-title .badge-urgent,
+.track-title .badge-listo {
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    padding: var(--esp-1) var(--esp-2);
+    letter-spacing: 0.01em;
+}
+.track-title .badge-urgent {
+    box-shadow: 0 0 0 1px var(--rojo-linea);
+}
+.badge-urgent-bell {
+    display: inline-block;
+    transform-origin: 50% 0%;
+    animation: badge-bell-ring 1.35s ease-in-out infinite;
+}
+.ops-etapa-chip-urgent:not(.is-empty) .badge-urgent-bell {
+    animation-duration: 1.2s;
+}
+.track-title .badge-listo {
+    box-shadow: 0 0 0 1px var(--verde-linea);
+}
+.track-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--esp-1) var(--esp-1);
+    margin: 0.28rem 0 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    line-height: 1.35;
+}
+.track-meta-sep {
+    color: var(--linea-fuerte);
+}
+.track-meta-sala {
+    color: var(--texto-3);
+    font-weight: 600;
+}
+.track-meta-persona {
+    color: var(--ink);
+    font-weight: 700;
+}
+.track-foot-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--esp-3);
+    row-gap: var(--esp-1);
+    margin-top: 0.55rem;
+    padding-top: var(--esp-3);
+    border-top: 1px solid var(--linea);
+}
+.track-more {
+    grid-column: 1;
+    margin: 0;
+    min-width: 0;
+}
+.track-more>summary {
+    display: inline-flex;
+    align-items: center;
+    width: auto;
+    cursor: pointer;
+    list-style: none;
+    padding: var(--esp-1) 0;
+    border-radius: 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    transition: color var(--dur-rapida) ease, border-color var(--dur-rapida) ease;
+}
+.track-more>summary:hover {
+    background: transparent;
+    border-bottom-color: var(--naranja-linea);
+}
+.track-summary-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-1);
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: 800;
+}
+.track-card.is-proceso-listo .track-more>summary {
+    border-color: transparent;
+    background: transparent;
+}
+.track-card.is-proceso-listo .track-more>summary:hover {
+    background: transparent;
+    border-bottom-color: var(--verde-linea);
+}
+.track-card.is-proceso-listo .track-more[open]>summary {
+    background: transparent;
+    border-bottom-color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .track-more[open]>summary .track-summary-label {
+    color: var(--verde-texto);
+}
+.track-more>summary::-webkit-details-marker {
+    display: none;
+}
+.track-summary-label::before {
+    content: "+";
+    font-weight: 800;
+}
+.track-more[open]>summary .track-summary-label::before {
+    content: "–";
+}
+.track-more[open]>summary {
+    margin-bottom: 0.55rem;
+    background: transparent;
+    border-bottom-color: var(--ink);
+}
+.track-more[open]>summary .track-summary-label {
+    color: var(--ink);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-more>summary:hover {
+    border-bottom-color: var(--naranja-linea);
+}
+
+/* Lista compacta con iconos (acordeón), sin cajitas/bloques. */
+.track-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 0.1rem 0 0;
+    list-style: none;
+    max-width: 20rem;
+    border: 0;
+    background: transparent;
+}
+.track-dato {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--esp-2);
+    min-width: 0;
+    padding: var(--esp-2) 0.05rem;
+    border: 0;
+    border-bottom: 1px solid var(--linea);
+    border-radius: 0;
+    background: transparent;
+}
+.track-dato:last-child {
+    border-bottom: 0;
+    padding-bottom: 0.05rem;
+}
+.track-dato-icono {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: var(--icono-md);
+    height: var(--icono-md);
+    margin-top: 0.12rem;
+    border-radius: var(--radio-sm);
+    background: var(--naranja-suave);
+    color: var(--naranja-oscuro);
+}
+.track-dato-icono svg {
+    width: var(--icono-xs);
+    height: var(--icono-xs);
+}
+.track-dato-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+/* Etiqueta secundaria chica; el valor manda. */
+.track-dato-label {
+    font-size: var(--fs-2xs);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: var(--texto-4);
+    line-height: 1.2;
+}
+.track-dato strong {
+    font-size: var(--fs-base);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    word-break: break-word;
+}
+.track-foot-bar .track-card-actions {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    margin-left: 0;
+}
+@media (min-width: 901px) {
+    .track-more {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+    .track-more>summary {
+        min-height: 2.05rem;
+    }
+    .track-foot-bar .track-card-actions {
+        align-self: start;
+        position: relative;
+    }
+    .track-detalle {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+        gap: 0 var(--esp-5);
+        max-width: none;
+    }
+    .track-dato,
+    .track-dato:last-child {
+        padding: 0.15rem 0;
+        border-bottom: 0;
+    }
+}
+@media (max-width: 900px) {
+    .track-foot-bar {
+        grid-template-columns: 1fr;
+    }
+    .track-detalle {
+        max-width: none;
+    }
+    .track-foot-bar .track-card-actions {
+        grid-column: 1;
+        grid-row: auto;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+.track-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-2xl);
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}
+
+/* Flujo interno: siempre naranja (el color de etapa va en el contorno). */
+@media (prefers-reduced-motion: reduce) {
+    .ops-etapa-list>.track-card,
+    .track-card {
+        animation: none !important;
+    }
+    .badge-urgent-bell {
+        animation: none !important;
+    }
+    .proceso-barra,
+    .track-card.is-proceso-listo .track-line.done {
+        animation: none !important;
+        background-position: 0 0 !important;
+    }
+}
+
+/* Nueva recepción */
+.track-card-actions {
+    display: inline-flex;
+    gap: var(--esp-2);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.flujo-modal {
+    width: min(30rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radio-lg);
+    background: var(--card);
+    color: var(--texto);
+    box-shadow: var(--sombra-2);
+}
+.flujo-modal::backdrop {
+    background: rgba(11, 31, 75, 0.45);
+}
+.flujo-modal-cuerpo {
+    padding: var(--esp-5) var(--esp-5) var(--esp-5);
+}
+.flujo-modal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3);
+    margin-bottom: 0.35rem;
+}
+.flujo-modal h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: var(--fs-3xl);
+    line-height: 1.25;
+}
+.flujo-paso {
+    margin-top: 0.95rem;
+    padding: var(--esp-4) var(--esp-4) var(--esp-4);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card-2);
+}
+.flujo-paso-titulo {
+    margin: 0;
+    color: var(--ink);
+    font-size: var(--fs-lg);
+    font-weight: 800;
+    line-height: 1.3;
+}
+.flujo-paso-titulo strong {
+    font-weight: 800;
+}
+.flujo-paso-resumen {
+    margin: 0.28rem 0 0;
+    color: var(--muted);
+    font-size: var(--fs-base);
+    line-height: 1.4;
+}
+.flujo-paso .field-label {
+    margin-top: 0.85rem;
+}
+.flujo-paso .flujo-chips {
+    margin: 0.7rem 0 0;
+}
+.flujo-paso .flujo-modal-acciones {
+    margin-top: 1.05rem;
+}
+.flujo-modal #etapa-historial {
+    margin-top: 1.15rem;
+}
+.flujo-modal-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--esp-2);
+    margin-top: 1rem;
+}
+.flujo-modal-acciones .btn {
+    width: auto;
+    min-width: 9rem;
+}
+.flujo-modal-acciones .btn-primary,
+.flujo-modal-acciones a.btn-primary {
+    margin-left: auto;
+}
+.flujo-modal [hidden],
+.flujo-aviso[hidden] {
+    display: none !important;
+}
+.flujo-motivo {
+    width: 100%;
+    min-height: 4.6rem;
+    margin: 0.35rem 0 0;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    padding: var(--esp-3) var(--esp-4);
+    font: inherit;
+    resize: vertical;
+    background: var(--card);
+    color: var(--texto);
+}
+.flujo-motivo:focus {
+    outline: none;
+    border-color: var(--naranja-linea);
+    box-shadow: var(--foco);
+}
+.track-card-actions .btn-corregir {
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+    box-shadow: none;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    padding: var(--esp-1) var(--esp-1);
+    min-height: 0;
+    gap: var(--esp-1);
+}
+.track-card-actions .btn-corregir .sigte-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+    opacity: 0.75;
+}
+.track-card-actions .btn-corregir:hover {
+    background: transparent;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.track-card-actions .btn-dark {
+    font-size: var(--fs-sm);
+    min-height: var(--alto-sm);
+    padding: 0 var(--esp-3);
+    border-radius: var(--radio-sm);
+}
+.track-card.is-proceso-listo .btn-corregir {
+    color: var(--texto-3);
+    border: 0;
+}
+.track-card.is-urgent:not(.is-proceso-listo) .btn-corregir {
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+}
+.flujo-pasar {
+    margin-top: 0.9rem;
+    padding-top: var(--esp-3);
+    border-top: 1px solid var(--borde);
+}
+#modal-etapa[data-modo="pasar"] #etapa-resumen:not([hidden]) + .flujo-pasar {
+    margin-top: 0.75rem;
+}
+.flujo-pasar.is-solo {
+    margin-top: 0.95rem;
+    padding: var(--esp-4) var(--esp-4) var(--esp-4);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card-2);
+}
+.flujo-resumen-lista {
+    list-style: none;
+    margin: 0.45rem 0 0;
+    padding: 0;
+}
+.flujo-resumen-lista li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--borde);
+}
+.flujo-resumen-lista li:last-child {
+    border-bottom: 0;
+}
+.flujo-resumen-lista strong {
+    color: var(--ink);
+    font-size: var(--fs-base);
+    font-weight: 700;
+}
+.flujo-resumen-lista span {
+    color: var(--texto-4);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+.flujo-pasar .flujo-paso-titulo {
+    margin: 0;
+}
+.flujo-pasar .flujo-paso-resumen {
+    margin: 0.28rem 0 0;
+}
+.flujo-pasar .flujo-modal-acciones {
+    margin-top: 0.65rem;
+}
+.flujo-tiempo {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    margin: 0.45rem 0;
+}
+.flujo-minutos {
+    width: 4.4rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    padding: var(--esp-2) var(--esp-2);
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    background: var(--card);
+    color: var(--ink);
+}
+.flujo-minutos:focus {
+    outline: none;
+    border-color: var(--naranja-linea);
+    box-shadow: var(--foco);
+}
+.flujo-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-2);
+    margin: 0.15rem 0 0.85rem;
+}
+.flujo-chip {
+    color: var(--ink);
+}
+.flujo-detalle {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    padding: var(--esp-2) var(--esp-3);
+    font: inherit;
+    background: var(--card);
+    color: var(--ink);
+}
+.flujo-detalle:focus {
+    outline: none;
+    border-color: var(--naranja-linea);
+    box-shadow: var(--foco);
+}
+.flujo-ruta {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    margin: 0.15rem 0 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-base);
+    font-weight: 700;
+}
+.flujo-ruta .sigte-icon {
+    width: var(--icono-sm);
+    height: var(--icono-sm);
+    color: var(--texto-4);
+}
+.flujo-ruta-desde {
+    color: var(--muted);
+}
+.flujo-ruta-hacia {
+    color: var(--naranja-oscuro);
+}
+.flujo-sin-puesto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3);
+    margin-top: 0.95rem;
+    padding: var(--esp-3) var(--esp-3);
+    border: 1px solid var(--naranja-linea);
+    border-radius: var(--radio-md);
+    background: var(--naranja-suave);
+    color: var(--naranja-texto);
+    font-size: var(--fs-base);
+    font-weight: 600;
+    line-height: 1.4;
+}
+.flujo-sin-puesto p {
+    margin: 0;
+}
+.flujo-sin-puesto .btn {
+    flex: 0 0 auto;
+    font-size: var(--fs-sm);
+    min-height: var(--alto-sm);
+    padding: 0 var(--esp-3);
+    border-radius: var(--radio-sm);
+}
+.flujo-paso-cabeza {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--esp-3);
+}
+.flujo-opcional {
+    color: var(--texto-4);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+}
+#etapa-anotar .flujo-paso-resumen {
+    margin-bottom: 0.65rem;
+}
+.flujo-tiempo-texto {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.1rem;
+}
+.flujo-tiempo-texto strong {
+    color: var(--ink);
+    font-size: var(--fs-base);
+    font-weight: 700;
+}
+.flujo-tiempo-texto small {
+    color: var(--texto-4);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+.flujo-tiempo.is-hecho {
+    padding: 0.35rem 0.45rem;
+    margin-left: -0.45rem;
+    margin-right: -0.45rem;
+    border-radius: var(--radio-md);
+    background: var(--verde-fondo);
+}
+.flujo-tiempo.is-hecho .flujo-tiempo-texto small,
+.flujo-chip.is-hecho {
+    color: var(--verde-texto);
+}
+.flujo-tiempo.is-hecho .flujo-tiempo-texto small::before,
+.flujo-chip.is-hecho::before {
+    content: "✓ ";
+}
+.flujo-chip.is-hecho {
+    border-color: var(--verde-linea);
+    background: var(--verde-fondo);
+}
+.flujo-chip:disabled,
+.flujo-minutos:disabled,
+.flujo-modal .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+    filter: none;
+}
+.flujo-pendiente {
+    margin: 0.6rem 0 0;
+    padding: var(--esp-2) var(--esp-3);
+    border-radius: var(--radio-md);
+    background: var(--naranja-fondo);
+    color: var(--naranja-texto);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.4;
+}
+.flujo-modal a.btn[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: 0.5;
+}
+#etapa-anotar .flujo-historial {
+    margin-top: 0.85rem;
+    border-top: 1px solid var(--borde);
+    padding-top: var(--esp-3);
+}
+#etapa-anotar .flujo-modal-acciones {
+    margin-top: 0.85rem;
+}
+.flujo-historial {
+    margin-top: 1rem;
+    border-top: 1px solid var(--borde);
+    padding-top: var(--esp-3);
+}
+.flujo-historial summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    list-style: none;
+}
+.flujo-historial summary::-webkit-details-marker {
+    display: none;
+}
+.flujo-historial summary::before {
+    content: "+ ";
+    color: var(--naranja-oscuro);
+}
+.flujo-historial[open] summary::before {
+    content: "− ";
+}
+.flujo-historial .act-lista {
+    margin-top: 0.65rem;
+    max-height: 14rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.flujo-historial .act-lista li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.flujo-historial .act-lista strong {
+    font-size: var(--fs-sm);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+.flujo-historial .act-lista span {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.track-card-actions .btn-anotar {
+    font-size: var(--fs-sm);
+    min-height: var(--alto-sm);
+    padding: 0 var(--esp-3);
+    border-radius: var(--radio-sm);
+}
+.track-card-actions .btn-anotar .sigte-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+}
+.ops-etapa-list>.track-card.is-recien {
+    animation: track-card-in 0.22s ease both, flujo-recien 2.6s ease-out;
+}
+.flujo-aviso {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    max-width: min(32rem, calc(100vw - 2rem));
+    padding: var(--esp-3) var(--esp-2) var(--esp-3) var(--esp-4);
+    border: 1px solid transparent;
+    border-radius: var(--radio-md);
+    background: var(--navy);
+    color: #fff;
+    box-shadow: var(--sombra-2);
+    transform: translateX(-50%);
+    animation: flujo-aviso-entra 0.3s ease-out;
+}
+.flujo-aviso > .sigte-icon {
+    flex: 0 0 auto;
+    width: var(--icono-md);
+    height: var(--icono-md);
+    color: #4ade80;
+}
+html[data-tema="oscuro"] .flujo-aviso {
+    border-color: var(--linea-fuerte);
+    background: var(--superficie-3);
+    color: var(--texto-1);
+}
+html[data-tema="oscuro"] .flujo-aviso > .sigte-icon {
+    color: var(--verde-texto);
+}
+.flujo-aviso p {
+    margin: 0;
+    font-size: var(--fs-base);
+    font-weight: 600;
+    line-height: 1.4;
+}
+.flujo-aviso-cerrar {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: var(--esp-1);
+    border: 0;
+    border-radius: var(--radio-sm);
+    background: transparent;
+    color: inherit;
+    opacity: 0.7;
+    cursor: pointer;
+}
+.flujo-aviso-cerrar:hover {
+    opacity: 1;
+}
+.flujo-aviso-cerrar .sigte-icon {
+    width: var(--icono-sm);
+    height: var(--icono-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+    .ops-etapa-list>.track-card.is-recien,
+    .flujo-aviso {
+        animation: none;
+    }
+    .ops-etapa-list>.track-card.is-recien {
+        box-shadow: 0 0 0 3px var(--naranja-linea);
+    }
+}
+.proceso {
+    display: grid;
+    justify-items: end;
+    gap: 0.12rem;
+    min-width: 8.5rem;
+    margin-left: auto;
+    text-align: right;
+}
+.proceso-etiqueta {
+    color: var(--texto-4);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    white-space: nowrap;
+}
+.proceso.is-listo .proceso-pista,
+.proceso.is-sin-proceso .proceso-pista {
+    display: none;
+}
+.proceso[hidden],
+.badge-listo[hidden] {
+    display: none !important;
+}
+.proceso-pista {
+    width: 100%;
+    height: 4px;
+    margin-top: 0.3rem;
+    border-radius: var(--radio-pill);
+    background: var(--superficie-3);
+    overflow: hidden;
+}
+@media (max-width: 640px) {
+    .proceso {
+        justify-items: start;
+        margin-left: 0;
+        text-align: left;
+    }
+}
+.proceso-barra {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg,
+      var(--naranja-oscuro),
+      #fb923c,
+      var(--naranja),
+      var(--naranja-oscuro));
+    background-size: 220% 100%;
+    animation: track-line-flow 1.4s linear infinite;
+}
+.proceso.is-listo .proceso-barra {
+    width: 100%;
+    background: linear-gradient(90deg,
+      var(--verde-texto),
+      #22c55e,
+      #4ade80,
+      var(--verde-texto));
+    background-size: 220% 100%;
+}
+.proceso-texto {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: var(--fs-md);
+    font-weight: 800;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.proceso:not(.is-listo, .is-sin-proceso) .proceso-texto {
+    color: var(--naranja-oscuro);
+}
+.proceso.is-listo .proceso-etiqueta {
+    color: var(--verde-texto);
+}
+
+/* Listo para pasar: tarjeta y flujo en verde. */
+.track-card.is-proceso-listo {
+    background: var(--verde-fondo);
+    border-color: var(--verde-linea);
+    box-shadow: 0 8px 24px rgba(22, 101, 52, 0.1);
+}
+.track-card.is-proceso-listo .track-head h2 {
+    color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .track-head p,
+.track-card.is-proceso-listo .track-label {
+    color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .track-dato-icono {
+    background: var(--verde-icono);
+    color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .badge {
+    background: var(--card);
+    color: var(--verde-texto);
+    border: 1px solid var(--verde-linea);
+}
+.track-card.is-proceso-listo .badge-listo {
+    background: var(--verde-texto);
+    color: #fff;
+    border-color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .track-node {
+    background: var(--card);
+    border-color: var(--verde-linea);
+    color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .track-line {
+    background: var(--superficie-3);
+}
+.track-card.is-proceso-listo .track-step.done .track-node {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: #fff;
+}
+.track-card.is-proceso-listo .track-line.done {
+    background: linear-gradient(90deg,
+      var(--verde-texto) 0%,
+      #22c55e 45%,
+      #4ade80 70%,
+      var(--verde-texto) 100%);
+    background-size: 220% 100%;
+    border-color: transparent;
+    animation: track-line-flow 1.5s linear infinite;
+}
+.track-card.is-proceso-listo .track-step.current .track-node {
+    background: var(--verde);
+    border-color: var(--verde-texto);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.22);
+    animation-name: track-node-pulse-listo;
+}
+.track-card.is-proceso-listo .track-step.current .track-node svg {
+    color: #fff;
+    stroke: currentColor;
+}
+.track-card.is-proceso-listo .track-step.current .track-label,
+.track-card.is-proceso-listo .proceso-texto,
+.track-card.is-proceso-listo .track-summary-label {
+    color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .btn-dark {
+    background: var(--verde-texto);
+}
+.track-card.is-proceso-listo .btn-anotar {
+    background: var(--verde-icono);
+    border-color: var(--verde-linea);
+    color: var(--verde-texto);
+}
+.track-card.is-proceso-listo .btn-anotar:hover {
+    background: #bbf7d0;
+    border-color: var(--verde);
+}
+.track-card.is-urgent:not(.is-proceso-listo) {
+    background: var(--card);
+    border: 1px solid var(--rojo-linea);
+    box-shadow: 0 6px 18px rgba(185, 28, 28, 0.05);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-head h2 {
+    color: var(--ink);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-head p,
+.track-card.is-urgent:not(.is-proceso-listo) .track-label {
+    color: var(--muted);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .badge,
+.track-card.is-urgent:not(.is-proceso-listo) .badge-listo {
+    background: var(--card);
+    color: var(--rojo-texto);
+    border: 1px solid var(--rojo-linea);
+}
+.track-card.is-urgent .badge-urgent {
+    background: var(--rojo-texto);
+    color: #ffffff;
+    border: 1px solid var(--rojo-texto);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .badge:not(.badge-urgent):not(.badge-listo) {
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--borde);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-node {
+    background: var(--superficie-3);
+    border: 2px solid var(--linea-fuerte);
+    color: var(--texto-3);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-line {
+    background: var(--superficie-3);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-step.done .track-node,
+.track-card.is-urgent:not(.is-proceso-listo) .track-line.done {
+    background: #f45b20;
+    border-color: #f45b20;
+    color: #ffffff;
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-step.current .track-node {
+    background: var(--naranja);
+    border-color: var(--naranja-oscuro);
+    color: #ffffff;
+    box-shadow: var(--foco);
+    animation-name: track-node-pulse;
+}
+.track-card.is-urgent:not(.is-proceso-listo) .track-step.current .track-label,
+.track-card.is-urgent:not(.is-proceso-listo) .proceso-texto,
+.track-card.is-urgent:not(.is-proceso-listo) .track-summary-label {
+    color: var(--naranja-oscuro);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .btn-dark {
+    background: var(--navy);
+    color: #ffffff;
+}
+.track-card.is-proceso-listo:hover {
+    border-color: var(--verde-linea);
+    box-shadow: 0 12px 28px rgba(22, 101, 52, 0.16);
+}
+.track-card.is-urgent:not(.is-proceso-listo):hover {
+    border-color: var(--rojo);
+    box-shadow: 0 12px 28px rgba(185, 28, 28, 0.10);
+}
+.shell-ops .btn-dark:hover,
+.flujo-modal .btn-primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.94);
+    text-decoration: none;
+}
+.flujo-modal .btn-ghost:hover {
+    transform: translateY(-1px);
+    background: var(--card-2);
+    border-color: var(--linea-fuerte);
+    text-decoration: none;
+}
+.shell-ops .btn-dark:active,
+.flujo-modal .btn:active {
+    transform: translateY(1px);
+}
+.track-card.is-proceso-listo .btn-corregir:hover {
+    background: transparent;
+    border-color: transparent;
+    color: var(--verde-texto);
+}
+.track-card.is-urgent:not(.is-proceso-listo) .btn-corregir:hover {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+    .shell-ops .btn-dark:hover,
+    .flujo-modal .btn:hover,
+    .flujo-modal .btn:active {
+        transform: none;
+    }
+}

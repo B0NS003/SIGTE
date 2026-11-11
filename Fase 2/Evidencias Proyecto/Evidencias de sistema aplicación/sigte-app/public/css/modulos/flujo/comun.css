@@ -1,0 +1,617 @@
+/* Flujo: puesto, etapas y piezas que comparten el panel, la recepción y la entrega. */
+@keyframes track-card-in {
+
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+
+}
+@keyframes track-node-pulse {
+
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 90, 28, 0.35);
+  }
+
+  55% {
+    box-shadow: 0 0 0 7px rgba(232, 90, 28, 0);
+  }
+
+}
+@keyframes badge-bell-ring {
+
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  8% {
+    transform: rotate(14deg);
+  }
+
+  16% {
+    transform: rotate(-12deg);
+  }
+
+  24% {
+    transform: rotate(10deg);
+  }
+
+  32% {
+    transform: rotate(-8deg);
+  }
+
+  40% {
+    transform: rotate(5deg);
+  }
+
+  48% {
+    transform: rotate(-3deg);
+  }
+
+  56%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+}
+@keyframes track-line-flow {
+
+  from {
+    background-position: 0% 0;
+  }
+
+  to {
+    background-position: -220% 0;
+  }
+
+}
+@keyframes flujo-recien {
+
+  0%, 35% { box-shadow: 0 0 0 3px var(--naranja-linea); }
+  100% { box-shadow: 0 0 0 3px transparent; }
+
+}
+@keyframes flujo-aviso-entra {
+
+  from { opacity: 0; transform: translate(-50%, 0.5rem); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+
+}
+@keyframes track-node-pulse-listo {
+
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.32);
+  }
+
+  55% {
+    box-shadow: 0 0 0 7px rgba(22, 163, 74, 0);
+  }
+
+}
+
+/* Avance de etapa */
+.adv-hero h2,
+.adv-listo h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: var(--fs-4xl);
+    line-height: 1.25;
+}
+.adv-hero .badge-urgent {
+    margin-top: 0.55rem;
+}
+.adv-movimiento {
+    margin: 0.45rem 0 0;
+    color: var(--texto);
+    font-size: var(--fs-lg);
+    line-height: 1.45;
+}
+.adv-listo {
+    background: var(--verde-fondo);
+    border-color: var(--verde-linea);
+}
+.adv-listo .eyebrow {
+    color: var(--verde-texto);
+}
+.adv-pipe {
+    margin-bottom: 1rem;
+}
+
+/* Entrega */
+.entrega-panel {
+    padding: var(--esp-5) var(--esp-5) var(--esp-4);
+}
+.entrega-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+    gap: 1.75rem;
+    align-items: start;
+}
+.entrega-cuerpo h2 {
+    margin: 0 0 0.9rem;
+}
+.entrega-obs {
+    margin: 0.2rem 0 1rem;
+}
+.entrega-obs summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-1);
+    cursor: pointer;
+    color: var(--ink);
+    font-size: var(--fs-base);
+    font-weight: 700;
+}
+.entrega-obs textarea {
+    margin-top: 0.65rem;
+}
+.entrega-panel .entrega-error-campo {
+    color: var(--rojo-texto);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 6px 0 14px;
+}
+.entrega-panel .entrega-campo-invalido {
+    border: 1.5px solid var(--rojo) !important;
+    background-color: var(--rojo-fondo);
+}
+
+/* Modo oscuro del flujo: etapas, tarjetas de caja, nodos y barra de avance */
+html[data-tema="oscuro"] .puesto-cambiar select {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--ink);
+}
+html[data-tema="oscuro"] .puesto-cambiar:focus-within {
+    background: var(--superficie-3);
+    border-color: var(--naranja-linea);
+    box-shadow: 0 0 0 3px rgba(240, 112, 47, 0.22);
+}
+html[data-tema="oscuro"] .track-node {
+    background: var(--card);
+    border-color: var(--linea-fuerte);
+    color: var(--texto-4);
+}
+html[data-tema="oscuro"] .track-line {
+    background: var(--linea-fuerte);
+}
+html[data-tema="oscuro"] .track-step.done .track-node,
+html[data-tema="oscuro"] .track-step.current .track-node {
+    background: var(--naranja);
+    border-color: var(--naranja);
+    color: #fff;
+}
+html[data-tema="oscuro"] .track-step.current .track-node {
+    box-shadow: 0 0 0 3px rgba(240, 112, 47, 0.25);
+}
+html[data-tema="oscuro"] .track-step.current .track-label,
+html[data-tema="oscuro"] .track-step.next .track-label {
+    color: var(--naranja-texto);
+}
+html[data-tema="oscuro"] .track-line.done {
+    background: linear-gradient(90deg, #d9561a 0%, #fdaa6e 35%, #f0702f 55%, #fb9a5e 75%, #d9561a 100%);
+    background-size: 220% 100%;
+    box-shadow: none;
+    animation: track-line-flow 1.35s linear infinite;
+}
+
+/* Operator tracking board */
+.puesto-card {
+    margin: 0 0 0.85rem;
+    padding: var(--esp-3) var(--esp-4);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card);
+    box-shadow: var(--sombra-1);
+}
+.puesto-card.is-empty {
+    border-color: var(--naranja-linea);
+    background: var(--card);
+}
+.puesto-card-main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--esp-3) var(--esp-4);
+}
+.puesto-avatar {
+    position: relative;
+    flex: 0 0 auto;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: 800;
+    background: var(--navy);
+    color: #fff;
+}
+.puesto-card.is-ok .puesto-avatar::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 2px solid var(--card);
+    border-radius: 50%;
+    background: #22c55e;
+}
+.puesto-card.is-empty .puesto-avatar {
+    background: var(--naranja-suave);
+    color: var(--naranja-texto);
+    border: 1.5px dashed var(--naranja);
+}
+.puesto-card-texto {
+    min-width: 0;
+}
+.puesto-kicker {
+    margin: 0;
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--texto-4);
+}
+.puesto-kicker span {
+    margin: 0 0.2rem;
+}
+.puesto-card.is-empty .puesto-kicker {
+    color: var(--naranja-texto);
+}
+.puesto-nombre {
+    margin: 0.15rem 0 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.puesto-meta {
+    margin: 0.15rem 0 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    line-height: 1.35;
+}
+.puesto-cambiar {
+    display: flex;
+    align-items: center;
+    min-width: 12rem;
+    margin: 0;
+    padding: var(--esp-1) var(--esp-3);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-pill);
+    background: var(--card-2);
+    transition: border-color var(--dur-rapida) ease, background var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.puesto-cambiar:hover {
+    border-color: var(--linea-fuerte);
+}
+.puesto-cambiar:focus-within {
+    border-color: var(--naranja);
+    background: var(--card);
+    box-shadow: var(--foco);
+}
+.puesto-cambiar.is-principal {
+    min-width: 13rem;
+    border-color: var(--naranja);
+    background: var(--naranja);
+}
+.puesto-cambiar .sigte-lista-boton,
+.puesto-cambiar .sigte-lista-boton.is-vacio {
+    min-height: 1.9rem;
+    color: var(--ink);
+    font-size: var(--fs-base);
+    font-weight: 700;
+}
+.puesto-cambiar.is-principal .sigte-lista-boton,
+.puesto-cambiar.is-principal .sigte-lista-boton svg {
+    color: #fff;
+}
+.puesto-cambiar select {
+    width: 100%;
+    min-height: 1.5rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font-size: var(--fs-base);
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+}
+.puesto-cambiar select:focus {
+    outline: none;
+}
+.puesto-card .sigte-error {
+    margin: 0.55rem 0 0;
+}
+@media (max-width: 720px) {
+    .puesto-card-main {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+    .puesto-cambiar,
+    .puesto-cambiar.is-principal {
+        grid-column: 1 / -1;
+        min-width: 0;
+    }
+}
+
+/* Etiqueta secundaria chica; el valor manda. */
+.track-pipe {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin: 0.35rem 0 0.55rem;
+    overflow-x: auto;
+    padding: var(--esp-2) var(--esp-1) 0.15rem;
+}
+.track-step {
+    flex: 0 0 auto;
+    width: 5rem;
+    text-align: center;
+}
+.track-node {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+    border-radius: 50%;
+    margin: 0 auto 0.4rem;
+    background: var(--superficie-3);
+    border: 2px solid var(--linea-fuerte);
+    color: var(--texto-3);
+}
+.track-node svg {
+    width: var(--icono-md);
+    height: var(--icono-md);
+    display: block;
+    flex-shrink: 0;
+    position: static;
+    transform: none;
+}
+
+/* Flujo interno: siempre naranja (el color de etapa va en el contorno). */
+.track-step.done .track-node {
+    background: #f45b20;
+    border-color: #f45b20;
+    color: #ffffff;
+}
+.track-step.current .track-node {
+    background: #f45b20;
+    border-color: #f45b20;
+    color: #ffffff;
+    box-shadow: var(--foco);
+    animation: track-node-pulse 1.8s ease-out infinite;
+}
+.track-label {
+    font-size: var(--fs-2xs);
+    color: var(--muted);
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: normal;
+}
+.track-step.current .track-label {
+    color: var(--naranja-oscuro);
+    font-weight: 800;
+}
+.track-line {
+    flex: 1 1 18px;
+    height: 3px;
+    background: var(--superficie-3);
+    margin-top: 6px;
+    min-width: 12px;
+    border-radius: var(--radio-pill);
+}
+.track-line.done {
+    background: linear-gradient(90deg,
+      var(--naranja-oscuro) 0%,
+      #fb923c 45%,
+      var(--naranja) 70%,
+      var(--naranja-oscuro) 100%);
+    background-size: 220% 100%;
+    transform-origin: left center;
+    animation: track-line-flow 1.5s linear infinite;
+}
+@media (max-width: 640px) {
+    .track-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    .track-step {
+        width: auto;
+        position: relative;
+    }
+    .track-pipe {
+        align-items: center;
+        padding-top: var(--esp-1);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .track-step.current .track-node {
+        animation: none !important;
+    }
+    .track-line.done {
+        animation: none !important;
+        background-position: 0 0 !important;
+    }
+    .track-line.done,
+    .track-node {
+        transform: none !important;
+    }
+}
+
+/* Nueva recepción */
+.recv-layout {
+    display: grid;
+    grid-template-columns: 1.35fr 0.9fr;
+    gap: var(--esp-4);
+    align-items: start;
+}
+.recv-form .field {
+    margin-bottom: 0.85rem;
+}
+.recv-textarea {
+    width: 100%;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    padding: var(--esp-3) var(--esp-4);
+    font: inherit;
+    resize: vertical;
+    min-height: 88px;
+    background: var(--card-2);
+    color: var(--texto);
+    margin-bottom: 0.85rem;
+}
+.recv-textarea:focus {
+    outline: none;
+    background: var(--card);
+    border-color: var(--naranja-linea);
+    box-shadow: var(--foco);
+}
+.act-barra {
+    height: 8px;
+    border-radius: var(--radio-pill);
+    background: var(--superficie-3);
+    overflow: hidden;
+}
+.act-barra span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--naranja);
+}
+.act-aviso {
+    margin: 0 0 0.75rem;
+}
+.act-suma {
+    margin-top: 0.4rem;
+    padding-top: var(--esp-4);
+    border-top: 1px solid var(--borde);
+}
+.act-suma h2 {
+    margin: 0 0 0.7rem;
+}
+.act-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--esp-2);
+}
+.act-lista li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--esp-4);
+    align-items: baseline;
+    padding: var(--esp-3) var(--esp-3);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    background: var(--card-2);
+}
+.act-lista strong {
+    color: var(--ink);
+    font-size: var(--fs-md);
+}
+.act-lista span {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    white-space: nowrap;
+}
+.recv-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--esp-2);
+    flex-wrap: wrap;
+    border-top: 1px solid var(--borde);
+    padding-top: var(--esp-4);
+}
+.recv-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-3);
+}
+.recv-help {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-base);
+    line-height: 1.45;
+}
+@media (max-width: 1000px) {
+    .recv-layout {
+        grid-template-columns: 1fr;
+    }
+    .entrega-cuerpo {
+        grid-template-columns: 1fr;
+    }
+}
+.track-step.next .track-node {
+    background: var(--naranja-suave);
+    border-color: var(--naranja);
+}
+.track-step.next .track-label {
+    color: var(--naranja-oscuro);
+}
+
+/* Listo para pasar: tarjeta y flujo en verde. */
+.shell-ops .btn-ghost:hover {
+    transform: translateY(-1px);
+    background: var(--card-2);
+    border-color: var(--linea-fuerte);
+    text-decoration: none;
+}
+.shell-ops .btn-ghost:active {
+    transform: translateY(1px);
+}
+@media (prefers-reduced-motion: reduce) {
+    .shell-ops .btn-ghost:hover,
+    .shell-ops .btn:active {
+        transform: none;
+    }
+}
+
+/* Entrega — servicio que lo recibe.
+   Un solo desplegable visible, sin select nativo superpuesto. */
+.entrega-dato strong {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--ink);
+    font-size: var(--fs-lg);
+    line-height: 1.3;
+}
+.field-label {
+    display: block;
+    font-size: var(--fs-base);
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 0.35rem;
+    letter-spacing: 0.02em;
+}

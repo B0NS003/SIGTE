@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/flujo.css') }}?v={{ @filemtime(public_path('css/flujo.css')) }}-ops8">
+    <link rel="stylesheet" href="{{ asset('css/modulos/flujo/comun.css') }}?v={{ @filemtime(public_path('css/modulos/flujo/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/flujo/panel.css') }}?v={{ @filemtime(public_path('css/modulos/flujo/panel.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Operadora')

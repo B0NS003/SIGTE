@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/inventario.css') }}?v={{ @filemtime(public_path('css/inventario.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/modulos/inventario/inventario.css') }}?v={{ @filemtime(public_path('css/modulos/inventario/inventario.css')) }}">
 
 @if ($esAdministradora && in_array($sala, ['lavado', 'armado']))
 <link rel="stylesheet" href="{{ asset('css/inventario/pestanas.css') }}?v={{ @filemtime(public_path('css/inventario/pestanas.css')) }}">

@@ -1,0 +1,10 @@
+/* Piezas compartidas de enfermera (panel y cierre). */
+/* enfermera — mismos patrones visuales que recepción/entrega (sigte + flujo) */
+.adv-k {
+    display: block;
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--muted);
+}

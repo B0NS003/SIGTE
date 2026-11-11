@@ -3,7 +3,7 @@
 @section('title', 'SIGTE — Iniciar sesión')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/login/login.css') }}?v={{ @filemtime(public_path('css/modulos/login/login.css')) }}">
 @endpush
 
 @section('content')

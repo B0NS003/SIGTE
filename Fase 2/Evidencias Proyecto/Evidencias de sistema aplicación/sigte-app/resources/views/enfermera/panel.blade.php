@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/enfermera.css') }}?v={{ @filemtime(public_path('css/enfermera.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/enfermera/comun.css') }}?v={{ @filemtime(public_path('css/modulos/enfermera/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/enfermera/panel.css') }}?v={{ @filemtime(public_path('css/modulos/enfermera/panel.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Enfermera de turno')

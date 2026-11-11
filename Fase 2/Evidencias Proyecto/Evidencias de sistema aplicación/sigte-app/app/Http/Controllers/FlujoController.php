@@ -16,6 +16,12 @@ use App\Models\Rol;
 use App\Models\User;
 use App\Http\Controllers\Concerns\ConsultaDeCajas;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
+use App\Http\Requests\Flujo\GuardarAvanceRequest;
+use App\Http\Requests\Flujo\GuardarRecepcionRequest;
+use App\Http\Requests\Flujo\GuardarRetrocesoRequest;
+use App\Services\Flujo\AvanceEtapa;
+use App\Services\Flujo\RecepcionCaja;
+use App\Services\Flujo\RetrocesoEtapa;
 use App\Support\AccesoPorRol;
 use App\Support\Auditoria;
 use App\Support\ReporteAdmin;
@@ -25,6 +31,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class FlujoController extends Controller
@@ -320,76 +327,31 @@ class FlujoController extends Controller
     }
 
     /** Crea la caja del flujo únicamente a partir de una ficha válida del catálogo. */
-    public function guardarRecepcion(Request $request): RedirectResponse
+    public function guardarRecepcion(GuardarRecepcionRequest $request, RecepcionCaja $recepcion): RedirectResponse
     {
-        $datos = $request->validate([
-            'servicio_id' => ['required', 'integer', 'exists:servicios,id'],
-            'tipo_conjunto_id' => ['required', 'integer', 'exists:tipo_conjunto,id'],
-            'ficha_id' => ['required', 'integer', 'exists:fichas,id'],
-            'quien_entrega' => ['required', 'string', 'max:150'],
-            'obs' => ['nullable', 'string', 'max:1000'],
-        ], [
-            'servicio_id.required' => 'Selecciona el servicio de origen.',
-            'tipo_conjunto_id.required' => 'Selecciona el tipo de conjunto.',
-            'ficha_id.required' => 'Selecciona una caja del catálogo.',
-            'quien_entrega.required' => 'Escribe el nombre de quien entrega el material.',
-        ]);
-
         if ($aviso = $this->faltaPuesto()) {
             return back()->withInput()->withErrors(['puesto' => $aviso]);
         }
 
-        $ficha = Ficha::query()->findOrFail($datos['ficha_id']);
-        $tipo = TipoConjunto::query()->findOrFail($datos['tipo_conjunto_id']);
-        if ((int) $tipo->servicio_id !== (int) $datos['servicio_id']
-            || (int) $ficha->servicio_id !== (int) $datos['servicio_id']
-            || (int) $ficha->tipo_conjunto_id !== (int) $tipo->id) {
-            return back()->withInput()->withErrors(['ficha_id' => 'La caja no corresponde al servicio y tipo seleccionados.']);
-        }
-        if (Caja::query()->where('codigo', $ficha->codigo)->exists()) {
-            return back()->withInput()->withErrors(['ficha_id' => 'Esta caja ya está registrada en el flujo. No puede ingresarse dos veces.']);
-        }
-
-        $marca = $this->marca();
         try {
-            DB::transaction(function () use ($ficha, $datos, $marca): void {
-                // Bloquea la fila para evitar dos recepciones simultáneas del mismo código.
-                $existente = Caja::query()->where('codigo', $ficha->codigo)->lockForUpdate()->first();
-                if ($existente !== null) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'ficha_id' => 'Esta caja ya está registrada en el flujo.',
-                    ]);
-                }
-                $caja = Caja::query()->create([
-                    'codigo' => $ficha->codigo,
-                    'ficha_id' => $ficha->id,
-                    'servicio_id' => $ficha->servicio_id,
-                    'etapa' => Caja::ETAPA_RECEPCION,
-                    'ubicacion' => 'Área sucia',
-                    'estado' => 'En Recepción',
-                    'actividad' => null,
-                    'urgente' => false,
-                    'responsable_id' => $marca['user_id'],
-                    'etapa_desde' => now(),
-                ]);
-                $detalle = 'Recepción. Entrega: '.trim($datos['quien_entrega']).'.';
-                if (!empty($datos['obs'])) {
-                    $detalle .= ' Observación: '.trim($datos['obs']);
-                }
-                $caja->anotaciones()->create([
-                    'user_id' => $marca['user_id'],
-                    'texto' => $detalle,
-                ]);
-            });
-        } catch (\Illuminate\Validation\ValidationException $e) {
+            $resultado = $recepcion->registrar($request->validated(), $this->marca());
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\Throwable $e) {
             report($e);
-            return back()->withInput()->withErrors(['ficha_id' => 'No se pudo registrar la recepción. Revisa los datos e inténtalo nuevamente.']);
+
+            return back()->withInput()->withErrors([
+                'ficha_id' => 'No se pudo registrar la recepción. Revisa los datos e inténtalo nuevamente.',
+            ]);
         }
 
+        $ficha = $resultado['ficha'];
+
         return redirect()->route('mockups.recepcion')
-            ->with('recepcion_ok', 'La caja '.$ficha->codigo.' — '.$ficha->nombre.' fue registrada correctamente en la etapa Recepción. Entregada por: '.trim($datos['quien_entrega']).'.');
+            ->with(
+                'recepcion_ok',
+                'La caja '.$ficha->codigo.' — '.$ficha->nombre.' fue registrada correctamente en la etapa Recepción. Entregada por: '.$resultado['quien_entrega'].'.'
+            );
     }
 
     public function avanzar(Request $request): RedirectResponse
@@ -403,131 +365,43 @@ class FlujoController extends Controller
     /**
      * HIU-EP2-002: avanza una sola etapa y deja fecha, hora y usuario.
      */
-    public function guardarAvance(Request $request): RedirectResponse
+    public function guardarAvance(GuardarAvanceRequest $request, AvanceEtapa $avance): RedirectResponse
     {
-        $codigo = trim((string) $request->input('caja', ''));
-        $destino = trim((string) $request->input('etapa_destino', ''));
+        $codigo = $request->validated('caja');
         $volver = $this->volverAlFlujo($request, $codigo);
         if ($aviso = $this->faltaPuesto()) {
-            return $volver->withErrors(['puesto' => $aviso]);
+            return $volver->withInput()->withErrors(['puesto' => $aviso]);
         }
-        if ($codigo === '') {
-            return $volver->withErrors(['caja' => 'Elige la caja que vas a pasar.']);
+
+        try {
+            $resultado = $avance->ejecutar($codigo, $request->validated('etapa_destino'), $this->marca());
+        } catch (ValidationException $e) {
+            return $volver->withInput()->withErrors($e->errors());
         }
-        $caja = Caja::query()->where('codigo', $codigo)->first();
-        if ($caja === null) {
-            return $volver->withErrors(['caja' => 'Esa caja no está en el flujo.']);
-        }
-        $etapas = Caja::etapas();
-        $indice = $caja->indiceEtapa();
-        $siguiente = $etapas[$indice + 1] ?? null;
-        $etiquetaActual = Caja::etiquetaEtapa($caja->etapa);
-        if ($destino === '') {
-            return $volver->withErrors([
-                'etapa_destino' => 'Falta la etapa a la que pasa la caja.',
-            ]);
-        }
-        if ($siguiente === null) {
-            return $volver->withErrors([
-                'etapa_destino' => $caja->codigo.' ya está en '.$etiquetaActual.'. El paso que sigue es registrar la entrega.',
-            ]);
-        }
-        if ($destino !== $siguiente) {
-            return $volver->withErrors([
-                'etapa_destino' => 'No se puede saltar etapas. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
-            ]);
-        }
-        $desde = $etiquetaActual;
-        $caja->etapa = $siguiente;
-        $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
-        $caja->actividad = null;
-        $caja->etapa_desde = now();
-        $caja->proceso_desde = null;
-        $caja->proceso_hasta = null;
-        $marca = $this->marca();
-        $caja->responsable_id = $marca['user_id'];
-        $caja->save();
-        $caja->anotaciones()->create([
-            'user_id' => $marca['user_id'],
-            'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
-        ]);
-        Auditoria::registrar(
-            'Avanzó etapa',
-            'etapa',
-            $caja->codigo,
-            $desde.' → '.Caja::etiquetaEtapa($siguiente),
-        );
-        return $this->volverAlFlujo($request, $caja->codigo, false)
-            ->with('ok', 'Listo. '.$caja->codigo.' está en '.Caja::etiquetaEtapa($siguiente).'.'.$this->firmaPuesto());
+
+        return $this->volverAlFlujo($request, $resultado['caja']->codigo, false)
+            ->with('ok', 'Listo. '.$resultado['caja']->codigo.' está en '.$resultado['hacia'].'.'.$this->firmaPuesto());
     }
+
     /**
      * HIU-EP2-003: un paso atrás, con motivo, solo desde lavado o preparación.
      */
-    public function guardarRetroceso(Request $request): RedirectResponse
+    public function guardarRetroceso(GuardarRetrocesoRequest $request, RetrocesoEtapa $retroceso): RedirectResponse
     {
-        $codigo = trim((string) $request->input('caja', ''));
-        $motivo = trim((string) $request->input('motivo', ''));
+        $codigo = $request->validated('caja');
         $volver = $this->volverAlFlujo($request, $codigo, true, 'retroceso');
         if ($aviso = $this->faltaPuesto()) {
-            return $volver->withErrors(['puesto' => $aviso]);
+            return $volver->withInput()->withErrors(['puesto' => $aviso]);
         }
-        if ($codigo === '') {
-            return $volver->withErrors(['caja' => 'Elige la caja que vas a corregir.']);
-        }
-        $caja = Caja::query()->where('codigo', $codigo)->first();
-        if ($caja === null) {
-            return $volver->withErrors(['caja' => 'Esa caja no está en el flujo.']);
-        }
-        $anterior = $caja->etapaAnteriorPermitida();
-        $etiquetaActual = Caja::etiquetaEtapa(trim((string) $caja->etapa));
-        if ($anterior === null) {
-            return $volver->withErrors([
-                'etapa' => 'El retroceso no está permitido. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
-            ]);
-        }
-        if ($motivo === '') {
-            return $volver->withErrors([
-                'motivo' => 'Registra el motivo del retroceso.',
-            ]);
-        }
-        $motivo = mb_substr($motivo, 0, 180);
-        $etiquetaAnterior = Caja::etiquetaEtapa($anterior);
+
         try {
-            $marca = $this->marca();
-            DB::transaction(function () use ($caja, $anterior, $motivo, $marca): void {
-                $origen = trim((string) $caja->etapa);
-                $caja->etapa = $anterior;
-                $caja->estado = 'En '.Caja::etiquetaEtapa($anterior);
-                $caja->actividad = null;
-                $caja->etapa_desde = now();
-                $caja->proceso_desde = null;
-                $caja->proceso_hasta = null;
-                $caja->responsable_id = $marca['user_id'];
-                $caja->save();
-                $caja->retrocesos()->create([
-                    'user_id' => $marca['user_id'],
-                    'etapa_desde' => $origen,
-                    'etapa_hacia' => $anterior,
-                    'motivo' => $motivo,
-                ]);
-                $caja->anotaciones()->create([
-                    'user_id' => $marca['user_id'],
-                    'texto' => 'Volvió a '.Caja::etiquetaEtapa($anterior).'. '.$motivo,
-                ]);
-            });
-        } catch (\Throwable) {
-            return $volver->withErrors([
-                'etapa' => 'No fue posible completar el retroceso. '.$caja->codigo.' sigue en '.$etiquetaActual.'.',
-            ]);
+            $resultado = $retroceso->ejecutar($codigo, $request->validated('motivo'), $this->marca());
+        } catch (ValidationException $e) {
+            return $volver->withInput()->withErrors($e->errors());
         }
-        Auditoria::registrar(
-            'Corrigió etapa',
-            'etapa',
-            $caja->codigo,
-            $etiquetaActual.' → '.$etiquetaAnterior.'. '.$motivo,
-        );
-        return $this->volverAlFlujo($request, $caja->codigo, false, 'retroceso')
-            ->with('ok', 'Listo. '.$caja->codigo.' volvió a '.$etiquetaAnterior.'.'.$this->firmaPuesto());
+
+        return $this->volverAlFlujo($request, $resultado['caja']->codigo, false, 'retroceso')
+            ->with('ok', 'Listo. '.$resultado['caja']->codigo.' volvió a '.$resultado['hacia'].'.'.$this->firmaPuesto());
     }
     private function volverAlFlujo(Request $request, string $codigo, bool $conservarEtapa = true, string $accion = 'etapa'): RedirectResponse
     {

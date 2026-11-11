@@ -1,0 +1,69 @@
+/* Vista panel. Se carga después de comun.css si existe. */
+/* enfermera — mismos patrones visuales que recepción/entrega (sigte + flujo) */
+.phases {
+    display: flex;
+    align-items: stretch;
+    gap: var(--esp-1);
+    margin-bottom: 1.35rem;
+    flex-wrap: wrap;
+}
+.phase {
+    flex: 1 1 110px;
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    padding: var(--esp-3) var(--esp-2) var(--esp-3);
+    text-align: center;
+    position: relative;
+}
+.phase-step {
+    position: absolute;
+    top: 0.45rem;
+    left: 0.5rem;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: var(--naranja-suave);
+    color: var(--naranja-oscuro);
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+}
+.phase .n {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: 700;
+    color: var(--naranja);
+}
+.phase .l {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    line-height: 1.2;
+    font-weight: 700;
+}
+.phase-sep {
+    display: flex;
+    align-items: center;
+    color: var(--linea-fuerte);
+    font-size: var(--fs-xl);
+    padding: 0 0.1rem;
+}
+.turno-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--esp-4);
+    padding: var(--esp-4) var(--esp-5);
+    margin-bottom: 1.1rem;
+}
+.turno-banner strong {
+    display: block;
+    color: var(--ink);
+    font-size: var(--fs-xl);
+    margin: 0.15rem 0;
+}
+.turno-banner small {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+}

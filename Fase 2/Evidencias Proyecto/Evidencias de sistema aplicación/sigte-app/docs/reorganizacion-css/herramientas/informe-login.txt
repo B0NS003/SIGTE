@@ -1,0 +1,6 @@
+MUERTOS (2)
+.auth-card .field-select
+.auth-card .field-select select
+
+PISADAS (0)
+

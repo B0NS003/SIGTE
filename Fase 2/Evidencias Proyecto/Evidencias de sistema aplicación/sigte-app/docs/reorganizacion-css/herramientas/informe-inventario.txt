@@ -1,0 +1,49 @@
+MUERTOS (45)
+.inv-libros
+.inv-libro
+.inv-libro:hover
+.inv-libro.sala-lavado
+.inv-libro.sala-armado
+.inv-libro.sala-esteril
+.inv-libro strong
+.inv-libro em
+.inv-libro ul
+.inv-libro li.is-alert
+.inv-sala-hero
+.inv-sala-hero ul
+.inv-mov.sala-lavado
+.inv-reposicion.sala-lavado
+.inv-mov.sala-armado
+.inv-reposicion.sala-armado
+.inv-mov.sala-esteril
+.inv-reposicion.sala-esteril
+#inv-consumo-historial-lista .inv-consumo-historial-item
+#inv-consumo-historial-lista .inv-consumo-historial-cabecera
+#inv-consumo-historial-lista .inv-consumo-historial-detalle
+#inv-consumo-historial-lista .inv-consumo-historial-fecha
+#inv-consumo-historial-lista .inv-consumo-historial-observacion
+#inv-consumo-historial-lista .inv-consumo-historial-etiqueta
+#inv-consumo-historial-lista .inv-consumo-historial-texto
+.inv-libros
+.inv-sala-hero
+.inv-sala-hero
+.inv-sala-hero ul
+.inv-paso
+.inv-paso
+.inv-vista.sala-todos .inv-paso
+.inv-vista.sala-lavado .inv-paso
+.inv-vista.sala-armado .inv-paso
+.inv-vista.sala-esteril .inv-paso
+.inv-reposicion
+.inv-reposicion-fila
+.inv-reposicion-fila .field
+.inv-reposicion .btn-primary
+.inv-historial
+.inv-historial h2
+.inv-reposicion-fila
+.inv-registrar-consumo
+.inv-registrar-consumo:hover
+.inv-registrar-consumo:focus-visible
+
+PISADAS (0)
+

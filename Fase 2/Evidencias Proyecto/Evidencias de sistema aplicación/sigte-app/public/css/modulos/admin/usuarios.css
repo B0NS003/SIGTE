@@ -1,0 +1,117 @@
+/* Vista usuarios. Se carga después de comun.css si existe. */
+/* admin */
+.user-actions {
+    white-space: nowrap;
+    display: flex;
+    gap: var(--esp-1);
+    justify-content: flex-end;
+}
+.user-actions .btn {
+    padding: 0 var(--esp-3);
+    font-size: var(--fs-sm);
+    min-height: var(--alto-sm);
+    border-radius: var(--radio-sm);
+}
+.user-inactive {
+    opacity: 0.72;
+}
+.users-kpis .kpi,
+.users-page .panel {
+    border-top: var(--franja) solid var(--naranja);
+}
+.users-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+    margin-bottom: 2rem;
+}
+.users-page .cuenta-alta {
+    margin-top: 0.5rem;
+}
+.user-quien {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+}
+.user-icono {
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.user-icono svg {
+    width: var(--icono-md);
+    height: var(--icono-md);
+}
+.user-icono svg path,
+.user-icono svg circle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.user-inactive .user-icono {
+    opacity: 0.55;
+}
+.users-page .user-actions form {
+    margin: 0;
+}
+.users-page .cuenta-alta .btn-primary {
+    width: auto;
+    min-width: 11rem;
+}
+.users-page .cuenta-pie {
+    display: flex;
+    justify-content: flex-end;
+}
+.users-paginas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--esp-2);
+    margin-top: 0.9rem;
+}
+.users-pagina {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.1rem;
+    height: var(--alto-sm);
+    padding: 0 var(--esp-3);
+    border-radius: var(--radio-pill);
+    border: 1px solid var(--borde);
+    background: var(--card);
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    text-decoration: none;
+}
+.users-pagina:hover {
+    border-color: var(--naranja-linea);
+    color: var(--ink);
+    text-decoration: none;
+}
+.users-pagina.is-on {
+    background: var(--naranja);
+    border-color: var(--naranja);
+    color: #fff;
+}
+.users-pagina.is-off {
+    color: var(--muted);
+    background: var(--card-2);
+}
+.users-rango {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+}
+.user-id {
+    width: 3rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}

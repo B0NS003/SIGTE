@@ -1,0 +1,147 @@
+    1 inventario                           .badge-sala
+    2 inventario                           .badge-lavado
+    3 inventario                           .badge-armado
+    4 inventario                           .badge-esteril
+    5 inventario                           html[data-tema="oscuro"] .badge-lavado
+    5 inventario                           html[data-tema="oscuro"] .inv-vista.sala-lavado .inv-elige > p
+    7 inventario                           html[data-tema="oscuro"] .badge-armado
+    7 inventario                           html[data-tema="oscuro"] .inv-vista.sala-armado .inv-elige > p
+    9 inventario                           html[data-tema="oscuro"] .badge-esteril
+    9 inventario                           html[data-tema="oscuro"] .inv-vista.sala-esteril .inv-elige > p
+   12 inventario                           .inv-titulo
+   18 inventario                           .inv-titulo .sigte-icon
+   19 NINGUNA                              .inv-libros
+   25 NINGUNA                              .inv-libro
+   37 NINGUNA                              .inv-libro:hover
+   43 NINGUNA                              .inv-libro.sala-lavado
+   44 NINGUNA                              .inv-libro.sala-armado
+   45 NINGUNA                              .inv-libro.sala-esteril
+   46 NINGUNA                              .inv-libro strong
+   54 NINGUNA                              .inv-libro em
+   61 NINGUNA                              .inv-libro ul
+   71 NINGUNA                              .inv-libro li.is-alert
+   73 NINGUNA                              .inv-sala-hero
+   80 NINGUNA                              .inv-sala-hero ul
+   87 inventario                           .inv-book.sala-lavado
+   87 NINGUNA                              .inv-mov.sala-lavado
+   87 NINGUNA                              .inv-reposicion.sala-lavado
+   90 inventario                           .inv-book.sala-armado
+   90 NINGUNA                              .inv-mov.sala-armado
+   90 NINGUNA                              .inv-reposicion.sala-armado
+   93 inventario                           .inv-book.sala-esteril
+   93 NINGUNA                              .inv-mov.sala-esteril
+   93 NINGUNA                              .inv-reposicion.sala-esteril
+   96 inventario                           .act-lista
+   97 inventario                           .act-lista li
+  101 inventario                           .act-lista strong
+  102 inventario                           .act-lista span
+  105 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-item
+  110 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-cabecera
+  117 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-detalle
+  122 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-fecha
+  128 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-observacion
+  135 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-etiqueta
+  144 NINGUNA                              #inv-consumo-historial-lista .inv-consumo-historial-texto
+  154 inventario                           .list tbody tr.stock-ok td
+  158 inventario                           .list tbody tr.stock-bajo td
+  162 inventario                           .list tbody tr.stock-critico td
+  167 inventario                           .list tbody tr.stock-ok td:first-child
+  171 inventario                           .list tbody tr.stock-bajo td:first-child
+  175 inventario                           .list tbody tr.stock-critico td:first-child
+  180 inventario                           .list tbody tr.stock-ok:hover td
+  184 inventario                           .list tbody tr.stock-bajo:hover td
+  188 inventario                           .list tbody tr.stock-critico:hover td
+  193 NINGUNA                              [@media (max-width: 900px)] .inv-libros
+  193 NINGUNA                              [@media (max-width: 900px)] .inv-sala-hero
+  194 NINGUNA                              [@media (max-width: 900px)] .inv-sala-hero
+  195 NINGUNA                              [@media (max-width: 900px)] .inv-sala-hero ul
+  198 inventario                           .stock-ok td:first-child strong
+  202 inventario                           .stock-bajo td:first-child strong
+  206 inventario                           .stock-critico td:first-child strong
+  210 NINGUNA                              .inv-paso
+  210 inventario                           .inv-elige > p
+  218 NINGUNA                              .inv-paso
+  219 NINGUNA                              .inv-vista.sala-todos .inv-paso
+  219 inventario                           .inv-vista.sala-todos .inv-elige > p
+  221 NINGUNA                              .inv-vista.sala-lavado .inv-paso
+  221 inventario                           .inv-vista.sala-lavado .inv-elige > p
+  223 NINGUNA                              .inv-vista.sala-armado .inv-paso
+  223 inventario                           .inv-vista.sala-armado .inv-elige > p
+  225 NINGUNA                              .inv-vista.sala-esteril .inv-paso
+  225 inventario                           .inv-vista.sala-esteril .inv-elige > p
+  227 inventario                           .inv-elige
+  228 inventario                           .inv-switch
+  235 inventario                           .inv-switch-item
+  252 inventario                           .inv-switch-item:hover
+  260 inventario                           .inv-switch-item strong
+  265 inventario                           .inv-switch-item em
+  271 inventario                           .inv-switch-item span
+  279 inventario                           .inv-switch-item span.is-alert
+  284 inventario                           .inv-switch-item.sala-lavado
+  288 inventario                           .inv-switch-item.sala-armado
+  292 inventario                           .inv-switch-item.sala-esteril
+  296 inventario                           .inv-switch-item.sala-todos
+  301 inventario                           .inv-switch-item.is-active
+  306 inventario                           .inv-switch-item.sala-lavado.is-active
+  312 inventario                           .inv-switch-item.sala-armado.is-active
+  318 inventario                           .inv-switch-item.sala-esteril.is-active
+  324 inventario                           .inv-switch-item.sala-todos.is-active
+  330 inventario                           html[data-tema="oscuro"] .inv-switch-item.sala-todos
+  334 inventario                           html[data-tema="oscuro"] .inv-switch-item.sala-todos.is-active
+  339 inventario                           .inv-resumen
+  348 inventario                           .inv-resumen strong
+  349 inventario                           .inv-resumen .is-alert
+  349 inventario                           .inv-resumen .is-alert strong
+  352 inventario                           .inv-busqueda
+  359 inventario                           .inv-busqueda .field
+  367 inventario                           .inv-busqueda .btn
+  375 inventario                           .inv-campo-busqueda
+  379 inventario                           .inv-icono-busqueda
+  391 inventario                           .inv-campo-busqueda input
+  396 inventario                           .inv-limpiar-busqueda
+  423 inventario                           .inv-limpiar-busqueda:hover
+  428 inventario                           .inv-limpiar-busqueda:focus-visible
+  433 inventario                           .inv-limpiar-busqueda svg
+  439 inventario                           .inv-limpiar-busqueda[hidden]
+  444 inventario                           .inv-campo-busqueda input[type="search"]::-webkit-search-cancel-button
+  449 NINGUNA                              .inv-reposicion
+  450 inventario                           .inv-quien
+  451 NINGUNA                              .inv-reposicion-fila
+  457 NINGUNA                              .inv-reposicion-fila .field
+  458 NINGUNA                              .inv-reposicion .btn-primary
+  465 NINGUNA                              .inv-historial
+  466 NINGUNA                              .inv-historial h2
+  468 inventario                           [@media (max-width: 900px)] .inv-switch
+  468 NINGUNA                              [@media (max-width: 900px)] .inv-reposicion-fila
+  469 inventario                           [@media (max-width: 900px)] .inv-resumen
+  474 inventario                           #cuerpo-inventario tr[hidden]
+  474 inventario                           #cuerpo-inventario tr.is-pagina-oculta
+  479 inventario                           .inv-paginacion
+  489 inventario                           .inv-paginacion-info
+  497 inventario                           .inv-paginacion-info label
+  501 inventario                           .inv-paginacion-info select
+  512 inventario                           .inv-paginacion-controles
+  518 inventario                           .inv-rango
+  525 inventario                           .inv-pagina-btn
+  525 inventario                           .inv-pagina-numero
+  552 inventario                           .inv-pagina-btn:hover:not(:disabled)
+  552 inventario                           .inv-pagina-numero:hover
+  559 inventario                           .inv-pagina-numero.is-active
+  566 inventario                           .inv-editar-stock
+  566 NINGUNA                              .inv-registrar-consumo
+  566 inventario                           .inv-configurar-minimo
+  583 inventario                           .inv-editar-stock:hover
+  583 NINGUNA                              .inv-registrar-consumo:hover
+  583 inventario                           .inv-configurar-minimo:hover
+  590 inventario                           .inv-editar-stock:focus-visible
+  590 NINGUNA                              .inv-registrar-consumo:focus-visible
+  590 inventario                           .inv-configurar-minimo:focus-visible
+  598 inventario                           .inv-tarjeta-encabezado
+  606 inventario                           .inv-campana-alertas
+  620 inventario                           .inv-campana-alertas svg
+  625 inventario                           .inv-switch-item .inv-campana-alertas .inv-campana-contador
+  646 inventario                           .inv-toast-confirmacion
+  677 inventario                           .inv-toast-confirmacion .sigte-icon
+  685 inventario                           .inv-toast-confirmacion[hidden]
+  690 inventario                           .inv-toast-confirmacion:not([hidden])
+  694 at                                   @keyframes toastEntrada

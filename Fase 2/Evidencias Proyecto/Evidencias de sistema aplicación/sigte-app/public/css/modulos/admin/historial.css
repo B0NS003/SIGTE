@@ -1,0 +1,361 @@
+/* Vista historial. Se carga después de comun.css si existe. */
+/* Sectores: atajo visual por servicio (conteo + última entrega). */
+.hist-sectores {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--esp-2);
+    margin-bottom: 0.85rem;
+}
+.hist-sector {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.12rem;
+    text-align: left;
+    padding: var(--esp-2) var(--esp-3) var(--esp-2);
+    border: 1px solid var(--borde);
+    border-top: var(--franja) solid var(--navy);
+    border-radius: var(--radio-md);
+    background: var(--card);
+    cursor: pointer;
+    font-family: var(--font-body);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease, background var(--dur-rapida) ease;
+}
+.hist-sector:hover,
+.hist-sector:focus {
+    text-decoration: none;
+    color: inherit;
+    border-color: var(--linea-fuerte);
+    box-shadow: var(--sombra-realce);
+}
+.hist-sector.is-on {
+    background: var(--card-2);
+    border-color: var(--ink);
+    box-shadow: var(--sombra-2);
+}
+.hist-sector strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--fs-sm);
+    color: var(--ink);
+    line-height: 1.2;
+}
+.hist-sector .n {
+    font-family: var(--font-display);
+    font-size: var(--fs-2xl);
+    line-height: 1;
+    color: var(--ink);
+    margin-top: 0.15rem;
+}
+.hist-sector small {
+    display: block;
+    color: var(--muted);
+    font-size: var(--fs-2xs);
+    line-height: 1.3;
+}
+
+/* Misma base blanca; solo la raya superior identifica el servicio (familia navy/naranja). */
+.hist-sectores,
+.hist-lista {
+    --svc-pabellon: var(--naranja);
+    --svc-pabellon-ink: var(--naranja-oscuro);
+    --svc-dental: #334155;
+    --svc-dental-ink: #1e293b;
+    --svc-uci: #1d4ed8;
+    --svc-uci-ink: #1e3a8a;
+    --svc-urgencia: #b91c1c;
+    --svc-urgencia-ink: #991b1b;
+    --svc-maternidad: #9a3412;
+    --svc-maternidad-ink: #7c2d12;
+    --svc-curaciones: #0f766e;
+    --svc-curaciones-ink: #115e59;
+}
+html[data-tema="oscuro"] .hist-sectores,
+html[data-tema="oscuro"] .hist-lista {
+    --svc-dental: #64748b;
+    --svc-dental-ink: var(--texto-3);
+    --svc-uci: #4a7cf0;
+    --svc-uci-ink: var(--azul-texto);
+    --svc-urgencia: #ef4444;
+    --svc-urgencia-ink: var(--rojo-texto);
+    --svc-maternidad: #ea6a26;
+    --svc-maternidad-ink: var(--naranja-texto);
+    --svc-curaciones: #1aa898;
+    --svc-curaciones-ink: var(--teal-texto);
+}
+.hist-sector.sec-pabellon {
+    border-top-color: var(--svc-pabellon);
+}
+.hist-sector.sec-dental {
+    border-top-color: var(--svc-dental);
+}
+.hist-sector.sec-uci {
+    border-top-color: var(--svc-uci);
+}
+.hist-sector.sec-urgencia {
+    border-top-color: var(--svc-urgencia);
+}
+.hist-sector.sec-maternidad {
+    border-top-color: var(--svc-maternidad);
+}
+.hist-sector.sec-curaciones {
+    border-top-color: var(--svc-curaciones);
+}
+.hist-sector.sec-pabellon.is-on {
+    border-color: var(--svc-pabellon);
+    background: var(--naranja-suave);
+    box-shadow: var(--foco);
+}
+.hist-sector.sec-dental.is-on {
+    border-color: var(--svc-dental);
+}
+.hist-sector.sec-uci.is-on {
+    border-color: var(--svc-uci);
+    background: var(--azul-fondo);
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.22);
+}
+.hist-sector.sec-urgencia.is-on {
+    border-color: var(--svc-urgencia);
+    background: var(--rojo-fondo);
+    box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.2);
+}
+.hist-sector.sec-maternidad.is-on {
+    border-color: var(--svc-maternidad);
+    background: var(--naranja-fondo);
+    box-shadow: 0 0 0 2px rgba(154, 52, 18, 0.2);
+}
+.hist-sector.sec-curaciones.is-on {
+    border-color: var(--svc-curaciones);
+    background: var(--teal-fondo);
+    box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.22);
+}
+@media (max-width: 1100px) {
+    .hist-sectores {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@media (max-width: 720px) {
+    .hist-sectores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Filtros a todo el ancho; botón centrado con los campos, sin estirarse. */
+.hist-filtros {
+    display: grid;
+    width: 100%;
+    margin: 0 0 1rem;
+    grid-template-columns: minmax(14rem, 1fr) 11rem auto;
+    align-items: center;
+    gap: var(--esp-3);
+}
+.hist-filtros .field {
+    min-height: var(--alto-md);
+    width: auto;
+    max-width: none;
+    padding: 0 var(--esp-3);
+}
+.hist-buscar,
+.hist-periodo {
+    width: auto;
+    max-width: none;
+}
+.hist-filtros .users-filtros-acciones {
+    min-height: 0;
+    align-self: center;
+    padding-bottom: 0;
+}
+.hist-filtros .btn {
+    min-height: var(--alto-md);
+    height: var(--alto-md);
+}
+@media (max-width: 720px) {
+    .hist-filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+    .hist-buscar {
+        grid-column: 1 / -1;
+    }
+    .hist-filtros .users-filtros-acciones {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+.hist-lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-2);
+    margin-bottom: 0.75rem;
+    width: 100%;
+}
+.hist-card {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 6.4rem minmax(0, 1fr);
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    overflow: hidden;
+    transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.hist-card:hover {
+    border-color: var(--linea-fuerte);
+    box-shadow: var(--sombra-realce);
+}
+.hist-cuando {
+    position: relative;
+    padding: var(--esp-3) var(--esp-3) var(--esp-3) var(--esp-3);
+    background: var(--card);
+    border-right: 1px solid var(--borde);
+}
+.hist-cuando::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--naranja);
+}
+.hist-cuando strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--fs-2xl);
+    color: var(--ink);
+    line-height: 1.1;
+}
+.hist-cuando span,
+.hist-cuando small {
+    display: block;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+}
+.hist-cuando small {
+    margin-top: 0.35rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--naranja-oscuro);
+}
+.hist-relativo {
+    display: inline-block;
+    margin-top: 0.3rem;
+    padding: 0.08rem var(--esp-2);
+    border-radius: var(--radio-pill);
+    background: rgba(11, 31, 75, 0.06);
+    color: var(--ink);
+    font-size: var(--fs-2xs);
+    font-style: normal;
+    font-weight: 700;
+}
+.hist-card.sec-pabellon .hist-cuando::before {
+    background: var(--svc-pabellon);
+}
+.hist-card.sec-pabellon .hist-cuando small {
+    color: var(--svc-pabellon-ink);
+}
+.hist-card.sec-dental .hist-cuando::before {
+    background: var(--svc-dental);
+}
+.hist-card.sec-dental .hist-cuando small {
+    color: var(--svc-dental-ink);
+}
+.hist-card.sec-uci .hist-cuando::before {
+    background: var(--svc-uci);
+}
+.hist-card.sec-uci .hist-cuando small {
+    color: var(--svc-uci-ink);
+}
+.hist-card.sec-urgencia .hist-cuando::before {
+    background: var(--svc-urgencia);
+}
+.hist-card.sec-urgencia .hist-cuando small {
+    color: var(--svc-urgencia-ink);
+}
+.hist-card.sec-maternidad .hist-cuando::before {
+    background: var(--svc-maternidad);
+}
+.hist-card.sec-maternidad .hist-cuando small {
+    color: var(--svc-maternidad-ink);
+}
+.hist-card.sec-curaciones .hist-cuando::before {
+    background: var(--svc-curaciones);
+}
+.hist-card.sec-curaciones .hist-cuando small {
+    color: var(--svc-curaciones-ink);
+}
+.hist-cuerpo {
+    padding: var(--esp-3) var(--esp-4) var(--esp-3);
+}
+.hist-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--esp-3);
+}
+.hist-top h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    color: var(--ink);
+}
+.hist-cajas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-1);
+    margin: 0.5rem 0 0.65rem;
+}
+.hist-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--esp-1);
+    padding: var(--esp-1) var(--esp-2);
+    border-radius: var(--radio-pill);
+    background: var(--card-2);
+    border: 1px solid var(--borde);
+    color: var(--ink);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+}
+.hist-chip small {
+    font-weight: 600;
+    color: var(--muted);
+}
+.hist-chip.is-material {
+    background: var(--naranja-fondo);
+    border-color: var(--naranja-linea);
+}
+.hist-card .entrega-datos {
+    margin: 0;
+    padding-top: var(--esp-2);
+    border-top: 1px solid var(--linea);
+}
+.hist-card .entrega-dato strong {
+    font-size: var(--fs-md);
+}
+.hist-card .entrega-dato small {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+@media (max-width: 720px) {
+    .hist-card {
+        grid-template-columns: 1fr;
+    }
+    .hist-cuando {
+        border-right: 0;
+        border-bottom: 1px solid var(--borde);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--esp-1) var(--esp-3);
+        padding-left: var(--esp-4);
+    }
+    .hist-cuando strong,
+    .hist-cuando span,
+    .hist-cuando small {
+        display: inline;
+        margin: 0;
+    }
+}

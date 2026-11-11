@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/secretaria.css') }}?v={{ @filemtime(public_path('css/secretaria.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/secretaria/panel.css') }}?v={{ @filemtime(public_path('css/modulos/secretaria/panel.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Secretaria')

@@ -1,7 +1,4 @@
 @extends('layouts.app')
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('css/secretaria.css') }}?v={{ @filemtime(public_path('css/secretaria.css')) }}">
-@endpush
 
 @section('title', 'SIGTE — Insumos')
 

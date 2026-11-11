@@ -1,6 +1,6 @@
 # Reorganización de CSS y JS de SIGTE — traspaso para la próxima sesión
 
-Última actualización: 11/11/2026. Fases 1 (CSS general), 2 (Reportes) y 3 (Catálogo) terminadas y verificadas. **Sigue la fase 4: Flujo** (sección 6).
+Última actualización: 11/11/2026. Fases 1 a 5 terminadas y verificadas (CSS base/componentes + reportes + catálogo + flujo CSS/JS + módulos restantes). Pendientes opcionales en sección 8.
 
 ## 1. Contexto y reglas de trabajo
 
@@ -36,12 +36,17 @@ public/css/
   modulos/
     reportes/      comun.css, admin.css, secretaria.css
     catalogo/      comun.css, consulta.css, admin.css, ficha.css
-    flujo/         (fase 4, por crear)
-  admin.css, enfermera.css, flujo.css, inventario.css, login.css, secretaria.css   (pendientes de mover)
-  inventario/      (ya modular desde antes; no se tocó)
+    flujo/         comun.css, panel.css, recepcion.css, entrega.css
+    login/         login.css
+    enfermera/     comun.css, panel.css, cierre.css
+    secretaria/    panel.css
+    inventario/    inventario.css
+    admin/         comun.css, usuarios.css, turnos.css, historial.css, custodia.css, alertas.css
+  inventario/      pestanas, tarjeta-prioridad, registro-movimiento, configurar-minimo, modal-reposicion
 public/js/
   modulos/reportes/admin.js
   modulos/catalogo/admin.js, ficha.js
+  modulos/flujo/   track-anim.js, proceso-reloj.js, modales.js, entrega.js, recepcion.js
 resources/views/layouts/partials/estilos-base.blade.php   (carga base + componentes en orden)
 ```
 
@@ -134,7 +139,28 @@ Tiempos: una medición de las 3 variantes de catálogo (164 mil elementos) tarda
 - **Auto-review** del entorno: a veces bloquea borrados recursivos encadenados (hacerlos uno por uno con `-LiteralPath` absoluto) o scripts en `%TEMP%`. Si el bloqueo es injustificado, reintentar el mismo comando pidiendo aprobación.
 - Las comparaciones grandes en PowerShell con `Group-Object` son lentísimas: usar `comparar.js`.
 
-## 6. Fase 4 — Flujo (la más pesada): qué hay y cómo hacerlo
+## 6. Fase 4 — Flujo
+
+### 6.0 Hecho el 11/11 (CSS y JS)
+
+`flujo.css` se dividió y se borró. Las vistas cargan `modulos/flujo/comun.css` y después el archivo de su pantalla (`panel`, `recepcion` o `entrega`). `avanzar` y `actividad` cargan `comun.css` y `panel.css`; no se borraron.
+
+JS extraído a `public/js/modulos/flujo/`:
+
+| Archivo | Origen |
+|---|---|
+| `track-anim.js` | `partials/track-anim` (después de `anime.min.js`) |
+| `proceso-reloj.js` | `partials/proceso-reloj` |
+| `modales.js` | `partials/modales-flujo` (los JSON `#pasos-etapa` y `#anotaciones-caja` siguen en el Blade) |
+| `entrega.js` | `entrega.blade.php` |
+| `recepcion.js` | `recepcion.blade.php` (`old()` pasó a `#recv-datos-old`) |
+
+- En esta máquina no hay Node. El mapa, el procesado y la comparación se hicieron en PHP: `mapa-flujo.php`, `procesar-flujo.php` y `comparar.php`. `medir.ps1` sigue usando Edge.
+- El mapa dejó 48 selectores muertos y 5 declaraciones pisadas. `ops-etapa--*` se arma en Blade y quedó en `panel.css`.
+- Verificación CSS: 5 páginas × 3 variantes, ruido esperado (reloj, pulso, loader).
+- Verificación JS: panel + recepción + entrega × 3 variantes. Solo ruido (`track-node`, `badge-listo`, `proceso-texto`, loader). Recepción y entrega sin diferencias propias.
+- Pendiente que la usuaria pruebe con sesión: abrir modales, anotar, pasar etapa, registrar recepción y entrega.
+- `actividad.blade.php` todavía tiene un `<script>` chico con `@json`; la vista parece muerta.
 
 ### 6.1 Inventario actual
 
@@ -222,12 +248,31 @@ docker exec sigte-app rm -f /tmp/render.php
 
 Ejecutarlos como comandos separados. `public/_ref` tiene datos reales y nunca debe quedar en el proyecto.
 
-## 8. Después de Flujo (no pedido aún; proponer)
+## 8. Fase 5 — Módulos restantes (login, enfermera, secretaria, inventario, admin)
 
-- Mover `admin.css` (paneles de administración: panel, historial, custodia, alertas, usuarios, turnos), `enfermera.css`, `secretaria.css`, `inventario.css` y `login.css` a `modulos/`, con el mismo método.
-- Utilidad global `[hidden] { display: none !important; }` en `base/utilidades.css`. Permitiría quitar los `!important` de `[hidden]` en Reportes y Catálogo, pero puede ocultar elementos que hoy se ven pese a tener `hidden`: verificar toda la app.
-- Unificar los tokens antiguos que siguen en los módulos (`--ink`, `--muted`, `--card`, `--card-2`, `--borde`) con los nuevos (`--texto-1`, `--superficie-*`, `--linea`, etc.).
+Hecho el 11/11/2026 con el mismo método (mapa PHP + procesar + medir/comparar). Herramientas nuevas: `mapa-modulo.php`, `procesar-modulo.php`.
+
+| Módulo | Destino | Muertos quitados | Verificación |
+|---|---|---|---|
+| login | `modulos/login/login.css` | 2 (`.field-select` sin uso en login) | 0 diffs |
+| enfermera | `comun` + `panel` + `cierre` | 5 (`.ct-*` legacy) | 0 diffs |
+| secretaria | `modulos/secretaria/panel.css` | 51 (`prod-*` de UI antigua) | 0 diffs |
+| inventario | `modulos/inventario/inventario.css` | 45 (libros/paso/reposicion viejos) | 0 diffs |
+| admin | `comun` + usuarios/turnos/historial/custodia/alertas | 58 (alert-strip, nomina, rep-*, aud-relacionadas) | 0 diffs |
+
+Notas:
+
+- Secretaría producción/reportes ya no cargan `secretaria.css`; usan solo `modulos/reportes/*`. Insumos queda con base + componentes.
+- El panel admin no tiene CSS exclusivo: carga `modulos/admin/comun.css` (shell móvil + piezas compartidas) y reportes.
+- `public/css/inventario/*.css` (modales/pestañas) se dejó donde estaba; solo se movió el `inventario.css` raíz.
+- Ya no existen en la raíz: `login.css`, `enfermera.css`, `secretaria.css`, `inventario.css`, `admin.css`.
+
+Pendientes opcionales (proponer si se piden):
+
+- Utilidad global `[hidden] { display: none !important; }` en `base/utilidades.css`.
+- Unificar tokens antiguos (`--ink`, `--muted`, `--card`, `--borde`) con los nuevos.
 - `catalogo/admin.js` usa `mensaje.style.color = '#b42318'`: pasarlo a una clase de error.
+- Mover `public/css/inventario/` a `modulos/inventario/` si se quiere unificar rutas.
 
 ## 9. Observaciones encontradas (problemas previos, sin tocar)
 
@@ -237,7 +282,7 @@ Ejecutarlos como comandos separados. `public/_ref` tiene datos reales y nunca de
 
 ## 10. Al subir cambios al VPS (para recordarle a la usuaria)
 
-- Incluir las carpetas `public/css/base/`, `public/css/componentes/`, `public/css/modulos/` y `public/js/modulos/`, y `resources/views/layouts/partials/estilos-base.blade.php`.
-- Ya no existen `public/css/sigte.css`, `public/css/reportes.css` ni `public/css/catalogo.css`.
+- Incluir las carpetas `public/css/base/`, `public/css/componentes/`, `public/css/modulos/` (login, enfermera, secretaria, inventario, admin, flujo, catalogo, reportes), `public/css/inventario/` (satélites) y `public/js/modulos/`, más `resources/views/layouts/partials/estilos-base.blade.php`.
+- Ya no existen en la raíz: `sigte.css`, `reportes.css`, `catalogo.css`, `flujo.css`, `login.css`, `enfermera.css`, `secretaria.css`, `inventario.css`, `admin.css`.
 - Ejecutar `php artisan view:clear` en el servidor.
 - No subir `.env` ni `public/_ref`. La carpeta `docs/` es solo documentación.
