@@ -31,6 +31,7 @@ class ReporteAdmin
             'entregas_por_servicio' => collect(),
             'entregas_por_fecha' => collect(),
             'en_flujo' => collect(),
+            'cajas_por_etapa' => collect(),
             'recibidas_periodo' => 0,
             'produccion' => self::produccionVacia(),
         ];
@@ -225,6 +226,8 @@ class ReporteAdmin
                 'cantidad' => (int) $fila->cantidad,
             ]);
 
+        $cajasPorEtapa = self::cajasPorEtapa($inicio, $fin);
+
         return [
             'movimientos' => $movimientos,
             'por_tipo' => $porTipo,
@@ -237,9 +240,90 @@ class ReporteAdmin
             'entregas_por_servicio' => $entregasPorServicio,
             'entregas_por_fecha' => $entregasPorFecha,
             'en_flujo' => $enFlujo,
+            'cajas_por_etapa' => $cajasPorEtapa,
             'recibidas_periodo' => $recibidasPeriodo,
             'produccion' => self::produccion($filtros),
         ];
+    }
+
+    private static function cajasPorEtapa(Carbon $inicio, Carbon $fin): Collection
+    {
+        $etapas = [
+            'Recepción',
+            'Lavado',
+            'Preparación',
+            'Esterilización',
+            'Almacén',
+            'Entrega',
+        ];
+
+        $conteos = [];
+
+        foreach ($etapas as $etapa) {
+            $conteos[$etapa] = [];
+        }
+
+        // INICIO RECEPCIÓN: CAJAS CREADAS DURANTE EL PERÍODO.
+        $recepciones = Caja::query()
+            ->whereBetween('created_at', [$inicio, $fin])
+            ->get(['codigo']);
+
+        foreach ($recepciones as $caja) {
+            $conteos['Recepción'][(string) $caja->codigo] = true;
+        }
+
+        // INICIO AVANCES: CONTAR LA ETAPA DE DESTINO.
+        $avances = RegistroAuditoria::query()
+            ->where('tipo', 'etapa')
+            ->where('accion', 'Avanzó etapa')
+            ->whereBetween('created_at', [$inicio, $fin])
+            ->get(['objeto', 'detalle']);
+
+        foreach ($avances as $avance) {
+            if (! $avance->objeto || ! str_contains((string) $avance->detalle, '→')) {
+                continue;
+            }
+
+            $partes = explode('→', (string) $avance->detalle);
+            $etapaDestino = trim((string) end($partes));
+
+            if (isset($conteos[$etapaDestino])) {
+                $conteos[$etapaDestino][(string) $avance->objeto] = true;
+            }
+        }
+
+        // INICIO RETROCESOS: CONTAR LA ETAPA A LA QUE REGRESÓ.
+        $retrocesos = CajaRetroceso::query()
+            ->with('caja:id,codigo')
+            ->whereBetween('created_at', [$inicio, $fin])
+            ->get(['caja_id', 'etapa_hacia']);
+
+        foreach ($retrocesos as $retroceso) {
+            if (! $retroceso->caja) {
+                continue;
+            }
+
+            $etapaDestino = Caja::etiquetaEtapa((string) $retroceso->etapa_hacia);
+
+            if (isset($conteos[$etapaDestino])) {
+                $conteos[$etapaDestino][(string) $retroceso->caja->codigo] = true;
+            }
+        }
+
+        // INICIO ENTREGA: CAJAS ENTREGADAS DURANTE EL PERÍODO.
+        $entregas = Caja::query()
+            ->whereNotNull('entregado_at')
+            ->whereBetween('entregado_at', [$inicio, $fin])
+            ->get(['codigo']);
+
+        foreach ($entregas as $caja) {
+            $conteos['Entrega'][(string) $caja->codigo] = true;
+        }
+
+        return collect($etapas)->map(fn (string $etapa) => [
+            'etapa' => $etapa,
+            'cantidad' => count($conteos[$etapa]),
+        ]);
     }
 
     private static function produccionVacia(): array

@@ -208,8 +208,88 @@
                     </div>
                 </article>
 
-                <article class="panel reportes-bloque reportes-bloque-moderno">
-                    <div class="reportes-banda"><h3><span class="reportes-banda-icono"><svg class="reportes-icono " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span> 2. Producción mensual por servicio</h3><span>Consumos y litros registrados por secretaría, agrupados por mes</span></div>
+                @php
+            $historicoEtapas = collect($cajas_por_etapa ?? []);
+            $totalHistoricoEtapas = $historicoEtapas->sum('cantidad');
+            $maxHistoricoEtapas = max(1, (int) $historicoEtapas->max('cantidad'));
+            $coloresHistorico = ['#3998ed', '#78b9f5', '#f5c44b', '#f48aa4', '#a98add', '#9edb91'];
+            @endphp
+
+            <article class="panel reportes-bloque reportes-bloque-moderno">
+                <div class="reportes-banda">
+                    <h3>2. Procesamiento histórico por etapa</h3>
+                    <span> Cajas únicas que ingresaron a cada etapa durante el período seleccionado </span>
+                </div>
+
+                <div class="reportes-resumen reportes-resumen-compacto">
+                    <div class="reportes-kpi reportes-kpi-azul">
+                        <div class="reportes-kpi-texto">
+                            <span>Ingresos a etapas</span>
+                            <strong>{{ number_format($totalHistoricoEtapas, 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+
+                    @foreach ($historicoEtapas as $indice => $fila)
+                    <div class="reportes-kpi reportes-kpi-violeta">
+                        <div class="reportes-kpi-texto">
+                            <span>{{ $fila['etapa'] }}</span>
+                            <strong>{{ number_format($fila['cantidad'], 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                <div class="reportes-produccion-analitica">
+                    <div class="reportes-produccion-card">
+                        <h4 class="reportes-titulo-detalle">Cajas por etapa durante el período</h4>
+
+                        @forelse ($historicoEtapas as $indice => $fila)
+                        <div class="reportes-produccion-barra-fila">
+                            <span>{{ $fila['etapa'] }}</span>
+                            <div class="reportes-produccion-barra-fondo">
+                                <div style="width: {{ round(($fila['cantidad'] / $maxHistoricoEtapas) * 100, 2) }}%; background: {{ $coloresHistorico[$indice % count($coloresHistorico)] }}"></div>
+                            </div>
+                            <strong>{{ number_format($fila['cantidad'], 0, ',', '.') }}</strong>
+                        </div>
+                        @empty
+                        <p class="reportes-vacio">No hay registros históricos disponibles para este período.</p>
+                        @endforelse
+                    </div>
+
+                    <div class="reportes-produccion-card">
+                        <h4 class="reportes-titulo-detalle">Detalle de ingresos por etapa</h4>
+                        <div class="reportes-tabla reportes-tabla-compacta">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Etapa</th>
+                                        <th>Cajas únicas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($historicoEtapas as $fila)
+                                    <tr>
+                                        <td>{{ $fila['etapa'] }}</td>
+                                        <td>{{ number_format($fila['cantidad'], 0, ',', '.') }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="2" class="reportes-vacio">Sin datos históricos para mostrar.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="reportes-nota">
+                    Cada caja se cuenta una sola vez por etapa dentro del período. Los resultados dependen de la disponibilidad de registros históricos.
+                </p>
+            </article>
+
+<article class="panel reportes-bloque reportes-bloque-moderno">
+                    <div class="reportes-banda"><h3><span class="reportes-banda-icono"><svg class="reportes-icono " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span> 3. Producción mensual por servicio</h3><span>Consumos y litros registrados por secretaría, agrupados por mes</span></div>
                     <div class="reportes-resumen reportes-resumen-compacto reportes-produccion-kpis">
                         <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Servicios con registros</span><strong>{{ number_format($produccion['servicios'], 0, ',', '.') }}</strong></div></div>
                         <div class="reportes-kpi reportes-kpi-verde"><div class="reportes-kpi-texto"><span>Unidades procesadas</span><strong>{{ number_format($produccion['cantidad'], 0, ',', '.') }}</strong></div></div>
