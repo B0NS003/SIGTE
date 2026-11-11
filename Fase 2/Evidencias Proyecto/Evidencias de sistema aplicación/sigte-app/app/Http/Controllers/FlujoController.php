@@ -286,6 +286,9 @@ class FlujoController extends Controller
                     'hora' => now()->timezone('America/Santiago')->format('H:i'),
                 ],
                 'reporte' => $rol === Rol::ADMINISTRADORA ? ReporteAdmin::vista($request) : null,
+                'resumen_turno' => $rol === Rol::ENFERMERA
+                    ? \App\Support\ResumenTurnoEnfermera::construir($user, $consulta['cajas'])
+                    : null,
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');
