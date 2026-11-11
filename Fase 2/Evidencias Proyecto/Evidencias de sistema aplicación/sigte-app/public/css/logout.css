@@ -1,0 +1,132 @@
+/* MODAL DE CIERRE DE SESIÓN */
+.logout-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.logout-modal[hidden] {
+    display: none !important;
+}
+
+.logout-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 31, 75, 0.48);
+    backdrop-filter: blur(2px);
+}
+
+.logout-contenido {
+    position: relative;
+    z-index: 1;
+    width: min(440px, 100%);
+    padding: 1.8rem;
+    background: var(--card, #ffffff);
+    border: 1px solid var(--borde, #dbe2ea);
+    border-top: 4px solid var(--navy, #294c70);
+    border-radius: 18px;
+    box-shadow: 0 18px 55px rgba(15, 35, 65, 0.22);
+    text-align: center;
+    outline: none;
+}
+
+.logout-icono {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c43d48;
+    background: rgba(196, 61, 72, 0.10);
+    border-radius: 50%;
+}
+
+.logout-icono svg {
+    width: 29px;
+    height: 29px;
+}
+
+.logout-contenido h2 {
+    margin: 0 0 0.8rem;
+    color: var(--ink, #17263a);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.logout-contenido p {
+    margin: 0;
+    color: var(--ink, #34445a);
+    font-size: 0.96rem;
+    line-height: 1.55;
+}
+
+.logout-contenido .logout-ayuda {
+    margin-top: 0.55rem;
+    color: var(--muted, #718096);
+    font-size: 0.86rem;
+}
+
+.logout-acciones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.6rem;
+}
+
+.logout-acciones form {
+    margin: 0;
+}
+
+.logout-btn-cancelar,
+.logout-btn-confirmar {
+    min-height: 42px;
+    padding: 0.65rem 1.15rem;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.logout-btn-cancelar {
+    color: var(--ink, #34445a);
+    background: var(--superficie-3, #edf1f5);
+    border: 1px solid var(--borde, #dbe2ea);
+}
+
+.logout-btn-cancelar:hover {
+    background: var(--borde, #dbe2ea);
+}
+
+.logout-btn-confirmar {
+    color: #ffffff;
+    background: #c43d48;
+    border: 1px solid #c43d48;
+}
+
+.logout-btn-confirmar:hover {
+    background: #a92e39;
+    border-color: #a92e39;
+}
+
+.logout-btn-cancelar:focus-visible,
+.logout-btn-confirmar:focus-visible {
+    outline: 3px solid rgba(41, 76, 112, 0.3);
+    outline-offset: 3px;
+}
+
+.logout-btn-confirmar:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+body.logout-modal-abierto {
+    overflow: hidden;
+}
