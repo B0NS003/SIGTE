@@ -64,6 +64,8 @@ class AccesoPorRol
         'secretaria.insumos.movimiento' => [Rol::SECRETARIA],
         'secretaria.reportes' => [Rol::SECRETARIA],
         'secretaria.reportes.exportar' => [Rol::SECRETARIA],
+        'secretaria.reportes.excel' => [Rol::SECRETARIA],
+        'secretaria.reportes.pdf' => [Rol::SECRETARIA],
     ];
 
     public static function puedeVerPanel(User $user, string $rolEnUrl): bool

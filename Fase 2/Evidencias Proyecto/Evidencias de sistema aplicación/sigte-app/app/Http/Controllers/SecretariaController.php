@@ -8,6 +8,7 @@ use App\Models\MovimientoInsumo;
 use App\Models\MaterialProduccion;
 use App\Models\RegistroProduccion;
 use App\Models\Servicio;
+use App\Support\ReporteAdmin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class SecretariaController extends Controller
 {
@@ -219,24 +221,28 @@ class SecretariaController extends Controller
             ->with('ok', 'Movimiento registrado. El stock de '.$insumo->nombre.' quedó actualizado.');
     }
 
+    /**
+     * Reportes equivalentes a Administradora; se reutilizan los mismos datos
+     * para Producción, Trazabilidad y Entregas.
+     */
     public function reportes(Request $request): View
     {
-        $periodo = $this->periodoDesdeRequest($request->query('periodo'))
-            ?? now()->startOfMonth()->toDateString();
-        $filas = $this->filasReporte($periodo);
-        $diarios = $this->filasProduccionDiaria($periodo);
+        return view('secretaria.reportes', array_merge(
+            ReporteAdmin::vista($request),
+            ['usuario' => $this->usuarioSesion()]
+        ));
+    }
 
-        return view('secretaria.reportes', [
-            'usuario' => $this->usuarioSesion(),
-            'periodo' => Carbon::parse($periodo)->format('Y-m'),
-            'periodo_etiqueta' => ConsumoServicio::etiquetaPeriodo($periodo),
-            'filas' => $filas,
-            'total_consumo' => $filas->sum('consumo'),
-            'total_litros' => $filas->sum('litros'),
-            'registros_diarios' => $diarios,
-            'total_unidades_diarias' => $diarios->sum('cantidad'),
-            'total_litros_diarios' => $diarios->sum(fn ($fila) => $fila->litros),
-        ]);
+    /** Excel idéntico al de Administradora; autorización controlada por la ruta de Secretaría. */
+    public function exportarReportesExcel(Request $request): StreamedResponse
+    {
+        return app(AdminController::class)->exportarReportesExcel($request);
+    }
+
+    /** PDF idéntico al de Administradora, incluida la identificación del usuario autenticado. */
+    public function exportarReportesPdf(Request $request): Response
+    {
+        return app(AdminController::class)->exportarReportesPdf($request);
     }
 
     public function exportarReportes(Request $request): StreamedResponse

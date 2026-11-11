@@ -71,5 +71,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/secretaria/insumos/movimientos', [SecretariaController::class, 'guardarMovimiento'])->name('secretaria.insumos.movimiento');
         Route::get('/secretaria/reportes', [SecretariaController::class, 'reportes'])->name('secretaria.reportes');
         Route::get('/secretaria/reportes/exportar', [SecretariaController::class, 'exportarReportes'])->name('secretaria.reportes.exportar');
+        Route::get('/secretaria/reportes/excel', [SecretariaController::class, 'exportarReportesExcel'])->name('secretaria.reportes.excel');
+        Route::get('/secretaria/reportes/pdf', [SecretariaController::class, 'exportarReportesPdf'])->name('secretaria.reportes.pdf');
     });
 });
