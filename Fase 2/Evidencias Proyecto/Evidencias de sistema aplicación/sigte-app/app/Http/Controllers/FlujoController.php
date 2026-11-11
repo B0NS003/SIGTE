@@ -200,18 +200,9 @@ class FlujoController extends Controller
         }
         $usuario = $this->usuarioSesion();
         if ($rol === Rol::SECRETARIA) {
-            $inicio = now()->startOfMonth()->toDateString();
-            $delMes = ConsumoServicio::query()->whereDate('periodo', $inicio)->get();
-            $insumos = Insumo::query()->with('salaFisica')->get();
             return view('secretaria.panel', [
                 'usuario' => $usuario,
-                'resumen' => [
-                    'periodo' => ConsumoServicio::etiquetaPeriodo($inicio),
-                    'servicios' => $delMes->count(),
-                    'consumo' => (int) $delMes->sum('consumo'),
-                    'litros' => (float) $delMes->sum('litros'),
-                    'bajo_minimo' => $insumos->filter(fn (Insumo $insumo) => $insumo->estadoStock() !== 'ok')->count(),
-                ],
+                'resumen' => \App\Support\ResumenSecretaria::construir($request->query('periodo')),
             ]);
         }
         $roles = [
