@@ -1,0 +1,52 @@
+/* Pestañas (Reportes, Catálogo, Inventario) y chips de filtro (Flujo, Catálogo). */
+
+/* El radio interior es el exterior menos el relleno, para que las curvas queden paralelas. */
+.reportes-tabs, .admin-tabs, .inv-pestanas {
+  display: flex; gap: var(--esp-1); padding: var(--esp-1);
+  background: var(--card); border: 1px solid var(--borde); border-radius: var(--radio-lg);
+}
+.reportes-tab, .admin-tab, .inv-pestana {
+  flex: 1 1 0; min-width: 0; min-height: var(--alto-md); padding: 0 var(--esp-4);
+  border: 0; border-radius: var(--radio-md); background: transparent;
+  color: var(--muted); font: inherit; font-size: var(--fs-base); font-weight: 700;
+  cursor: pointer; transition: background-color var(--dur-rapida) ease, color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.reportes-tab:hover:not(.activo), .admin-tab:hover:not(.is-active), .inv-pestana:hover:not(.is-active) {
+  background: var(--card-2); color: var(--ink);
+}
+.reportes-tab.activo, .admin-tab.is-active, .inv-pestana.is-active {
+  background: var(--navy); color: #fff; box-shadow: var(--sombra-1);
+}
+.reportes-tab:focus-visible, .admin-tab:focus-visible, .inv-pestana:focus-visible {
+  outline: 2px solid var(--naranja); outline-offset: 2px;
+}
+
+.ops-filters {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-2);
+  padding-top: var(--esp-3); border-top: 1px solid var(--linea);
+}
+.ops-filter, .flujo-chip {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--esp-1);
+  min-height: var(--alto-sm); padding: 0 var(--esp-3);
+  border: 1px solid var(--borde); border-radius: var(--radio-pill); background: var(--card);
+  color: var(--texto-3); font-family: var(--font-body); font-size: var(--fs-sm); font-weight: 700;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--dur-rapida) ease, border-color var(--dur-rapida) ease, color var(--dur-rapida) ease;
+}
+.ops-filter svg { width: var(--icono-sm); height: var(--icono-sm); flex-shrink: 0; color: currentColor; opacity: 0.85; }
+.ops-filter em {
+  font-style: normal; font-size: var(--fs-sm); font-weight: 800;
+  color: var(--texto-4); font-variant-numeric: tabular-nums;
+}
+.ops-filter:hover, .flujo-chip:hover {
+  border-color: var(--naranja-linea); color: var(--ink); text-decoration: none;
+}
+.ops-filter.is-active, .flujo-chip.is-on {
+  border-color: var(--naranja); background: var(--naranja-suave); color: var(--naranja-oscuro);
+}
+.ops-filter.is-active em { color: var(--naranja-oscuro); }
+
+html[data-tema="oscuro"] .ops-filter.is-active,
+html[data-tema="oscuro"] .ops-filter[aria-current="page"] {
+  color: var(--naranja-texto);
+}

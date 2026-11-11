@@ -1,30 +1,43 @@
-        <nav class="reportes-tabs" aria-label="Tipos de reportes" role="tablist">
-            <button class="reportes-tab activo" type="button" role="tab" id="tab-produccion" aria-selected="true" aria-controls="panel-produccion" data-tab="produccion">Producción</button>
-            <button class="reportes-tab" type="button" role="tab" id="tab-trazabilidad" aria-selected="false" aria-controls="panel-trazabilidad" data-tab="trazabilidad">Trazabilidad</button>
-            <button class="reportes-tab" type="button" role="tab" id="tab-entregas" aria-selected="false" aria-controls="panel-entregas" data-tab="entregas">Entregas</button>
-        </nav>
-
-        <form class="panel reportes-filtros" method="GET" action="{{ route('mockups.panel', 'administradora') }}">
-            <div class="reportes-section-head"><div><h2>Filtros del reporte</h2><p>Selecciona el período para consultar los registros disponibles.</p></div></div>
-            <div class="reportes-campos reportes-campos-produccion">
-                <label class="reportes-campo">Desde<input type="date" name="desde" value="{{ $filtros['desde'] }}" required></label>
-                <label class="reportes-campo">Hasta<input type="date" name="hasta" value="{{ $filtros['hasta'] }}" required></label>
-                <label class="reportes-campo reportes-filtro-tipo">Tipo de movimiento<select name="tipo">
-                    <option value="">Todos los tipos</option>
-                    @foreach ($tipos_auditoria as $clave => $nombre)
-                        <option value="{{ $clave }}" @selected($filtros['tipo'] === $clave)>{{ $nombre }}</option>
-                    @endforeach
-                </select></label>
-                <label class="reportes-campo reportes-filtro-servicio">Servicio<select name="servicio">
-                    <option value="">Todos los servicios</option>
-                    @foreach ($servicios_produccion as $servicio)
-                        <option value="{{ $servicio->id }}" @selected(($filtros['servicio'] ?? null) === (int) $servicio->id)>{{ $servicio->nombre }}</option>
-                    @endforeach
-                </select></label>
-                <button class="btn btn-dark reportes-consultar" type="submit">Consultar registros</button>
+        @php
+            $servicioElegido = collect($servicios_produccion ?? [])->firstWhere('id', $filtros['servicio'] ?? null);
+            $tipoElegido = $tipos_auditoria[$filtros['tipo'] ?? ''] ?? null;
+        @endphp
+        <div class="panel reportes-control">
+            <div class="reportes-control-fila reportes-control-cabecera">
+                <nav class="reportes-tabs" aria-label="Tipos de reportes" role="tablist">
+                    <button class="reportes-tab activo" type="button" role="tab" id="tab-produccion" aria-selected="true" aria-controls="panel-produccion" data-tab="produccion">Producción</button>
+                    <button class="reportes-tab" type="button" role="tab" id="tab-trazabilidad" aria-selected="false" aria-controls="panel-trazabilidad" data-tab="trazabilidad">Trazabilidad</button>
+                    <button class="reportes-tab" type="button" role="tab" id="tab-entregas" aria-selected="false" aria-controls="panel-entregas" data-tab="entregas">Entregas</button>
+                </nav>
+                <div class="reportes-periodo">
+                    <p>Mostrando <strong>{{ \Carbon\Carbon::parse($filtros['desde'])->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($filtros['hasta'])->format('d/m/Y') }}</strong><span data-periodo="produccion"> · {{ $servicioElegido->nombre ?? 'Todos los servicios' }}</span><span data-periodo="trazabilidad" hidden> · {{ $tipoElegido ?? 'Todos los tipos' }}</span></p>
+                    <span class="reportes-chip">Vista previa</span>
+                </div>
             </div>
-            <p class="reportes-ayuda">Los litros se calculan desde los registros diarios de producción. El tipo de movimiento solo se aplica a Trazabilidad.</p>
-        </form>
+
+            <form class="reportes-control-fila reportes-filtros" method="GET" action="{{ route('mockups.panel', 'administradora') }}">
+                <div class="reportes-campos">
+                    <label class="reportes-campo">Desde<input type="date" name="desde" value="{{ $filtros['desde'] }}" required></label>
+                    <label class="reportes-campo">Hasta<input type="date" name="hasta" value="{{ $filtros['hasta'] }}" required></label>
+                    <label class="reportes-campo reportes-filtro-tipo">Tipo de movimiento<select name="tipo">
+                        <option value="">Todos los tipos</option>
+                        @foreach ($tipos_auditoria as $clave => $nombre)
+                            <option value="{{ $clave }}" @selected($filtros['tipo'] === $clave)>{{ $nombre }}</option>
+                        @endforeach
+                    </select></label>
+                    <label class="reportes-campo reportes-filtro-servicio">Servicio<select name="servicio">
+                        <option value="">Todos los servicios</option>
+                        @foreach ($servicios_produccion as $servicio)
+                            <option value="{{ $servicio->id }}" @selected(($filtros['servicio'] ?? null) === (int) $servicio->id)>{{ $servicio->nombre }}</option>
+                        @endforeach
+                    </select></label>
+                    <button class="btn btn-dark reportes-consultar" type="submit">Consultar</button>
+                </div>
+                <p class="reportes-ayuda" data-ayuda="produccion"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Procesamiento de cajas y producción mensual por servicio. Los litros se calculan desde los registros diarios de producción.</p>
+                <p class="reportes-ayuda" data-ayuda="trazabilidad" hidden><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Acciones de auditoría registradas dentro del período. El tipo de movimiento filtra solo este reporte.</p>
+                <p class="reportes-ayuda" data-ayuda="entregas" hidden><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Cajas de instrumental quirúrgico entregadas a los servicios dentro del período.</p>
+            </form>
+        </div>
 
         @if ($falla)
             <div class="panel reportes-estado"><strong>No se pudo consultar la información.</strong><p>Revisa la conexión a la base de datos e inténtalo nuevamente.</p></div>
@@ -43,13 +56,8 @@
                 $graficoFlujo = count($segmentosFlujo) ? 'conic-gradient(' . implode(', ', $segmentosFlujo) . ')' : 'conic-gradient(#e2e8f0 0% 100%)';
             @endphp
             <section class="reportes-panel activo" id="panel-produccion" role="tabpanel" aria-labelledby="tab-produccion">
-                <div class="reportes-section-head reportes-titulo-modulo">
-                    <div><h2>▥ &nbsp;Reporte de producción</h2><p>Procesamiento de cajas y producción mensual, presentados por separado.</p></div>
-                    <span class="reportes-chip">Vista previa</span>
-                </div>
-
                 <article class="panel reportes-bloque reportes-bloque-moderno">
-                    <div class="reportes-banda"><h3><span class="reportes-banda-icono"><svg class="reportes-icono " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg></span><span>1. Procesamiento de cajas</span></h3><span class="reportes-banda-descripcion">Estado actual del flujo · No corresponde a movimientos históricos del período</span></div>
+                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg></span><div><h3>1. Procesamiento de cajas</h3><p class="reportes-banda-descripcion">Estado actual del flujo; no depende del período consultado.</p></div></div>
                     <div class="reportes-produccion-grid">
                         <div class="reportes-produccion-principal">
                             <div class="reportes-resumen reportes-resumen-compacto">
@@ -76,17 +84,17 @@
                             </div>
                             <div class="reportes-tabla reportes-tabla-compacta"><table><thead><tr><th>Etapa actual</th><th>Cantidad de cajas</th><th>% del total</th></tr></thead><tbody>
                                 @forelse ($en_flujo as $indice => $fila)
-                                    <tr><td><span class="reportes-punto" style="background: {{ $coloresFlujo[$indice % count($coloresFlujo)] }}"></span>{{ $fila['etapa'] }}</td><td>{{ $fila['cantidad'] }}</td><td>{{ $totalCajasFlujo ? number_format($fila['cantidad'] / $totalCajasFlujo * 100, 1, ',', '.') : 0 }} %</td></tr>
+                                    <tr><td><span class="reportes-punto" style="--punto-color: {{ $coloresFlujo[$indice % count($coloresFlujo)] }}"></span>{{ $fila['etapa'] }}</td><td>{{ $fila['cantidad'] }}</td><td>{{ $totalCajasFlujo ? number_format($fila['cantidad'] / $totalCajasFlujo * 100, 1, ',', '.') : 0 }} %</td></tr>
                                 @empty <tr><td colspan="3" class="reportes-vacio">No hay cajas actualmente en flujo.</td></tr> @endforelse
                             </tbody></table></div>
                         </div>
                         <div class="reportes-distribucion">
                             <h4 class="reportes-titulo-detalle">Distribución de cajas en el flujo</h4>
                             <div class="reportes-grafico-area">
-                                <div class="reportes-dona" style="background: {{ $graficoFlujo }}" role="img" aria-label="Distribución de {{ $totalCajasFlujo }} cajas entre {{ count($en_flujo) }} etapas"><div class="reportes-dona-centro"><strong>{{ $totalCajasFlujo }}</strong><span>cajas</span></div></div>
+                                <div class="reportes-dona" style="--dona-relleno: {{ $graficoFlujo }}" role="img" aria-label="Distribución de {{ $totalCajasFlujo }} cajas entre {{ count($en_flujo) }} etapas"><div class="reportes-dona-centro"><strong>{{ $totalCajasFlujo }}</strong><span>cajas</span></div></div>
                                 <div class="reportes-leyenda">
                                     @forelse ($en_flujo as $indice => $fila)
-                                        <div><span class="reportes-punto" style="background: {{ $coloresFlujo[$indice % count($coloresFlujo)] }}"></span><span>{{ $fila['etapa'] }}</span><strong>{{ $fila['cantidad'] }}</strong></div>
+                                        <div><span class="reportes-punto" style="--punto-color: {{ $coloresFlujo[$indice % count($coloresFlujo)] }}"></span><span>{{ $fila['etapa'] }}</span><strong>{{ $fila['cantidad'] }}</strong></div>
                                     @empty <p class="reportes-nota">Sin datos disponibles.</p> @endforelse
                                 </div>
                             </div>
@@ -95,7 +103,7 @@
                 </article>
 
                 <article class="panel reportes-bloque reportes-bloque-moderno">
-                    <div class="reportes-banda"><h3><span class="reportes-banda-icono"><svg class="reportes-icono " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span> 2. Producción mensual por servicio</h3><span>Consumos y litros registrados por secretaría, agrupados por mes</span></div>
+                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span><div><h3>2. Producción mensual por servicio</h3><p class="reportes-banda-descripcion">Consumos y litros registrados por secretaría, agrupados por mes.</p></div></div>
                     <div class="reportes-resumen reportes-resumen-compacto reportes-produccion-kpis">
                         <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Servicios con registros</span><strong>{{ number_format($produccion['servicios'], 0, ',', '.') }}</strong></div></div>
                         <div class="reportes-kpi reportes-kpi-verde"><div class="reportes-kpi-texto"><span>Unidades procesadas</span><strong>{{ number_format($produccion['cantidad'], 0, ',', '.') }}</strong></div></div>
@@ -109,7 +117,7 @@
                             @forelse ($produccion['por_servicio'] as $servicio)
                                 <div class="reportes-produccion-barra-fila">
                                     <span title="{{ $servicio->nombre }}">{{ $servicio->nombre }}</span>
-                                    <div class="reportes-produccion-barra-fondo"><div style="width: {{ round(((float) $servicio->litros / $maxLitrosServicio) * 100, 2) }}%"></div></div>
+                                    <div class="reportes-produccion-barra-fondo"><div style="--barra-ancho: {{ round(((float) $servicio->litros / $maxLitrosServicio) * 100, 2) }}%"></div></div>
                                     <strong>{{ number_format($servicio->litros, 2, ',', '.') }} L</strong>
                                 </div>
                             @empty
@@ -124,7 +132,7 @@
                                     @foreach ($produccion['por_mes'] as $mes)
                                         <div class="reportes-produccion-mes" title="{{ $mes->mes }}: {{ number_format($mes->litros, 2, ',', '.') }} litros">
                                             <strong>{{ number_format($mes->litros, 0, ',', '.') }} L</strong>
-                                            <div class="reportes-produccion-mes-columna"><span style="height: {{ max(2, round(((float) $mes->litros / $maxLitrosMes) * 100, 2)) }}%"></span></div>
+                                            <div class="reportes-produccion-mes-columna"><span style="--columna-alto: {{ max(2, round(((float) $mes->litros / $maxLitrosMes) * 100, 2)) }}%"></span></div>
                                             <small>{{ $mes->mes }}</small>
                                         </div>
                                     @endforeach
@@ -178,14 +186,6 @@
                     $trazaPorDia = $trazaRegistros->groupBy(fn ($m) => (string) ($m['fecha'] ?? 'Sin fecha'))->map->count();
                     $trazaMaxDia = max(1, (int) $trazaPorDia->max());
                 @endphp
-                <div class="reportes-section-head reportes-traza-encabezado">
-                    <div class="reportes-traza-titulo">
-                        <svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><path d="M10.5 6.7 6.5 16M13.5 6.7l4 9.3M8 19h8"/></svg>
-                        <div><h2>Reporte de trazabilidad</h2><p>Acciones de auditoría registradas dentro del período seleccionado.</p></div>
-                    </div>
-                    <span class="reportes-chip">Vista previa</span>
-                </div>
-
                 <article class="panel reportes-traza-panel">
                     <div class="reportes-traza-grid">
                         <div class="reportes-traza-izquierda">
@@ -210,7 +210,7 @@
                                         @foreach ($trazaPorDia as $dia => $cantidad)
                                             <div class="reportes-traza-barra-col" title="{{ $dia }}: {{ $cantidad }} registros">
                                                 <strong>{{ $cantidad }}</strong>
-                                                <div class="reportes-traza-barra" style="height: {{ max(5, round($cantidad / $trazaMaxDia * 100)) }}%"></div>
+                                                <div class="reportes-traza-barra" style="--barra-alto: {{ max(5, round($cantidad / $trazaMaxDia * 100)) }}%"></div>
                                                 <span>{{ $dia }}</span>
                                             </div>
                                         @endforeach
@@ -223,12 +223,12 @@
                         <div class="reportes-traza-derecha">
                             <h3>Movimientos por tipo</h3>
                             <div class="reportes-traza-distribucion">
-                                <div class="reportes-dona reportes-traza-dona" style="background: {{ $trazaDona }}" role="img" aria-label="{{ $trazaTotal }} registros distribuidos por tipo">
+                                <div class="reportes-dona reportes-traza-dona" style="--dona-relleno: {{ $trazaDona }}" role="img" aria-label="{{ $trazaTotal }} registros distribuidos por tipo">
                                     <div class="reportes-dona-centro"><strong>{{ $trazaTotal }}</strong><span>registros</span></div>
                                 </div>
                                 <div class="reportes-traza-leyenda">
                                     @forelse ($trazaTipos as $tipo => $grupo)
-                                        <div><span class="reportes-punto" style="background: {{ $trazaPaleta[$loop->index % count($trazaPaleta)] }}"></span><span>{{ $tipo }}</span><strong>{{ $trazaTotal ? number_format($grupo->count() / $trazaTotal * 100, 1, ',', '.') : 0 }} %</strong></div>
+                                        <div><span class="reportes-punto" style="--punto-color: {{ $trazaPaleta[$loop->index % count($trazaPaleta)] }}"></span><span>{{ $tipo }}</span><strong>{{ $trazaTotal ? number_format($grupo->count() / $trazaTotal * 100, 1, ',', '.') : 0 }} %</strong></div>
                                     @empty
                                         <p class="reportes-nota">Sin movimientos registrados.</p>
                                     @endforelse
@@ -283,14 +283,6 @@
                     $entregasMostrarCalendario = $entregasTotalDias >= 1 && $entregasTotalDias <= 42;
                 @endphp
 
-                <div class="reportes-section-head reportes-entregas-encabezado">
-                    <div class="reportes-entregas-titulo">
-                        <svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h11v12H3zM14 9h4l3 4v4h-7z"/><circle cx="7.5" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg>
-                        <div><h2>Reporte de entregas</h2><p>Cajas de instrumental quirúrgico entregadas a los servicios.</p></div>
-                    </div>
-                    <span class="reportes-chip">Vista previa</span>
-                </div>
-
                 <div class="reportes-entregas-kpis">
                     <div class="reportes-entregas-kpi reportes-entregas-kpi-principal">
                         <img class="reportes-entregas-bandeja" src="{{ asset('images/Reportes/reportes_entrega_decoracion_1.png') }}" alt="Caja metálica de esterilización para instrumental quirúrgico">
@@ -312,9 +304,9 @@
                         @forelse ($entregasServicios as $nombreServicio => $cantidadServicio)
                             @php $porcentajeServicio = $entregasCantidad ? $cantidadServicio / $entregasCantidad * 100 : 0; $colorServicio = $entregasColores[$loop->index % count($entregasColores)]; @endphp
                             <div class="reportes-entregas-servicio-fila">
-                                <span class="reportes-entregas-servicio-nombre"><i style="background: {{ $colorServicio }}"></i>{{ $nombreServicio }}</span>
+                                <span class="reportes-entregas-servicio-nombre"><i style="--servicio-color: {{ $colorServicio }}"></i>{{ $nombreServicio }}</span>
                                 <span class="reportes-entregas-servicio-cantidad">{{ $cantidadServicio }} {{ $cantidadServicio === 1 ? 'caja' : 'cajas' }}</span>
-                                <div class="reportes-entregas-progreso"><span style="width: {{ $porcentajeServicio }}%; background: {{ $colorServicio }}"></span></div>
+                                <div class="reportes-entregas-progreso"><span style="--progreso-ancho: {{ $porcentajeServicio }}%; --servicio-color: {{ $colorServicio }}"></span></div>
                                 <strong>{{ number_format($porcentajeServicio, 0) }} %</strong>
                             </div>
                         @empty
@@ -367,33 +359,5 @@
             </footer>
         @endif
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.reportes-tab');
-    const panels = document.querySelectorAll('.reportes-panel');
-    function ajustarFiltros(tab) {
-        const produccion = tab === 'produccion';
-        const tipo = document.querySelector('.reportes-filtro-tipo');
-        const servicio = document.querySelector('.reportes-filtro-servicio');
-        if (tipo) tipo.hidden = tab !== 'trazabilidad';
-        if (servicio) servicio.hidden = !produccion;
-    }
-    ajustarFiltros('produccion');
-    tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-            ajustarFiltros(tab.dataset.tab);
-            tabs.forEach(function (item) {
-                const active = item === tab;
-                item.classList.toggle('activo', active);
-                item.setAttribute('aria-selected', String(active));
-            });
-            panels.forEach(function (panel) {
-                const active = panel.id === 'panel-' + tab.dataset.tab;
-                panel.classList.toggle('activo', active);
-                panel.hidden = !active;
-            });
-        });
-    });
-});
-</script>
+    <script src="{{ asset('js/modulos/reportes/admin.js') }}?v={{ @filemtime(public_path('js/modulos/reportes/admin.js')) }}"></script>
 @endpush

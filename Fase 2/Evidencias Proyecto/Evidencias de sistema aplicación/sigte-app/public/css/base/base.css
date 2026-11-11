@@ -1,0 +1,22 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-height: 100%; }
+body {
+  font-family: var(--font-body);
+  color: var(--texto);
+  background: var(--fondo);
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font-family: inherit; }
+a { color: var(--naranja-texto); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.sigte-icon { width: var(--icono-sm); height: var(--icono-sm); flex: 0 0 auto; display: block; }
+
+html[data-tema="oscuro"] ::selection {
+  background: rgba(240, 112, 47, 0.35);
+  color: var(--ink);
+}
+
+html[data-tema="oscuro"] img[src*="sin_imagen"] {
+  filter: invert(0.86) hue-rotate(180deg);
+}

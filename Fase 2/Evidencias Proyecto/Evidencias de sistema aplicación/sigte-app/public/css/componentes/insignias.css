@@ -1,0 +1,34 @@
+/* Badges de estado, pills y roles. Muestrario en /guia-visual.html#estados. */
+
+.badge {
+  display: inline-flex; align-items: center; gap: var(--esp-1);
+  padding: var(--esp-1) var(--esp-2); border-radius: var(--radio-pill); font-size: var(--fs-xs);
+  background: var(--naranja-suave); color: var(--naranja-oscuro); font-weight: 700;
+}
+.badge .sigte-icon { width: var(--icono-xs); height: var(--icono-xs); }
+.badge-urgent { color: var(--rojo-texto); border-color: var(--rojo-linea); background: var(--rojo-fondo); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: var(--esp-1) var(--esp-2);
+  border-radius: var(--radio-pill);
+}
+.pill .sigte-icon { width: var(--icono-xs); height: var(--icono-xs); }
+.pill-ok { background: var(--verde-fondo); color: var(--verde-texto); box-shadow: inset 0 0 0 1px var(--verde-linea); }
+.pill-warn { background: var(--ambar-fondo); color: var(--ambar-texto); box-shadow: inset 0 0 0 1px var(--ambar-linea); }
+.pill-danger { background: var(--rojo-fondo); color: var(--rojo-texto); box-shadow: inset 0 0 0 1px var(--rojo-linea); }
+
+.rol-pill { font-weight: 700; }
+.rol-admin { background: var(--superficie-3); color: var(--texto-1); box-shadow: inset 0 0 0 1px var(--linea-fuerte); }
+.rol-enfermera { background: var(--rosa-fondo); color: var(--rosa-texto); box-shadow: inset 0 0 0 1px var(--rosa-linea); }
+.rol-operadora { background: var(--azul-fondo); color: var(--azul-texto); box-shadow: inset 0 0 0 1px var(--azul-linea); }
+.rol-secretaria { background: var(--violeta-fondo); color: var(--violeta-texto); box-shadow: inset 0 0 0 1px var(--violeta-linea); }
+
+.badge-listo {
+  background: var(--verde-fondo);
+  color: var(--verde-texto);
+}

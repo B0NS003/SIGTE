@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/reportes.css') }}?v={{ @filemtime(public_path('css/reportes.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/reportes/comun.css') }}?v={{ @filemtime(public_path('css/modulos/reportes/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/reportes/admin.css') }}?v={{ @filemtime(public_path('css/modulos/reportes/admin.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Administradora')

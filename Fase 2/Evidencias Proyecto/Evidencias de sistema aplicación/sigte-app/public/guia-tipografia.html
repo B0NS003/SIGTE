@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIGTE · Guía tipográfica</title>
+<script>
+  try {
+    var temaPedido = new URLSearchParams(location.search).get('tema');
+    if (temaPedido ? temaPedido === 'oscuro' : localStorage.getItem('sigte-tema') === 'oscuro') document.documentElement.setAttribute('data-tema', 'oscuro');
+  } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,900&family=Inter:wght@400;500;600;700;800&family=Sora:wght@700&family=Manrope:wght@400;600&family=Roboto:wght@400;700&family=Plus+Jakarta+Sans:wght@400;800&family=Lexend:wght@700&family=Source+Sans+3:wght@400&family=Poppins:wght@700&family=Outfit:wght@700&family=DM+Sans:wght@400;700&family=Figtree:wght@400;800&family=IBM+Plex+Sans:wght@400;700&family=Red+Hat+Display:wght@700&family=Red+Hat+Text:wght@400&display=swap">
+<link rel="stylesheet" href="css/base/tokens.css">
+<link rel="stylesheet" href="css/base/base.css">
+<link rel="stylesheet" href="css/base/layout.css">
+<link rel="stylesheet" href="css/componentes/botones.css">
+<link rel="stylesheet" href="css/componentes/formularios.css">
+<link rel="stylesheet" href="css/componentes/pestanas.css">
+<link rel="stylesheet" href="css/componentes/paneles.css">
+<link rel="stylesheet" href="css/componentes/tablas.css">
+<link rel="stylesheet" href="css/componentes/insignias.css">
+<link rel="stylesheet" href="css/componentes/mensajes.css">
+<link rel="stylesheet" href="css/base/utilidades.css">
+<style>
+  body { padding: var(--esp-8) var(--esp-6) var(--esp-9); }
+  .gt { max-width: 1040px; margin: 0 auto; display: grid; gap: var(--esp-8); }
+  .gt h2 { margin: 0 0 var(--esp-1); font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700; color: var(--texto-1); }
+  .gt h3 { margin: var(--esp-5) 0 var(--esp-3); font-size: var(--fs-xs); font-weight: 800; text-transform: uppercase; letter-spacing: var(--etiqueta-espaciado); color: var(--muted); }
+  .gt-regla { margin: 0 0 var(--esp-4); color: var(--texto-3); font-size: var(--fs-base); line-height: 1.55; max-width: 46rem; }
+  .gt code { font-size: var(--fs-xs); background: var(--superficie-2); border: 1px solid var(--linea); border-radius: 6px; padding: 1px 5px; color: var(--texto-2); white-space: nowrap; }
+
+  .gt-portada { border-radius: var(--radio-lg); background: #0b1f4b; color: #e8edf5; padding: var(--esp-9) var(--esp-8); display: grid; gap: var(--esp-4); }
+  .gt-portada .gt-sobre { font-size: var(--fs-xs); font-weight: 800; letter-spacing: var(--etiqueta-espaciado); text-transform: uppercase; color: #fdba74; }
+  .gt-portada .gt-marca { margin: 0; font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 88px; line-height: 0.95; color: #fff; }
+  .gt-portada .gt-marca span { color: #f0702f; }
+  .gt-portada p { margin: 0; max-width: 36rem; color: #aab6c7; font-size: var(--fs-lg); line-height: 1.5; }
+  .gt-portada .gt-par { display: flex; gap: var(--esp-6); flex-wrap: wrap; margin-top: var(--esp-2); }
+  .gt-portada .gt-par div { border-top: 1px solid rgba(255,255,255,.18); padding-top: var(--esp-3); min-width: 14rem; }
+  .gt-portada .gt-par strong { display: block; font-size: var(--fs-2xl); color: #fff; }
+  .gt-portada .gt-par small { color: #aab6c7; font-size: var(--fs-sm); }
+
+  .gt-familias { display: grid; grid-template-columns: 1fr 1fr; gap: var(--esp-4); }
+  .gt-familia { background: var(--superficie-1); border: 1px solid var(--linea); border-radius: var(--radio-lg); padding: var(--esp-6); display: grid; gap: var(--esp-3); align-content: start; }
+  .gt-familia .gt-aa { font-size: 96px; line-height: 1; color: var(--texto-1); }
+  .gt-familia .gt-nombre { font-size: var(--fs-3xl); font-weight: 700; color: var(--texto-1); margin: 0; }
+  .gt-familia .gt-rol { margin: 0; color: var(--naranja-texto); font-size: var(--fs-sm); font-weight: 700; }
+  .gt-familia p { margin: 0; color: var(--texto-3); font-size: var(--fs-base); line-height: 1.5; }
+  .gt-familia .gt-abc { font-size: var(--fs-xl); color: var(--texto-2); line-height: 1.5; word-break: break-word; }
+  .gt-pesos { display: grid; gap: var(--esp-1); border-top: 1px solid var(--linea); padding-top: var(--esp-3); }
+  .gt-pesos div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--esp-3); font-size: var(--fs-xl); color: var(--texto-1); }
+  .gt-pesos small { font-family: var(--font-body); font-size: var(--fs-xs); font-weight: 500; color: var(--muted); font-style: normal; white-space: nowrap; }
+  .gt-display { font-family: var(--font-display); }
+  .gt-body { font-family: var(--font-body); }
+
+  .gt-marcas { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--esp-4); }
+  .gt-marca-caja { border-radius: var(--radio-lg); padding: var(--esp-6); display: grid; gap: var(--esp-2); border: 1px solid var(--linea); }
+  .gt-marca-caja b { font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 56px; line-height: 1; }
+  .gt-marca-caja small { font-size: var(--fs-sm); }
+  .gt-marca-oscura { background: #0b1f4b; border-color: #0b1f4b; }
+  .gt-marca-oscura b { color: #fff; } .gt-marca-oscura b span { color: #f0702f; } .gt-marca-oscura small { color: #aab6c7; }
+  .gt-marca-clara { background: #fff; } .gt-marca-clara b { color: #0b1f4b; } .gt-marca-clara b span { color: #e85a1c; } .gt-marca-clara small { color: #5f6e86; }
+  .gt-marca-mal b { color: #0b1f4b; } .gt-marca-mal { background: #fff; }
+  .gt-marca-mal small { color: #b91c1c; }
+  .gt-mal-lista { display: grid; gap: var(--esp-2); }
+  .gt-mal-lista span { font-size: 30px; color: #0b1f4b; line-height: 1.1; }
+  .gt-mal-lista span em { color: #e85a1c; font-style: inherit; }
+
+  .gt-escala { width: 100%; border-collapse: collapse; background: var(--superficie-1); border: 1px solid var(--linea); border-radius: var(--radio-lg); overflow: hidden; }
+  .gt-escala th { text-align: left; font-size: var(--fs-2xs); font-weight: 800; letter-spacing: var(--etiqueta-espaciado); text-transform: uppercase; color: var(--muted); padding: var(--esp-3) var(--esp-4); border-bottom: 1px solid var(--linea); background: var(--superficie-2); }
+  .gt-escala td { padding: var(--esp-3) var(--esp-4); border-bottom: 1px solid var(--linea); vertical-align: middle; color: var(--texto-3); font-size: var(--fs-sm); }
+  .gt-escala tr:last-child td { border-bottom: 0; }
+  .gt-escala td:first-child { white-space: nowrap; }
+  .gt-escala .gt-muestra { color: var(--texto-1); line-height: 1.15; }
+
+  .gt-reglas { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--esp-3); }
+  .gt-regla-caja { background: var(--superficie-1); border: 1px solid var(--linea); border-radius: var(--radio-md); padding: var(--esp-4); }
+  .gt-regla-caja strong { display: block; font-size: var(--fs-md); color: var(--texto-1); margin-bottom: var(--esp-1); }
+  .gt-regla-caja p { margin: 0; font-size: var(--fs-sm); color: var(--texto-3); line-height: 1.5; }
+
+  .gt-contexto { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--esp-4); align-items: start; }
+  .gt-anotada { display: grid; gap: var(--esp-2); }
+  .gt-anotada div { display: flex; gap: var(--esp-3); align-items: baseline; font-size: var(--fs-sm); color: var(--texto-3); }
+  .gt-anotada b { min-width: 2rem; height: 1.5rem; border-radius: var(--radio-pill); background: var(--naranja-suave); color: var(--naranja-texto); display: inline-grid; place-items: center; font-size: var(--fs-xs); }
+  .gt-n { display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--naranja); color: #fff; font: 800 10px var(--font-body); font-style: normal; vertical-align: middle; margin-right: var(--esp-1); }
+
+  .gt-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: var(--esp-4); }
+  .gt-reloj { display: inline-grid; gap: 2px; font-size: 44px; font-weight: 700; line-height: 1; color: var(--texto-1); }
+  .gt-reloj span { justify-self: start; background: var(--naranja-suave); border-radius: 6px; padding: 0 4px; }
+  .gt-cartel { margin: var(--esp-3) 0 0; font-size: var(--fs-xs); font-weight: 700; line-height: 1.45; }
+  .gt-tab { font-variant-numeric: tabular-nums; }
+
+  .gt-opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--esp-3); }
+  .gt-opcion { background: var(--superficie-1); border: 1px solid var(--linea); border-radius: var(--radio-md); padding: var(--esp-4); display: grid; gap: var(--esp-2); }
+  .gt-opcion.es-elegida { border-color: var(--naranja); box-shadow: var(--foco); }
+  .gt-opcion header { display: flex; justify-content: space-between; gap: var(--esp-2); font-size: var(--fs-xs); font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: var(--etiqueta-espaciado); }
+  .gt-opcion header span { color: var(--naranja-texto); }
+  .gt-opcion .gt-op-titulo { font-size: var(--fs-3xl); color: var(--texto-1); line-height: 1.1; margin: 0; }
+  .gt-opcion .gt-op-texto { font-size: var(--fs-sm); color: var(--texto-3); margin: 0; line-height: 1.45; }
+  .gt-opcion .gt-op-motivo { font-size: var(--fs-xs); color: var(--muted); margin: 0; border-top: 1px solid var(--linea); padding-top: var(--esp-2); }
+
+  .gt-tema { position: fixed; right: var(--esp-5); bottom: var(--esp-5); z-index: 5; box-shadow: var(--sombra-2); }
+
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0; }
+    .gt { gap: var(--esp-7); }
+    .gt-tema { display: none; }
+    .gt-familia, .gt-marca-caja, .gt-escala tr, .gt-regla-caja, .gt-opcion, .panel, .kpi { break-inside: avoid; }
+    .gt h2, .gt h3, .gt-regla { break-after: avoid; }
+    #familias, #escala, #contexto, #anexo { break-before: page; }
+  }
+  @media (max-width: 760px) {
+    body { padding: var(--esp-6) var(--esp-4) var(--esp-9); }
+    .gt-familias, .gt-marcas, .gt-reglas, .gt-contexto, .gt-numeros, .gt-opciones { grid-template-columns: 1fr; }
+    .gt-portada { padding: var(--esp-7) var(--esp-5); }
+    .gt-portada .gt-marca { font-size: 64px; }
+  }
+</style>
+</head>
+<body>
+<main class="gt">
+
+  <header class="gt-portada">
+    <span class="gt-sobre">Guía tipográfica · Hospital San José de Melipilla</span>
+    <p class="gt-marca">SIG<span>TE</span></p>
+    <p>Las letras que usa el sistema, qué peso y tamaño va en cada lugar, y por qué se eligieron.</p>
+    <div class="gt-par">
+      <div><strong class="gt-display">Montserrat</strong><small>Títulos, números grandes y marca</small></div>
+      <div><strong class="gt-body">Inter</strong><small>Texto, botones, campos y tablas</small></div>
+    </div>
+  </header>
+
+  <section id="familias">
+    <h2>Las dos familias</h2>
+    <p class="gt-regla">El sistema usa solo dos familias, ambas de Google Fonts y gratuitas. Montserrat da la identidad: es geométrica y firme, y se reconoce en títulos y en la marca. Inter hace el trabajo de lectura: fue diseñada para pantallas y se mantiene clara a 11 y 13 px, que es el tamaño de la mayoría de los datos del sistema.</p>
+    <div class="gt-familias">
+      <article class="gt-familia">
+        <span class="gt-aa gt-display" style="font-weight:700">Aa</span>
+        <p class="gt-nombre gt-display">Montserrat</p>
+        <p class="gt-rol">Variable <code>--font-display</code></p>
+        <p>Títulos de página, de sección y de panel, números de KPI y la marca SIGTE.</p>
+        <span class="gt-abc gt-display" style="font-weight:600">ABCDEFGHIJKLMNÑOPQRSTUVWXYZ abcdefghijklmnñopqrstuvwxyz 0123456789</span>
+        <div class="gt-pesos gt-display">
+          <div style="font-weight:500">Recepción de cajas <small>500 · poco uso</small></div>
+          <div style="font-weight:600">Recepción de cajas <small>600 · subtítulos</small></div>
+          <div style="font-weight:700">Recepción de cajas <small>700 · títulos (principal)</small></div>
+          <div style="font-weight:800">Recepción de cajas <small>800 · énfasis</small></div>
+          <div style="font-weight:900;font-style:italic">SIGTE <small>900 itálica · solo la marca</small></div>
+        </div>
+      </article>
+      <article class="gt-familia">
+        <span class="gt-aa gt-body" style="font-weight:600">Aa</span>
+        <p class="gt-nombre gt-body">Inter</p>
+        <p class="gt-rol">Variable <code>--font-body</code></p>
+        <p>Todo lo demás: párrafos, tablas, botones, campos, chips, badges y etiquetas.</p>
+        <span class="gt-abc gt-body">ABCDEFGHIJKLMNÑOPQRSTUVWXYZ abcdefghijklmnñopqrstuvwxyz 0123456789</span>
+        <div class="gt-pesos gt-body">
+          <div style="font-weight:400">Caja entregada al servicio <small>400 · párrafos</small></div>
+          <div style="font-weight:500">Caja entregada al servicio <small>500 · texto secundario</small></div>
+          <div style="font-weight:600">Caja entregada al servicio <small>600 · checks, datos</small></div>
+          <div style="font-weight:700">Caja entregada al servicio <small>700 · botones, etiquetas</small></div>
+          <div style="font-weight:800">CAJA ENTREGADA <small>800 · mayúsculas</small></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="marca">
+    <h2>La marca SIGTE</h2>
+    <p class="gt-regla">Siempre en Montserrat 900 itálica, sin espaciado extra, con <strong>SIG</strong> en navy (o blanco sobre fondo oscuro) y <strong>TE</strong> en naranja. La itálica da sensación de movimiento, como las cajas que avanzan por el proceso.</p>
+    <div class="gt-marcas">
+      <div class="gt-marca-caja gt-marca-oscura"><b>SIG<span>TE</span></b><small>Sobre navy: SIG blanco, TE naranja claro (#f0702f).</small></div>
+      <div class="gt-marca-caja gt-marca-clara"><b>SIG<span>TE</span></b><small>Sobre blanco: SIG navy, TE naranja (#e85a1c).</small></div>
+      <div class="gt-marca-caja gt-marca-mal">
+        <div class="gt-mal-lista">
+          <span style="font-family:var(--font-display);font-weight:900">SIG<em>TE</em></span>
+          <span style="font-family:var(--font-display);font-weight:900;font-style:italic;letter-spacing:.14em">SIG<em>TE</em></span>
+          <span style="font-family:var(--font-body);font-weight:800;font-style:italic">SIG<em>TE</em></span>
+        </div>
+        <small>No: recta, espaciada u otra letra.</small>
+      </div>
+    </div>
+  </section>
+
+  <section id="escala">
+    <h2>Escala de tamaños</h2>
+    <p class="gt-regla">Todos los tamaños salen de esta escala (<code>--fs-*</code> en <code>css/base/tokens.css</code>). No escribas tamaños sueltos en px: si falta un paso, se agrega aquí primero. La base es 14 px.</p>
+    <table class="gt-escala">
+      <thead><tr><th>Variable</th><th>Tamaño</th><th>Muestra</th><th>Se usa en</th></tr></thead>
+      <tbody>
+        <tr><td><code>--fs-6xl</code></td><td>32 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-6xl);font-weight:700">48 cajas</td><td>Números destacados</td></tr>
+        <tr><td><code>--fs-5xl</code></td><td>30 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-5xl);font-weight:700">Flujo de cajas</td><td>Título de página, número de KPI</td></tr>
+        <tr><td><code>--fs-4xl</code></td><td>24 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-4xl);font-weight:700">Inventario</td><td>Título de página en móvil</td></tr>
+        <tr><td><code>--fs-3xl</code></td><td>22 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-3xl);font-weight:700">SET-073</td><td>Código de caja, número de fase</td></tr>
+        <tr><td><code>--fs-2xl</code></td><td>20 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-2xl);font-weight:700">Recepción</td><td>Título de sección o etapa</td></tr>
+        <tr><td><code>--fs-xl</code></td><td>18 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-xl);font-weight:700">Registrar entrega</td><td>Título de modal</td></tr>
+        <tr><td><code>--fs-lg</code></td><td>16 px</td><td class="gt-muestra gt-display" style="font-size:var(--fs-lg);font-weight:700">Últimos movimientos</td><td>Título de panel</td></tr>
+        <tr><td><code>--fs-md</code></td><td>15 px</td><td class="gt-muestra gt-body" style="font-size:var(--fs-md)">Nombre y apellido</td><td>Texto de campos, botón principal</td></tr>
+        <tr><td><code>--fs-base</code></td><td>14 px</td><td class="gt-muestra gt-body" style="font-size:var(--fs-base)">Revisa en qué etapa va cada caja.</td><td>Texto normal, tablas, botones</td></tr>
+        <tr><td><code>--fs-sm</code></td><td>13 px</td><td class="gt-muestra gt-body" style="font-size:var(--fs-sm)">Dental · Sala lavado · Muñoz</td><td>Metadatos, chips, etiquetas de campo</td></tr>
+        <tr><td><code>--fs-xs</code></td><td>12 px</td><td class="gt-muestra gt-body" style="font-size:var(--fs-xs);font-weight:700">Bajo mínimo</td><td>Badges, ayudas</td></tr>
+        <tr><td><code>--fs-2xs</code></td><td>11 px</td><td class="gt-muestra gt-body" style="font-size:var(--fs-2xs);font-weight:800;text-transform:uppercase;letter-spacing:var(--etiqueta-espaciado);color:var(--muted)">En esta etapa desde</td><td>Etiquetas en mayúsculas, encabezados de tabla</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="reglas">
+    <h2>Reglas de uso</h2>
+    <div class="gt-reglas">
+      <div class="gt-regla-caja"><strong>Un título por nivel</strong><p>Página en <code>--fs-5xl</code>, sección en <code>--fs-2xl</code> y panel en <code>--fs-lg</code>, todos en Montserrat 700. No mezcles dos tamaños de título en el mismo nivel.</p></div>
+      <div class="gt-regla-caja"><strong>Botones en Inter</strong><p>Los botones, chips y pestañas van en Inter 700. Montserrat en un botón lo hace parecer título y compite con el encabezado.</p></div>
+      <div class="gt-regla-caja"><strong>900 solo para la marca</strong><p>El peso 900 y la itálica son exclusivos de SIGTE. En el resto del sistema el máximo es 800, y solo en etiquetas en mayúsculas.</p></div>
+      <div class="gt-regla-caja"><strong>Mayúsculas con aire</strong><p>Toda etiqueta en mayúsculas lleva <code>letter-spacing: var(--etiqueta-espaciado)</code> (0.06em), peso 800 y 11 a 12 px. Nunca un párrafo en mayúsculas.</p></div>
+      <div class="gt-regla-caja"><strong>Interlineado</strong><p>Títulos entre 1 y 1.2. Texto corrido entre 1.4 y 1.5. Los números de KPI van en 1 para que no empujen la tarjeta.</p></div>
+      <div class="gt-regla-caja"><strong>Números que no bailan</strong><p>Tiempos, horas y contadores que cambian en vivo usan <code>font-variant-numeric: tabular-nums</code>, así cada dígito ocupa lo mismo y el texto no salta.</p></div>
+    </div>
+  </section>
+
+  <section id="contexto">
+    <h2>Jerarquía en una pantalla</h2>
+    <p class="gt-regla">Así se combinan los tamaños en una vista real. Cada número indica qué estilo lleva ese elemento.</p>
+    <div class="gt-contexto">
+      <div class="panel" style="padding:var(--esp-6)">
+        <p class="eyebrow"><i class="gt-n">1</i>Operadora · Sala lavado</p>
+        <div class="main-top" style="margin:0 0 var(--esp-1)"><h1><i class="gt-n">2</i>Flujo de cajas</h1></div>
+        <p class="main-sub" style="margin-bottom:var(--esp-5)"><i class="gt-n">3</i>Revisa en qué etapa va cada caja.</p>
+        <div class="panel" style="box-shadow:none;background:var(--superficie-2)">
+          <div class="panel-head"><h2><i class="gt-n">4</i>SET-073</h2><span class="badge badge-urgent"><i class="gt-n" style="background:var(--rojo)">5</i>Urgente</span></div>
+          <p style="margin:0 0 var(--esp-3);font-size:var(--fs-sm);color:var(--muted)"><i class="gt-n">6</i>Dental · Sala lavado · <strong style="color:var(--texto-1)">Felipe Sagredo L.</strong></p>
+          <p style="margin:0;font-size:var(--fs-2xs);font-weight:800;text-transform:uppercase;letter-spacing:var(--etiqueta-espaciado);color:var(--muted)"><i class="gt-n">7</i>En esta etapa desde</p>
+          <p class="gt-tab" style="margin:2px 0 var(--esp-4);font-size:var(--fs-md);font-weight:700;color:var(--naranja-texto)"><i class="gt-n">8</i>02/11/2026 · 06:01 · quedan 55 min</p>
+          <button class="btn btn-dark" type="button"><i class="gt-n">9</i>Pasar a Preparación</button>
+        </div>
+      </div>
+      <div class="gt-anotada">
+        <div><b>1</b>Eyebrow: Inter 800, 11 px, mayúsculas, naranja oscuro.</div>
+        <div><b>2</b>Título de página: Montserrat 700, 30 px.</div>
+        <div><b>3</b>Subtítulo: Inter 400, 14 px, <code>--muted</code>.</div>
+        <div><b>4</b>Título de tarjeta: Montserrat 700, 16 a 22 px.</div>
+        <div><b>5</b>Badge: Inter 700, 12 px.</div>
+        <div><b>6</b>Metadatos: Inter 400, 13 px; el dato clave en 700.</div>
+        <div><b>7</b>Etiqueta: Inter 800, 11 px, mayúsculas.</div>
+        <div><b>8</b>Dato en vivo: Inter 700, 15 px, números tabulares.</div>
+        <div><b>9</b>Botón: Inter 700, 14 px.</div>
+      </div>
+    </div>
+
+    <h3>Números tabulares</h3>
+    <div class="gt-numeros">
+      <div class="panel"><div class="gt-reloj gt-body"><span>11:11</span><span>00:00</span></div><p class="gt-cartel" style="color:var(--rojo-texto)">Sin tabular-nums: "11:11" queda más angosto que "00:00" y el texto salta cuando cambia la hora.</p></div>
+      <div class="panel"><div class="gt-reloj gt-body gt-tab"><span>11:11</span><span>00:00</span></div><p class="gt-cartel" style="color:var(--verde-texto)">Con tabular-nums: todos los dígitos miden lo mismo y la columna queda alineada.</p></div>
+    </div>
+  </section>
+
+  <section id="anexo">
+    <h2>Anexo: opciones evaluadas</h2>
+    <p class="gt-regla">Antes de elegir se compararon estas combinaciones en la portada, en el flujo de cajas y en texto chico. El equipo eligió la opción R, Montserrat + Inter. Funciona porque la marca gana identidad con Montserrat 900 itálica, Inter se lee bien a 11 y 13 px, y separar botones (Inter) de títulos (Montserrat) ordena la jerarquía. Debajo de cada opción va una observación de la comparación.</p>
+    <div class="gt-opciones">
+      <article class="gt-opcion es-elegida"><header>R · Montserrat + Inter<span>Elegida</span></header><p class="gt-op-titulo" style="font-family:Montserrat;font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:Inter">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Identidad en títulos y lectura clara en datos.</p></article>
+      <article class="gt-opcion"><header>A · Sora + Manrope<span>Anterior</span></header><p class="gt-op-titulo" style="font-family:Sora;font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:Manrope">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Sora no tiene itálica para la marca.</p></article>
+      <article class="gt-opcion"><header>B · Montserrat + Roboto</header><p class="gt-op-titulo" style="font-family:Montserrat;font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:Roboto">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Roboto se ve más genérica que Inter en tamaños chicos.</p></article>
+      <article class="gt-opcion"><header>D · Plus Jakarta Sans</header><p class="gt-op-titulo" style="font-family:'Plus Jakarta Sans';font-weight:800">Flujo de cajas</p><p class="gt-op-texto" style="font-family:'Plus Jakarta Sans'">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Una sola familia: menos contraste entre títulos y texto.</p></article>
+      <article class="gt-opcion"><header>E · Lexend + Source Sans 3</header><p class="gt-op-titulo" style="font-family:Lexend;font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:'Source Sans 3'">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Muy ancha; los códigos de caja ocupan más espacio.</p></article>
+      <article class="gt-opcion"><header>F · Poppins + Inter</header><p class="gt-op-titulo" style="font-family:Poppins;font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:Inter">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Poppins se siente más de marketing que clínica.</p></article>
+      <article class="gt-opcion"><header>G · Outfit + Inter</header><p class="gt-op-titulo" style="font-family:Outfit;font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:Inter">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Outfit no tiene itálica para la marca.</p></article>
+      <article class="gt-opcion"><header>H · DM Sans</header><p class="gt-op-titulo" style="font-family:'DM Sans';font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:'DM Sans'">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Correcta, pero sin carácter propio en la marca.</p></article>
+      <article class="gt-opcion"><header>I · Figtree</header><p class="gt-op-titulo" style="font-family:Figtree;font-weight:800">Flujo de cajas</p><p class="gt-op-texto" style="font-family:Figtree">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Muy redondeada para un sistema clínico.</p></article>
+      <article class="gt-opcion"><header>J · IBM Plex Sans</header><p class="gt-op-titulo" style="font-family:'IBM Plex Sans';font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:'IBM Plex Sans'">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Técnica y fría; títulos con poca presencia.</p></article>
+      <article class="gt-opcion"><header>K · Red Hat Display + Text</header><p class="gt-op-titulo" style="font-family:'Red Hat Display';font-weight:700">Flujo de cajas</p><p class="gt-op-texto" style="font-family:'Red Hat Text'">Dental · Sala lavado · quedan 55 min</p><p class="gt-op-motivo">Buena, pero asociada a otra marca conocida.</p></article>
+    </div>
+  </section>
+
+</main>
+
+<button class="btn btn-dark gt-tema" type="button" id="gt-tema">Cambiar a modo oscuro</button>
+
+<script>
+  (function () {
+    var raiz = document.documentElement;
+    var boton = document.getElementById('gt-tema');
+    function rotular() { boton.textContent = raiz.getAttribute('data-tema') === 'oscuro' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'; }
+    boton.addEventListener('click', function () {
+      if (raiz.getAttribute('data-tema') === 'oscuro') raiz.removeAttribute('data-tema');
+      else raiz.setAttribute('data-tema', 'oscuro');
+      rotular();
+    });
+    rotular();
+  })();
+</script>
+</body>
+</html>

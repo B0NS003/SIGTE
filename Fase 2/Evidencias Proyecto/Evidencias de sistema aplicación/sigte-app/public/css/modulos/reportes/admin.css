@@ -1,0 +1,1314 @@
+/* Reportes de Administración: control de período, Producción, Trazabilidad y Entregas. */
+
+.reportes-pagina {
+    min-width: 0;
+}
+.reportes-panel[hidden] {
+    display: none !important;
+}
+.reportes-panel {
+    margin-top: 20px;
+}
+.reportes-bloque {
+    padding: var(--esp-5);
+    margin-bottom: 18px;
+}
+.reportes-bloque h3 {
+    margin: 0 0 6px;
+    font-size: var(--fs-xl);
+    color: var(--texto-1);
+}
+.reportes-control {
+    padding: 0;
+    margin-bottom: var(--esp-4);
+}
+.reportes-control-fila {
+    padding: var(--esp-4) var(--esp-5);
+}
+.reportes-control-fila + .reportes-control-fila {
+    border-top: 1px solid var(--linea);
+}
+.reportes-control-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3) var(--esp-4);
+    flex-wrap: wrap;
+    padding-block: var(--esp-3);
+}
+.reportes-control .reportes-tabs {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+.reportes-control .reportes-tab {
+    flex: 0 0 auto;
+    padding: 0 var(--esp-5);
+}
+.reportes-periodo {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+    flex-wrap: wrap;
+}
+.reportes-periodo p {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+}
+.reportes-periodo strong {
+    color: var(--texto-1);
+    font-variant-numeric: tabular-nums;
+}
+.reportes-campos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--esp-3);
+}
+.reportes-campo {
+    display: flex;
+    flex: 1 1 170px;
+    flex-direction: column;
+    gap: var(--esp-1);
+    min-width: 0;
+    color: var(--texto-1);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+}
+.reportes-filtro-tipo,
+.reportes-filtro-servicio {
+    flex-grow: 1.4;
+}
+.reportes-campo input,
+.reportes-campo select,
+.reportes-campo .sigte-lista-boton {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--alto-md);
+    border: 1px solid var(--linea-fuerte);
+    border-radius: var(--radio-md);
+    padding: 0 var(--esp-3);
+    background: var(--superficie-1);
+    color: var(--texto-1);
+    font: inherit;
+    font-weight: 400;
+    transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.reportes-campo input:focus,
+.reportes-campo .sigte-lista-boton:focus-visible,
+.reportes-campo .sigte-lista-boton[aria-expanded="true"] {
+    outline: none;
+    border-color: var(--naranja-linea);
+    box-shadow: var(--foco);
+}
+.reportes-campo .sigte-lista-boton svg {
+    color: var(--muted);
+}
+.reportes-consultar {
+    flex: 0 0 auto;
+    min-height: var(--alto-md);
+    white-space: nowrap;
+}
+.reportes-ayuda,
+.reportes-nota {
+    font-size: var(--fs-xs);
+    color: var(--texto-3);
+    line-height: 1.5;
+}
+.reportes-ayuda {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--esp-2);
+    margin: var(--esp-3) 0 0;
+}
+.reportes-ayuda[hidden] {
+    display: none;
+}
+.reportes-ayuda .sigte-icon {
+    width: var(--icono-xs);
+    height: var(--icono-xs);
+    margin-top: 2px;
+    color: var(--muted);
+}
+.reportes-nota {
+    margin: 4px 0 16px;
+}
+.reportes-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-5);
+    padding: var(--esp-5) var(--esp-5);
+    margin-top: 16px;
+}
+.reportes-pie strong {
+    color: var(--texto-1);
+}
+.reportes-pie p {
+    margin: 5px 0 0;
+    color: var(--texto-3);
+    font-size: var(--fs-xs);
+}
+.reportes-exportar {
+    display: flex;
+    gap: var(--esp-2);
+}
+.reportes-exportar button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+.reportes-estado {
+    padding: var(--esp-5);
+}
+@media (max-width: 650px) {
+  .reportes-control .reportes-tabs {
+        width: 100%;
+    }
+  .reportes-control .reportes-tab {
+        flex: 1 1 0;
+        padding: 0 var(--esp-2);
+    }
+  .reportes-control-fila {
+        padding-inline: var(--esp-4);
+    }
+  .reportes-consultar {
+        flex: 1 1 100%;
+    }
+  .reportes-pie {
+        flex-direction: column;
+    }
+  .reportes-exportar {
+        width: 100%;
+    }
+  .reportes-exportar button {
+        flex: 1;
+    }
+  .reportes-bloque {
+        padding: var(--esp-4);
+    }
+}
+
+/* Vista de producción rediseñada — conserva las reglas existentes de SIGTE */
+.reportes-pagina .reportes-panel {
+    margin-top: 0
+}
+.reportes-pagina .reportes-bloque-moderno {
+    padding: var(--esp-2);
+    margin-bottom: 14px;
+    border-radius: var(--radio-lg)
+}
+.reportes-banda {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+    padding: var(--esp-2) var(--esp-3) var(--esp-3);
+    margin-bottom: var(--esp-3);
+    border-bottom: 1px solid var(--linea);
+}
+.reportes-banda-icono {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-sm);
+    background: var(--superficie-2);
+    color: var(--texto-2);
+}
+.reportes-banda-icono .reportes-icono {
+    width: var(--icono-md);
+    height: var(--icono-md);
+}
+.reportes-pagina .reportes-banda h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    line-height: 1.25;
+    color: var(--texto-1);
+}
+.reportes-banda-descripcion {
+    margin: 2px 0 0;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+    line-height: 1.4;
+}
+.reportes-produccion-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(260px, .95fr);
+    gap: var(--esp-5);
+    padding: 0 var(--esp-3) var(--esp-2)
+}
+.reportes-produccion-principal {
+    min-width: 0
+}
+.reportes-distribucion {
+    min-width: 0;
+    border-left: 1px solid var(--linea);
+    padding: var(--esp-2) var(--esp-2) var(--esp-2) var(--esp-5)
+}
+.reportes-resumen-compacto {
+    gap: var(--esp-2);
+    margin: 0 0 14px
+}
+.reportes-resumen-compacto .reportes-kpi {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--esp-3);
+    min-height: 86px;
+    padding: var(--esp-3) var(--esp-4);
+    border: 0
+}
+.reportes-resumen-compacto .reportes-kpi span {
+    font-size: var(--fs-xs);
+    color: var(--texto-2)
+}
+.reportes-resumen-compacto .reportes-kpi strong {
+    font-size: var(--fs-5xl);
+    line-height: 1.2
+}
+.reportes-resumen-compacto .reportes-kpi small {
+    font-size: var(--fs-2xs)
+}
+.reportes-kpi-azul {
+    background: var(--azul-fondo)
+}
+.reportes-kpi-verde {
+    background: var(--verde-fondo)
+}
+.reportes-kpi-violeta {
+    background: var(--violeta-fondo)
+}
+.reportes-titulo-detalle {
+    font-size: var(--fs-sm);
+    color: var(--texto-1);
+    margin: 8px 0 10px;
+    font-weight: 800
+}
+.reportes-etapas {
+    display: flex;
+    align-items: stretch;
+    gap: var(--esp-1);
+    margin-bottom: 12px
+}
+.reportes-etapa {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--esp-2);
+    min-height: 57px;
+    padding: var(--esp-2) var(--esp-1);
+    border-radius: var(--radio-sm);
+    text-align: center;
+    background: var(--azul-fondo)
+}
+.reportes-etapa span {
+    font-size: var(--fs-2xs);
+    overflow-wrap: anywhere;
+    color: var(--texto-2)
+}
+.reportes-etapa strong {
+    font-size: var(--fs-2xl);
+    color: var(--texto-1)
+}
+.reportes-etapa-1 {
+    background: var(--azul-fondo)
+}
+.reportes-etapa-2 {
+    background: var(--ambar-fondo)
+}
+.reportes-etapa-3 {
+    background: var(--rojo-fondo)
+}
+.reportes-etapa-4 {
+    background: var(--violeta-fondo)
+}
+.reportes-etapa-5 {
+    background: var(--verde-fondo)
+}
+.reportes-etapa-flecha {
+    align-self: center;
+    color: var(--texto-4);
+    font-size: var(--fs-3xl);
+    font-weight: 800
+}
+.reportes-tabla-compacta th,
+.reportes-tabla-compacta td {
+    padding: var(--esp-2) var(--esp-3);
+    font-size: var(--fs-xs);
+    text-align: center;
+    vertical-align: middle;
+}
+.reportes-punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 9px;
+    flex-shrink: 0;
+    background: var(--punto-color);
+}
+.reportes-grafico-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--esp-4);
+    min-height: 215px
+}
+.reportes-dona {
+    width: 185px;
+    height: 185px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: var(--dona-relleno);
+}
+.reportes-dona-centro {
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: var(--superficie-1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}
+.reportes-dona-centro strong {
+    font-size: var(--fs-5xl);
+    color: var(--texto-1);
+    line-height: 1.1
+}
+.reportes-dona-centro span {
+    font-size: var(--fs-sm);
+    color: var(--texto-3)
+}
+.reportes-leyenda {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-2);
+    min-width: 110px;
+    flex: 1
+}
+.reportes-leyenda>div {
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-xs);
+    color: var(--texto-2);
+    gap: var(--esp-1)
+}
+.reportes-leyenda>div>span:nth-child(2) {
+    flex: 1
+}
+.reportes-leyenda strong {
+    color: var(--texto-1)
+}
+.reportes-pagina .reportes-pie {
+    padding: var(--esp-4) var(--esp-5)
+}
+@media(max-width:1200px) {
+  .reportes-produccion-grid {
+        grid-template-columns: 1fr
+    }
+  .reportes-distribucion {
+        border-left: 0;
+        border-top: 1px solid var(--linea);
+        padding: var(--esp-3) 0
+    }
+  .reportes-grafico-area {
+        justify-content: flex-start
+    }
+}
+@media(max-width:650px) {
+  .reportes-etapas {
+        flex-wrap: wrap
+    }
+  .reportes-etapa {
+        flex: 1 1 26%
+    }
+  .reportes-etapa-flecha {
+        display: none
+    }
+  .reportes-grafico-area {
+        flex-wrap: wrap
+    }
+  .reportes-resumen-compacto {
+        grid-template-columns: 1fr
+    }
+  .reportes-produccion-grid {
+        padding: 0 var(--esp-1) var(--esp-2)
+    }
+}
+
+/* Iconos SVG locales: sin librerías externas ni fuentes adicionales */
+.reportes-icono {
+    display: block;
+    width: var(--icono-lg);
+    height: var(--icono-lg);
+    flex-shrink: 0
+}
+.reportes-kpi-icono {
+    width: 29px;
+    height: 29px;
+    flex-shrink: 0
+}
+.reportes-kpi-azul .reportes-kpi-icono {
+    color: #439ef4
+}
+.reportes-kpi-verde .reportes-kpi-icono {
+    color: var(--verde)
+}
+.reportes-kpi-violeta .reportes-kpi-icono {
+    color: var(--violeta-texto)
+}
+.reportes-kpi-texto {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-1);
+    min-width: 0
+}
+.reportes-etapa-icono {
+    width: var(--icono-lg);
+    height: var(--icono-lg);
+    color: #3895ee
+}
+.reportes-etapa-2 .reportes-etapa-icono {
+    color: #efad22
+}
+.reportes-etapa-3 .reportes-etapa-icono {
+    color: #ee7491
+}
+.reportes-etapa-4 .reportes-etapa-icono {
+    color: var(--violeta-texto)
+}
+.reportes-etapa-5 .reportes-etapa-icono {
+    color: #2db45c
+}
+.reportes-etapa-texto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--esp-1);
+    min-width: 0
+}
+@media(max-width:900px) {
+  .reportes-etapa {
+        flex-direction: column
+    }
+  .reportes-resumen-compacto .reportes-kpi {
+        gap: var(--esp-2)
+    }
+  .reportes-kpi-icono {
+        width: 23px;
+        height: 23px
+    }
+}
+
+/* Flujo horizontal compacto con tarjetas en forma de chevrón */
+.reportes-pagina .reportes-etapas {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-1);
+    width: 100%;
+    margin: 0 0 12px;
+    flex-wrap: nowrap;
+}
+.reportes-pagina .reportes-etapa {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 47px;
+    min-height: 47px;
+    padding: var(--esp-1) var(--esp-3) var(--esp-1) var(--esp-3);
+    box-sizing: border-box;
+    border-radius: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--esp-1);
+    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%, 10px 50%);
+}
+.reportes-pagina .reportes-etapa:first-child {
+    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
+    border-radius: var(--radio-sm) 0 0 var(--radio-sm);
+    padding-left: var(--esp-2);
+}
+.reportes-pagina .reportes-etapa:last-of-type {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10px 50%);
+    border-radius: 0 var(--radio-sm) var(--radio-sm) 0;
+    padding-right: var(--esp-1);
+}
+.reportes-pagina .reportes-etapa-icono {
+    width: var(--icono-md);
+    height: var(--icono-md);
+    flex: 0 0 21px;
+}
+.reportes-pagina .reportes-etapa-texto {
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 0;
+    line-height: 1.1;
+}
+.reportes-pagina .reportes-etapa-texto span {
+    font-size: var(--fs-2xs);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+.reportes-pagina .reportes-etapa-texto strong {
+    font-size: var(--fs-xl);
+    line-height: 1.15;
+}
+.reportes-pagina .reportes-etapa-flecha {
+    flex: 0 0 12px;
+    width: 12px;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-3xl);
+    font-weight: 800;
+    line-height: 1;
+    color: #348ee8;
+}
+.reportes-pagina .reportes-etapa-flecha:nth-of-type(8) {
+    color: #f0a11b;
+}
+.reportes-pagina .reportes-etapa-flecha:nth-of-type(10) {
+    color: var(--rosa-texto);
+}
+.reportes-pagina .reportes-etapa-flecha:nth-of-type(12) {
+    color: #22a75b;
+}
+@media (max-width: 720px) {
+  .reportes-pagina .reportes-etapas {
+        overflow-x: auto;
+        padding-bottom: var(--esp-2);
+    }
+  .reportes-pagina .reportes-etapa {
+        flex: 0 0 110px;
+    }
+  .reportes-pagina .reportes-etapa-flecha {
+        display: flex;
+        flex: 0 0 12px;
+    }
+}
+
+/* Trazabilidad: diseño específico. No modifica las pestañas ni la producción. */
+.reportes-traza-panel {
+    padding: var(--esp-4);
+    margin-bottom: 14px;
+    border-radius: var(--radio-lg);
+}
+.reportes-traza-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, .9fr);
+    gap: var(--esp-4);
+}
+.reportes-traza-izquierda {
+    min-width: 0;
+}
+.reportes-traza-kpis {
+    margin: 0 0 12px;
+    gap: var(--esp-2);
+}
+.reportes-traza-kpis .reportes-kpi {
+    flex-direction: row;
+    align-items: center;
+    min-height: 78px;
+    border: 0;
+    padding: var(--esp-3);
+    gap: var(--esp-3);
+}
+.reportes-traza-kpis .reportes-kpi span {
+    font-size: var(--fs-xs);
+    color: var(--texto-2);
+}
+.reportes-traza-kpis .reportes-kpi strong {
+    font-size: var(--fs-5xl);
+    line-height: 1.1;
+}
+.reportes-traza-kpis .reportes-kpi small {
+    font-size: var(--fs-2xs);
+}
+.reportes-kpi-naranja {
+    background: var(--naranja-fondo);
+}
+.reportes-kpi-naranja .reportes-kpi-icono {
+    color: #ee791a;
+}
+.reportes-traza-serie {
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-md);
+    padding: var(--esp-3);
+    min-width: 0;
+}
+.reportes-traza-serie h3,
+.reportes-traza-derecha h3 {
+    font-size: var(--fs-md);
+    color: var(--texto-1);
+    margin: 0 0 12px;
+}
+.reportes-traza-barras {
+    display: flex;
+    gap: var(--esp-2);
+    align-items: flex-end;
+    height: 175px;
+    overflow-x: auto;
+    padding: var(--esp-2) var(--esp-1) 0;
+    border-bottom: 1px solid var(--linea);
+}
+.reportes-traza-barra-col {
+    flex: 1 0 44px;
+    min-width: 44px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--esp-1);
+}
+.reportes-traza-barra-col strong {
+    color: var(--texto-2);
+    font-size: var(--fs-2xs);
+}
+.reportes-traza-barra {
+    width: min(70%, 38px);
+    background: linear-gradient(180deg, #9c79ed, var(--violeta-fondo));
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    height: var(--barra-alto);
+}
+.reportes-traza-barra-col span {
+    font-size: var(--fs-2xs);
+    color: var(--texto-3);
+    white-space: nowrap;
+    padding-bottom: var(--esp-1);
+}
+.reportes-traza-sin-datos {
+    min-height: 160px;
+    display: grid;
+    place-items: center;
+    color: var(--texto-3);
+    font-size: var(--fs-sm);
+    text-align: center;
+}
+.reportes-traza-derecha {
+    border-left: 1px solid var(--linea);
+    padding: var(--esp-2) var(--esp-1) var(--esp-2) var(--esp-5);
+    min-width: 0;
+}
+.reportes-traza-distribucion {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--esp-4);
+}
+.reportes-traza-dona {
+    width: 170px;
+    height: 170px;
+}
+.reportes-traza-leyenda {
+    display: flex;
+    flex: 1 1 140px;
+    flex-direction: column;
+    gap: var(--esp-3);
+    min-width: 135px;
+}
+.reportes-traza-leyenda>div {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-1);
+    font-size: var(--fs-xs);
+    color: var(--texto-2);
+}
+.reportes-traza-leyenda>div>span:nth-child(2) {
+    flex: 1;
+    overflow-wrap: anywhere;
+}
+.reportes-traza-leyenda strong {
+    color: var(--texto-1);
+    white-space: nowrap;
+}
+.reportes-traza-detalle {
+    padding: var(--esp-4);
+    border-radius: var(--radio-lg);
+}
+.reportes-traza-detalle-cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--esp-3);
+    margin-bottom: 12px;
+}
+.reportes-traza-detalle-cabecera>.reportes-icono {
+    color: #ed650a;
+    width: 28px;
+    height: 28px;
+}
+.reportes-traza-detalle-cabecera h3 {
+    margin: 0 0 3px;
+}
+.reportes-traza-detalle-cabecera .reportes-nota {
+    margin: 0;
+}
+.reportes-traza-tabla td {
+    vertical-align: middle;
+}
+.reportes-traza-usuario {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-2);
+    white-space: nowrap;
+}
+.reportes-traza-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: var(--azul-fondo);
+    color: var(--texto-2);
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+}
+.reportes-traza-accion {
+    display: inline-block;
+    padding: var(--esp-1) var(--esp-2);
+    border-radius: var(--radio-lg);
+    background: var(--azul-fondo);
+    color: var(--texto-3);
+    font-weight: 700;
+    font-size: var(--fs-2xs);
+    white-space: nowrap;
+}
+@media (max-width: 1200px) {
+  .reportes-traza-grid {
+        grid-template-columns: 1fr;
+    }
+  .reportes-traza-derecha {
+        border-left: 0;
+        border-top: 1px solid var(--linea);
+        padding: var(--esp-4) 0 0;
+    }
+}
+@media (max-width: 700px) {
+  .reportes-traza-kpis {
+        grid-template-columns: 1fr;
+    }
+  .reportes-traza-panel {
+        padding: var(--esp-3);
+    }
+  .reportes-traza-detalle {
+        padding: var(--esp-3);
+    }
+}
+
+/* Entregas: diseño independiente de Producción y Trazabilidad */
+.reportes-entregas-kpis {
+    display: grid;
+    grid-template-columns: 1.3fr .85fr .85fr;
+    gap: var(--esp-3);
+    margin-bottom: 14px
+}
+.reportes-entregas-kpi {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-4);
+    min-height: 106px;
+    box-sizing: border-box;
+    padding: var(--esp-4) var(--esp-5);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-lg);
+    background: var(--superficie-1);
+    min-width: 0
+}
+.reportes-entregas-kpi>svg.reportes-icono {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0
+}
+.reportes-entregas-kpi>div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-1);
+    min-width: 0
+}
+.reportes-entregas-kpi span {
+    font-size: var(--fs-base);
+    color: var(--texto-1);
+    font-weight: 700
+}
+.reportes-entregas-kpi strong {
+    font-size: var(--fs-6xl);
+    line-height: 1.15;
+    color: var(--texto-1)
+}
+.reportes-entregas-kpi small {
+    font-size: var(--fs-2xs);
+    color: var(--texto-3)
+}
+.reportes-entregas-kpi-principal {
+    background: var(--naranja-fondo);
+    border-color: var(--naranja-linea)
+}
+.reportes-entregas-bandeja {
+    width: 145px;
+    max-width: 35%;
+    height: auto;
+    flex-shrink: 0;
+    filter: drop-shadow(0 7px 5px #6c7d8a22)
+}
+.reportes-entregas-kpi-operaciones {
+    background: linear-gradient(115deg, var(--superficie-1), var(--azul-fondo))
+}
+.reportes-entregas-kpi-operaciones>svg {
+    color: var(--azul-texto)
+}
+.reportes-entregas-kpi-servicios {
+    background: linear-gradient(115deg, var(--superficie-1), var(--violeta-fondo))
+}
+.reportes-entregas-kpi-servicios>svg {
+    color: var(--violeta-texto)
+}
+.reportes-entregas-analitica {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--esp-3);
+    margin-bottom: 14px
+}
+.reportes-entregas-card {
+    min-width: 0;
+    padding: var(--esp-4) var(--esp-5);
+    border-radius: var(--radio-lg)
+}
+.reportes-entregas-card h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    margin: 0 0 16px;
+    color: var(--texto-1);
+    font-size: var(--fs-lg)
+}
+.reportes-entregas-card h3>.reportes-icono {
+    width: 23px;
+    height: 23px;
+    color: #ed650a
+}
+.reportes-entregas-servicio-fila {
+    display: grid;
+    grid-template-columns: minmax(95px, 1.15fr) auto minmax(60px, 1.4fr) 46px;
+    align-items: center;
+    gap: var(--esp-3);
+    margin: 14px 0;
+    font-size: var(--fs-xs);
+    color: var(--texto-1)
+}
+.reportes-entregas-servicio-nombre {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    min-width: 0;
+    overflow-wrap: anywhere
+}
+.reportes-entregas-servicio-nombre i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--servicio-color);
+}
+.reportes-entregas-servicio-cantidad {
+    white-space: nowrap;
+    font-weight: 700
+}
+.reportes-entregas-progreso {
+    height: 14px;
+    background: var(--superficie-3);
+    border-radius: var(--radio-lg);
+    overflow: hidden
+}
+.reportes-entregas-progreso span {
+    display: block;
+    height: 100%;
+    border-radius: var(--radio-pill);
+    width: var(--progreso-ancho);
+    background: var(--servicio-color);
+}
+.reportes-entregas-servicio-fila>strong {
+    text-align: right;
+    background: var(--azul-fondo);
+    border-radius: var(--radio-lg);
+    padding: var(--esp-1);
+    font-size: var(--fs-2xs)
+}
+.reportes-entregas-calendario {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--esp-2);
+    margin: 8px 0 12px
+}
+.reportes-entregas-dia {
+    aspect-ratio: 1.7;
+    min-height: 26px;
+    border-radius: var(--radio-sm);
+    display: grid;
+    place-items: center;
+    background: rgba(248, 109, 20, calc(.10 + var(--entregas-intensidad) * .83));
+    color: var(--naranja-texto);
+    font-size: var(--fs-2xs)
+}
+.reportes-entregas-leyenda-calendario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--esp-1);
+    color: var(--texto-3);
+    font-size: var(--fs-2xs)
+}
+.reportes-entregas-leyenda-calendario span {
+    width: 16px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--naranja-fondo)
+}
+.reportes-entregas-leyenda-calendario span:nth-of-type(2) {
+    background: var(--naranja-linea)
+}
+.reportes-entregas-leyenda-calendario span:nth-of-type(3) {
+    background: #fb8b4a
+}
+.reportes-entregas-leyenda-calendario span:nth-of-type(4) {
+    background: #f06a17
+}
+.reportes-entregas-datos-dia {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--esp-3);
+    margin-top: 16px;
+    padding-top: var(--esp-3);
+    border-top: 1px solid var(--linea)
+}
+.reportes-entregas-datos-dia>div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-1)
+}
+.reportes-entregas-datos-dia span {
+    font-size: var(--fs-2xs);
+    color: var(--texto-3)
+}
+.reportes-entregas-datos-dia strong {
+    font-size: var(--fs-2xl);
+    color: var(--texto-1)
+}
+.reportes-entregas-datos-dia small {
+    font-size: var(--fs-2xs);
+    color: #ee6415
+}
+.reportes-entregas-inferior {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: var(--esp-3)
+}
+.reportes-entregas-card-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3)
+}
+.reportes-entregas-card-cabecera h3 {
+    margin-bottom: 12px
+}
+.reportes-entregas-tabla th,
+.reportes-entregas-tabla td {
+    padding: var(--esp-2) var(--esp-3);
+    font-size: var(--fs-xs);
+    vertical-align: middle
+}
+.reportes-entregas-codigo {
+    display: inline-block;
+    border-radius: var(--radio-lg);
+    background: var(--superficie-3);
+    color: var(--texto-2);
+    padding: var(--esp-1) var(--esp-2);
+    font-weight: 800;
+    white-space: nowrap
+}
+.reportes-entregas-ultimas .reportes-nota {
+    margin: 12px 0 0
+}
+.reportes-entregas-estado {
+    display: flex;
+    align-items: center
+}
+.reportes-entregas-estado small {
+    font-size: var(--fs-2xs);
+    color: var(--texto-3);
+    line-height: 1.4;
+    display: block
+}
+.reportes-entregas-vacio {
+    padding: var(--esp-7) var(--esp-3);
+    text-align: center;
+    color: var(--texto-3);
+    font-size: var(--fs-xs)
+}
+@media(max-width:1150px) {
+  .reportes-entregas-analitica,
+  .reportes-entregas-inferior {
+        grid-template-columns: 1fr
+    }
+  .reportes-entregas-kpis {
+        grid-template-columns: 1fr 1fr
+    }
+  .reportes-entregas-kpi-principal {
+        grid-column: 1/-1
+    }
+}
+@media(max-width:650px) {
+  .reportes-entregas-kpis {
+        grid-template-columns: 1fr
+    }
+  .reportes-entregas-kpi-principal {
+        grid-column: auto
+    }
+  .reportes-entregas-card {
+        padding: var(--esp-3)
+    }
+  .reportes-entregas-servicio-fila {
+        grid-template-columns: 1fr auto 42px;
+        gap: var(--esp-2)
+    }
+  .reportes-entregas-progreso {
+        grid-column: 1/-1;
+        grid-row: 2
+    }
+  .reportes-entregas-servicio-fila>strong {
+        grid-column: 3;
+        grid-row: 1
+    }
+  .reportes-entregas-servicio-cantidad {
+        grid-column: 2;
+        grid-row: 1
+    }
+}
+
+/* Imagen real de caja de instrumental quirúrgico en la tarjeta de entregas */
+.reportes-entregas-kpi-principal img.reportes-entregas-bandeja {
+    width: 185px;
+    max-width: 39%;
+    height: 112px;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 7px 8px #6c7d8a30)
+}
+@media(max-width:650px) {
+  .reportes-entregas-kpi-principal img.reportes-entregas-bandeja {
+        width: 135px;
+        height: 95px;
+        max-width: 42%
+    }
+}
+
+/* Tarjeta Estado del período, con imagen real de instrumental */
+.reportes-entregas-estado-interior {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--esp-5);
+    width: 100%;
+    min-height: 178px;
+    padding: var(--esp-5) var(--esp-6);
+    border-radius: var(--radio-md);
+    background: var(--verde-fondo);
+    overflow: hidden;
+}
+.reportes-entregas-estado-interior img.reportes-entregas-bandeja-estado {
+    display: block;
+    width: 175px;
+    height: 135px;
+    max-width: 42%;
+    object-fit: contain;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 7px 6px rgba(42, 64, 58, .17));
+}
+.reportes-entregas-estado-interior>div {
+    min-width: 0;
+    flex: 1;
+}
+.reportes-entregas-estado h3 {
+    margin: 0 0 8px;
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    color: var(--texto-1);
+}
+.reportes-entregas-estado p {
+    margin: 0 0 8px;
+    color: var(--texto-2);
+    font-size: var(--fs-base);
+    line-height: 1.5;
+}
+@media (max-width: 650px) {
+  .reportes-entregas-estado-interior {
+        flex-direction: row;
+        align-items: center;
+        padding: var(--esp-4);
+        gap: var(--esp-3);
+    }
+  .reportes-entregas-estado-interior img.reportes-entregas-bandeja-estado {
+        width: 112px;
+        height: 105px;
+        max-width: 36%;
+    }
+  .reportes-entregas-estado h3 {
+        font-size: var(--fs-lg);
+    }
+}
+
+/* Administración — producción real agrupada por servicio y mes */
+.reportes-pagina .reportes-filtro-tipo[hidden],
+.reportes-pagina .reportes-filtro-servicio[hidden] {
+    display: none !important;
+}
+.reportes-pagina .reportes-produccion-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 0 var(--esp-3);
+}
+.reportes-pagina .reportes-produccion-kpis .reportes-kpi {
+    min-height: 76px;
+}
+.reportes-pagina .reportes-produccion-kpis strong {
+    font-size: clamp(19px, 2vw, 26px);
+    overflow-wrap: anywhere;
+}
+.reportes-produccion-analitica {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--esp-4);
+    padding: 0 var(--esp-3) var(--esp-4);
+}
+.reportes-produccion-card {
+    min-width: 0;
+    padding: var(--esp-4);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-lg);
+    background: var(--superficie-1);
+}
+.reportes-produccion-card .reportes-titulo-detalle {
+    margin: 0 0 18px;
+    font-size: var(--fs-base);
+}
+.reportes-produccion-barra-fila {
+    display: grid;
+    grid-template-columns: minmax(90px, 1fr) minmax(60px, 2fr) auto;
+    align-items: center;
+    gap: var(--esp-2);
+    margin: 12px 0;
+    font-size: var(--fs-xs);
+    color: var(--texto-2);
+}
+.reportes-produccion-barra-fila>span {
+    overflow-wrap: anywhere;
+}
+.reportes-produccion-barra-fila>strong {
+    white-space: nowrap;
+    font-size: var(--fs-2xs);
+}
+.reportes-produccion-barra-fondo {
+    height: 12px;
+    border-radius: var(--radio-pill);
+    background: var(--superficie-3);
+    overflow: hidden;
+}
+.reportes-produccion-barra-fondo>div {
+    height: 100%;
+    width: var(--barra-ancho);
+    background: linear-gradient(90deg, #55a8f6, #2478d2);
+    border-radius: inherit;
+}
+.reportes-produccion-meses {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--esp-2);
+    overflow-x: auto;
+    min-height: 195px;
+    padding: var(--esp-3) var(--esp-1) var(--esp-1);
+}
+.reportes-produccion-mes {
+    display: flex;
+    flex: 1 0 52px;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--esp-2);
+    height: 175px;
+    justify-content: flex-end;
+}
+.reportes-produccion-mes>strong {
+    font-size: var(--fs-2xs);
+    color: var(--texto-2);
+    white-space: nowrap;
+}
+.reportes-produccion-mes-columna {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 120px;
+    width: 32px;
+}
+.reportes-produccion-mes-columna span {
+    display: block;
+    width: 100%;
+    height: var(--columna-alto);
+    background: linear-gradient(180deg, #ad8bf1, #5e70d8);
+    border-radius: 5px 5px 0 0;
+}
+.reportes-produccion-mes>small {
+    color: var(--texto-3);
+    font-size: var(--fs-2xs);
+    white-space: nowrap;
+}
+.reportes-produccion-detalle {
+    margin: 0 12px 10px;
+}
+.reportes-produccion-detalle .reportes-tabla {
+    max-height: 350px;
+    overflow: auto;
+}
+.reportes-produccion-detalle thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+@media (max-width: 1050px) {
+  .reportes-pagina .reportes-produccion-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  .reportes-produccion-analitica {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 650px) {
+  .reportes-pagina .reportes-produccion-kpis {
+        grid-template-columns: 1fr;
+    }
+  .reportes-produccion-analitica {
+        padding: 0 var(--esp-1) var(--esp-3);
+    }
+  .reportes-produccion-detalle {
+        margin: 0 3px 8px;
+    }
+  .reportes-produccion-barra-fila {
+        grid-template-columns: minmax(65px, 1fr) minmax(50px, 1.5fr) auto;
+        gap: var(--esp-1);
+    }
+}

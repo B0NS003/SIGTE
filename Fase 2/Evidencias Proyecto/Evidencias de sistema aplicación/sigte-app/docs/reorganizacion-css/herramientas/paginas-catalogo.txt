@@ -1,0 +1,1 @@
+catalogo,catalogo@filtros,catalogo-admin,catalogo-admin@filtros,catalogo-admin@instrumentos,catalogo-admin@lista,catalogo-admin@nueva-ficha,catalogo-admin@nuevo-instrumento,ficha,ficha@checks

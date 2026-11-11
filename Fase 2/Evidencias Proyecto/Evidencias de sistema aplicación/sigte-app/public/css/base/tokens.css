@@ -1,0 +1,189 @@
+/* Tokens de diseño SIGTE: la única fuente de colores, tipografía, medidas y sombras.
+   Referencia visual en /guia-visual.html. */
+
+:root {
+  --sala-lavado: #c2410c;
+  --sala-lavado-bg: #fff7ed;
+  --sala-armado: #0f766e;
+  --sala-armado-bg: #f0fdfa;
+  --sala-esteril: #1d4ed8;
+  --sala-esteril-bg: #eff6ff;
+  --naranja: #e85a1c;
+  --naranja-oscuro: #c2410c;
+  --naranja-suave: #fff1e8;
+  --navy: #0b1f4b;
+  --navy-mid: #163066;
+  --texto: #1c1917;
+  --ink: #0b1f4b;
+  --muted: #5f6e86;
+  --borde: #e2e8f0;
+  --blanco: #ffffff;
+  --card: #ffffff;
+  --card-2: #f8fafc;
+  --fondo: #f4f6f9;
+  --ok: #0f766e;
+  --alerta: #b91c1c;
+  --sidebar: #0b1f4b;
+  --font-display: "Montserrat", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --fs-2xs: 0.6875rem;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.875rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1rem;
+  --fs-xl: 1.125rem;
+  --fs-2xl: 1.25rem;
+  --fs-3xl: 1.375rem;
+  --fs-4xl: 1.5rem;
+  --fs-5xl: 1.875rem;
+  --fs-6xl: 2rem;
+  --radio-sm: 10px;
+  --radio-md: 14px;
+  --radio-lg: 20px;
+  --radio-pill: 999px;
+  --alto-sm: 34px;
+  --alto-md: 44px;
+  --alto-lg: 52px;
+
+  --superficie-1: var(--card);
+  --superficie-2: var(--card-2);
+  --superficie-3: #e8eef5;
+  --linea: #e2e8f0;
+  --linea-fuerte: #cbd5e1;
+  --texto-1: var(--ink);
+  --texto-2: #1f3a5f;
+  --texto-3: #475569;
+  --texto-4: #7c8aa0;
+  --sidebar-suave: #94a3b8;
+  --sidebar-texto: #e2e8f0;
+
+  --rojo: #dc2626; --verde: #16a34a; --violeta: #7c3aed;
+  --rojo-fondo: #fef2f2;
+  --rojo-linea: #fecaca;
+  --rojo-texto: #b91c1c;
+  --naranja-fondo: #fff4e8;
+  --naranja-linea: #fdba74;
+  --naranja-texto: #c2410c;
+  --ambar-fondo: #fffbeb;
+  --ambar-linea: #fde68a;
+  --ambar-texto: #92400e;
+  --verde-fondo: #ecfdf3;
+  --verde-linea: #bbf7d0;
+  --verde-texto: #166534;
+  --verde-icono: #dcfce7;
+  --teal-fondo: #f0fdfa;
+  --teal-linea: #99f6e4;
+  --teal-texto: #0f766e;
+  --azul-fondo: #eff6ff;
+  --azul-linea: #bfdbfe;
+  --azul-texto: #1d4ed8;
+  --violeta-fondo: #f5f3ff;
+  --violeta-linea: #ddd6fe;
+  --violeta-texto: #6d28d9;
+  --rosa-fondo: #fdf2f8;
+  --rosa-linea: #fbcfe8;
+  --rosa-texto: #be185d;
+
+  --franja: 4px;
+  --sombra-1: 0 1px 2px rgba(11, 31, 75, 0.04), 0 6px 18px rgba(11, 31, 75, 0.05);
+  --sombra-realce: 0 10px 26px rgba(11, 31, 75, 0.09);
+  --sombra-2: 0 18px 50px rgba(11, 31, 75, 0.12);
+  --foco: 0 0 0 3px rgba(232, 90, 28, 0.18);
+
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 20px;
+  --esp-6: 24px;
+  --esp-7: 32px;
+  --esp-8: 40px;
+  --esp-9: 48px;
+
+  --icono-xs: 14px;
+  --icono-sm: 16px;
+  --icono-md: 20px;
+  --icono-lg: 24px;
+
+  --etiqueta-espaciado: 0.06em;
+  --dur-rapida: 160ms;
+  --dur-media: 280ms;
+
+  --carga-velo: rgba(244, 246, 249, 0.35);
+  --carga-anillo: #e8eef5;
+}
+
+html[data-tema="oscuro"] {
+  color-scheme: dark;
+
+  --fondo: #0d1321;
+  --card: #151d2d;
+  --card-2: #1b2538;
+  --superficie-1: var(--card);
+  --superficie-2: var(--card-2);
+  --superficie-3: #232f45;
+
+  --linea: #27344b;
+  --linea-fuerte: #364560;
+  --borde: var(--linea);
+
+  --ink: #f3f6fa;
+  --texto: #dfe6ef;
+  --muted: #9aa8bc;
+  --texto-1: var(--ink);
+  --texto-2: var(--texto);
+  --texto-3: #aab6c7;
+  --texto-4: #8e9cb1;
+  --sidebar-suave: #8e9cb1;
+
+  --navy: #2b4170;
+  --navy-mid: #34508a;
+  --naranja: #e8621f;
+  --naranja-oscuro: #fb9a5e;
+  --naranja-suave: rgba(240, 112, 47, 0.14);
+  --ok: #4fd18b;
+  --alerta: #f87171;
+
+  --sala-lavado: #ea6a26;
+  --sala-lavado-bg: rgba(234, 106, 38, 0.14);
+  --sala-armado: #1aa898;
+  --sala-armado-bg: rgba(26, 168, 152, 0.14);
+  --sala-esteril: #4a7cf0;
+  --sala-esteril-bg: rgba(74, 124, 240, 0.15);
+
+  --rojo-fondo: rgba(239, 68, 68, 0.13);
+  --rojo-linea: rgba(248, 113, 113, 0.4);
+  --rojo-texto: #fb8585;
+  --naranja-fondo: rgba(251, 146, 60, 0.12);
+  --naranja-linea: rgba(251, 146, 60, 0.38);
+  --naranja-texto: #fdaa6e;
+  --ambar-fondo: rgba(245, 158, 11, 0.12);
+  --ambar-linea: rgba(251, 191, 36, 0.35);
+  --ambar-texto: #fcd34d;
+  --verde-fondo: rgba(34, 197, 94, 0.12);
+  --verde-linea: rgba(74, 222, 128, 0.35);
+  --verde-texto: #6ee7a1;
+  --verde-icono: rgba(74, 222, 128, 0.16);
+  --teal-fondo: rgba(20, 184, 166, 0.12);
+  --teal-linea: rgba(45, 212, 191, 0.35);
+  --teal-texto: #5eead4;
+  --azul-fondo: rgba(59, 130, 246, 0.13);
+  --azul-linea: rgba(96, 165, 250, 0.38);
+  --azul-texto: #93c5fd;
+  --violeta-fondo: rgba(139, 92, 246, 0.14);
+  --violeta-linea: rgba(167, 139, 250, 0.38);
+  --violeta-texto: #c4b5fd;
+  --rosa-fondo: rgba(236, 72, 153, 0.13);
+  --rosa-linea: rgba(244, 114, 182, 0.38);
+  --rosa-texto: #f9a8d4;
+
+  --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --sombra-realce: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.3);
+  --sombra-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.32);
+  --foco: 0 0 0 3px rgba(240, 112, 47, 0.35);
+  --carga-velo: rgba(13, 19, 33, 0.78);
+  --carga-anillo: var(--linea);
+
+  scrollbar-color: var(--linea-fuerte) var(--fondo);
+}

@@ -1,0 +1,596 @@
+/* Ficha de consulta del operador y checklist de revisión. Se carga después de comun.css. */
+.ficha-guia {
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
+    padding: var(--esp-5);
+    border-radius: var(--radio-lg);
+    border: 1px solid var(--borde);
+    background: radial-gradient(circle at 20% 15%, rgba(232, 90, 28, 0.16), transparent 42%),
+    linear-gradient(165deg, var(--naranja-fondo), var(--card));
+}
+.ficha-guia.is-empty {
+    background: var(--card);
+    border-style: dashed;
+    justify-content: flex-end;
+}
+.ficha-kicker {
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--naranja-oscuro);
+}
+.ficha-guia strong {
+    display: block;
+    margin: 0.35rem 0 0.25rem;
+    font-family: var(--font-display);
+    color: var(--ink);
+    font-size: var(--fs-3xl);
+}
+.ficha-guia p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-base);
+}
+.ficha-facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--esp-3);
+    margin: 0.9rem 0 0;
+}
+.ficha-facts div {
+    padding: var(--esp-3) var(--esp-3);
+    background: var(--card-2);
+    border-radius: var(--radio-md);
+}
+.ficha-facts dt {
+    margin: 0;
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.ficha-facts dd {
+    margin: 0.2rem 0 0;
+    color: var(--ink);
+    font-weight: 700;
+}
+.ficha-items {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+}
+.ficha-items li {
+    display: grid;
+    grid-template-columns: 42px 1fr auto;
+    gap: var(--esp-3);
+    align-items: center;
+    padding: var(--esp-3) 0;
+    border-top: 1px solid var(--borde);
+}
+.ficha-thumb {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radio-sm);
+    background: var(--naranja-suave);
+    color: var(--naranja-oscuro);
+    font-size: var(--fs-base);
+    font-weight: 800;
+}
+.ficha-thumb.is-empty {
+    background: var(--superficie-3);
+    color: var(--muted);
+}
+.ficha-nombre {
+    color: var(--ink);
+    font-weight: 700;
+}
+.ficha-nombre small {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+.ficha-cant {
+    min-width: 2.4rem;
+    text-align: center;
+    font-weight: 800;
+    font-size: var(--fs-lg);
+    color: var(--ink);
+}
+
+/* Ficha de consulta del operador: diseño compacto y checklist de apoyo. */
+.ficha-operador-resumen {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, .85fr);
+    gap: var(--esp-3);
+    margin-bottom: 12px;
+}
+.ficha-operador-guia {
+    display: grid;
+    grid-template-columns: minmax(155px, .85fr) 1fr;
+    gap: var(--esp-4);
+    align-items: center;
+    min-height: 0;
+    padding: var(--esp-3);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card);
+}
+.ficha-operador-guia.is-empty {
+    justify-content: initial;
+    border-style: solid;
+}
+.ficha-operador-guia-imagen {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 172px;
+    border-radius: var(--radio-sm);
+    background: repeating-linear-gradient(135deg, var(--superficie-3) 0, var(--superficie-3) 9px, var(--superficie-2) 9px, var(--superficie-2) 18px);
+    color: #b4c1d0;
+}
+.ficha-operador-guia-etiqueta {
+    position: absolute;
+    right: 9px;
+    top: 9px;
+    border-radius: var(--radio-pill);
+    padding: var(--esp-1) var(--esp-2);
+    background: var(--card);
+    color: var(--texto-3);
+    font-size: var(--fs-2xs);
+    font-weight: 700;
+    box-shadow: 0 2px 8px #0b1f4b0a;
+}
+.ficha-operador-guia-texto .ficha-kicker {
+    font-size: var(--fs-2xs);
+}
+.ficha-operador-guia-texto strong {
+    font-family: inherit;
+    font-size: var(--fs-md);
+    line-height: 1.35;
+    margin: 5px 0;
+}
+.ficha-operador-guia-texto p {
+    font-size: var(--fs-xs);
+    line-height: 1.55;
+}
+.ficha-operador-datos {
+    padding: var(--esp-4);
+    border-radius: var(--radio-lg);
+}
+.ficha-operador-datos h2 {
+    font-size: var(--fs-lg);
+}
+.ficha-operador-datos .ficha-facts {
+    gap: var(--esp-2);
+    margin-top: 12px;
+}
+.ficha-operador-datos .ficha-facts div {
+    padding: var(--esp-2) var(--esp-3);
+    border-radius: var(--radio-sm);
+}
+.ficha-operador-datos .ficha-facts dt {
+    font-size: var(--fs-2xs);
+}
+.ficha-operador-datos .ficha-facts dd {
+    font-size: var(--fs-sm);
+    margin-top: 4px;
+}
+.ficha-operador-lista {
+    padding: var(--esp-3) var(--esp-4) var(--esp-2);
+    border-radius: var(--radio-lg);
+}
+.ficha-operador-barra {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-4);
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.ficha-operador-titulo {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+}
+.ficha-operador-titulo h2 {
+    font-size: var(--fs-xl);
+}
+.ficha-operador-contador {
+    border-radius: var(--radio-pill);
+    background: var(--naranja-fondo);
+    color: var(--naranja-texto);
+    padding: var(--esp-1) var(--esp-2);
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+    white-space: nowrap;
+}
+.ficha-operador-progreso {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    min-width: 170px;
+    flex: 1;
+    max-width: 290px;
+    font-size: var(--fs-xs);
+    color: var(--ink);
+    font-weight: 700;
+}
+.ficha-operador-progreso-pista {
+    height: 8px;
+    border-radius: var(--radio-pill);
+    background: var(--superficie-3);
+    overflow: hidden;
+    flex: 1;
+}
+#ficha-progreso-barra {
+    height: 100%;
+    width: 0;
+    background: #ea5b1c;
+    border-radius: inherit;
+    transition: width var(--dur-rapida) ease;
+}
+.ficha-operador-acciones {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+}
+.ficha-operador-acciones .btn {
+    min-height: var(--alto-sm);
+    padding: var(--esp-1) var(--esp-3);
+    font-size: var(--fs-xs);
+    border-radius: var(--radio-sm);
+}
+.ficha-operador-acciones .btn:disabled {
+    opacity: .5;
+    cursor: default;
+}
+.ficha-operador-ayuda {
+    margin: 9px 0 12px;
+    font-size: var(--fs-2xs);
+    color: var(--muted);
+}
+.ficha-operador-cabecera,
+.ficha-operador-fila {
+    display: grid;
+    grid-template-columns: 32px 30px minmax(0, 1fr) 75px;
+    gap: var(--esp-2);
+    align-items: center;
+}
+.ficha-operador-cabecera {
+    background: var(--superficie-3);
+    border-radius: var(--radio-sm);
+    padding: var(--esp-2) var(--esp-3);
+    font-size: var(--fs-2xs);
+    color: var(--texto-3);
+    font-weight: 800;
+}
+.ficha-operador-cabecera span:last-child {
+    text-align: right;
+}
+.ficha-operador-items {
+    margin-top: 0;
+}
+.ficha-operador-items li {
+    display: block;
+    padding: 0;
+    border-top: 0;
+    border-bottom: 1px solid var(--linea);
+}
+.ficha-operador-fila {
+    padding: var(--esp-2) var(--esp-3);
+    cursor: pointer;
+    min-height: 52px;
+    transition: background var(--dur-rapida);
+}
+.ficha-operador-fila:hover {
+    background: var(--card-2);
+}
+.ficha-operador-check {
+    appearance: none;
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid #9aabc1;
+    border-radius: 5px;
+    background: var(--card);
+    cursor: pointer;
+    margin: 0;
+    display: grid;
+    place-items: center;
+}
+.ficha-operador-check:checked {
+    background: #e85a1c;
+    border-color: #e85a1c;
+}
+.ficha-operador-check:checked::after {
+    content: '✓';
+    color: #fff;
+    font-size: var(--fs-xs);
+    font-weight: 800;
+}
+.ficha-operador-check:focus-visible {
+    outline: 3px solid var(--naranja-linea);
+    outline-offset: 2px;
+}
+.ficha-operador-numero {
+    font-size: var(--fs-xs);
+    color: var(--texto-3);
+    text-align: center;
+}
+.ficha-operador-instrumento {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+    min-width: 0;
+}
+.ficha-operador-instrumento .ficha-thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radio-sm);
+    flex: none;
+    font-size: var(--fs-xs);
+}
+.ficha-operador-instrumento .ficha-nombre {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: 1.35;
+}
+.ficha-operador-items .ficha-cant {
+    min-width: 0;
+    justify-self: end;
+    background: var(--superficie-3);
+    padding: var(--esp-1) var(--esp-2);
+    border-radius: var(--radio-sm);
+    font-size: var(--fs-xs);
+}
+.ficha-operador-items li.is-revisado {
+    background: var(--verde-fondo);
+}
+.ficha-operador-items li.is-revisado .ficha-nombre {
+    color: var(--texto-3);
+    text-decoration: line-through;
+}
+.ficha-operador-completada {
+    margin: 12px 0 6px;
+    padding: var(--esp-2) var(--esp-3);
+    border-radius: var(--radio-sm);
+    background: var(--verde-fondo);
+    color: var(--verde-texto);
+    font-size: var(--fs-xs);
+}
+.ficha-operador-completada[hidden] {
+    display: none;
+}
+@media(max-width:980px) {
+    .ficha-operador-resumen {
+        grid-template-columns: 1fr;
+    }
+}
+@media(max-width:620px) {
+    .ficha-operador-guia {
+        grid-template-columns: 1fr;
+    }
+    .ficha-operador-guia-imagen {
+        min-height: 125px;
+    }
+    .ficha-operador-progreso {
+        max-width: none;
+        flex-basis: 100%;
+    }
+    .ficha-operador-cabecera,
+    .ficha-operador-fila {
+        grid-template-columns: 24px 22px minmax(0, 1fr) 48px;
+        gap: var(--esp-1);
+        padding-left: var(--esp-1);
+        padding-right: var(--esp-1);
+    }
+    .ficha-operador-instrumento {
+        gap: var(--esp-2);
+    }
+    .ficha-operador-instrumento .ficha-nombre {
+        font-size: var(--fs-xs);
+    }
+    .ficha-operador-instrumento .ficha-thumb {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Iconos compactos en los datos generales de la ficha del operador */
+.ficha-operador-datos .ficha-facts .ficha-dato-con-icono {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    min-width: 0;
+}
+.ficha-operador-datos .ficha-dato-icono {
+    width: 33px;
+    height: 33px;
+    flex: 0 0 33px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--azul-fondo);
+    border-radius: var(--radio-sm);
+    color: var(--azul-texto);
+}
+.ficha-operador-datos .ficha-dato-icono svg {
+    width: var(--icono-md);
+    height: var(--icono-md);
+}
+.ficha-operador-datos .ficha-dato-texto {
+    min-width: 0;
+}
+.ficha-operador-datos .ficha-dato-texto dt {
+    margin: 0;
+}
+.ficha-operador-datos .ficha-dato-texto dd {
+    margin-top: 4px;
+}
+.ficha-operador-guia-etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-1);
+}
+.ficha-operador-guia-etiqueta svg {
+    width: var(--icono-xs);
+    height: var(--icono-xs);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Estado de ficha no encontrada */
+.ficha-error-contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 35px var(--esp-5) 55px;
+    width: 100%;
+}
+.ficha-error-card {
+    width: 100%;
+    max-width: 780px;
+    padding: 45px 55px var(--esp-8);
+    background: var(--card);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-lg);
+    box-shadow: 0 12px 35px rgba(15, 35, 70, .045);
+    text-align: center;
+}
+.ficha-error-ilustracion {
+    position: relative;
+    width: 170px;
+    height: 145px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ficha-error-circulo {
+    width: 145px;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--superficie-3);
+    border-radius: 50%;
+    color: #c5ccdf;
+}
+.ficha-error-circulo svg {
+    width: 105px;
+    height: 105px;
+}
+.ficha-error-alerta {
+    position: absolute;
+    top: 9px;
+    right: 5px;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ff805c;
+    color: #fff;
+    font-size: var(--fs-5xl);
+    font-weight: 800;
+    box-shadow: 0 5px 12px rgba(255, 128, 92, .18);
+}
+.ficha-error-card h2 {
+    margin: 0 0 10px;
+    color: var(--texto-1);
+    font-size: var(--fs-4xl);
+    font-weight: 800;
+    line-height: 1.3;
+}
+.ficha-error-descripcion {
+    margin: 0 0 25px;
+    color: var(--texto-3);
+    font-size: var(--fs-lg);
+    line-height: 1.6;
+}
+.ficha-error-aviso {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+    padding: var(--esp-4) var(--esp-5);
+    margin-bottom: 27px;
+    background: var(--azul-fondo);
+    border-radius: var(--radio-sm);
+    text-align: left;
+}
+.ficha-error-aviso svg {
+    width: var(--icono-lg);
+    height: var(--icono-lg);
+    flex-shrink: 0;
+}
+.ficha-error-aviso p {
+    margin: 0;
+    color: var(--texto-2);
+    font-size: var(--fs-base);
+    line-height: 1.5;
+}
+.ficha-error-acciones {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--esp-6);
+    border-top: 1px solid var(--linea);
+}
+.ficha-error-boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--esp-2);
+    min-height: var(--alto-md);
+    padding: var(--esp-3) var(--esp-6);
+    background: #ff5100;
+    color: #fff;
+    border: 1px solid #ff5100;
+    border-radius: var(--radio-md);
+    font-size: var(--fs-base);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.ficha-error-boton svg {
+    width: 18px;
+    height: 18px;
+}
+.ficha-error-boton:hover {
+    background: #e64900;
+    border-color: #e64900;
+    color: #fff;
+    box-shadow: 0 5px 12px rgba(255, 81, 0, .15);
+}
+.ficha-error-boton:focus-visible {
+    outline: 3px solid var(--naranja-linea);
+    outline-offset: 3px;
+}
+@media(max-width:768px) {
+    .ficha-error-contenedor {
+        padding: var(--esp-5) 0 35px;
+    }
+    .ficha-error-card {
+        padding: var(--esp-7) var(--esp-5);
+        border-radius: var(--radio-lg);
+    }
+    .ficha-error-card h2 {
+        font-size: var(--fs-3xl);
+    }
+    .ficha-error-descripcion {
+        font-size: var(--fs-base);
+    }
+    .ficha-error-aviso {
+        padding: var(--esp-3);
+    }
+    .ficha-error-boton {
+        width: 100%;
+    }
+}

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/catalogo.css') }}?v={{ @filemtime(public_path('css/catalogo.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/catalogo/comun.css') }}?v={{ @filemtime(public_path('css/modulos/catalogo/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/catalogo/consulta.css') }}?v={{ @filemtime(public_path('css/modulos/catalogo/consulta.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Catálogo')

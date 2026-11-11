@@ -1,0 +1,12 @@
+/* Avisos en línea: error (auth-error) y confirmación (adv-ok). */
+
+.auth-error {
+  background: var(--rojo-fondo); color: var(--rojo-texto); border: 1px solid var(--rojo-linea);
+  border-radius: var(--radio-md); padding: var(--esp-3) var(--esp-4); margin: 0 0 1rem;
+  font-size: var(--fs-md); font-weight: 600; line-height: 1.4;
+}
+.adv-ok {
+  margin: 0 0 1rem; padding: var(--esp-3) var(--esp-4); border-radius: var(--radio-md);
+  background: var(--verde-fondo); color: var(--verde-texto); border: 1px solid var(--verde-linea);
+  font-size: var(--fs-md); font-weight: 700; line-height: 1.45;
+}

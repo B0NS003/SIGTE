@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIGTE · Guía visual</title>
+<script>
+  try {
+    var temaPedido = new URLSearchParams(location.search).get('tema');
+    if (temaPedido ? temaPedido === 'oscuro' : localStorage.getItem('sigte-tema') === 'oscuro') document.documentElement.setAttribute('data-tema', 'oscuro');
+  } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,900&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/base/tokens.css">
+<link rel="stylesheet" href="css/base/base.css">
+<link rel="stylesheet" href="css/base/layout.css">
+<link rel="stylesheet" href="css/componentes/botones.css">
+<link rel="stylesheet" href="css/componentes/formularios.css">
+<link rel="stylesheet" href="css/componentes/pestanas.css">
+<link rel="stylesheet" href="css/componentes/paneles.css">
+<link rel="stylesheet" href="css/componentes/tablas.css">
+<link rel="stylesheet" href="css/componentes/insignias.css">
+<link rel="stylesheet" href="css/componentes/mensajes.css">
+<link rel="stylesheet" href="css/base/utilidades.css">
+<style>
+  body { padding: var(--esp-8) var(--esp-6) var(--esp-9); }
+  .gv { max-width: 1120px; margin: 0 auto; display: grid; gap: var(--esp-7); }
+  .gv-top { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--esp-4); flex-wrap: wrap; }
+  .gv-top h1 { margin: 0; font-family: var(--font-display); font-size: var(--fs-5xl); color: var(--texto-1); }
+  .gv-top h1 b { font-weight: 900; font-style: italic; }
+  .gv-top h1 b span { color: var(--naranja); }
+  .gv-top p { margin: var(--esp-1) 0 0; color: var(--muted); max-width: 40rem; line-height: 1.5; }
+  .gv-indice { display: flex; flex-wrap: wrap; gap: var(--esp-2); }
+  .gv-indice a { font-size: var(--fs-sm); font-weight: 700; color: var(--texto-3); }
+  .gv h2 { margin: 0 0 var(--esp-1); font-family: var(--font-display); font-size: var(--fs-2xl); color: var(--texto-1); }
+  .gv h3 { margin: var(--esp-5) 0 var(--esp-3); font-size: var(--fs-xs); font-weight: 800; text-transform: uppercase; letter-spacing: var(--etiqueta-espaciado); color: var(--muted); }
+  .gv-regla { margin: 0 0 var(--esp-4); color: var(--texto-3); font-size: var(--fs-base); line-height: 1.55; max-width: 48rem; }
+  .gv-regla code, .gv code { font-size: var(--fs-xs); background: var(--superficie-2); border: 1px solid var(--linea); border-radius: 6px; padding: 1px 5px; color: var(--texto-2); white-space: nowrap; }
+  .gv-grid { display: grid; gap: var(--esp-3); grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .gv-grid-ancho { display: grid; gap: var(--esp-3); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .gv-muestra { border: 1px solid var(--linea); border-radius: var(--radio-md); overflow: hidden; background: var(--superficie-1); }
+  .gv-muestra i { display: block; height: 56px; border-bottom: 1px solid var(--linea); }
+  .gv-muestra div { padding: var(--esp-2) var(--esp-3); }
+  .gv-muestra strong { display: block; font-size: var(--fs-sm); color: var(--texto-1); }
+  .gv-val { display: block; font-size: var(--fs-2xs); color: var(--muted); font-family: ui-monospace, Consolas, monospace; word-break: break-all; }
+  .gv-familia { border: 1px solid var(--linea); border-radius: var(--radio-md); background: var(--superficie-1); padding: var(--esp-3); display: grid; gap: var(--esp-2); }
+  .gv-familia header { display: flex; align-items: center; justify-content: space-between; gap: var(--esp-2); }
+  .gv-familia header strong { font-size: var(--fs-base); color: var(--texto-1); }
+  .gv-familia p { margin: 0; font-size: var(--fs-sm); color: var(--texto-3); line-height: 1.45; }
+  .gv-aviso { border: 1px solid; border-radius: var(--radio-sm); padding: var(--esp-2) var(--esp-3); font-size: var(--fs-sm); font-weight: 600; }
+  .gv-tonos { display: flex; gap: var(--esp-1); }
+  .gv-tonos span { flex: 1; height: 22px; border-radius: 6px; border: 1px solid var(--linea); }
+  .gv-fila { display: flex; align-items: center; gap: var(--esp-4); padding: var(--esp-3) 0; border-bottom: 1px solid var(--linea); flex-wrap: wrap; }
+  .gv-fila:last-child { border-bottom: 0; }
+  .gv-fila > code:first-child { min-width: 9rem; }
+  .gv-caja { width: 120px; height: 72px; background: var(--superficie-1); border: 1px solid var(--linea); }
+  .gv-barra { height: 14px; background: var(--naranja); border-radius: 3px; }
+  .gv-elev { height: 96px; border-radius: var(--radio-lg); background: var(--superficie-1); border: 1px solid var(--linea); display: grid; place-items: center; font-size: var(--fs-sm); font-weight: 700; color: var(--texto-2); }
+  .gv-franja { padding: var(--esp-4); border: 1px solid var(--linea); border-radius: var(--radio-lg); background: var(--superficie-1); font-size: var(--fs-sm); color: var(--texto-3); }
+  .gv-franja strong { display: block; color: var(--texto-1); margin-bottom: 2px; }
+  .gv-mov { width: 44px; height: 44px; border-radius: var(--radio-md); background: var(--navy); }
+  .gv-mov-pista:hover .gv-mov { transform: translateX(120px); }
+  .gv-mov-pista { padding: var(--esp-2); border: 1px dashed var(--linea-fuerte); border-radius: var(--radio-md); width: 190px; }
+  .gv-comp { display: flex; flex-wrap: wrap; align-items: center; gap: var(--esp-3); }
+  .gv-nota { font-size: var(--fs-xs); color: var(--muted); margin: var(--esp-2) 0 0; }
+  .gv-tema { position: fixed; right: var(--esp-5); bottom: var(--esp-5); z-index: 5; box-shadow: var(--sombra-2); }
+  .gv .panel .list { margin-top: var(--esp-2); }
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0; }
+    .gv { gap: var(--esp-6); }
+    .gv-tema, .gv-indice, .gv-mov-pista, .gv-mov-pista + .gv-nota { display: none; }
+    .gv-familia, .gv-muestra, .gv-elev, .gv-franja, .gv-fila, .kpi, .gv-comp, .panel-head, .list tr { break-inside: avoid; }
+    .gv h2, .gv h3, .gv-regla { break-after: avoid; }
+    #estados, #tipografia, #forma, #elevacion, #componentes { break-before: page; }
+  }
+  @media (max-width: 640px) { body { padding: var(--esp-6) var(--esp-4) var(--esp-9); } .kpi-row { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<main class="gv">
+
+  <header class="gv-top">
+    <div>
+      <p class="eyebrow">Sistema de diseño</p>
+      <h1><b>SIG<span>TE</span></b> · Guía visual</h1>
+      <p>Esta guía define los colores, las medidas y los componentes del sistema. Los valores salen de <code>css/base/tokens.css</code> y los componentes de <code>css/componentes/</code>, así que si cambias una variable allí, esta página y todas las pantallas cambian juntas.</p>
+    </div>
+    <nav class="gv-indice" aria-label="Secciones">
+      <a href="#color">Color</a><a href="#estados">Estados</a><a href="#tipografia">Tipografía</a><a href="#forma">Forma</a><a href="#espaciado">Espaciado</a><a href="#elevacion">Elevación</a><a href="#franjas">Franjas</a><a href="#iconos">Íconos</a><a href="#movimiento">Movimiento</a><a href="#componentes">Componentes</a>
+    </nav>
+  </header>
+
+  <section id="color">
+    <h2>Color base</h2>
+    <p class="gv-regla">Hay dos colores de marca. El <strong>navy</strong> es la estructura: barra lateral, títulos y la pestaña activa. El <strong>naranja</strong> es la acción: el botón principal, el filtro activo y el foco. Usa el naranja con moderación; si todo es naranja, nada destaca.</p>
+    <h3>Marca</h3>
+    <div class="gv-grid">
+      <div class="gv-muestra"><i style="background:var(--navy)"></i><div><strong>--navy</strong><span class="gv-val" data-token="--navy"></span></div></div>
+      <div class="gv-muestra"><i style="background:var(--naranja)"></i><div><strong>--naranja</strong><span class="gv-val" data-token="--naranja"></span></div></div>
+      <div class="gv-muestra"><i style="background:var(--naranja-oscuro)"></i><div><strong>--naranja-oscuro</strong><span class="gv-val" data-token="--naranja-oscuro"></span></div></div>
+      <div class="gv-muestra"><i style="background:var(--naranja-suave)"></i><div><strong>--naranja-suave</strong><span class="gv-val" data-token="--naranja-suave"></span></div></div>
+    </div>
+    <h3>Superficies y líneas</h3>
+    <div class="gv-grid">
+      <div class="gv-muestra"><i style="background:var(--fondo)"></i><div><strong>--fondo</strong><span class="gv-val" data-token="--fondo"></span></div></div>
+      <div class="gv-muestra"><i style="background:var(--superficie-1)"></i><div><strong>--superficie-1</strong><span class="gv-val">tarjetas y paneles</span></div></div>
+      <div class="gv-muestra"><i style="background:var(--superficie-2)"></i><div><strong>--superficie-2</strong><span class="gv-val">campos, notas</span></div></div>
+      <div class="gv-muestra"><i style="background:var(--superficie-3)"></i><div><strong>--superficie-3</strong><span class="gv-val">pistas, rieles</span></div></div>
+      <div class="gv-muestra"><i style="background:var(--linea)"></i><div><strong>--linea</strong><span class="gv-val">bordes normales</span></div></div>
+      <div class="gv-muestra"><i style="background:var(--linea-fuerte)"></i><div><strong>--linea-fuerte</strong><span class="gv-val">hover, separadores</span></div></div>
+    </div>
+    <h3>Texto</h3>
+    <div class="panel">
+      <div class="gv-fila"><code>--texto-1</code><span style="color:var(--texto-1);font-weight:700">Títulos y datos principales</span></div>
+      <div class="gv-fila"><code>--texto-2</code><span style="color:var(--texto-2)">Texto de apoyo con peso</span></div>
+      <div class="gv-fila"><code>--texto-3</code><span style="color:var(--texto-3)">Párrafos y descripciones</span></div>
+      <div class="gv-fila"><code>--muted</code><span style="color:var(--muted)">Etiquetas, ayudas y metadatos</span></div>
+      <div class="gv-fila"><code>--texto-4</code><span style="color:var(--texto-4)">Placeholder e íconos de campo (nunca texto que haya que leer)</span></div>
+    </div>
+  </section>
+
+  <section id="estados">
+    <h2>Familias de estado</h2>
+    <p class="gv-regla">Cada color tiene un significado fijo. Cada familia trae tres tonos que van juntos: <code>-fondo</code>, <code>-linea</code> y <code>-texto</code>. No mezcles tonos de familias distintas ni inventes un hex nuevo. Si un estado no calza en ninguna familia, primero se define aquí.</p>
+    <div class="gv-grid-ancho">
+      <article class="gv-familia"><header><strong>Verde</strong><span class="pill pill-ok">Listo</span></header><p>Listo, entregado, completado, todo bien.</p><div class="gv-aviso" style="background:var(--verde-fondo);border-color:var(--verde-linea);color:var(--verde-texto)">Caja entregada al servicio</div><div class="gv-tonos"><span style="background:var(--verde-fondo)"></span><span style="background:var(--verde-linea)"></span><span style="background:var(--verde-texto)"></span><span style="background:var(--verde)"></span></div></article>
+      <article class="gv-familia"><header><strong>Rojo</strong><span class="pill pill-danger">Urgente</span></header><p>Requiere atención ahora: error, urgencia, vencido.</p><div class="gv-aviso" style="background:var(--rojo-fondo);border-color:var(--rojo-linea);color:var(--rojo-texto)">Caja con más de 4 h en lavado</div><div class="gv-tonos"><span style="background:var(--rojo-fondo)"></span><span style="background:var(--rojo-linea)"></span><span style="background:var(--rojo-texto)"></span><span style="background:var(--rojo)"></span></div></article>
+      <article class="gv-familia"><header><strong>Naranja</strong><span class="badge">Pendiente</span></header><p>Acción, en proceso, pendiente de la operadora.</p><div class="gv-aviso" style="background:var(--naranja-fondo);border-color:var(--naranja-linea);color:var(--naranja-texto)">Elige tu puesto para empezar</div><div class="gv-tonos"><span style="background:var(--naranja-fondo)"></span><span style="background:var(--naranja-linea)"></span><span style="background:var(--naranja-texto)"></span><span style="background:var(--naranja)"></span></div></article>
+      <article class="gv-familia"><header><strong>Ámbar</strong><span class="pill pill-warn">Bajo mínimo</span></header><p>Advertencia suave: algo para revisar, sin urgencia.</p><div class="gv-aviso" style="background:var(--ambar-fondo);border-color:var(--ambar-linea);color:var(--ambar-texto)">Stock bajo el mínimo sugerido</div><div class="gv-tonos"><span style="background:var(--ambar-fondo)"></span><span style="background:var(--ambar-linea)"></span><span style="background:var(--ambar-texto)"></span></div></article>
+      <article class="gv-familia"><header><strong>Azul</strong><span class="badge" style="background:var(--azul-fondo);color:var(--azul-texto)">Info</span></header><p>Informativo. También es el color de la sala de esterilización.</p><div class="gv-aviso" style="background:var(--azul-fondo);border-color:var(--azul-linea);color:var(--azul-texto)">El reporte se genera cada lunes</div><div class="gv-tonos"><span style="background:var(--azul-fondo)"></span><span style="background:var(--azul-linea)"></span><span style="background:var(--azul-texto)"></span></div></article>
+      <article class="gv-familia"><header><strong>Teal</strong><span class="badge" style="background:var(--teal-fondo);color:var(--teal-texto)">Armado</span></header><p>Sala de armado y estados "ok" del inventario.</p><div class="gv-aviso" style="background:var(--teal-fondo);border-color:var(--teal-linea);color:var(--teal-texto)">Caja armada y revisada</div><div class="gv-tonos"><span style="background:var(--teal-fondo)"></span><span style="background:var(--teal-linea)"></span><span style="background:var(--teal-texto)"></span></div></article>
+      <article class="gv-familia"><header><strong>Violeta y rosa</strong><span class="badge" style="background:var(--violeta-fondo);color:var(--violeta-texto)">Gráfico</span></header><p>Solo para series de gráficos, roles (con azul y navy) y la etapa de preparación. No representan un estado.</p><div class="gv-tonos"><span style="background:var(--violeta-fondo)"></span><span style="background:var(--violeta-linea)"></span><span style="background:var(--violeta-texto)"></span><span style="background:var(--rosa-fondo)"></span><span style="background:var(--rosa-linea)"></span><span style="background:var(--rosa-texto)"></span></div></article>
+    </div>
+    <h3>Salas</h3>
+    <div class="gv-comp">
+      <span class="sala-chip sala-lavado"><span></span>Lavado</span>
+      <span class="sala-chip sala-armado"><span></span>Armado</span>
+      <span class="sala-chip sala-esteril"><span></span>Esterilización</span>
+      <span class="badge badge-sala badge-lavado">Lavado</span>
+      <span class="badge badge-sala badge-armado">Armado</span>
+      <span class="badge badge-sala badge-esteril">Esterilización</span>
+    </div>
+  </section>
+
+  <section id="tipografia">
+    <h2>Tipografía</h2>
+    <p class="gv-regla"><strong>Montserrat</strong> (<code>--font-display</code>) se usa en títulos y números grandes. <strong>Inter</strong> (<code>--font-body</code>) se usa en todo lo demás, incluidos botones y campos. La marca SIGTE va en Montserrat 900 itálica.</p>
+    <div class="panel">
+      <div class="gv-fila"><code>--fs-6xl · 32</code><span style="font-family:var(--font-display);font-size:var(--fs-6xl);font-weight:700;color:var(--texto-1)">Número de KPI</span></div>
+      <div class="gv-fila"><code>--fs-5xl · 30</code><span style="font-family:var(--font-display);font-size:var(--fs-5xl);font-weight:700;color:var(--texto-1)">Título de página</span></div>
+      <div class="gv-fila"><code>--fs-2xl · 20</code><span style="font-family:var(--font-display);font-size:var(--fs-2xl);font-weight:700;color:var(--texto-1)">Título de sección</span></div>
+      <div class="gv-fila"><code>--fs-lg · 16</code><span style="font-family:var(--font-display);font-size:var(--fs-lg);font-weight:700;color:var(--texto-1)">Título de panel</span></div>
+      <div class="gv-fila"><code>--fs-md · 15</code><span style="font-size:var(--fs-md)">Texto de campos y botón principal</span></div>
+      <div class="gv-fila"><code>--fs-base · 14</code><span style="font-size:var(--fs-base)">Texto normal, tablas y botones</span></div>
+      <div class="gv-fila"><code>--fs-sm · 13</code><span style="font-size:var(--fs-sm)">Chips, notas y etiquetas de campo</span></div>
+      <div class="gv-fila"><code>--fs-xs · 12</code><span style="font-size:var(--fs-xs)">Badges y ayudas</span></div>
+      <div class="gv-fila"><code>--fs-2xs · 11</code><span style="font-size:var(--fs-2xs);font-weight:800;text-transform:uppercase;letter-spacing:var(--etiqueta-espaciado);color:var(--muted)">Etiqueta en mayúsculas</span></div>
+    </div>
+    <h3>Etiquetas en mayúsculas</h3>
+    <p class="gv-regla">Siempre llevan peso 800, <code>letter-spacing: var(--etiqueta-espaciado)</code> (0.06em), tamaño <code>--fs-2xs</code> o <code>--fs-xs</code> y color <code>--muted</code>. La excepción es <code>.eyebrow</code>, que va en naranja.</p>
+    <div class="gv-comp"><span class="eyebrow">Eyebrow de página</span><span class="section-title" style="margin:0">Título de sección</span></div>
+  </section>
+
+  <section id="forma">
+    <h2>Forma: radios y alturas</h2>
+    <p class="gv-regla">Hay tres radios y tres alturas, y cada control usa un par fijo. Los contenedores grandes llevan <code>--radio-lg</code>, los controles <code>--radio-md</code> y los elementos chicos dentro de tarjetas <code>--radio-sm</code>. Los chips y badges son <code>--radio-pill</code>.</p>
+    <div class="gv-grid">
+      <div class="gv-muestra" style="text-align:center"><div><div class="gv-caja" style="border-radius:var(--radio-sm);margin:var(--esp-2) auto"></div><strong>--radio-sm</strong><span class="gv-val" data-token="--radio-sm"></span><span class="gv-val">botón en tarjeta</span></div></div>
+      <div class="gv-muestra" style="text-align:center"><div><div class="gv-caja" style="border-radius:var(--radio-md);margin:var(--esp-2) auto"></div><strong>--radio-md</strong><span class="gv-val" data-token="--radio-md"></span><span class="gv-val">botones, campos, pestañas</span></div></div>
+      <div class="gv-muestra" style="text-align:center"><div><div class="gv-caja" style="border-radius:var(--radio-lg);margin:var(--esp-2) auto"></div><strong>--radio-lg</strong><span class="gv-val" data-token="--radio-lg"></span><span class="gv-val">paneles, tarjetas, modales</span></div></div>
+      <div class="gv-muestra" style="text-align:center"><div><div class="gv-caja" style="border-radius:var(--radio-pill);height:36px;margin:var(--esp-6) auto"></div><strong>--radio-pill</strong><span class="gv-val">chips, badges</span></div></div>
+    </div>
+    <div class="panel" style="margin-top:var(--esp-4)">
+      <div class="gv-fila"><code>--alto-sm · <span data-token="--alto-sm"></span></code><button class="btn btn-ghost" style="min-height:var(--alto-sm);border-radius:var(--radio-sm);padding:0 var(--esp-3)">Botón en tarjeta</button><button class="ops-filter is-active" type="button">Chip de filtro</button></div>
+      <div class="gv-fila"><code>--alto-md · <span data-token="--alto-md"></span></code><button class="btn btn-dark">Botón normal</button><button class="btn btn-ghost">Secundario</button></div>
+      <div class="gv-fila"><code>--alto-lg · <span data-token="--alto-lg"></span></code><div style="width:240px"><button class="btn btn-primary">Acción principal</button></div><label class="field" style="margin:0;width:240px"><input placeholder="Campo de texto"></label></div>
+    </div>
+  </section>
+
+  <section id="espaciado">
+    <h2>Espaciado</h2>
+    <p class="gv-regla">La escala va de 4 en 4 hasta 24 y después salta. En <code>padding</code> y <code>gap</code> usa siempre un paso de la escala. Lo habitual: <code>--esp-2</code> entre elementos chicos, <code>--esp-3</code> dentro de grupos, <code>--esp-4</code> como relleno de panel y <code>--esp-6</code> a <code>--esp-7</code> entre secciones.</p>
+    <div class="panel">
+      <div class="gv-fila"><code>--esp-1 · 4</code><div class="gv-barra" style="width:var(--esp-1)"></div></div>
+      <div class="gv-fila"><code>--esp-2 · 8</code><div class="gv-barra" style="width:var(--esp-2)"></div></div>
+      <div class="gv-fila"><code>--esp-3 · 12</code><div class="gv-barra" style="width:var(--esp-3)"></div></div>
+      <div class="gv-fila"><code>--esp-4 · 16</code><div class="gv-barra" style="width:var(--esp-4)"></div></div>
+      <div class="gv-fila"><code>--esp-5 · 20</code><div class="gv-barra" style="width:var(--esp-5)"></div></div>
+      <div class="gv-fila"><code>--esp-6 · 24</code><div class="gv-barra" style="width:var(--esp-6)"></div></div>
+      <div class="gv-fila"><code>--esp-7 · 32</code><div class="gv-barra" style="width:var(--esp-7)"></div></div>
+      <div class="gv-fila"><code>--esp-8 · 40</code><div class="gv-barra" style="width:var(--esp-8)"></div></div>
+      <div class="gv-fila"><code>--esp-9 · 48</code><div class="gv-barra" style="width:var(--esp-9)"></div></div>
+    </div>
+  </section>
+
+  <section id="elevacion">
+    <h2>Elevación y foco</h2>
+    <p class="gv-regla">Hay tres niveles de sombra. <code>--sombra-1</code> es para lo que está apoyado en la página, <code>--sombra-realce</code> para el hover de tarjetas clicables y <code>--sombra-2</code> para lo que flota (modales, menús, avisos). El foco de teclado siempre es <code>--foco</code>. En modo oscuro las sombras se vuelven más densas, porque una sombra suave no se ve sobre fondo oscuro.</p>
+    <div class="gv-grid">
+      <div class="gv-elev" style="box-shadow:none">Sin sombra</div>
+      <div class="gv-elev" style="box-shadow:var(--sombra-1)">--sombra-1</div>
+      <div class="gv-elev" style="box-shadow:var(--sombra-realce)">--sombra-realce</div>
+      <div class="gv-elev" style="box-shadow:var(--sombra-2)">--sombra-2</div>
+      <div class="gv-elev" style="box-shadow:var(--foco);border-color:var(--naranja-linea)">--foco</div>
+    </div>
+  </section>
+
+  <section id="franjas">
+    <h2>Franjas de acento</h2>
+    <p class="gv-regla">El grosor es siempre <code>--franja</code> (4px). La <strong>franja superior</strong> identifica qué es el contenedor: naranja para un panel de módulo, el color de sala o de servicio, o navy para un grupo neutro. La <strong>franja lateral</strong> se usa solo en filas de lista para marcar un nivel de estado (alertas y etapas). No pongas franjas solo para decorar.</p>
+    <div class="gv-grid-ancho">
+      <div class="gv-franja" style="border-top:var(--franja) solid var(--naranja)"><strong>Panel de módulo</strong>Usuarios, auditoría, reportes</div>
+      <div class="gv-franja" style="border-top:var(--franja) solid var(--sala-armado)"><strong>Sala o servicio</strong>Inventario, historial por sector</div>
+      <div class="gv-franja" style="border-top:var(--franja) solid var(--navy)"><strong>Grupo neutro</strong>Dónde queda cada caja, modales</div>
+      <div class="gv-franja" style="border-left:var(--franja) solid var(--rojo);background:var(--rojo-fondo)"><strong>Fila con nivel</strong>Alerta alta, media o baja</div>
+    </div>
+  </section>
+
+  <section id="iconos">
+    <h2>Íconos</h2>
+    <p class="gv-regla">Hay cuatro tamaños. <code>--icono-xs</code> va dentro de badges y etiquetas, <code>--icono-sm</code> en botones y chips (es el tamaño por defecto de <code>.sigte-icon</code>), <code>--icono-md</code> en campos y en la navegación, y <code>--icono-lg</code> en cabeceras de tarjeta. El trazo es siempre de 1.8 a 2px y el color sigue al texto (<code>currentColor</code>).</p>
+    <div class="panel gv-comp" style="gap:var(--esp-7)">
+      <span class="gv-comp" style="gap:var(--esp-2)"><svg class="sigte-icon" style="width:var(--icono-xs);height:var(--icono-xs)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><code>xs · 14</code></span>
+      <span class="gv-comp" style="gap:var(--esp-2)"><svg class="sigte-icon" style="width:var(--icono-sm);height:var(--icono-sm)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><code>sm · 16</code></span>
+      <span class="gv-comp" style="gap:var(--esp-2)"><svg class="sigte-icon" style="width:var(--icono-md);height:var(--icono-md)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><code>md · 20</code></span>
+      <span class="gv-comp" style="gap:var(--esp-2)"><svg class="sigte-icon" style="width:var(--icono-lg);height:var(--icono-lg)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><code>lg · 24</code></span>
+    </div>
+  </section>
+
+  <section id="movimiento">
+    <h2>Movimiento</h2>
+    <p class="gv-regla">Hay dos duraciones. <code>--dur-rapida</code> (160ms) es para hover, foco y cambios de color, y <code>--dur-media</code> (280ms) para lo que aparece o se desplaza, como modales, paneles y avisos. Anima solo <code>transform</code>, <code>opacity</code> y colores, nunca el alto o el ancho.</p>
+    <div class="gv-comp" style="gap:var(--esp-6)">
+      <div><div class="gv-mov-pista"><div class="gv-mov" style="transition:transform var(--dur-rapida) ease"></div></div><p class="gv-nota">--dur-rapida (pasa el mouse)</p></div>
+      <div><div class="gv-mov-pista"><div class="gv-mov" style="transition:transform var(--dur-media) ease"></div></div><p class="gv-nota">--dur-media (pasa el mouse)</p></div>
+    </div>
+  </section>
+
+  <section id="componentes">
+    <h2>Componentes</h2>
+    <p class="gv-regla">Estos son los componentes compartidos de <code>css/componentes/</code>. Para una pantalla nueva, úsalos tal cual en vez de crear una variante con otro radio o alto.</p>
+
+    <h3>Botones</h3>
+    <div class="panel gv-comp">
+      <div style="width:220px"><button class="btn btn-primary">Registrar entrega</button></div>
+      <button class="btn btn-dark">Avanzar etapa</button>
+      <button class="btn btn-ghost">Cancelar</button>
+      <button class="btn btn-dark" disabled>Deshabilitado</button>
+    </div>
+    <p class="gv-nota">Primario naranja: una sola acción principal por vista. Navy: acciones frecuentes. Ghost: acciones secundarias o para cancelar.</p>
+
+    <h3>Campos</h3>
+    <div class="panel" style="max-width:420px">
+      <label class="field-label" for="gv-campo">Quién retira en el servicio</label>
+      <label class="field"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.5 4-5 7-5s5.8 1.5 7 5"/></svg><input id="gv-campo" placeholder="Nombre y apellido"></label>
+      <label class="check"><input type="checkbox" checked> Confirmo que la caja va sellada</label>
+    </div>
+
+    <h3>Pestañas</h3>
+    <div class="admin-tabs" role="tablist" style="max-width:520px">
+      <button class="admin-tab is-active" type="button" role="tab" aria-selected="true">Catálogo</button>
+      <button class="admin-tab" type="button" role="tab" aria-selected="false">Instrumentos</button>
+      <button class="admin-tab" type="button" role="tab" aria-selected="false">Mantención</button>
+    </div>
+    <p class="gv-nota">Una sola clase visual para <code>.reportes-tabs</code>, <code>.admin-tabs</code> e <code>.inv-pestanas</code>. La activa va en navy.</p>
+
+    <h3>Chips de filtro</h3>
+    <div class="ops-filters" style="border-top:0;padding-top:0">
+      <button class="ops-filter is-active" type="button">Todas <em>24</em></button>
+      <button class="ops-filter" type="button">Lavado <em>9</em></button>
+      <button class="ops-filter" type="button">Armado <em>7</em></button>
+      <button class="ops-filter" type="button">Esterilización <em>8</em></button>
+    </div>
+    <p class="gv-nota">El chip activo usa la familia naranja. <code>.flujo-chip</code> comparte este mismo estilo.</p>
+
+    <h3>Badges y pills de estado</h3>
+    <div class="gv-comp">
+      <span class="badge">Pendiente</span>
+      <span class="badge badge-listo">Listo</span>
+      <span class="badge badge-urgent">Urgente</span>
+      <span class="pill pill-ok">Activo</span>
+      <span class="pill pill-warn">Bajo mínimo</span>
+      <span class="pill pill-danger">Crítico</span>
+    </div>
+    <p class="gv-nota">Cada color dice una sola cosa. Verde: todo bien. Ámbar (<code>.pill-warn</code>): revisar. Rojo: urgente. Naranja (<code>.badge</code>): pendiente de acción.</p>
+
+    <h3>Roles</h3>
+    <div class="gv-comp">
+      <span class="badge rol-pill rol-admin">Administradora</span>
+      <span class="badge rol-pill rol-operadora">Operadora</span>
+      <span class="badge rol-pill rol-enfermera">Enfermera</span>
+      <span class="badge rol-pill rol-secretaria">Secretaria</span>
+    </div>
+    <p class="gv-nota">Los roles usan colores que ningún estado usa (navy, azul, rosa y violeta), así un rol nunca se confunde con una alerta en la misma tabla.</p>
+
+    <h3>KPIs</h3>
+    <div class="kpi-row">
+      <div class="kpi"><div class="l">Cajas hoy</div><div class="n">48</div><div class="h">12 más que ayer</div></div>
+      <div class="kpi ok"><div class="l">Entregadas</div><div class="n">31</div><div class="h">65% del total</div></div>
+      <div class="kpi"><div class="l">En proceso</div><div class="n">14</div><div class="h">en 3 salas</div></div>
+      <div class="kpi warn"><div class="l">Atrasadas</div><div class="n">3</div><div class="h">más de 4 h</div></div>
+    </div>
+
+    <h3>Panel con tabla</h3>
+    <div class="panel">
+      <div class="panel-head"><h2>Últimos movimientos</h2><a class="panel-link">Ver todo</a></div>
+      <div class="list table-wrap">
+        <table>
+          <thead><tr><th>Caja</th><th>Sala</th><th>Estado</th><th>Hora</th></tr></thead>
+          <tbody>
+            <tr><td><strong>PAB-014</strong></td><td><span class="badge badge-sala badge-esteril">Esterilización</span></td><td><span class="badge">En proceso</span></td><td>10:42</td></tr>
+            <tr><td><strong>UCI-002</strong></td><td><span class="badge badge-sala badge-armado">Armado</span></td><td><span class="pill pill-ok">Listo</span></td><td>10:15</td></tr>
+            <tr><td><strong>URG-031</strong></td><td><span class="badge badge-sala badge-lavado">Lavado</span></td><td><span class="pill pill-danger">Atrasada</span></td><td>06:58</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="panel-note">La nota de panel usa <code>--superficie-2</code> y <code>--radio-sm</code>.</p>
+      <div class="bar-track" style="margin-top:var(--esp-3)"><div class="bar-fill" style="width:65%"></div></div>
+    </div>
+  </section>
+
+</main>
+
+<button class="btn btn-dark gv-tema" type="button" id="gv-tema">Cambiar a modo oscuro</button>
+
+<script>
+  (function () {
+    var raiz = document.documentElement;
+    var boton = document.getElementById('gv-tema');
+    function pintar() {
+      var estilo = getComputedStyle(raiz);
+      document.querySelectorAll('[data-token]').forEach(function (el) {
+        el.textContent = estilo.getPropertyValue(el.dataset.token).trim();
+      });
+      boton.textContent = raiz.getAttribute('data-tema') === 'oscuro' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+    }
+    boton.addEventListener('click', function () {
+      if (raiz.getAttribute('data-tema') === 'oscuro') raiz.removeAttribute('data-tema');
+      else raiz.setAttribute('data-tema', 'oscuro');
+      pintar();
+    });
+    pintar();
+  })();
+</script>
+</body>
+</html>

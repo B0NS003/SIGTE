@@ -1,0 +1,74 @@
+<!doctype html>
+<html><head><meta charset="utf-8"></head>
+<body><pre id="out">PENDIENTE</pre>
+<script>
+const q = new URLSearchParams(location.search);
+const PAGINAS = (q.get('p') || 'login,panel-admin,panel-enfermera,panel-operador,panel-operador-etapa,panel-operador-actividad,panel-secretaria,recepcion,entrega,catalogo,catalogo-admin,ficha,inventario-operador,inventario-enfermera,usuarios,turnos,entregas,custodia,alertas,cierre-turno,sec-produccion,sec-insumos,sec-reportes').split(',');
+const tema = q.get('tema') || 'claro';
+const ancho = +(q.get('w') || 1280);
+const dir = q.get('d') || 'antes';
+const solo = q.get('solo') ? q.get('solo').split(',') : null;
+const PROPS = ['display','position','top','right','bottom','left','z-index','float','box-sizing','width','height','min-width','min-height','max-width','max-height',
+  'margin-top','margin-right','margin-bottom','margin-left','padding-top','padding-right','padding-bottom','padding-left',
+  'border-top-width','border-right-width','border-bottom-width','border-left-width','border-top-style','border-right-style','border-bottom-style','border-left-style',
+  'border-top-color','border-right-color','border-bottom-color','border-left-color',
+  'border-top-left-radius','border-top-right-radius','border-bottom-right-radius','border-bottom-left-radius',
+  'background-color','background-image','background-size','background-position','color','opacity','box-shadow','outline-style','outline-color','outline-width','outline-offset',
+  'font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-transform','text-align','text-decoration-line','white-space','font-variant-numeric',
+  'flex-direction','flex-wrap','flex-grow','flex-shrink','flex-basis','justify-content','align-items','align-self','align-content','gap','row-gap','column-gap','order',
+  'grid-template-columns','grid-template-rows','grid-column-start','grid-column-end','grid-row-start','grid-row-end','place-items',
+  'overflow-x','overflow-y','visibility','cursor','pointer-events','transform','filter','backdrop-filter','mix-blend-mode','object-fit','fill','stroke','list-style-type','vertical-align','accent-color','content','inset'];
+
+function valores(c) {
+  let s = '';
+  for (const p of PROPS) s += p + ':' + c.getPropertyValue(p).replace(/url\("?[^")]*\/([^/")]+)"?\)/g, 'url($1)') + ';';
+  return s;
+}
+function hash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(16);
+}
+const salida = [];
+function medir(f, pagina) {
+  const d = f.contentDocument, win = f.contentWindow;
+  const st = d.createElement('style');
+  st.textContent = '*,*::before,*::after{transition:none!important;animation:none!important}';
+  d.head.appendChild(st);
+  if (tema === 'oscuro') d.documentElement.setAttribute('data-tema', 'oscuro'); else d.documentElement.removeAttribute('data-tema');
+  void d.body.offsetHeight;
+  [d.documentElement, d.body, ...d.body.querySelectorAll('*')].forEach((el, i) => {
+    const cls = typeof el.className === 'string' ? el.className.trim() : (el.getAttribute('class') || '');
+    const sig = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (cls ? '.' + cls.split(/\s+/).join('.') : '');
+    let v = valores(win.getComputedStyle(el));
+    for (const ps of ['::before', '::after']) {
+      const c = win.getComputedStyle(el, ps);
+      if (c.content && c.content !== 'none' && c.content !== 'normal') v += ps + valores(c);
+    }
+    if (solo) { if (solo.includes(pagina + ':' + i)) salida.push(pagina + '|' + i + '|' + sig + '|' + v); }
+    else salida.push(pagina + '|' + i + '|' + sig + '|' + hash(v));
+  });
+}
+const ACCIONES = {
+  'instrumentos': w => w.mostrarTab('instrumentos'),
+  'lista': w => { w.mostrarTab('instrumentos'); w.document.querySelector('[data-instrument-view="list"]').click(); },
+  'nueva-ficha': w => w.mostrarTab('nueva-ficha'),
+  'nuevo-instrumento': w => w.mostrarTab('nuevo-instrumento'),
+  'filtros': w => w.document.querySelectorAll('[data-filter-toggle]').forEach(b => b.click()),
+  'checks': w => { const b = w.document.getElementById('ficha-marcar-todos'); if (b) b.click(); },
+};
+function siguiente(n) {
+  if (n >= PAGINAS.length) { document.getElementById('out').textContent = salida.join('\n'); return; }
+  const [archivo, accion] = PAGINAS[n].split('@');
+  const f = document.createElement('iframe');
+  f.style.cssText = 'width:' + ancho + 'px;height:900px;border:0';
+  f.onload = () => setTimeout(() => {
+    try { if (accion) ACCIONES[accion](f.contentWindow); } catch (e) { salida.push(PAGINAS[n] + '|ERROR-ACCION|' + e.message); }
+    setTimeout(() => { try { medir(f, PAGINAS[n]); } catch (e) { salida.push(PAGINAS[n] + '|ERROR|' + e.message); } f.remove(); siguiente(n + 1); }, 500);
+  }, 2500);
+  f.src = '/_ref/' + dir + '/' + archivo + '.html';
+  document.body.appendChild(f);
+}
+siguiente(0);
+</script>
+</body></html>

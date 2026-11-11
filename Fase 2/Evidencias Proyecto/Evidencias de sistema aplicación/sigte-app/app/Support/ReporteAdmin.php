@@ -61,10 +61,11 @@ class ReporteAdmin
     public static function filtros(Request $request): array
     {
         $hoy = now()->timezone('America/Santiago')->toDateString();
-        $desde = (string) $request->input('desde', now()->timezone('America/Santiago')->subDays(13)->toDateString());
+        $inicioAnio = now()->timezone('America/Santiago')->startOfYear()->toDateString();
+        $desde = (string) $request->input('desde', $inicioAnio);
         $hasta = (string) $request->input('hasta', $hoy);
         if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde)) {
-            $desde = now()->timezone('America/Santiago')->subDays(13)->toDateString();
+            $desde = $inicioAnio;
         }
         if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta)) {
             $hasta = $hoy;
