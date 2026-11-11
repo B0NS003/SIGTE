@@ -3,6 +3,8 @@
 namespace App\Support;
 
 use App\Models\Caja;
+use App\Models\CajaRetroceso;
+use App\Models\Entrega;
 use App\Models\RegistroAuditoria;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,11 +14,7 @@ use Throwable;
 
 class ReporteAdmin
 {
-    /**
-     * Variables que usa la sección de reportes del resumen de la administradora.
-     *
-     * @return array<string, mixed>
-     */
+    /** Datos para las pestañas de reportes del panel de Administradora. */
     public static function vista(Request $request): array
     {
         $filtros = self::filtros($request);
@@ -24,8 +22,16 @@ class ReporteAdmin
         $datos = [
             'movimientos' => collect(),
             'por_tipo' => collect(),
+            'movimientos_por_dia' => collect(),
+            'total_movimientos' => 0,
+            'retrocesos_periodo' => 0,
             'entregas' => collect(),
+            'total_cajas_entregadas' => 0,
+            'operaciones_entrega' => 0,
+            'entregas_por_servicio' => collect(),
+            'entregas_por_fecha' => collect(),
             'en_flujo' => collect(),
+            'recibidas_periodo' => 0,
             'produccion' => self::produccionVacia(),
         ];
 
@@ -40,33 +46,34 @@ class ReporteAdmin
 
         $momento = now()->timezone('America/Santiago');
 
-        return [
+        return array_merge($datos, [
             'falla' => $falla,
             'filtros' => $filtros,
+            'tab_activo' => self::pestana($request),
             'fecha' => $momento->format('d/m/Y'),
             'hora' => $momento->format('H:i'),
-            'movimientos' => $datos['movimientos'],
-            'por_tipo' => $datos['por_tipo'],
-            'entregas' => $datos['entregas'],
-            'en_flujo' => $datos['en_flujo'],
-            'produccion' => $datos['produccion'],
             'servicios_produccion' => DB::table('servicios')->orderBy('nombre')->get(['id', 'nombre']),
             'tipos_auditoria' => RegistroAuditoria::TIPOS,
-        ];
+        ]);
     }
 
-    /**
-     * @return array{desde: string, hasta: string, tipo: string, servicio: ?int}
-     */
+    public static function pestana(Request $request): string
+    {
+        $tab = (string) $request->input('tab', 'produccion');
+
+        return in_array($tab, ['produccion', 'trazabilidad', 'entregas'], true) ? $tab : 'produccion';
+    }
+
+    /** @return array{desde: string, hasta: string, tipo: string, servicio: ?int} */
     public static function filtros(Request $request): array
     {
         $hoy = now()->timezone('America/Santiago')->toDateString();
         $desde = (string) $request->input('desde', now()->timezone('America/Santiago')->subDays(13)->toDateString());
         $hasta = (string) $request->input('hasta', $hoy);
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde)) {
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde) || ! self::fechaValida($desde)) {
             $desde = now()->timezone('America/Santiago')->subDays(13)->toDateString();
         }
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta)) {
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta) || ! self::fechaValida($hasta)) {
             $hasta = $hoy;
         }
         if ($desde > $hasta) {
@@ -81,64 +88,156 @@ class ReporteAdmin
             'desde' => $desde,
             'hasta' => $hasta,
             'tipo' => $tipo,
-            'servicio' => $request->filled('servicio') && ctype_digit((string) $request->input('servicio')) ? (int) $request->input('servicio') : null,
+            'servicio' => $request->filled('servicio') && ctype_digit((string) $request->input('servicio'))
+                ? (int) $request->input('servicio')
+                : null,
         ];
     }
 
+    private static function fechaValida(string $fecha): bool
+    {
+        $fechaParseada = \DateTimeImmutable::createFromFormat('!Y-m-d', $fecha);
+
+        return $fechaParseada !== false && $fechaParseada->format('Y-m-d') === $fecha;
+    }
+
     /**
-     * @param  array{desde: string, hasta: string, tipo: string, servicio: ?int}  $filtros
-     * @return array{movimientos: Collection<int, array<string, string>>, por_tipo: Collection<string, int>, entregas: Collection<int, array<string, string>>, en_flujo: Collection<int, array<string, string|int>>, produccion: array<string, mixed>}
+     * Calcula los indicadores sobre TODOS los registros filtrados.
+     * Las tablas web se paginan a 25 filas; las exportaciones usan $completo=true.
+     *
+     * @param array{desde: string, hasta: string, tipo: string, servicio: ?int} $filtros
+     * @return array<string, mixed>
      */
-    public static function datos(array $filtros): array
+    public static function datos(array $filtros, bool $completo = false): array
     {
         $inicio = Carbon::parse($filtros['desde'], 'America/Santiago')->startOfDay()->timezone('UTC');
         $fin = Carbon::parse($filtros['hasta'], 'America/Santiago')->endOfDay()->timezone('UTC');
 
-        $consulta = RegistroAuditoria::query()
+        // Trazabilidad: los indicadores se calculan en SQL y NO sobre la página mostrada.
+        $consultaAuditoria = RegistroAuditoria::query()
+            ->whereBetween('created_at', [$inicio, $fin]);
+        if ($filtros['tipo'] !== '') {
+            $consultaAuditoria->where('tipo', $filtros['tipo']);
+        }
+        $totalMovimientos = (clone $consultaAuditoria)->count();
+        $porTipo = (clone $consultaAuditoria)
+            ->select('tipo')
+            ->selectRaw('COUNT(*) AS cantidad')
+            ->groupBy('tipo')
+            ->pluck('cantidad', 'tipo')
+            ->map(fn ($cantidad) => (int) $cantidad);
+
+        // El cast a hora chilena permite agrupar fechas correctamente cerca de medianoche.
+        $diaAuditoria = "(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Santiago')::date";
+        $movimientosPorDia = (clone $consultaAuditoria)
+            ->selectRaw($diaAuditoria.' AS dia')
+            ->selectRaw('COUNT(*) AS cantidad')
+            ->groupByRaw($diaAuditoria)
+            ->orderBy('dia')
+            ->get()
+            ->mapWithKeys(fn ($fila) => [Carbon::parse($fila->dia)->format('d/m/Y') => (int) $fila->cantidad]);
+
+        $listaAuditoria = (clone $consultaAuditoria)
             ->with('actor')
-            ->whereBetween('created_at', [$inicio, $fin])
             ->latest('created_at')
             ->latest('id');
-        if ($filtros['tipo'] !== '') {
-            $consulta->where('tipo', $filtros['tipo']);
-        }
-
-        $registros = $consulta->limit(500)->get();
-        $movimientos = $registros->map(fn (RegistroAuditoria $r) => array_merge($r->paraConsulta(), [
+        $transformarMovimiento = fn (RegistroAuditoria $r) => array_merge($r->paraConsulta(), [
             'tipo_etiqueta' => RegistroAuditoria::TIPOS[$r->tipo] ?? $r->tipo,
-        ]));
+        ]);
+        $movimientos = $completo
+            ? $listaAuditoria->get()->map($transformarMovimiento)
+            : $listaAuditoria->paginate(25, ['*'], 'pagina_movimientos')
+                ->withQueryString()->through($transformarMovimiento);
 
-        $porTipo = $registros->groupBy('tipo')->map->count();
+        // Los retrocesos tienen una tabla propia. Este total depende solo del período.
+        $retrocesosPeriodo = CajaRetroceso::query()
+            ->whereBetween('created_at', [$inicio, $fin])
+            ->count();
 
-        $entregas = Caja::query()
-            ->with(['responsable', 'persona'])
-            ->whereNotNull('entregado_at')
+        // Entregas: una operación puede tener varias cajas o solamente material.
+        // Se usa EntregaCaja para que el servicio sea el DESTINO, no el origen de la caja.
+        $consultaEntregas = DB::table('entrega_cajas as ec')
+            ->join('entregas as e', 'e.id', '=', 'ec.entrega_id')
+            ->leftJoin('users as u', 'u.id', '=', 'e.user_id')
+            ->whereBetween('e.entregado_at', [$inicio, $fin]);
+        $totalCajasEntregadas = (clone $consultaEntregas)->count();
+        $operacionesEntrega = Entrega::query()
             ->whereBetween('entregado_at', [$inicio, $fin])
-            ->orderByDesc('entregado_at')
-            ->limit(100)
-            ->get()
-            ->map(fn (Caja $caja) => [
-                'codigo' => $caja->codigo,
-                'servicio' => $caja->servicio,
-                'cuando' => $caja->entregado_at->timezone('America/Santiago')->format('d/m/Y H:i'),
-                'responsable' => $caja->nombreResponsable(),
-            ]);
+            ->count();
+        $entregasPorServicio = (clone $consultaEntregas)
+            ->select('e.servicio')
+            ->selectRaw('COUNT(*) AS cantidad')
+            ->groupBy('e.servicio')
+            ->orderByDesc('cantidad')
+            ->pluck('cantidad', 'e.servicio')
+            ->map(fn ($cantidad) => (int) $cantidad);
 
-        $enFlujo = Caja::query()
-            ->whereNull('entregado_at')
+        $diaEntrega = "(e.entregado_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Santiago')::date";
+        $entregasPorFecha = (clone $consultaEntregas)
+            ->selectRaw($diaEntrega.' AS dia')
+            ->selectRaw('COUNT(*) AS cantidad')
+            ->groupByRaw($diaEntrega)
+            ->orderBy('dia')
             ->get()
-            ->groupBy(fn (Caja $caja) => Caja::etiquetaEtapa((string) $caja->etapa))
-            ->map(fn ($grupo, $etapa) => [
-                'etapa' => $etapa,
-                'cantidad' => $grupo->count(),
+            ->mapWithKeys(fn ($fila) => [(string) $fila->dia => (int) $fila->cantidad]);
+
+        $listaEntregas = (clone $consultaEntregas)
+            ->select([
+                'ec.codigo',
+                'e.codigo as operacion',
+                'e.servicio',
+                'e.recibe',
+                'e.entregado_at as entregado_utc',
             ])
-            ->values();
+            ->selectRaw("COALESCE(u.name, 'Sin registrar') AS responsable")
+            ->orderByDesc('e.entregado_at')
+            ->orderByDesc('ec.id');
+        $transformarEntrega = fn ($fila) => [
+            'codigo' => $fila->codigo,
+            'operacion' => $fila->operacion,
+            'servicio' => $fila->servicio,
+            'cuando' => Carbon::parse($fila->entregado_utc, 'UTC')
+                ->timezone('America/Santiago')->format('d/m/Y H:i'),
+            'responsable' => $fila->responsable,
+            'recibe' => $fila->recibe,
+        ];
+        $entregas = $completo
+            ? $listaEntregas->get()->map($transformarEntrega)
+            : $listaEntregas->paginate(25, ['*'], 'pagina_entregas')
+                ->withQueryString()->through($transformarEntrega);
+
+        // Flujo actual y recepciones: solo el segundo indicador usa fechas.
+        $consultaCajas = Caja::query();
+        if ($filtros['servicio'] !== null) {
+            $consultaCajas->where('servicio_id', $filtros['servicio']);
+        }
+        $recibidasPeriodo = (clone $consultaCajas)
+            ->whereBetween('created_at', [$inicio, $fin])
+            ->count();
+        $enFlujo = (clone $consultaCajas)
+            ->whereNull('entregado_at')
+            ->select('etapa')
+            ->selectRaw('COUNT(*) AS cantidad')
+            ->groupBy('etapa')
+            ->get()
+            ->map(fn ($fila) => [
+                'etapa' => Caja::etiquetaEtapa((string) $fila->etapa),
+                'cantidad' => (int) $fila->cantidad,
+            ]);
 
         return [
             'movimientos' => $movimientos,
             'por_tipo' => $porTipo,
+            'movimientos_por_dia' => $movimientosPorDia,
+            'total_movimientos' => $totalMovimientos,
+            'retrocesos_periodo' => $retrocesosPeriodo,
             'entregas' => $entregas,
+            'total_cajas_entregadas' => $totalCajasEntregadas,
+            'operaciones_entrega' => $operacionesEntrega,
+            'entregas_por_servicio' => $entregasPorServicio,
+            'entregas_por_fecha' => $entregasPorFecha,
             'en_flujo' => $enFlujo,
+            'recibidas_periodo' => $recibidasPeriodo,
             'produccion' => self::produccion($filtros),
         ];
     }
@@ -153,8 +252,7 @@ class ReporteAdmin
 
     private static function produccion(array $filtros): array
     {
-        // Se utiliza únicamente registros_produccion: no se suman los
-        // agregados de consumos_servicio para evitar duplicar consumos.
+        // Exclusivamente registros_produccion: evita duplicar consumos_servicio históricos.
         $base = DB::table('registros_produccion as rp')
             ->join('servicios as s', 's.id', '=', 'rp.servicio_id')
             ->whereBetween('rp.fecha', [$filtros['desde'], $filtros['hasta']]);

@@ -46,6 +46,8 @@ class AccesoPorRol
         'mockups.cierre_turno.guardar' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],
         'mockups.reportes.exportar' => [Rol::ADMINISTRADORA],
+        'mockups.reportes.excel' => [Rol::ADMINISTRADORA],
+        'mockups.reportes.pdf' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],
         'mockups.historial_entregas' => [Rol::ADMINISTRADORA, Rol::ENFERMERA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],

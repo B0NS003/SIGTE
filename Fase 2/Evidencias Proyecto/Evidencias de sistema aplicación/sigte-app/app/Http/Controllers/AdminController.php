@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -453,14 +455,14 @@ class AdminController extends Controller
     {
         return redirect()->route('mockups.panel', array_merge(
             ['rol' => Rol::ADMINISTRADORA],
-            $request->only(['desde', 'hasta', 'tipo', 'servicio'])
+            $request->only(['desde', 'hasta', 'tipo', 'servicio', 'tab'])
         ));
     }
 
     public function exportarReportes(Request $request): StreamedResponse
     {
         $filtros = ReporteAdmin::filtros($request);
-        $datos = ReporteAdmin::datos($filtros);
+        $datos = ReporteAdmin::datos($filtros, true);
         $nombre = 'sigte-reporte-'.$filtros['desde'].'_'.$filtros['hasta'].'.csv';
 
         return response()->streamDownload(function () use ($datos, $filtros) {
@@ -495,6 +497,168 @@ class AdminController extends Controller
         }, $nombre, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    /** Excel de la pestaña seleccionada, con totales completos y detalle sin paginación. */
+    public function exportarReportesExcel(Request $request): StreamedResponse
+    {
+        $filtros = ReporteAdmin::filtros($request);
+        $tab = ReporteAdmin::pestana($request);
+        $datos = ReporteAdmin::datos($filtros, true);
+        $nombre = 'sigte-'.$tab.'-'.$filtros['desde'].'_'.$filtros['hasta'].'.xlsx';
+
+        $libro = new Spreadsheet;
+        $resumen = $libro->getActiveSheet();
+        $resumen->setTitle('Resumen');
+        $this->escribirHojaReporteExcel(
+            $resumen,
+            'SIGTE — Resumen '.ucfirst($tab),
+            ['Indicador', 'Valor'],
+            $this->resumenReporte($datos, $tab),
+            $filtros
+        );
+
+        if ($tab === 'produccion') {
+            $hoja = $libro->createSheet();
+            $hoja->setTitle('Flujo actual');
+            $totalFlujo = collect($datos['en_flujo'])->sum('cantidad');
+            $filasFlujo = collect($datos['en_flujo'])->map(fn ($fila) => [
+                $fila['etapa'],
+                (int) $fila['cantidad'],
+                $totalFlujo > 0 ? round($fila['cantidad'] / $totalFlujo * 100, 2) : 0,
+            ]);
+            $this->escribirHojaReporteExcel($hoja, 'Procesamiento de cajas (estado actual)', ['Etapa', 'Cajas', 'Porcentaje (%)'], $filasFlujo, $filtros);
+
+            $hoja = $libro->createSheet();
+            $hoja->setTitle('Producción mensual');
+            $filas = $datos['produccion']['detalle']->map(fn ($fila) => [
+                $fila->mes,
+                $fila->servicio,
+                (int) $fila->cantidad,
+                round((float) $fila->litros, 2),
+            ]);
+            $this->escribirHojaReporteExcel($hoja, 'Producción mensual por servicio', ['Mes', 'Servicio', 'Unidades', 'Litros'], $filas, $filtros);
+        } elseif ($tab === 'trazabilidad') {
+            $hoja = $libro->createSheet();
+            $hoja->setTitle('Movimientos');
+            $filas = $datos['movimientos']->map(fn ($fila) => [
+                $fila['fecha'], $fila['hora'], $fila['actor'], $fila['accion'],
+                $fila['tipo_etiqueta'], $fila['objeto'], $fila['detalle'],
+            ]);
+            $this->escribirHojaReporteExcel($hoja, 'Historial de movimientos', ['Fecha', 'Hora', 'Usuario', 'Acción', 'Tipo', 'Objeto', 'Detalle'], $filas, $filtros);
+        } else {
+            $hoja = $libro->createSheet();
+            $hoja->setTitle('Cajas entregadas');
+            $filas = $datos['entregas']->map(fn ($fila) => [
+                $fila['codigo'], $fila['operacion'], $fila['servicio'],
+                $fila['cuando'], $fila['responsable'], $fila['recibe'],
+            ]);
+            $this->escribirHojaReporteExcel($hoja, 'Cajas entregadas por operación', ['Caja', 'Operación', 'Servicio destino', 'Fecha', 'Responsable', 'Recibe'], $filas, $filtros);
+        }
+
+        $libro->setActiveSheetIndex(0);
+
+        return response()->streamDownload(function () use ($libro) {
+            (new Xlsx($libro))->save('php://output');
+            $libro->disconnectWorksheets();
+        }, $nombre, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    /** PDF de la pestaña seleccionada (sin depender de la página visible). */
+    public function exportarReportesPdf(Request $request): Response
+    {
+        $filtros = ReporteAdmin::filtros($request);
+        $tab = ReporteAdmin::pestana($request);
+        $datos = ReporteAdmin::datos($filtros, true);
+        $nombre = 'sigte-'.$tab.'-'.$filtros['desde'].'_'.$filtros['hasta'].'.pdf';
+
+        return Pdf::loadView('admin.partials.reportes', [
+            'modo_pdf' => true,
+            'tab' => $tab,
+            'filtros' => $filtros,
+            'datos' => $datos,
+            'resumen' => $this->resumenReporte($datos, $tab),
+            'fecha_generacion' => now()->timezone('America/Santiago')->format('d/m/Y H:i'),
+        ])->setPaper('letter', 'landscape')->download($nombre);
+    }
+
+    /** @return list<array{0: string, 1: int|float}> */
+    private function resumenReporte(array $datos, string $tab): array
+    {
+        if ($tab === 'produccion') {
+            return [
+                ['Cajas actualmente en flujo', (int) collect($datos['en_flujo'])->sum('cantidad')],
+                ['Cajas recibidas en el período', (int) $datos['recibidas_periodo']],
+                ['Etapas con cajas', (int) collect($datos['en_flujo'])->count()],
+                ['Servicios con producción', (int) $datos['produccion']['servicios']],
+                ['Unidades procesadas', (int) $datos['produccion']['cantidad']],
+                ['Litros totales', (float) $datos['produccion']['litros']],
+                ['Materiales distintos', (int) $datos['produccion']['materiales']],
+            ];
+        }
+        if ($tab === 'trazabilidad') {
+            return [
+                ['Movimientos del período', (int) $datos['total_movimientos']],
+                ['Tipos de movimientos encontrados', (int) $datos['por_tipo']->count()],
+                ['Retrocesos estructurados del período', (int) $datos['retrocesos_periodo']],
+            ];
+        }
+
+        return [
+            ['Cajas entregadas', (int) $datos['total_cajas_entregadas']],
+            ['Operaciones de entrega (incluye solo material)', (int) $datos['operaciones_entrega']],
+            ['Servicios destino con cajas', (int) $datos['entregas_por_servicio']->count()],
+        ];
+    }
+
+    /**
+     * Escribe texto como texto, no como fórmula. Esto también protege el XLSX de
+     * valores ingresados por usuarios que comiencen con =, +, - o @.
+     *
+     * @param iterable<array<int, mixed>> $filas
+     */
+    private function escribirHojaReporteExcel($hoja, string $titulo, array $encabezados, iterable $filas, array $filtros): void
+    {
+        $ultimaColumna = Coordinate::stringFromColumnIndex(count($encabezados));
+        $hoja->setCellValue('A1', $titulo);
+        $hoja->mergeCells('A1:'.$ultimaColumna.'1');
+        $hoja->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        $hoja->setCellValue('A2', 'Período: '.$filtros['desde'].' al '.$filtros['hasta']);
+        $hoja->mergeCells('A2:'.$ultimaColumna.'2');
+        $hoja->setCellValue('A3', 'Generado: '.now()->timezone('America/Santiago')->format('d/m/Y H:i'));
+        $hoja->mergeCells('A3:'.$ultimaColumna.'3');
+
+        foreach ($encabezados as $indice => $encabezado) {
+            $columna = Coordinate::stringFromColumnIndex($indice + 1);
+            $hoja->setCellValueExplicit($columna.'5', (string) $encabezado, DataType::TYPE_STRING);
+            $hoja->getColumnDimension($columna)->setAutoSize(true);
+        }
+        $hoja->getStyle('A5:'.$ultimaColumna.'5')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1A5F7A']],
+        ]);
+
+        $numeroFila = 6;
+        foreach ($filas as $fila) {
+            foreach (array_values($fila) as $indice => $valor) {
+                $celda = Coordinate::stringFromColumnIndex($indice + 1).$numeroFila;
+                if (is_int($valor) || is_float($valor)) {
+                    $hoja->setCellValue($celda, $valor);
+                } else {
+                    $hoja->setCellValueExplicit($celda, (string) ($valor ?? ''), DataType::TYPE_STRING);
+                }
+            }
+            $numeroFila++;
+        }
+        if ($numeroFila === 6) {
+            $hoja->setCellValue('A6', 'Sin registros para los filtros seleccionados.');
+        } else {
+            $hoja->setAutoFilter('A5:'.$ultimaColumna.($numeroFila - 1));
+        }
+        $hoja->freezePane('A6');
     }
 
     public function historialEntregas(Request $request): View
