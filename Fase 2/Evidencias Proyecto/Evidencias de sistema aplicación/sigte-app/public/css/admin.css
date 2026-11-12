@@ -1,6 +1,5 @@
 /* admin */
 
-
 .alert-strip {
   background: var(--card); border: 1px solid var(--rojo-linea, #fecaca); border-radius: 16px;
   padding: 0.9rem 1rem; margin-bottom: 1.25rem;
@@ -1149,4 +1148,24 @@ html[data-tema="oscuro"] .hist-lista {
 @media (max-width: 900px) {
   .rep-filtros, .rep-firma { grid-template-columns: 1fr; }
   .rep-hoja-top { flex-direction: column; }
+}
+
+/* AJUSTE VISUAL DEL ENCABEZADO DE RESUMEN */
+.reportes-pagina > .main-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.reportes-pagina > .main-top > div:first-child {
+  min-width: 0;
+}
+
+.reportes-pagina > .main-top .main-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
 }

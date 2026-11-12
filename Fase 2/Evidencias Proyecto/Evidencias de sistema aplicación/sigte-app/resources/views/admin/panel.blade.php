@@ -26,7 +26,7 @@
             <div>
                 <p class="eyebrow">Hospital San José de Melipilla</p>
                 <h1>Resumen de gestión</h1>
-                <p class="main-sub">Producción, trazabilidad y entregas del período.</p>
+                <p class="main-sub">Consulta y supervisa la producción, trazabilidad y entregas del hospital durante el período seleccionado.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">Ver vista operadora</a>

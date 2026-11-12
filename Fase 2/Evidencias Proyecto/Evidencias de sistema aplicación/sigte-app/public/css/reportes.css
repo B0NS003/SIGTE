@@ -2093,3 +2093,162 @@
 @media (max-width: 650px) {
     .reportes-paginacion { flex-direction: column; align-items: stretch; }
 }
+
+/* REDISEÑO DE PESTAÑAS DEL RESUMEN DE GESTIÓN */
+.reportes-pagina .reportes-tabs {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 26px;
+    padding: 0 0 8px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--linea, #dce3ed);
+    border-radius: 0;
+    margin: 0 0 22px;
+}
+
+.reportes-pagina .reportes-tab {
+    position: relative;
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 10px 2px 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--muted, #64748b);
+    font-size: var(--fs-base);
+    font-weight: 700;
+    transition: color .2s ease;
+}
+
+.reportes-pagina .reportes-tab:hover:not(.activo) {
+    background: transparent;
+    color: var(--ink, #17263a);
+}
+
+.reportes-pagina .reportes-tab.activo {
+    background: transparent;
+    color: #ea5415;
+}
+
+.reportes-pagina .reportes-tab.activo::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -9px;
+    height: 3px;
+    border-radius: 3px;
+    background: #ea5415;
+}
+
+/* ICONOS DE LAS PESTAÑAS DE REPORTES */
+.reportes-pagina .reportes-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.reportes-pagina .reportes-tab svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+/* AVISO INFORMATIVO */
+.reportes-pagina .reportes-aviso-produccion {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 13px 0 0;
+    background: #f2f7fc;
+    border: 1px solid #dce8f4;
+    border-radius: 11px;
+    color: var(--texto-2, #36516d);
+}
+
+.reportes-pagina .reportes-aviso-produccion p {
+    margin: 0;
+    font-size: var(--fs-xs);
+    line-height: 1.55;
+}
+
+.reportes-pagina .reportes-aviso-produccion-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 19px;
+    width: 19px;
+    height: 19px;
+    color: #3979b8;
+}
+
+.reportes-pagina .reportes-aviso-produccion-icono svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+.reportes-pagina .reportes-aviso-produccion[hidden] {
+    display: none !important;
+}
+
+/* ENCABEZADO DEL REPORTE DE PRODUCCIÓN */
+.reportes-pagina .reportes-titulo-modulo h2 {
+    display: flex;           
+    align-items: center;   
+    gap: 9px;           
+}
+
+/* AVISOS INFORMATIVOS */
+.reportes-pagina .reportes-aviso-produccion,
+.reportes-pagina .reportes-aviso-procesamiento,
+.reportes-pagina .reportes-aviso-entregas {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 13px 0 0;
+    background: #f2f7fc;
+    border: 1px solid #dce8f4;
+    border-radius: 11px;
+    color: var(--texto-2, #36516d);
+}
+
+.reportes-pagina .reportes-aviso-produccion p,
+.reportes-pagina .reportes-aviso-procesamiento p,
+.reportes-pagina .reportes-aviso-entregas p {
+    margin: 0;
+    font-size: var(--fs-xs);
+    line-height: 1.55;
+}
+
+.reportes-pagina .reportes-aviso-produccion-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 19px;
+    width: 19px;
+    height: 19px;
+    color: #3979b8;
+}
+
+.reportes-pagina .reportes-aviso-produccion-icono svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+.reportes-pagina .reportes-aviso-produccion[hidden] {
+    display: none !important;
+}
+
+/* Mostrar descripciones y avisos según la pestaña seleccionada */
+.reportes-pagina [data-tab-descripcion][hidden] {
+    display: none !important;
+}
