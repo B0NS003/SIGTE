@@ -2770,3 +2770,63 @@
     width: 100%
   }
 }
+
+/* Alta de tipos de conjunto */
+#tab-nuevo-tipo-conjunto .nuevo-conjunto-panel {
+  max-width: 820px;
+  padding: 1.4rem;
+  border-radius: 16px;
+}
+
+#tab-nuevo-tipo-conjunto h2 {
+  margin: 0 0 .4rem;
+  color: var(--ink);
+}
+
+#tab-nuevo-tipo-conjunto .nuevo-conjunto-panel>p {
+  margin: 0 0 1.3rem;
+  color: var(--muted);
+}
+
+#tab-nuevo-tipo-conjunto .nuevo-conjunto-campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+#tab-nuevo-tipo-conjunto .nuevo-conjunto-campos label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--ink);
+}
+
+#tab-nuevo-tipo-conjunto .nuevo-conjunto-campos input,
+#tab-nuevo-tipo-conjunto .nuevo-conjunto-campos select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: .4rem;
+  padding: .7rem .8rem;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+#tab-nuevo-tipo-conjunto #nuevo-conjunto-mensaje {
+  padding: .7rem .8rem;
+  background: var(--card-2);
+  border-radius: 10px;
+}
+
+#tab-nuevo-tipo-conjunto #nuevo-conjunto-mensaje[hidden] {
+  display: none;
+}
+
+@media(max-width: 680px) {
+  #tab-nuevo-tipo-conjunto .nuevo-conjunto-campos {
+    grid-template-columns: 1fr;
+  }
+}

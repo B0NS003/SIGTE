@@ -33,6 +33,7 @@
             <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="instrumentos">Instrumentos</button>
             <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nueva-ficha">+ Nueva ficha</button>
             <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-instrumento">+ Nuevo instrumento</button>
+            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-tipo-conjunto">+ Nuevo tipo de conjunto</button>
         </nav>
         <div class="admin-panel-tab" id="tab-catalogo" role="tabpanel">
             <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-fichas"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Buscar por código, nombre, tipo o servicio…" autocomplete="off"></label></div>
@@ -229,6 +230,36 @@
                         <button type="button" class="instrumento-delete-photo" id="instrumento-quitar-foto" title="Quitar imagen" aria-label="Quitar imagen">✕</button>
                     </div>
                 </aside>
+            </div>
+        </section>
+        <section class="admin-panel-tab" id="tab-nuevo-tipo-conjunto" role="tabpanel" hidden>
+            <div class="panel nuevo-conjunto-panel">
+                <h2>Registrar nuevo tipo de conjunto</h2>
+                <p>El tipo quedará disponible para registrar instrumentos y crear fichas del servicio seleccionado.</p>
+                <form id="nuevo-conjunto-form" action="{{ route('mockups.catalogo.tipos-conjunto.guardar') }}" method="post">
+                    @csrf
+                    <p id="nuevo-conjunto-mensaje" role="status" aria-live="polite" hidden></p>
+                    <div class="nuevo-conjunto-campos">
+                        <label for="nuevo-conjunto-codigo">Código <span aria-hidden="true">*</span>
+                            <input id="nuevo-conjunto-codigo" name="codigo" type="text" maxlength="100" placeholder="Ej. RINO" required>
+                        </label>
+                        <label for="nuevo-conjunto-nombre">Nombre del conjunto <span aria-hidden="true">*</span>
+                            <input id="nuevo-conjunto-nombre" name="nombre_conjunto" type="text" maxlength="255" placeholder="Ej. Rinoplastía" required>
+                        </label>
+                        <label for="nuevo-conjunto-servicio">Servicio clínico <span aria-hidden="true">*</span>
+                            <select id="nuevo-conjunto-servicio" name="servicio_id" required>
+                                <option value="">Selecciona un servicio</option>
+                                @foreach ($serviciosFicha as $servicioFicha)
+                                    <option value="{{ $servicioFicha->id }}">{{ $servicioFicha->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button class="btn btn-ghost" type="reset">Limpiar</button>
+                        <button class="btn btn-primary" id="nuevo-conjunto-guardar" type="submit">Guardar tipo de conjunto</button>
+                    </div>
+                </form>
             </div>
         </section>
     </main>
@@ -588,6 +619,49 @@
     var fichaEditandoId = null;
     var serviciosFicha = @json($serviciosFicha);
     var tiposFicha = @json($tiposConjuntoInstrumento);
+    // Alta de conjuntos: actualiza ambos desplegables sin recargar la página.
+    document.getElementById('nuevo-conjunto-form').addEventListener('submit', async function (evento) {
+        evento.preventDefault();
+        if (!this.reportValidity()) return;
+        var mensaje = document.getElementById('nuevo-conjunto-mensaje');
+        var boton = document.getElementById('nuevo-conjunto-guardar');
+        var formulario = this;
+        boton.disabled = true;
+        boton.textContent = 'Guardando…';
+        mensaje.hidden = true;
+        try {
+            var respuesta = await fetch(formulario.action, {
+                method: 'POST',
+                body: new FormData(formulario),
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            });
+            var resultado = await respuesta.json();
+            if (!respuesta.ok) {
+                throw new Error(resultado.errors
+                    ? Object.values(resultado.errors).flat().join(' ')
+                    : (resultado.message || 'No fue posible guardar el tipo de conjunto.'));
+            }
+            var nuevo = resultado.tipo_conjunto;
+            tiposFicha.push(nuevo);
+            tiposFicha.sort(function (a, b) { return a.nombre_conjunto.localeCompare(b.nombre_conjunto, 'es'); });
+            var selectInstrumento = document.getElementById('instrumento-tipo-conjunto');
+            selectInstrumento.add(new Option(nuevo.nombre_conjunto, String(nuevo.id)));
+            // La ficha se filtra por servicio y solo admite conjuntos del servicio elegido.
+            poblarTipos();
+            formulario.reset();
+            mensaje.textContent = 'Tipo de conjunto registrado correctamente en la base de datos. Ya está disponible en Nuevo instrumento y Nueva ficha.';
+            mensaje.style.color = '#08765c';
+            mensaje.hidden = false;
+        } catch (error) {
+            mensaje.textContent = error.message || 'Error al guardar el tipo de conjunto.';
+            mensaje.style.color = '#b42318';
+            mensaje.hidden = false;
+        } finally {
+            boton.disabled = false;
+            boton.textContent = 'Guardar tipo de conjunto';
+        }
+    });
     var titulo = document.getElementById('ficha-titulo');
     var modo = document.getElementById('ficha-modo');
     var guardar = document.getElementById('ficha-guardar');

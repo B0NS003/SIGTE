@@ -218,6 +218,48 @@ class CatalogoController extends Controller
         ]);
     }
 
+    /** Crea un tipo de conjunto que puede utilizarse en instrumentos y fichas. */
+    public function guardarTipoConjunto(Request $request)
+    {
+        $datos = $request->validate([
+            'codigo' => ['required', 'string', 'max:100'],
+            'nombre_conjunto' => ['required', 'string', 'max:255'],
+            'servicio_id' => ['required', 'integer', 'exists:servicios,id'],
+        ]);
+
+        $codigo = mb_strtoupper(trim($datos['codigo']));
+        $nombre = trim($datos['nombre_conjunto']);
+        if ($codigo === '' || $nombre === '') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'codigo' => 'El código y el nombre son obligatorios.',
+            ]);
+        }
+        if (DB::table('tipo_conjunto')->whereRaw('UPPER(codigo) = ?', [$codigo])->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'codigo' => 'Ya existe un tipo de conjunto con ese código.',
+            ]);
+        }
+
+        $valores = [
+            'codigo' => $codigo,
+            'nombre_conjunto' => $nombre,
+            'servicio_id' => (int) $datos['servicio_id'],
+        ];
+        if (Schema::hasColumn('tipo_conjunto', 'created_at')) $valores['created_at'] = now();
+        if (Schema::hasColumn('tipo_conjunto', 'updated_at')) $valores['updated_at'] = now();
+        $id = DB::table('tipo_conjunto')->insertGetId($valores);
+
+        return response()->json([
+            'message' => 'Tipo de conjunto registrado correctamente.',
+            'tipo_conjunto' => [
+                'id' => $id,
+                'codigo' => $codigo,
+                'nombre_conjunto' => $nombre,
+                'servicio_id' => (int) $datos['servicio_id'],
+            ],
+        ], 201);
+    }
+
     public function guardarInstrumento(Request $request)
     {
         // La ruta debe permanecer protegida por los middleware auth y acceso.

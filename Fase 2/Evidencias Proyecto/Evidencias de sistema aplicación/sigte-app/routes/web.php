@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/catalogo', [CatalogoController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
         Route::post('/admin/catalogo/fichas', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.guardar');
         Route::put('/admin/catalogo/fichas/{ficha}', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.actualizar');
+        Route::post('/admin/catalogo/tipos-conjunto', [CatalogoController::class, 'guardarTipoConjunto'])->name('mockups.catalogo.tipos-conjunto.guardar');
         Route::post('/admin/catalogo/instrumentos', [CatalogoController::class, 'guardarInstrumento'])->name('mockups.catalogo.instrumentos.guardar');
         Route::get('/consulta/catalogo/{codigo}', [CatalogoController::class, 'ficha'])->name('mockups.ficha');
 
@@ -57,8 +58,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/usuarios/{user}/estado', [AdminController::class, 'cambiarEstadoUsuario'])->name('mockups.usuarios.estado');
         Route::get('/admin/reportes', [AdminController::class, 'reportes'])->name('mockups.reportes');
         Route::get('/admin/reportes/exportar', [AdminController::class, 'exportarReportes'])->name('mockups.reportes.exportar');
-        Route::get('/admin/reportes/excel', [AdminController::class, 'exportarReportesExcel'])->name('mockups.reportes.excel');
-        Route::get('/admin/reportes/pdf', [AdminController::class, 'exportarReportesPdf'])->name('mockups.reportes.pdf');
         Route::get('/admin/entregas', [AdminController::class, 'historialEntregas'])->name('mockups.historial_entregas');
         Route::get('/admin/custodia', [AdminController::class, 'custodia'])->name('mockups.custodia');
         Route::get('/admin/alertas', [AdminController::class, 'alertas'])->name('mockups.alertas');
@@ -71,7 +70,5 @@ Route::middleware('auth')->group(function () {
         Route::post('/secretaria/insumos/movimientos', [SecretariaController::class, 'guardarMovimiento'])->name('secretaria.insumos.movimiento');
         Route::get('/secretaria/reportes', [SecretariaController::class, 'reportes'])->name('secretaria.reportes');
         Route::get('/secretaria/reportes/exportar', [SecretariaController::class, 'exportarReportes'])->name('secretaria.reportes.exportar');
-        Route::get('/secretaria/reportes/excel', [SecretariaController::class, 'exportarReportesExcel'])->name('secretaria.reportes.excel');
-        Route::get('/secretaria/reportes/pdf', [SecretariaController::class, 'exportarReportesPdf'])->name('secretaria.reportes.pdf');
     });
 });
