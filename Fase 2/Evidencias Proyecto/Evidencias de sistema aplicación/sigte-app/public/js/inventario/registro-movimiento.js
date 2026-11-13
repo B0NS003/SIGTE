@@ -360,13 +360,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 botonSeleccionado.dataset.stock = datos.elemento.stock;
                 botonSeleccionado.dataset.enProceso = datos.elemento.en_proceso;
 
-                const fila = botonSeleccionado.closest('tr');
+                /* ACTUALIZAR LA FICHA DEL INSUMO */
+                const tarjeta = botonSeleccionado.closest('.inv-insumo-card');
 
-                if (fila) {
-                    const stockAnterior = Number(fila.dataset.stock);
-                    const procesoAnterior = Number(fila.dataset.enProceso);
-                    const estadoAnterior = fila.dataset.estado;
+                if (tarjeta) {
 
+                    const stockAnterior = Number(tarjeta.dataset.stock);
+                    const procesoAnterior = Number(tarjeta.dataset.enProceso);
+                    const estadoAnterior = tarjeta.dataset.estado;
+
+                    // Calcular el nuevo estado del insumo.
                     const nuevoEstado = datos.elemento.stock <= 0 ||
                         (datos.elemento.minimo > 0 &&
                             datos.elemento.stock <= Math.floor(datos.elemento.minimo / 2))
@@ -375,62 +378,95 @@ document.addEventListener('DOMContentLoaded', () => {
                             ? 'bajo'
                             : 'ok';
 
-                    fila.dataset.stock = datos.elemento.stock;
-                    fila.dataset.enProceso = datos.elemento.en_proceso;
-                    fila.dataset.estado = nuevoEstado;
+                    // Actualizar los datos internos de la ficha.
+                    tarjeta.dataset.stock = datos.elemento.stock;
+                    tarjeta.dataset.enProceso = datos.elemento.en_proceso;
+                    tarjeta.dataset.estado = nuevoEstado;
 
-                    fila.cells[3].textContent = datos.elemento.stock;
-                    fila.cells[5].textContent = datos.elemento.en_proceso;
+                    // Actualizar los indicadores de stock.
+                    tarjeta.querySelector('.inv-insumo-stock').textContent =
+                        datos.elemento.stock;
 
-                    fila.classList.remove('stock-ok', 'stock-bajo', 'stock-critico');
-                    fila.classList.add(`stock-${nuevoEstado}`);
+                    tarjeta.querySelector('.inv-insumo-proceso').textContent =
+                        datos.elemento.en_proceso;
 
-                    const celdaEstado = fila.cells[6];
-                    celdaEstado.replaceChildren();
+                    // Actualizar el color superior de la ficha.
+                    tarjeta.classList.remove(
+                        'stock-ok',
+                        'stock-bajo',
+                        'stock-critico'
+                    );
 
-                    const indicador = document.createElement('span');
-                    indicador.className = nuevoEstado === 'ok'
-                        ? 'pill pill-ok'
-                        : nuevoEstado === 'bajo'
-                            ? 'pill pill-warn'
-                            : 'pill pill-danger';
+                    tarjeta.classList.add(`stock-${nuevoEstado}`);
 
-                    indicador.textContent = nuevoEstado === 'ok'
-                        ? 'OK'
-                        : nuevoEstado === 'bajo'
-                            ? 'Bajo mínimo'
-                            : 'Crítico';
+                    // Actualizar la etiqueta del estado.
+                    const contenedorEstado = tarjeta.querySelector('.inv-insumo-estado');
 
-                    celdaEstado.append(indicador);
+                    if (contenedorEstado) {
 
+                        contenedorEstado.replaceChildren();
+
+                        const indicador = document.createElement('span');
+
+                        indicador.className = nuevoEstado === 'ok'
+                            ? 'pill pill-ok'
+                            : nuevoEstado === 'bajo'
+                                ? 'pill pill-warn'
+                                : 'pill pill-danger';
+
+                        indicador.textContent = nuevoEstado === 'ok'
+                            ? 'OK'
+                            : nuevoEstado === 'bajo'
+                                ? 'Bajo mínimo'
+                                : 'Crítico';
+
+                        contenedorEstado.append(indicador);
+                    }
+
+                    // Actualizar los datos de los botones de acción de la ficha.
+                    tarjeta.querySelectorAll('button').forEach((boton) => {
+                        boton.dataset.stock = datos.elemento.stock;
+                        boton.dataset.enProceso = datos.elemento.en_proceso;
+                        boton.dataset.minimo = datos.elemento.minimo;
+                    });
+
+                    // Actualizar los contadores generales del inventario.
                     const totalStock = document.getElementById('inv-total-stock');
                     const totalProceso = document.getElementById('inv-total-proceso');
                     const totalBajo = document.getElementById('inv-total-bajo');
                     const alertaResumen = document.getElementById('inv-alerta-resumen');
 
-                    totalStock.textContent =
-                        Number(totalStock.textContent) +
-                        Number(datos.elemento.stock) - stockAnterior;
+                    if (totalStock) {
+                        totalStock.textContent =
+                            Number(totalStock.textContent) +
+                            Number(datos.elemento.stock) - stockAnterior;
+                    }
 
-                    totalProceso.textContent =
-                        Number(totalProceso.textContent) +
-                        Number(datos.elemento.en_proceso) - procesoAnterior;
+                    if (totalProceso) {
+                        totalProceso.textContent =
+                            Number(totalProceso.textContent) +
+                            Number(datos.elemento.en_proceso) - procesoAnterior;
+                    }
 
-                    totalBajo.textContent =
-                        Number(totalBajo.textContent) +
-                        (nuevoEstado !== 'ok' ? 1 : 0) -
-                        (estadoAnterior !== 'ok' ? 1 : 0);
+                    if (totalBajo) {
+                        totalBajo.textContent =
+                            Number(totalBajo.textContent) +
+                            (nuevoEstado !== 'ok' ? 1 : 0) -
+                            (estadoAnterior !== 'ok' ? 1 : 0);
+                    }
 
-                    alertaResumen.classList.toggle(
-                        'is-alert',
-                        Number(totalBajo.textContent) > 0
-                    );
+                    if (alertaResumen && totalBajo) {
+                        alertaResumen.classList.toggle(
+                            'is-alert',
+                            Number(totalBajo.textContent) > 0
+                        );
+                    }
                 }
-            }
+                cantidad.value = '';
+                guardar.disabled = true;
+                cargarHistorial();
 
-            cantidad.value = '';
-            guardar.disabled = true;
-            cargarHistorial();
+            }
 
         } catch (e) {
             error.textContent = e.message;

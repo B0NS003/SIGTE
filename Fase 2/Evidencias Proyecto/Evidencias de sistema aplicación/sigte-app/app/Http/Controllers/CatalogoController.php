@@ -143,6 +143,42 @@ class CatalogoController extends Controller
             'hay_filtros' => $busqueda !== '' || $servicio !== '',
         ]);
     }
+
+    // PARA CONECTAR CON INVENTARIO
+    public function imagenFicha(int $id)
+    {
+        $ficha = DB::table('fichas')
+            ->where('id', $id)
+            ->first(['imagen', 'imagen_formato']);
+
+        abort_if(!$ficha || !$ficha->imagen, 404);
+
+        $bytes = $ficha->imagen;
+
+        if (is_resource($bytes)) {
+            $bytes = stream_get_contents($bytes);
+        }
+
+        if (is_string($bytes) && str_starts_with($bytes, '\\x')) {
+            $bytes = hex2bin(substr($bytes, 2));
+        }
+
+        abort_unless(is_string($bytes) && $bytes !== '', 404);
+
+        $mime = (string) ($ficha->imagen_formato ?? '');
+
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($bytes);
+        }
+
+        abort_unless(in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true), 404);
+
+        return response($bytes, 200, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'private, max-age=3600',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
     public function catalogoAdmin(Request $request)
     {
         // Se reutiliza la ruta GET existente para entregar fotografías sin modificar web.php.

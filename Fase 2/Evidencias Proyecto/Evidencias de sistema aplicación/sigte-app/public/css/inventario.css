@@ -467,12 +467,14 @@ html[data-tema="oscuro"] .inv-switch-item.sala-todos.is-active {
 
 .inv-paginacion {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 0.9rem;
-    padding-top: 0.85rem;
-    border-top: 1px solid var(--borde);
+    gap: 0.65rem;
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    background: var(--card-2);
 }
 
 .inv-paginacion-info {
@@ -500,61 +502,75 @@ html[data-tema="oscuro"] .inv-switch-item.sala-todos.is-active {
 
 .inv-paginacion-controles {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.3rem;
 }
 
 .inv-rango {
     margin-right: 0.35rem;
     color: var(--muted);
     font-size: var(--fs-sm);
+    font-weight: 700;
     white-space: nowrap;
 }
 
 .inv-pagina-btn,
 .inv-pagina-numero {
-    width: 32px;
-    height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    padding: 0;
+    min-width: 2.15rem;
+    height: 2.15rem;
+    padding: 0 0.55rem;
     border: 1px solid var(--borde);
     border-radius: 8px;
-
     background: var(--card);
     color: var(--ink);
-
     font-size: var(--fs-sm);
-    font-weight: 600;
-
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
     cursor: pointer;
-
     transition:
         background-color .15s ease,
         border-color .15s ease,
-        color .15s ease,
-        transform .15s ease;
+        color .15s ease;
 }
 
 .inv-pagina-btn:hover:not(:disabled),
-.inv-pagina-numero:hover {
-    background: var(--card-2);
-    border-color: var(--ink);
+.inv-pagina-numero:hover:not(:disabled) {
+    border-color: var(--naranja-linea, #fdba74);
+    color: var(--ink);
 }
 
-/* COLOR UNIFORME DE PAGINACIÓN */
+.inv-pagina-btn:disabled {
+    color: #cbd5e1;
+    background: var(--superficie-3, #f1f5f9);
+    cursor: default;
+}
+
 .inv-pagina-numero.is-active {
     background: var(--navy);
     border-color: var(--navy);
     color: #fff;
 }
 
+.inv-pagina-numero.is-gap {
+    min-width: 1.4rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: default;
+    pointer-events: none;
+}
+
 /* BOTONES DE ACCIÓN DEL INVENTARIO */
 .inv-editar-stock,
 .inv-registrar-consumo,
-.inv-configurar-minimo {
+.inv-configurar-minimo,
+.inv-abrir-movimiento {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -571,14 +587,16 @@ html[data-tema="oscuro"] .inv-switch-item.sala-todos.is-active {
 
 .inv-editar-stock:hover,
 .inv-registrar-consumo:hover,
-.inv-configurar-minimo:hover {
+.inv-configurar-minimo:hover,
+.inv-abrir-movimiento:hover {
     background-color: var(--navy);
     color: #ffffff;
 }
 
 .inv-editar-stock:focus-visible,
 .inv-registrar-consumo:focus-visible,
-.inv-configurar-minimo:focus-visible {
+.inv-configurar-minimo:focus-visible,
+.inv-abrir-movimiento:focus-visible {
     outline: 2px solid var(--navy);
     outline-offset: 2px;
 }
@@ -690,4 +708,423 @@ html[data-tema="oscuro"] .inv-switch-item.sala-todos.is-active {
         opacity: 1;
         transform: translate(-50%, 0);
     }
+}
+/* FICHAS DE INSUMOS DEL INVENTARIO */
+.inv-insumos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 18px;
+    width: 100%;
+}
+
+/* NUEVO: ESTRUCTURA PRINCIPAL DE CADA FICHA */
+.inv-insumo-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.inv-insumo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+/* NUEVO: ESPACIO PARA LA FUTURA IMAGEN DEL INSUMO */
+.inv-insumo-imagen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+.inv-insumo-imagen img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.inv-insumo-imagen-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.inv-insumo-imagen-placeholder[hidden] {
+    display: none !important;
+}
+
+.inv-insumo-imagen svg {
+    width: 48px;
+    height: 48px;
+}
+
+/* NUEVO: CONTENIDO DE LA FICHA */
+.inv-insumo-contenido {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.inv-insumo-codigo {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.inv-insumo-nombre {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.inv-insumo-ubicacion {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* NUEVO: INDICADORES DE STOCK */
+.inv-insumo-indicadores {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.inv-insumo-indicador {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    padding: 10px 8px;
+    background: #f8fafc;
+    border-radius: 9px;
+    text-align: center;
+}
+
+.inv-insumo-indicador span {
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.3;
+}
+
+.inv-insumo-indicador strong {
+    color: #1e293b;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+/* NUEVO: ESTADO Y ACCIONES */
+.inv-insumo-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.inv-insumo-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inv-insumo-acciones button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* NUEVO: DISTINCIÓN VISUAL SEGÚN EL ESTADO DEL STOCK */
+.inv-insumo-card.stock-ok {
+    border-top: 3px solid #16a34a;
+}
+
+.inv-insumo-card.stock-bajo {
+    border-top: 3px solid #d97706;
+}
+
+.inv-insumo-card.stock-critico {
+    border-top: 3px solid #dc2626;
+}
+
+/* NUEVO: MENSAJE SIN RESULTADOS */
+.inv-sin-resultados {
+    grid-column: 1 / -1;
+    padding: 28px 16px;
+    color: #64748b;
+    text-align: center;
+}
+
+/* OCULTAR FICHAS FUERA DE LA PÁGINA ACTUAL */
+#cuerpo-inventario > .inv-insumo-card[hidden],
+#cuerpo-inventario > .inv-insumo-card.is-pagina-oculta {
+    display: none !important;
+}
+
+/* MATERIAL ESTÉRIL: VISTA DE LISTA */
+.inv-book.sala-esteril .inv-esteril-encabezado {
+    display: grid;
+    grid-template-columns: minmax(250px, 2fr) minmax(110px, 0.9fr)
+        minmax(120px, 0.8fr) minmax(140px, 1fr);
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    border-bottom: 1px solid var(--borde);
+}
+
+.inv-book.sala-esteril .inv-esteril-fila {
+    display: grid;
+    grid-template-columns: minmax(250px, 2fr) minmax(110px, 0.9fr)
+        minmax(120px, 0.8fr) minmax(140px, 1fr);
+    gap: 16px;
+    align-items: center;
+    min-height: 88px;
+    padding: 12px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--borde);
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--card);
+}
+
+.inv-book.sala-esteril .inv-esteril-fila:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--card-2);
+}
+
+/* Imagen e identificación */
+.inv-book.sala-esteril .inv-esteril-material {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.inv-book.sala-esteril .inv-esteril-imagen {
+    display: flex;
+    flex: 0 0 60px;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 9px;
+    background: var(--superficie-3, #f1f5f9);
+}
+
+.inv-book.sala-esteril .inv-esteril-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.inv-book.sala-esteril .inv-esteril-identificacion {
+    min-width: 0;
+}
+
+.inv-book.sala-esteril .inv-insumo-codigo {
+    margin-bottom: 3px;
+}
+
+.inv-book.sala-esteril .inv-insumo-nombre {
+    overflow-wrap: anywhere;
+}
+
+/* Servicio, stock y ubicación */
+.inv-book.sala-esteril .inv-esteril-servicio,
+.inv-book.sala-esteril .inv-esteril-stock,
+.inv-book.sala-esteril .inv-esteril-ubicacion {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    overflow-wrap: anywhere;
+}
+
+.inv-book.sala-esteril .inv-esteril-etiqueta {
+    display: none;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+
+.inv-book.sala-esteril .inv-esteril-stock strong {
+    color: var(--ink);
+    font-size: var(--fs-lg);
+}
+
+.inv-book.sala-esteril .inv-insumos-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+}
+
+/* Imagen alternativa para fichas sin fotografía */
+.inv-book.sala-esteril .inv-esteril-imagen {
+    position: relative;
+    background: #f1f5f9;
+}
+
+.inv-book.sala-esteril .inv-esteril-sin-imagen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: #7890ad;
+}
+
+.inv-book.sala-esteril .inv-esteril-sin-imagen[hidden] {
+    display: none !important;
+}
+
+.inv-book.sala-esteril .inv-esteril-sin-imagen svg {
+    width: 38px;
+    height: 38px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.inv-book.sala-esteril .inv-esteril-sin-imagen span {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* LAVADO Y ARMADO: INVENTARIO EN FILAS */
+.inv-book.sala-lavado #cuerpo-inventario,
+.inv-book.sala-armado #cuerpo-inventario {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.inv-book.sala-lavado .inv-insumo-lista-encabezado,
+.inv-book.sala-armado .inv-insumo-lista-encabezado {
+    display: grid;
+    grid-template-columns: 60px minmax(180px, 2fr) repeat(3, minmax(75px, 0.65fr)) minmax(105px, 0.8fr) 90px;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    border-bottom: 1px solid var(--borde);
+}
+
+.inv-book.sala-lavado .inv-insumo-card,
+.inv-book.sala-armado .inv-insumo-card {
+    display: grid;
+    grid-template-columns: 60px minmax(180px, 2fr) repeat(3, minmax(75px, 0.65fr)) minmax(105px, 0.8fr) 90px;
+    gap: 12px;
+    align-items: center;
+    min-height: 76px;
+    padding: 12px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--borde);
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--card);
+}
+
+.inv-book.sala-lavado .inv-insumo-card:hover,
+.inv-book.sala-armado .inv-insumo-card:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--card-2);
+}
+.inv-book.sala-lavado .inv-insumo-contenido,
+.inv-book.sala-armado .inv-insumo-contenido {
+    display: contents;
+}
+
+.inv-book.sala-lavado .inv-insumo-identificacion,
+.inv-book.sala-armado .inv-insumo-identificacion {
+    min-width: 0;
+}
+
+.inv-book.sala-lavado .inv-insumo-nombre,
+.inv-book.sala-armado .inv-insumo-nombre {
+    overflow-wrap: anywhere;
+}
+
+.inv-book.sala-lavado .inv-insumo-ubicacion,
+.inv-book.sala-armado .inv-insumo-ubicacion {
+    margin: 3px 0 0;
+    font-size: var(--fs-xs);
+}
+
+.inv-book.sala-lavado .inv-insumo-indicadores,
+.inv-book.sala-armado .inv-insumo-indicadores {
+    display: contents;
+}
+
+.inv-book.sala-lavado .inv-insumo-indicador,
+.inv-book.sala-armado .inv-insumo-indicador {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    background: transparent;
+}
+
+.inv-book.sala-lavado .inv-insumo-indicador span,
+.inv-book.sala-armado .inv-insumo-indicador span {
+    font-size: var(--fs-xs);
+}
+
+.inv-book.sala-lavado .inv-insumo-indicador strong,
+.inv-book.sala-armado .inv-insumo-indicador strong {
+    font-size: var(--fs-md);
+}
+
+.inv-book.sala-lavado .inv-insumo-pie,
+.inv-book.sala-armado .inv-insumo-pie {
+    display: contents;
+}
+
+.inv-book.sala-lavado .inv-insumo-estado,
+.inv-book.sala-armado .inv-insumo-estado {
+    display: flex;
+    justify-content: center;
+}
+
+.inv-book.sala-lavado .inv-insumo-acciones,
+.inv-book.sala-armado .inv-insumo-acciones {
+    justify-content: center;
 }

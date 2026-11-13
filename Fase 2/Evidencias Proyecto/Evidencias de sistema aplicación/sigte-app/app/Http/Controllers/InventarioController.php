@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
 use App\Models\ElementoInventario;
+use App\Models\Ficha;
 use App\Models\Reposicion;
 use App\Models\MovimientoInsumo;
 use App\Models\Rol;
@@ -32,6 +33,7 @@ class InventarioController extends Controller
                 'sala' => $elemento->codigoSala(),
                 'codigo' => $elemento->codigo,
                 'nombre' => $elemento->nombre,
+                'imagen' => $elemento->imagen,
                 'ubicacion' => $elemento->ubicacion,
                 'stock' => $elemento->stock,
                 'minimo' => $elemento->minimo,
@@ -71,19 +73,79 @@ class InventarioController extends Controller
             ->paginate($cajasPorPagina, ['*'], 'cajas_armado_page')
             ->appends(request()->except('cajas_armado_page'));
 
+        $cajasEnAlmacen = Caja::query()
+            ->whereIn('etapa', [
+                Caja::ETAPA_ALMACEN,
+                Caja::ETAPA_ENTREGA,
+            ])
+            ->whereNull('entregado_at')
+            ->whereNotNull('ficha_id')
+            ->orderBy('codigo')
+            ->get()
+            ->groupBy('ficha_id');
+
+        $cajasEsteril = Ficha::query()
+            ->select(['id', 'codigo', 'nombre', 'servicio_id', 'imagen_formato'])
+            ->with('servicioClinico')
+            ->orderBy('nombre')
+            ->get()
+            ->map(function (Ficha $ficha) use ($cajasEnAlmacen) {
+                $cajas = $cajasEnAlmacen->get($ficha->id, collect());
+
+                return [
+                    'ficha_id' => $ficha->id,
+                    'codigo' => $ficha->codigo,
+                    'nombre' => $ficha->nombre,
+                    'servicio' => $ficha->servicioClinico?->nombre ?? 'Sin servicio',
+                    'imagen_formato' => $ficha->imagen_formato,
+                    'stock' => $cajas->count(),
+                    'ubicaciones' => $cajas->pluck('ubicacion')
+                        ->filter()
+                        ->unique()
+                        ->values(),
+                    'cajas' => $cajas->map(fn($caja) => [
+                        'codigo' => $caja->codigo,
+                        'ubicacion' => $caja->ubicacion ?? 'Sin ubicación',
+                        'ingreso' => $caja->etapa_desde,
+                    ])->values(),
+                ];
+            })
+            ->values();
+
         $salas = [
             'lavado' => 'Sala lavado',
             'armado' => 'Sala armado',
             'esteril' => 'Material estéril',
         ];
-        $sala = request()->query('sala', 'todos');
+
+        $rol = Auth::user()->nombreRol();
+
+        $salaPredeterminada = $rol === Rol::OPERADOR ? 'lavado' : 'todos';
+
+        $sala = request()->query('sala', $salaPredeterminada);
+
         if ($sala !== 'todos' && ! isset($salas[$sala])) {
-            $sala = 'todos';
+            $sala = $salaPredeterminada;
         }
         $busqueda = trim((string) request()->query('q', ''));
         $libros = [];
+
         foreach ($salas as $clave => $nombre) {
+            if ($clave === 'esteril') {
+                $libros[] = [
+                    'clave' => $clave,
+                    'nombre' => $nombre,
+                    'tipos' => $cajasEsteril->count(),
+                    'stock' => (int) $cajasEsteril->sum('stock'),
+                    'bajo' => 0,
+                    'en_proceso' => 0,
+                ];
+
+                continue;
+            }
+
             $delLibro = collect($items)->where('sala', $clave);
+
             $libros[] = [
                 'clave' => $clave,
                 'nombre' => $nombre,
@@ -94,12 +156,12 @@ class InventarioController extends Controller
             ];
         }
 
-        $itemsSala = $sala === 'todos'
+        $itemsSala = in_array($sala, ['todos', 'esteril'], true)
             ? collect()
             : collect($items)
             ->where('sala', $sala)
             ->sortBy(fn(array $item) => [
-                'crítico' => 0,
+                'critico' => 0,
                 'bajo' => 1,
                 'ok' => 2,
             ][$item['estado']] ?? 9)
@@ -109,6 +171,7 @@ class InventarioController extends Controller
 
         /* JERARQUÍA PARA EL ELEMENTO A REPONER */
         $atencion = collect($items)
+            ->whereIn('sala', ['lavado', 'armado'])
             ->whereIn('estado', ['bajo', 'critico'])
             ->sortBy(function ($item) {
                 $prioridadEstado = [
@@ -119,7 +182,6 @@ class InventarioController extends Controller
                 $stock = (float) $item['stock'];
                 $minimo = (float) $item['minimo'];
 
-                // Calcula cuánto stock hay en relación con el mínimo requerido.
                 $proporcionStock = $minimo > 0
                     ? $stock / $minimo
                     : 1;
@@ -129,7 +191,6 @@ class InventarioController extends Controller
             ->values()
             ->all();
 
-        $rol = Auth::user()->nombreRol();
         return view('inventario.index', [
             'usuario' => $this->usuarioSesion(),
             'rol' => $rol,
@@ -145,16 +206,27 @@ class InventarioController extends Controller
             'items' => $filtrados,
             'cajasLavado' => $cajasLavado,
             'cajasArmado' => $cajasArmado,
+            'cajasEsteril' => $cajasEsteril,
             'elementos' => $sala === 'todos'
                 ? []
                 : collect($items)->where('sala', $sala)->values()->all(),
             'atencion' => $atencion,
             'resumen' => [
-                'tipos' => $itemsSala->count(),
-                'bajo_minimo' => $itemsSala
-                    ->whereIn('estado', ['bajo', 'critico'])->count(),
-                'en_almacen' => $itemsSala->sum('stock'),
-                'en_proceso' => $itemsSala->sum('en_proceso'),
+                'tipos' => $sala === 'esteril'
+                    ? $cajasEsteril->count()
+                    : $itemsSala->count(),
+
+                'bajo_minimo' => $sala === 'esteril'
+                    ? 0
+                    : $itemsSala->whereIn('estado', ['bajo', 'critico'])->count(),
+
+                'en_almacen' => $sala === 'esteril'
+                    ? (int) $cajasEsteril->sum('stock')
+                    : (int) $itemsSala->sum('stock'),
+
+                'en_proceso' => $sala === 'esteril'
+                    ? 0
+                    : (int) $itemsSala->sum('en_proceso'),
             ],
             'fecha' => now()->timezone('America/Santiago')->format('d/m/Y'),
             'hora' => now()->timezone('America/Santiago')->format('H:i'),

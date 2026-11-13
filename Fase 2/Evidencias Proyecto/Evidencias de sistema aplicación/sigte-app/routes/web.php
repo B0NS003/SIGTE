@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/operador/entrega', [FlujoController::class, 'registrarEntrega'])->name('mockups.entrega.registrar');
         Route::get('/consulta/catalogo', [CatalogoController::class, 'catalogo'])->name('mockups.catalogo');
         Route::get('/admin/catalogo', [CatalogoController::class, 'catalogoAdmin'])->name('mockups.catalogo.admin');
+        Route::get('/fichas/{id}/imagen', [CatalogoController::class, 'imagenFicha'])->whereNumber('id')->name('fichas.imagen');
         Route::post('/admin/catalogo/fichas', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.guardar');
         Route::put('/admin/catalogo/fichas/{ficha}', [CatalogoController::class, 'guardarFicha'])->name('mockups.catalogo.fichas.actualizar');
         Route::post('/admin/catalogo/instrumentos', [CatalogoController::class, 'guardarInstrumento'])->name('mockups.catalogo.instrumentos.guardar');

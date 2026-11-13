@@ -181,6 +181,11 @@ class DatabaseSeeder extends Seeder
             ['sala' => 'lavado', 'codigo' => 'CEP-NYL', 'nombre' => 'Cepillos nylon instrumental', 'ubicacion' => 'Meson lavado', 'stock' => 2, 'minimo' => 8, 'en_proceso' => 0], // critico
             ['sala' => 'lavado', 'codigo' => 'LUB-INS', 'nombre' => 'Lubricante instrumental', 'ubicacion' => 'Estante quimicos', 'stock' => 14, 'minimo' => 6, 'en_proceso' => 1], // ok
             ['sala' => 'lavado', 'codigo' => 'BOL-BIO', 'nombre' => 'Bolsas rojas biologicas', 'ubicacion' => 'Area sucia', 'stock' => 0, 'minimo' => 10, 'en_proceso' => 0], // critico
+            ['sala' => 'lavado', 'codigo' => 'DET-NEU', 'nombre' => 'Detergente neutro instrumental', 'ubicacion' => 'Estante quimicos', 'stock' => 12, 'minimo' => 6, 'en_proceso' => 0],
+            ['sala' => 'lavado', 'codigo' => 'AGU-DES', 'nombre' => 'Agua desmineralizada', 'ubicacion' => 'Bodega area limpia', 'stock' => 18, 'minimo' => 8, 'en_proceso' => 0],
+            ['sala' => 'lavado', 'codigo' => 'CEP-LUM', 'nombre' => 'Cepillos para lumens', 'ubicacion' => 'Meson lavado', 'stock' => 5, 'minimo' => 8, 'en_proceso' => 0],
+            ['sala' => 'lavado', 'codigo' => 'PAN-SEC', 'nombre' => 'Paños sin pelusas', 'ubicacion' => 'Puesto secado', 'stock' => 15, 'minimo' => 8, 'en_proceso' => 0],
+
             // Sala armado
             ['sala' => 'armado', 'codigo' => 'WRAP-SMS', 'nombre' => 'Envoltorio SMS 60x60', 'ubicacion' => 'Mesas de armado', 'stock' => 35, 'minimo' => 25, 'en_proceso' => 0], // ok
             ['sala' => 'armado', 'codigo' => 'IND-CLASE5', 'nombre' => 'Indicadores clase 5', 'ubicacion' => 'Estante armado', 'stock' => 12, 'minimo' => 20, 'en_proceso' => 0], // bajo
@@ -188,6 +193,11 @@ class DatabaseSeeder extends Seeder
             ['sala' => 'armado', 'codigo' => 'CIN-AUTO', 'nombre' => 'Cinta autoclave', 'ubicacion' => 'Cajon rotulado', 'stock' => 3, 'minimo' => 12, 'en_proceso' => 0], // critico
             ['sala' => 'armado', 'codigo' => 'ETQ-TRAZ', 'nombre' => 'Etiquetas de trazabilidad', 'ubicacion' => 'Impresora armado', 'stock' => 18, 'minimo' => 30, 'en_proceso' => 0], // bajo
             ['sala' => 'armado', 'codigo' => 'FIL-QUIM', 'nombre' => 'Filtros quimicos contenedor', 'ubicacion' => 'Estante filtros', 'stock' => 40, 'minimo' => 15, 'en_proceso' => 4], // ok
+            ['sala' => 'armado', 'codigo' => 'BAN-INS', 'nombre' => 'Bandejas para instrumental', 'ubicacion' => 'Area preparacion', 'stock' => 10, 'minimo' => 5, 'en_proceso' => 0],
+            ['sala' => 'armado', 'codigo' => 'PRO-PUN', 'nombre' => 'Protectores de puntas de instrumental', 'ubicacion' => 'Mesas de armado', 'stock' => 20, 'minimo' => 10, 'en_proceso' => 0],
+            ['sala' => 'armado', 'codigo' => 'IND-CLASE4', 'nombre' => 'Indicadores quimicos clase 4', 'ubicacion' => 'Estante armado', 'stock' => 20, 'minimo' => 10, 'en_proceso' => 0],
+            ['sala' => 'armado', 'codigo' => 'MAR-EST', 'nombre' => 'Marcadores para esterilizacion', 'ubicacion' => 'Cajon rotulado', 'stock' => 10, 'minimo' => 5, 'en_proceso' => 0],
+
             // Material esteril / almacen
             ['sala' => 'esteril', 'codigo' => 'SET-LAP-01', 'nombre' => 'Set laparoscopia basico', 'ubicacion' => 'Almacen esteril A1', 'stock' => 4, 'minimo' => 3, 'en_proceso' => 2], // ok
             ['sala' => 'esteril', 'codigo' => 'SET-CES-02', 'nombre' => 'Set cesarea', 'ubicacion' => 'Almacen esteril A2', 'stock' => 2, 'minimo' => 3, 'en_proceso' => 1], // bajo

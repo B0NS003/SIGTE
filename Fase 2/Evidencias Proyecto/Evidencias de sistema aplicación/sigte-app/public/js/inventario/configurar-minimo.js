@@ -179,21 +179,29 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             if (botonElemento) {
-                botonElemento.dataset.minimo = elemento.minimo;
 
-                // ACTUALIZAR TAMBIÉN LA CELDA DEL MÍNIMO EN LA MISMA FILA
-                const fila = botonElemento.closest('tr');
-                const celdaMinimo = fila?.querySelector('[data-minimo-celda]');
+                // BUSCAR LA FICHA DEL INSUMO
+                const tarjeta = botonElemento.closest('.inv-insumo-card');
 
-                if (celdaMinimo) {
-                    celdaMinimo.textContent = elemento.minimo;
-                }
+                if (tarjeta) {
 
-                // ACTUALIZAR EL ESTADO Y COLOR DE LA FILA
-                if (fila) {
                     const stock = Number(elemento.stock);
                     const minimo = Number(elemento.minimo);
+                    const estadoAnterior = tarjeta.dataset.estado;
 
+                    // ACTUALIZAR LOS DATOS INTERNOS DE LA FICHA
+                    tarjeta.dataset.minimo = minimo;
+
+                    // ACTUALIZAR EL MÍNIMO VISIBLE
+                    const indicadorMinimo = tarjeta.querySelector(
+                        '.inv-insumo-minimo[data-minimo-celda]'
+                    );
+
+                    if (indicadorMinimo) {
+                        indicadorMinimo.textContent = minimo;
+                    }
+
+                    // CALCULAR EL NUEVO ESTADO DEL INSUMO
                     let estado;
 
                     if (stock <= 0 || (minimo > 0 && stock <= Math.floor(minimo / 2))) {
@@ -204,25 +212,65 @@ document.addEventListener('DOMContentLoaded', () => {
                         estado = 'ok';
                     }
 
-                    fila.classList.remove('stock-critico', 'stock-bajo', 'stock-ok');
-                    fila.classList.add(`stock-${estado}`);
-                    fila.dataset.estado = estado;
+                    // ACTUALIZAR EL ESTADO INTERNO Y EL COLOR DE LA FICHA
+                    tarjeta.dataset.estado = estado;
 
-                    const celdaEstado = fila.querySelector('.pill');
+                    tarjeta.classList.remove(
+                        'stock-critico',
+                        'stock-bajo',
+                        'stock-ok'
+                    );
 
-                    if (celdaEstado) {
-                        celdaEstado.classList.remove('pill-ok', 'pill-warn', 'pill-danger');
+                    tarjeta.classList.add(`stock-${estado}`);
 
-                        if (estado === 'critico') {
-                            celdaEstado.classList.add('pill-danger');
-                            celdaEstado.innerHTML = '<span class="sigte-icon"></span> Crítico';
-                        } else if (estado === 'bajo') {
-                            celdaEstado.classList.add('pill-warn');
-                            celdaEstado.innerHTML = 'Bajo mínimo';
-                        } else {
-                            celdaEstado.classList.add('pill-ok');
-                            celdaEstado.innerHTML = 'OK';
-                        }
+                    // ACTUALIZAR LA ETIQUETA DEL ESTADO
+                    const contenedorEstado = tarjeta.querySelector('.inv-insumo-estado');
+
+                    if (contenedorEstado) {
+
+                        contenedorEstado.replaceChildren();
+
+                        const indicador = document.createElement('span');
+
+                        indicador.className = estado === 'ok'
+                            ? 'pill pill-ok'
+                            : estado === 'bajo'
+                                ? 'pill pill-warn'
+                                : 'pill pill-danger';
+
+                        indicador.textContent = estado === 'ok'
+                            ? 'OK'
+                            : estado === 'bajo'
+                                ? 'Bajo mínimo'
+                                : 'Crítico';
+
+                        contenedorEstado.append(indicador);
+                    }
+
+                    // ACTUALIZAR LOS DATOS DE TODOS LOS BOTONES DE LA FICHA
+                    tarjeta.querySelectorAll('button').forEach((boton) => {
+                        boton.dataset.stock = stock;
+                        boton.dataset.minimo = minimo;
+                    });
+
+                    // ACTUALIZAR EL CONTADOR GENERAL DE STOCK BAJO
+                    const totalBajo = document.getElementById('inv-total-bajo');
+
+                    if (totalBajo) {
+                        totalBajo.textContent =
+                            Number(totalBajo.textContent) +
+                            (estado !== 'ok' ? 1 : 0) -
+                            (estadoAnterior !== 'ok' ? 1 : 0);
+                    }
+
+                    // ACTUALIZAR LA ALERTA DEL RESUMEN
+                    const alertaResumen = document.getElementById('inv-alerta-resumen');
+
+                    if (alertaResumen && totalBajo) {
+                        alertaResumen.classList.toggle(
+                            'is-alert',
+                            Number(totalBajo.textContent) > 0
+                        );
                     }
                 }
             }

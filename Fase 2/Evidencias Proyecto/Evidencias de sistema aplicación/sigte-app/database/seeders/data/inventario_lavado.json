@@ -1,0 +1,162 @@
+[
+    {
+        "codigo":  "JER-IRR",
+        "nombre":  "Jeringas de irrigación",
+        "ubicacion":  "Mesón de lavado",
+        "stock":  12,
+        "minimo":  6,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "ADA-IRR",
+        "nombre":  "Adaptadores de irrigación",
+        "ubicacion":  "Área de lavado",
+        "stock":  8,
+        "minimo":  4,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "CEP-ART",
+        "nombre":  "Cepillos para articulaciones y bisagras",
+        "ubicacion":  "Mesón de lavado",
+        "stock":  10,
+        "minimo":  5,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "HIS-LUM",
+        "nombre":  "Hisopos para limpieza de lúmenes",
+        "ubicacion":  "Mesón de lavado",
+        "stock":  15,
+        "minimo":  8,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "DET-LAV",
+        "nombre":  "Detergente para lavadora instrumental",
+        "ubicacion":  "Estante de químicos",
+        "stock":  10,
+        "minimo":  5,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "TES-PRO",
+        "nombre":  "Test de residuos proteicos",
+        "ubicacion":  "Área de control",
+        "stock":  12,
+        "minimo":  6,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "TIR-DET",
+        "nombre":  "Tiras de control de concentración de detergente",
+        "ubicacion":  "Estante de químicos",
+        "stock":  10,
+        "minimo":  5,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "CON-TRA",
+        "nombre":  "Contenedores para traslado de instrumental contaminado",
+        "ubicacion":  "Área sucia",
+        "stock":  6,
+        "minimo":  3,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "VIS-FAC",
+        "nombre":  "Protectores faciales contra salpicaduras",
+        "ubicacion":  "Bodega de EPP",
+        "stock":  8,
+        "minimo":  4,
+        "en_proceso":  0
+    },
+    {
+        "codigo":  "GUA-LAR",
+        "nombre":  "Guantes largos resistentes a productos químicos",
+        "ubicacion":  "Bodega de EPP",
+        "stock":  20,
+        "minimo":  10,
+        "en_proceso":  0
+    },
+    {
+        "minimo":  6,
+        "nombre":  "Bandejas para instrumental",
+        "en_proceso":  0,
+        "ubicacion":  "Área limpia",
+        "stock":  12,
+        "codigo":  "BAN-INS"
+    },
+    {
+        "minimo":  4,
+        "nombre":  "Recipientes para remojo de instrumental",
+        "en_proceso":  0,
+        "ubicacion":  "Área sucia",
+        "stock":  8,
+        "codigo":  "REC-INS"
+    },
+    {
+        "minimo":  15,
+        "nombre":  "Paños absorbentes desechables",
+        "en_proceso":  0,
+        "ubicacion":  "Puesto de secado",
+        "stock":  30,
+        "codigo":  "PIS-ABS"
+    },
+    {
+        "minimo":  6,
+        "nombre":  "Escobillas para limpieza de instrumental",
+        "en_proceso":  0,
+        "ubicacion":  "Mesón de lavado",
+        "stock":  12,
+        "codigo":  "ESC-INT"
+    },
+    {
+        "minimo":  5,
+        "nombre":  "Antiparras de protección ocular",
+        "en_proceso":  0,
+        "ubicacion":  "Bodega de EPP",
+        "stock":  10,
+        "codigo":  "PRO-OCU"
+    },
+    {
+        "minimo":  4,
+        "nombre":  "Delantal impermeable de protección",
+        "en_proceso":  0,
+        "ubicacion":  "Bodega de EPP",
+        "stock":  8,
+        "codigo":  "DEL-QUI"
+    },
+    {
+        "minimo":  12,
+        "nombre":  "Mascarillas de protección respiratoria",
+        "en_proceso":  0,
+        "ubicacion":  "Bodega de EPP",
+        "stock":  25,
+        "codigo":  "MASC-RES"
+    },
+    {
+        "minimo":  5,
+        "nombre":  "Contenedores para objetos punzantes",
+        "en_proceso":  0,
+        "ubicacion":  "Área sucia",
+        "stock":  10,
+        "codigo":  "CON-PER"
+    },
+    {
+        "minimo":  20,
+        "nombre":  "Etiquetas para identificación de instrumental",
+        "en_proceso":  0,
+        "ubicacion":  "Área limpia",
+        "stock":  50,
+        "codigo":  "ETI-IDE"
+    },
+    {
+        "minimo":  15,
+        "nombre":  "Registros de control de temperatura",
+        "en_proceso":  0,
+        "ubicacion":  "Área de control",
+        "stock":  30,
+        "codigo":  "REG-TEM"
+    }
+]

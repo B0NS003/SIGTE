@@ -266,20 +266,114 @@ document.addEventListener('DOMContentLoaded', function () {
             const codigo = String(datos.elemento.codigo);
             const sala = String(datos.elemento.sala);
 
-            // Actualizar los datos del botón de la tabla.
+            // ACTUALIZAR LOS DATOS DE LA FICHA DEL INSUMO.
             if (botonAnterior) {
-                botonAnterior.dataset.stock = nuevoStock;
-                botonAnterior.dataset.minimo = minimo;
 
-                const fila = botonAnterior.closest('tr');
+                // Buscar la ficha correspondiente.
+                const tarjeta = botonAnterior.closest('.inv-insumo-card');
 
-                if (fila) {
-                    fila.dataset.stock = nuevoStock;
+                if (tarjeta) {
 
-                    if (fila.cells.length > 3) {
-                        fila.cells[3].textContent = nuevoStock;
+                    const stockAnterior = Number(tarjeta.dataset.stock);
+                    const estadoAnterior = tarjeta.dataset.estado;
+
+                    // Actualizar los datos internos de la ficha.
+                    tarjeta.dataset.stock = nuevoStock;
+
+                    // Calcular el nuevo estado.
+                    let estado;
+
+                    if (
+                        nuevoStock <= 0 ||
+                        (minimo > 0 && nuevoStock <= Math.floor(minimo / 2))
+                    ) {
+                        estado = 'critico';
+                    } else if (nuevoStock < minimo) {
+                        estado = 'bajo';
+                    } else {
+                        estado = 'ok';
+                    }
+
+                    tarjeta.dataset.estado = estado;
+
+                    // Actualizar el stock visible.
+                    const indicadorStock = tarjeta.querySelector('.inv-insumo-stock');
+
+                    if (indicadorStock) {
+                        indicadorStock.textContent = nuevoStock;
+                    }
+
+                    // Actualizar el color de la ficha.
+                    tarjeta.classList.remove(
+                        'stock-ok',
+                        'stock-bajo',
+                        'stock-critico'
+                    );
+
+                    tarjeta.classList.add(`stock-${estado}`);
+
+                    // Actualizar la etiqueta del estado.
+                    const contenedorEstado = tarjeta.querySelector('.inv-insumo-estado');
+
+                    if (contenedorEstado) {
+
+                        contenedorEstado.replaceChildren();
+
+                        const indicador = document.createElement('span');
+
+                        indicador.className = estado === 'ok'
+                            ? 'pill pill-ok'
+                            : estado === 'bajo'
+                                ? 'pill pill-warn'
+                                : 'pill pill-danger';
+
+                        indicador.textContent = estado === 'ok'
+                            ? 'OK'
+                            : estado === 'bajo'
+                                ? 'Bajo mínimo'
+                                : 'Crítico';
+
+                        contenedorEstado.append(indicador);
+                    }
+
+                    // Actualizar los datos de los botones de la ficha.
+                    tarjeta.querySelectorAll('button').forEach((boton) => {
+                        boton.dataset.stock = nuevoStock;
+                        boton.dataset.minimo = minimo;
+                    });
+
+                    // Actualizar el total general de unidades en stock.
+                    const totalStock = document.getElementById('inv-total-stock');
+
+                    if (totalStock) {
+                        totalStock.textContent =
+                            Number(totalStock.textContent) +
+                            nuevoStock - stockAnterior;
+                    }
+
+                    // Actualizar el contador general de stock bajo.
+                    const totalBajo = document.getElementById('inv-total-bajo');
+
+                    if (totalBajo) {
+                        totalBajo.textContent =
+                            Number(totalBajo.textContent) +
+                            (estado !== 'ok' ? 1 : 0) -
+                            (estadoAnterior !== 'ok' ? 1 : 0);
+                    }
+
+                    const alertaResumen = document.getElementById('inv-alerta-resumen');
+
+                    if (alertaResumen && totalBajo) {
+                        alertaResumen.classList.toggle(
+                            'is-alert',
+                            Number(totalBajo.textContent) > 0
+                        );
                     }
                 }
+
+                // Actualizar también el botón que abrió el modal.
+                botonAnterior.dataset.stock = nuevoStock;
+                botonAnterior.dataset.minimo = minimo;
             }
 
             // Actualizar el stock mostrado dentro del modal.

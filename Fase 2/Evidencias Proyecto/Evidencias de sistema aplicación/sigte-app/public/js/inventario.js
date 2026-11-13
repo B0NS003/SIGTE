@@ -9,8 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    /* SELECCIONAR FICHAS DE INSUMOS */
     const filas = Array.from(
-        cuerpo.querySelectorAll('tr[data-stock]')
+        cuerpo.querySelectorAll(
+            '.inv-insumo-card[data-stock], .inv-esteril-fila'
+        )
     );
 
     const mensajeVacio = document.getElementById('inv-sin-resultados');
@@ -57,18 +60,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
         filasVisibles.forEach(function (fila) {
 
-            stock += Number(fila.dataset.stock);
-            enProceso += Number(fila.dataset.enProceso);
+            stock += Number(fila.dataset.stock || 0);
 
-            const estado = normalizar(
-                fila.dataset.estado
-            );
+            if (fila.dataset.enProceso !== undefined) {
+                enProceso += Number(fila.dataset.enProceso || 0);
+            }
 
-            if (
-                estado === 'bajo' ||
-                estado === 'critico'
-            ) {
-                bajoMinimo++;
+            if (fila.dataset.estado !== undefined) {
+
+                const estado = normalizar(fila.dataset.estado);
+
+                if (
+                    estado === 'bajo' ||
+                    estado === 'critico'
+                ) {
+                    bajoMinimo++;
+                }
             }
         });
 
@@ -140,13 +147,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     total
                 );
 
-        /* Ocultar todas las filas primero. */
+        /* OCULTAR TODAS LAS FICHAS ANTES DE MOSTRAR LA PÁGINA ACTUAL. */
         filas.forEach(function (fila) {
             fila.hidden = true;
             fila.classList.add('is-pagina-oculta');
         });
 
-        /* Mostrar solamente las filas de la página actual. */
+        /* MOSTRAR SOLAMENTE LAS FICHAS DE LA PÁGINA ACTUAL. */
         filasFiltradas
             .slice(inicio, fin)
             .forEach(function (fila) {
@@ -159,13 +166,12 @@ document.addEventListener('DOMContentLoaded', function () {
             mensajeVacio.hidden = total !== 0;
         }
 
-        /* Texto: 1–10 de 37 */
-        if (total > 0) {
-            rango.textContent =
-                `${inicio + 1}–${fin} de ${total}`;
-        } else {
-            rango.textContent = '0–0 de 0';
-        }
+        /* Información de resultados */
+        const numeroFormato = new Intl.NumberFormat('es-CL');
+
+        rango.textContent = total > 0
+            ? `Total ${numeroFormato.format(total)} resultados · Pág. ${paginaActual}/${Math.max(1, totalPaginas)} · ${numeroFormato.format(inicio + 1)}–${numeroFormato.format(fin)}`
+            : 'Total 0 resultados · Pág. 1/1 · 0–0';
 
         /* Botones anterior/siguiente. */
         paginaAnterior.disabled =
@@ -175,43 +181,63 @@ document.addEventListener('DOMContentLoaded', function () {
             paginaActual >= totalPaginas ||
             totalPaginas === 0;
 
-        /* Números de página. */
+        /* Números de página compactos. */
         paginas.innerHTML = '';
 
-        for (
-            let i = 1;
-            i <= totalPaginas;
-            i++
-        ) {
+        const numeros = [];
+        const alrededor = 2;
 
-            const boton =
-                document.createElement('button');
+        if (totalPaginas <= 9) {
+            for (let i = 1; i <= totalPaginas; i++) {
+                numeros.push(i);
+            }
+        } else {
+            numeros.push(1);
+
+            const desde = Math.max(2, paginaActual - alrededor);
+            const hasta = Math.min(totalPaginas - 1, paginaActual + alrededor);
+
+            if (desde > 2) {
+                numeros.push(null);
+            }
+
+            for (let i = desde; i <= hasta; i++) {
+                numeros.push(i);
+            }
+
+            if (hasta < totalPaginas - 1) {
+                numeros.push(null);
+            }
+
+            numeros.push(totalPaginas);
+        }
+
+        numeros.forEach(function (numero) {
+            const boton = document.createElement('button');
 
             boton.type = 'button';
             boton.className = 'inv-pagina-numero';
 
-            if (i === paginaActual) {
-                boton.classList.add('is-active');
-                boton.setAttribute(
-                    'aria-current',
-                    'page'
-                );
+            if (numero === null) {
+                boton.classList.add('is-gap');
+                boton.textContent = '…';
+                boton.disabled = true;
+            } else {
+                boton.textContent = numero;
+
+                if (numero === paginaActual) {
+                    boton.classList.add('is-active');
+                    boton.setAttribute('aria-current', 'page');
+                }
+
+                boton.addEventListener('click', function () {
+                    paginaActual = numero;
+                    actualizarVista();
+                });
             }
 
-            boton.textContent = i;
-
-            boton.addEventListener(
-                'click',
-                function () {
-
-                    paginaActual = i;
-
-                    actualizarVista();
-                }
-            );
-
             paginas.appendChild(boton);
-        }
+        });
 
         /* Si solamente hay una página, no necesitamos mostrar los controles. */
         paginacion.hidden = false;
