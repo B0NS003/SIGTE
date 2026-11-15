@@ -62,7 +62,11 @@
     </div>
 
     @yield('content')
+    @include('partials.logout-modal')
+    @include('partials.exportar-aviso')
     @stack('scripts')
+    <script src="{{ asset('js/logout.js') }}?v={{ @filemtime(public_path('js/logout.js')) }}" defer></script>
+    <script src="{{ asset('js/exportar-descarga.js') }}?v={{ @filemtime(public_path('js/exportar-descarga.js')) }}" defer></script>
     <script src="{{ asset('js/anime.min.js') }}"></script>
     <script>
         (function () {

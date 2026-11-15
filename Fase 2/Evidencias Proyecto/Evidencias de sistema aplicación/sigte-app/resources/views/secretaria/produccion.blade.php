@@ -42,15 +42,35 @@
                 </form>
             </section>
             <aside class="sp-lateral">
-                <section class="panel sp-card"><h2>Indicaciones</h2><p>Registra cada material producido con su fecha, servicio clínico y cantidad. Los litros se calculan con el factor ingresado.</p><p>Los registros diarios se pueden consultar en el reporte mensual.</p><a class="btn btn-ghost sp-enlace" href="{{ route('secretaria.reportes') }}">Ver reportes</a></section>
-                <section class="panel sp-card"><h2>Últimos registros</h2><p class="sp-numero">{{ $registros_produccion->count() }}</p><p>Registros mostrados (máximo 100).</p></section>
+                <section class="panel sp-card sp-indicaciones">
+                    <div>
+                        <h2>Indicaciones</h2>
+                        <p>Registra cada material producido con su fecha, servicio clínico y cantidad. Los litros se calculan con el factor ingresado.</p>
+                        <p>Los registros diarios se pueden consultar en el reporte mensual.</p>
+                    </div>
+                    <a class="btn btn-ghost sp-enlace" href="{{ route('secretaria.reportes') }}">Ver reportes</a>
+                </section>
+                <section class="panel sp-card">
+                    <h2>Últimos registros</h2>
+                    <p class="sp-numero">{{ number_format($registros_produccion->total(), 0, ',', '.') }}</p>
+                    <p>Total en el sistema · 15 por página.</p>
+                </section>
             </aside>
         </div>
-        <section class="panel sp-card sp-seccion"><div class="sp-encabezado"><div><h2>Producción diaria registrada</h2><p>Últimos 100 registros, ordenados por fecha.</p></div></div>
+        <section class="panel sp-card sp-seccion">
+            <div class="sp-encabezado">
+                <div>
+                    <h2>Producción diaria registrada</h2>
+                    <p>Ordenados por fecha · {{ number_format($registros_produccion->total(), 0, ',', '.') }} registros en total.</p>
+                </div>
+            </div>
             <div class="reportes-tabla"><table><thead><tr><th>Fecha</th><th>Servicio</th><th>Material</th><th>Categoría</th><th>Cantidad</th><th>Factor L/u</th><th>Litros</th><th>Observación</th></tr></thead><tbody>
                 @forelse($registros_produccion as $fila)<tr><td>{{ $fila->fecha?->format('d/m/Y') }}</td><td>{{ $fila->servicio?->nombre ?? '—' }}</td><td><strong>{{ $fila->material?->nombre ?? '—' }}</strong></td><td>{{ ucfirst($fila->material?->categoria ?? '—') }}</td><td>{{ number_format($fila->cantidad, 0, ',', '.') }}</td><td>{{ number_format((float)$fila->factor_litros, 2, ',', '.') }}</td><td><strong>{{ number_format((float)$fila->litros, 2, ',', '.') }}</strong></td><td>{{ $fila->observacion ?: '—' }}</td></tr>
                 @empty<tr><td colspan="8" class="reportes-vacio">Todavía no hay registros de producción diaria.</td></tr>@endforelse
             </tbody></table></div>
+            @if($registros_produccion->hasPages())
+                <div class="reportes-paginacion">{{ $registros_produccion->onEachSide(1)->links('partials.paginacion-sigte') }}</div>
+            @endif
         </section>
         <details class="panel sp-card sp-seccion sp-historico" @if(old('periodo') || $editando) open @endif>
             <summary>Registro mensual anterior (histórico)</summary>

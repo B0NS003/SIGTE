@@ -1,5 +1,59 @@
 /* Vista alertas. Se carga después de comun.css si existe. */
-/* admin */
+
+/* Control unificado: KPIs + búsqueda/filtros en la misma card. */
+.alertas-control {
+    padding: 0;
+    margin-bottom: var(--esp-4);
+}
+.alertas-control .alertas-kpis {
+    margin: 0;
+    padding: var(--esp-4) var(--esp-5);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.alertas-control .kpi {
+    border-top: var(--franja) solid var(--naranja);
+}
+.alertas-control .alertas-kpi-abiertas {
+    border-top-color: var(--rojo);
+}
+.alertas-control .alertas-kpi-alta {
+    border-top-color: var(--naranja);
+}
+.alertas-control .alertas-kpi-inventario {
+    border-top-color: var(--navy);
+}
+.alertas-control .alertas-kpi-resueltas {
+    border-top-color: var(--teal-texto);
+}
+.alertas-control .query-toolbar {
+    margin: 0;
+    padding: var(--esp-4) var(--esp-5);
+    border-top: 1px solid var(--linea);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-3);
+    align-items: center;
+}
+.alertas-buscar {
+    flex: 1 1 16rem;
+    min-width: 12rem;
+    order: 0;
+}
+.alertas-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-3);
+    align-items: center;
+    margin-left: auto;
+    order: 1;
+}
+.alertas-bandeja {
+    padding: var(--esp-5);
+}
+.alertas-bandeja .panel-head {
+    margin-bottom: var(--esp-4);
+}
+
 .query-toolbar {
     display: flex;
     gap: var(--esp-3);
@@ -8,7 +62,6 @@
     margin-bottom: 1rem;
 }
 
-/* Filtros a todo el ancho; botón centrado con los campos, sin estirarse. */
 .alerts-board {
     display: flex;
     flex-direction: column;
@@ -84,6 +137,19 @@
     min-height: var(--alto-sm);
     padding: 0 var(--esp-3);
     border-radius: var(--radio-sm);
+}
+@media (max-width: 900px) {
+    .alertas-control .alertas-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .alertas-filtros {
+        margin-left: 0;
+        width: 100%;
+    }
+    .alertas-buscar {
+        width: 100%;
+        flex: 1 1 100%;
+    }
 }
 @media (max-width: 800px) {
     .alert-row {

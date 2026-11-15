@@ -375,30 +375,6 @@
     height: var(--icono-sm);
     flex-shrink: 0;
 }
-.turno-btn-pdf {
-    background: var(--rojo);
-    border-color: var(--rojo);
-    color: #fff;
-    text-decoration: none;
-}
-.turno-btn-pdf:hover {
-    background: var(--rojo-texto);
-    border-color: var(--rojo-texto);
-    color: #fff;
-    text-decoration: none;
-}
-.turno-btn-excel {
-    background: var(--verde);
-    border-color: var(--verde);
-    color: #fff;
-    text-decoration: none;
-}
-.turno-btn-excel:hover {
-    background: #15803d;
-    border-color: #15803d;
-    color: #fff;
-    text-decoration: none;
-}
 .turno-btn-guardar.is-pendiente {
     background: var(--naranja);
     border-color: var(--naranja);

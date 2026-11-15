@@ -8,8 +8,10 @@ use App\Models\MovimientoInsumo;
 use App\Models\MaterialProduccion;
 use App\Models\RegistroProduccion;
 use App\Models\Servicio;
+use App\Support\ReporteAdmin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +45,12 @@ class SecretariaController extends Controller
             'consumos' => $consumos,
             'materiales_produccion' => MaterialProduccion::query()->where('activo', true)->orderBy('nombre')->get(),
             'servicios_produccion' => Servicio::query()->get(),
-            'registros_produccion' => RegistroProduccion::query()->with(['material', 'servicio'])->orderByDesc('fecha')->orderByDesc('id')->limit(100)->get(),
+            'registros_produccion' => RegistroProduccion::query()
+                ->with(['material', 'servicio'])
+                ->orderByDesc('fecha')
+                ->orderByDesc('id')
+                ->paginate(15)
+                ->withQueryString(),
             'editando' => $editando,
             'periodo_form' => $periodo ? Carbon::parse($periodo)->format('Y-m') : now()->format('Y-m'),
         ]);
@@ -221,22 +228,15 @@ class SecretariaController extends Controller
 
     public function reportes(Request $request): View
     {
-        $periodo = $this->periodoDesdeRequest($request->query('periodo'))
-            ?? now()->startOfMonth()->toDateString();
-        $filas = $this->filasReporte($periodo);
-        $diarios = $this->filasProduccionDiaria($periodo);
-
-        return view('secretaria.reportes', [
-            'usuario' => $this->usuarioSesion(),
-            'periodo' => Carbon::parse($periodo)->format('Y-m'),
-            'periodo_etiqueta' => ConsumoServicio::etiquetaPeriodo($periodo),
-            'filas' => $filas,
-            'total_consumo' => $filas->sum('consumo'),
-            'total_litros' => $filas->sum('litros'),
-            'registros_diarios' => $diarios,
-            'total_unidades_diarias' => $diarios->sum('cantidad'),
-            'total_litros_diarios' => $diarios->sum(fn ($fila) => $fila->litros),
-        ]);
+        return view('secretaria.reportes', array_merge(
+            ReporteAdmin::vista($request),
+            [
+                'usuario' => $this->usuarioSesion(),
+                'reportes_form_action' => route('secretaria.reportes'),
+                'reportes_excel_route' => 'secretaria.reportes.excel',
+                'reportes_pdf_route' => 'secretaria.reportes.pdf',
+            ]
+        ));
     }
 
     public function exportarReportes(Request $request): StreamedResponse
@@ -266,6 +266,18 @@ class SecretariaController extends Controller
         }, $nombre, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    /** Excel idéntico al de Administradora; autorización controlada por la ruta de Secretaría. */
+    public function exportarReportesExcel(Request $request): StreamedResponse
+    {
+        return app(AdminController::class)->exportarReportesExcel($request);
+    }
+
+    /** PDF idéntico al de Administradora, incluida la identificación del usuario autenticado. */
+    public function exportarReportesPdf(Request $request): Response
+    {
+        return app(AdminController::class)->exportarReportesPdf($request);
     }
 
     /**

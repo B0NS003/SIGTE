@@ -2,6 +2,20 @@
 var datosCatalogo = JSON.parse(document.getElementById('catalogo-admin-datos').textContent);
 var fichas = datosCatalogo.fichas;
 var tabActual = 'catalogo';
+function actualizarMetaControl(id) {
+    var meta = document.getElementById('catalogo-control-meta');
+    if (!meta) return;
+    var textos = {
+        catalogo: (document.getElementById('fichas-cuenta') || {}).textContent
+            ? document.getElementById('fichas-cuenta').textContent + ' fichas vigentes'
+            : 'Catálogo de fichas',
+        instrumentos: 'Instrumentos del catálogo',
+        'nueva-ficha': 'Alta de ficha',
+        'nuevo-instrumento': 'Alta de instrumento',
+        'nuevo-tipo-conjunto': 'Alta de tipo de conjunto'
+    };
+    meta.textContent = textos[id] || '';
+}
 function mostrarTab(id) {
     tabActual = id;
     document.querySelectorAll('.admin-tab').forEach(function (boton) {
@@ -12,6 +26,10 @@ function mostrarTab(id) {
     document.querySelectorAll('.admin-panel-tab').forEach(function (panel) {
         panel.hidden = panel.id !== 'tab-' + id;
     });
+    document.querySelectorAll('[data-herramientas]').forEach(function (bloque) {
+        bloque.hidden = bloque.dataset.herramientas !== id;
+    });
+    actualizarMetaControl(id);
 }
 document.querySelectorAll('.admin-tab').forEach(function (boton) {
     boton.addEventListener('click', function () {
@@ -27,14 +45,6 @@ document.querySelectorAll('.admin-tab').forEach(function (boton) {
 });
 var servicioActivo = '';
 var serviciosDisponibles = datosCatalogo.servicios;
-document.querySelectorAll('[data-filter-toggle]').forEach(function (boton) {
-    boton.addEventListener('click', function () {
-        var panel = document.getElementById('filtros-' + boton.dataset.filterToggle);
-        panel.hidden = !panel.hidden;
-        boton.setAttribute('aria-expanded', String(!panel.hidden));
-        boton.querySelector('.admin-filter-chevron').textContent = panel.hidden ? '▸' : '▾';
-    });
-});
 function tarjetasCatalogo() { return Array.from(document.querySelectorAll('#fichas-mural .mant-card')); }
 function agruparPorArea() {
     var mural = document.getElementById('fichas-mural');
@@ -79,37 +89,44 @@ function filtrarFichas() {
     });
 }
 function construirFiltrosServicio() {
-    var cards = tarjetasCatalogo().filter(function(card) { return card.dataset.estado !== 'retirada'; });
-    function pintar(nombre, contenedorId, opciones, seleccionado, alSeleccionar, otraClave, otroValor) {
-        var contenedor = document.getElementById(contenedorId);
-        var conteos = new Map();
-        cards.forEach(function(card) {
-            if (otroValor && card.dataset[otraClave] !== otroValor) return;
-            var valor = card.dataset[nombre] || ('Sin ' + nombre + ' asignada');
-            conteos.set(valor, (conteos.get(valor) || 0) + 1);
-        });
-        contenedor.replaceChildren();
-        function agregar(etiqueta, valor, cantidad) {
-            var boton = document.createElement('button');
-            boton.type = 'button';
-            boton.className = 'ops-filter' + (seleccionado === valor ? ' is-active' : '');
-            boton.setAttribute('aria-pressed', String(seleccionado === valor));
-            boton.appendChild(document.createTextNode(etiqueta + ' '));
-            var em = document.createElement('em');
-            em.textContent = cantidad;
-            boton.appendChild(em);
-            boton.addEventListener('click', function() { alSeleccionar(valor); construirFiltrosServicio(); });
-            contenedor.appendChild(boton);
-        }
-        agregar('Todos', '', Array.from(conteos.values()).reduce(function(a,b) { return a+b; },0));
-        Array.from(new Set(opciones.concat(Array.from(conteos.keys())))).sort(function(a,b) { return a.localeCompare(b,'es'); }).forEach(function(valor) {
-            agregar(valor, valor, conteos.get(valor) || 0);
-        });
+    var select = document.getElementById('filtro-servicio');
+    if (!select) {
+        filtrarFichas();
+        return;
     }
-    pintar('servicio','filtros-servicio',serviciosDisponibles,servicioActivo,function(v){servicioActivo=v;},null,null);
+    var cards = tarjetasCatalogo().filter(function (card) { return card.dataset.estado !== 'retirada'; });
+    var conteos = new Map();
+    cards.forEach(function (card) {
+        var valor = card.dataset.servicio || 'Sin servicio asignado';
+        conteos.set(valor, (conteos.get(valor) || 0) + 1);
+    });
+    var total = Array.from(conteos.values()).reduce(function (a, b) { return a + b; }, 0);
+    var valorActual = servicioActivo;
+    select.replaceChildren();
+    var opcionTodos = document.createElement('option');
+    opcionTodos.value = '';
+    opcionTodos.textContent = 'Todos los servicios (' + total + ')';
+    select.appendChild(opcionTodos);
+    Array.from(new Set(serviciosDisponibles.concat(Array.from(conteos.keys()))))
+        .sort(function (a, b) { return a.localeCompare(b, 'es'); })
+        .forEach(function (valor) {
+            var opcion = document.createElement('option');
+            opcion.value = valor;
+            opcion.textContent = valor + ' (' + (conteos.get(valor) || 0) + ')';
+            select.appendChild(opcion);
+        });
+    select.value = valorActual;
+    if (select.value !== valorActual) {
+        servicioActivo = '';
+        select.value = '';
+    }
     filtrarFichas();
 }
 document.getElementById('buscar-fichas').addEventListener('input', filtrarFichas);
+document.getElementById('filtro-servicio').addEventListener('change', function () {
+    servicioActivo = this.value;
+    filtrarFichas();
+});
 // Datos reales de instrumentos, sin transferir fotografías BYTEA en el HTML.
 var instrumentosDemo = datosCatalogo.instrumentos;
 var imagenInstrumentoRespaldo = datosCatalogo.imagenRespaldo;
@@ -353,7 +370,9 @@ pintarInstrumentos('');
 var formFila = null;
 var fichaEditandoId = null;
 var serviciosFicha = datosCatalogo.serviciosFicha;
-var tiposFicha = datosCatalogo.tiposFicha;
+var tiposFicha = Array.isArray(datosCatalogo.tiposFicha)
+    ? datosCatalogo.tiposFicha.slice()
+    : Object.values(datosCatalogo.tiposFicha || {});
 var titulo = document.getElementById('ficha-titulo');
 var modo = document.getElementById('ficha-modo');
 var guardar = document.getElementById('ficha-guardar');
@@ -711,3 +730,67 @@ poblarTipos('');
 pintarPiezas([]);
 agruparPorArea();
 construirFiltrosServicio();
+
+// Alta de tipos de conjunto: actualiza los desplegables sin recargar.
+(function () {
+    var formulario = document.getElementById('nuevo-conjunto-form');
+    if (!formulario) {
+        return;
+    }
+
+    formulario.addEventListener('submit', async function (evento) {
+        evento.preventDefault();
+        if (!formulario.reportValidity()) {
+            return;
+        }
+
+        var mensaje = document.getElementById('nuevo-conjunto-mensaje');
+        var boton = document.getElementById('nuevo-conjunto-guardar');
+        boton.disabled = true;
+        boton.textContent = 'Guardando…';
+        mensaje.hidden = true;
+        mensaje.classList.remove('is-ok', 'is-error');
+
+        try {
+            var respuesta = await fetch(formulario.action, {
+                method: 'POST',
+                body: new FormData(formulario),
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+            });
+            var resultado = await respuesta.json();
+            if (!respuesta.ok) {
+                throw new Error(resultado.errors
+                    ? Object.values(resultado.errors).flat().join(' ')
+                    : (resultado.message || 'No fue posible guardar el tipo de conjunto.'));
+            }
+
+            var nuevo = resultado.tipo_conjunto;
+            tiposFicha.push(nuevo);
+            tiposFicha.sort(function (a, b) {
+                return String(a.nombre_conjunto).localeCompare(String(b.nombre_conjunto), 'es');
+            });
+
+            var selectInstrumento = document.getElementById('instrumento-tipo-conjunto');
+            if (selectInstrumento) {
+                selectInstrumento.add(new Option(nuevo.nombre_conjunto, String(nuevo.id)));
+            }
+            poblarTipos();
+
+            formulario.reset();
+            mensaje.textContent = 'Tipo de conjunto registrado correctamente. Ya está disponible en Nuevo instrumento y Nueva ficha.';
+            mensaje.classList.add('is-ok');
+            mensaje.hidden = false;
+        } catch (error) {
+            mensaje.textContent = error.message || 'Error al guardar el tipo de conjunto.';
+            mensaje.classList.add('is-error');
+            mensaje.hidden = false;
+        } finally {
+            boton.disabled = false;
+            boton.textContent = 'Guardar tipo de conjunto';
+        }
+    });
+})();

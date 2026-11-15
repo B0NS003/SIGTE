@@ -1,4 +1,17 @@
 /* Catálogo de consulta (operador y enfermera). Se carga después de comun.css. */
+.catalogo-consulta-control {
+    padding: 0;
+    margin-bottom: var(--esp-4);
+}
+.catalogo-consulta-control .ops-consulta {
+    margin: 0;
+    padding: var(--esp-4) var(--esp-5);
+}
+.catalogo-consulta-control .ops-filters {
+    margin: 0;
+    padding: var(--esp-3) var(--esp-5) var(--esp-4);
+    border-top: 1px solid var(--linea);
+}
 .ops-consulta {
     margin: 0 0 0.85rem;
 }

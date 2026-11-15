@@ -1,21 +1,37 @@
         @php
             $servicioElegido = collect($servicios_produccion ?? [])->firstWhere('id', $filtros['servicio'] ?? null);
             $tipoElegido = $tipos_auditoria[$filtros['tipo'] ?? ''] ?? null;
+            $reportesFormAction = $reportes_form_action ?? route('mockups.panel', 'administradora');
+            $reportesExcelRoute = $reportes_excel_route ?? 'mockups.reportes.excel';
+            $reportesPdfRoute = $reportes_pdf_route ?? 'mockups.reportes.pdf';
+            $paramsExport = array_merge(
+                array_filter($filtros, fn ($v) => $v !== null && $v !== ''),
+                ['tab' => $tab_activo ?? 'produccion']
+            );
         @endphp
         <div class="panel reportes-control">
             <div class="reportes-control-fila reportes-control-cabecera">
                 <nav class="reportes-tabs" aria-label="Tipos de reportes" role="tablist">
-                    <button class="reportes-tab activo" type="button" role="tab" id="tab-produccion" aria-selected="true" aria-controls="panel-produccion" data-tab="produccion">Producción</button>
-                    <button class="reportes-tab" type="button" role="tab" id="tab-trazabilidad" aria-selected="false" aria-controls="panel-trazabilidad" data-tab="trazabilidad">Trazabilidad</button>
-                    <button class="reportes-tab" type="button" role="tab" id="tab-entregas" aria-selected="false" aria-controls="panel-entregas" data-tab="entregas">Entregas</button>
+                    <button class="reportes-tab {{ ($tab_activo ?? 'produccion') === 'produccion' ? 'activo' : '' }}" type="button" role="tab" id="tab-produccion" aria-selected="{{ ($tab_activo ?? 'produccion') === 'produccion' ? 'true' : 'false' }}" aria-controls="panel-produccion" data-tab="produccion">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l6 4V9l6 4V5l6 4v12H3Z"/><path d="M7 17h2M12 17h2M17 17h2"/></svg>
+                        <span>Producción</span>
+                    </button>
+                    <button class="reportes-tab {{ ($tab_activo ?? 'produccion') === 'trazabilidad' ? 'activo' : '' }}" type="button" role="tab" id="tab-trazabilidad" aria-selected="{{ ($tab_activo ?? 'produccion') === 'trazabilidad' ? 'true' : 'false' }}" aria-controls="panel-trazabilidad" data-tab="trazabilidad">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 15V9a3 3 0 0 1 3-3h6"/><path d="M18 9v6a3 3 0 0 1-3 3h-6"/></svg>
+                        <span>Trazabilidad</span>
+                    </button>
+                    <button class="reportes-tab {{ ($tab_activo ?? 'produccion') === 'entregas' ? 'activo' : '' }}" type="button" role="tab" id="tab-entregas" aria-selected="{{ ($tab_activo ?? 'produccion') === 'entregas' ? 'true' : 'false' }}" aria-controls="panel-entregas" data-tab="entregas">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5v8l-9 5-9-5V8l9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></svg>
+                        <span>Entregas</span>
+                    </button>
                 </nav>
                 <div class="reportes-periodo">
                     <p>Mostrando <strong>{{ \Carbon\Carbon::parse($filtros['desde'])->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($filtros['hasta'])->format('d/m/Y') }}</strong><span data-periodo="produccion"> · {{ $servicioElegido->nombre ?? 'Todos los servicios' }}</span><span data-periodo="trazabilidad" hidden> · {{ $tipoElegido ?? 'Todos los tipos' }}</span></p>
-                    <span class="reportes-chip">Vista previa</span>
                 </div>
             </div>
 
-            <form class="reportes-control-fila reportes-filtros" method="GET" action="{{ route('mockups.panel', 'administradora') }}">
+            <form id="reportes-filtros-form" class="reportes-control-fila reportes-filtros" method="GET" action="{{ $reportesFormAction }}">
+                <input type="hidden" name="tab" id="reportes-tab-seleccionada" value="{{ $tab_activo ?? 'produccion' }}">
                 <div class="reportes-campos">
                     <label class="reportes-campo">Desde<input type="date" name="desde" value="{{ $filtros['desde'] }}" required></label>
                     <label class="reportes-campo">Hasta<input type="date" name="hasta" value="{{ $filtros['hasta'] }}" required></label>
@@ -33,7 +49,7 @@
                     </select></label>
                     <button class="btn btn-dark reportes-consultar" type="submit">Consultar</button>
                 </div>
-                <p class="reportes-ayuda" data-ayuda="produccion"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Procesamiento de cajas y producción mensual por servicio. Los litros se calculan desde los registros diarios de producción.</p>
+                <p class="reportes-ayuda" data-ayuda="produccion"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Flujo actual, histórico por etapa y producción mensual. Los litros salen de los registros diarios de producción.</p>
                 <p class="reportes-ayuda" data-ayuda="trazabilidad" hidden><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Acciones de auditoría registradas dentro del período. El tipo de movimiento filtra solo este reporte.</p>
                 <p class="reportes-ayuda" data-ayuda="entregas" hidden><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Cajas de instrumental quirúrgico entregadas a los servicios dentro del período.</p>
             </form>
@@ -55,14 +71,14 @@
                 }
                 $graficoFlujo = count($segmentosFlujo) ? 'conic-gradient(' . implode(', ', $segmentosFlujo) . ')' : 'conic-gradient(#e2e8f0 0% 100%)';
             @endphp
-            <section class="reportes-panel activo" id="panel-produccion" role="tabpanel" aria-labelledby="tab-produccion">
+            <section class="reportes-panel {{ ($tab_activo ?? 'produccion') === 'produccion' ? 'activo' : '' }}" id="panel-produccion" role="tabpanel" aria-labelledby="tab-produccion" @if (($tab_activo ?? 'produccion') !== 'produccion') hidden @endif>
                 <article class="panel reportes-bloque reportes-bloque-moderno">
                     <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg></span><div><h3>1. Procesamiento de cajas</h3><p class="reportes-banda-descripcion">Estado actual del flujo; no depende del período consultado.</p></div></div>
                     <div class="reportes-produccion-grid">
                         <div class="reportes-produccion-principal">
                             <div class="reportes-resumen reportes-resumen-compacto">
                                 <div class="reportes-kpi reportes-kpi-azul"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg><div class="reportes-kpi-texto"><span>Cajas actualmente en flujo</span><strong>{{ $totalCajasFlujo }}</strong></div></div>
-                                <div class="reportes-kpi reportes-kpi-verde"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><div class="reportes-kpi-texto"><span>Cajas recibidas en el período</span><strong>—</strong><small>Pendiente de vinculación</small></div></div>
+                                <div class="reportes-kpi reportes-kpi-verde"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><div class="reportes-kpi-texto"><span>Cajas recibidas en el período</span><strong>{{ $recibidas_periodo }}</strong><small>Según el rango de fechas seleccionado</small></div></div>
                                 <div class="reportes-kpi reportes-kpi-violeta"><svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg><div class="reportes-kpi-texto"><span>Etapas con cajas</span><strong>{{ count($en_flujo) }}</strong></div></div>
                             </div>
                             <h4 class="reportes-titulo-detalle">Cajas por etapa (flujo actual)</h4>
@@ -102,8 +118,41 @@
                     </div>
                 </article>
 
+                @php
+                    $historicoEtapas = collect($cajas_por_etapa ?? []);
+                    $totalHistoricoEtapas = (int) $historicoEtapas->sum('cantidad');
+                    $coloresHistorico = ['#3998ed', '#78b9f5', '#f5c44b', '#f48aa4', '#a98add', '#9edb91'];
+                @endphp
                 <article class="panel reportes-bloque reportes-bloque-moderno">
-                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span><div><h3>2. Producción mensual por servicio</h3><p class="reportes-banda-descripcion">Consumos y litros registrados por secretaría, agrupados por mes.</p></div></div>
+                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></span><div><h3>2. Procesamiento histórico por etapa</h3><p class="reportes-banda-descripcion">Cajas distintas que pasaron por cada etapa en el período consultado.</p></div></div>
+                    <div class="reportes-resumen reportes-resumen-compacto">
+                        <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Ingresos contabilizados</span><strong>{{ number_format($totalHistoricoEtapas, 0, ',', '.') }}</strong><small>Suma de cajas distintas por etapa (una caja puede contar en varias)</small></div></div>
+                        <div class="reportes-kpi reportes-kpi-verde"><div class="reportes-kpi-texto"><span>Etapas con movimiento</span><strong>{{ $historicoEtapas->where('cantidad', '>', 0)->count() }}</strong><small>Del período seleccionado</small></div></div>
+                    </div>
+                    <div class="reportes-produccion-card reportes-produccion-detalle">
+                        <h4 class="reportes-titulo-detalle">Detalle de ingresos por etapa</h4>
+                        <div class="reportes-tabla reportes-tabla-compacta">
+                            <table>
+                                <thead><tr><th>Etapa</th><th>Cajas distintas</th><th>% del total contabilizado</th></tr></thead>
+                                <tbody>
+                                    @forelse ($historicoEtapas as $indice => $fila)
+                                        <tr>
+                                            <td><span class="reportes-punto" style="--punto-color: {{ $coloresHistorico[$indice % count($coloresHistorico)] }}"></span>{{ $fila['etapa'] }}</td>
+                                            <td>{{ number_format($fila['cantidad'], 0, ',', '.') }}</td>
+                                            <td>{{ $totalHistoricoEtapas ? number_format($fila['cantidad'] / $totalHistoricoEtapas * 100, 1, ',', '.') : 0 }} %</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="3" class="reportes-vacio">No hay registros históricos para este período.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="reportes-nota">Cada caja se contabiliza una vez por etapa según creación, avances, retrocesos y entregas del período.</p>
+                    </div>
+                </article>
+
+                <article class="panel reportes-bloque reportes-bloque-moderno">
+                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M8 16h8"/></svg></span><div><h3>3. Producción mensual por servicio</h3><p class="reportes-banda-descripcion">Consumos y litros registrados por secretaría, agrupados por mes.</p></div></div>
                     <div class="reportes-resumen reportes-resumen-compacto reportes-produccion-kpis">
                         <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Servicios con registros</span><strong>{{ number_format($produccion['servicios'], 0, ',', '.') }}</strong></div></div>
                         <div class="reportes-kpi reportes-kpi-verde"><div class="reportes-kpi-texto"><span>Unidades procesadas</span><strong>{{ number_format($produccion['cantidad'], 0, ',', '.') }}</strong></div></div>
@@ -165,25 +214,23 @@
                 </article>
             </section>
 
-            <section class="reportes-panel" id="panel-trazabilidad" role="tabpanel" aria-labelledby="tab-trazabilidad" hidden>
+            <section class="reportes-panel {{ ($tab_activo ?? 'produccion') === 'trazabilidad' ? 'activo' : '' }}" id="panel-trazabilidad" role="tabpanel" aria-labelledby="tab-trazabilidad" @if (($tab_activo ?? 'produccion') !== 'trazabilidad') hidden @endif>
                 @php
-                    // Resumen calculado exclusivamente con los registros de auditoría ya entregados por el controlador.
-                    $trazaRegistros = collect($movimientos);
-                    $trazaTotal = $trazaRegistros->count();
-                    $trazaTipos = $trazaRegistros->groupBy(fn ($m) => trim((string) ($m['tipo_etiqueta'] ?? 'Sin tipo')));
+                    $trazaTotal = (int) ($total_movimientos ?? 0);
+                    $trazaTipos = collect($por_tipo ?? []);
                     $trazaPaleta = ['#4e74d9', '#78b9f5', '#f5c44b', '#f48aa4', '#a98add', '#9edb91', '#f3a66e'];
                     $trazaSegmentos = [];
                     $trazaAcumulado = 0;
                     $trazaIndiceColor = 0;
-                    foreach ($trazaTipos as $grupoTipo) {
-                        $trazaParte = $trazaTotal ? $grupoTipo->count() / $trazaTotal * 100 : 0;
+                    foreach ($trazaTipos as $cantidadTipo) {
+                        $trazaParte = $trazaTotal ? ((int) $cantidadTipo) / $trazaTotal * 100 : 0;
                         $trazaColor = $trazaPaleta[$trazaIndiceColor % count($trazaPaleta)];
                         $trazaSegmentos[] = $trazaColor . ' ' . $trazaAcumulado . '% ' . ($trazaAcumulado + $trazaParte) . '%';
                         $trazaAcumulado += $trazaParte;
                         $trazaIndiceColor++;
                     }
                     $trazaDona = $trazaTotal ? 'conic-gradient(' . implode(', ', $trazaSegmentos) . ')' : '#e2e8f0';
-                    $trazaPorDia = $trazaRegistros->groupBy(fn ($m) => (string) ($m['fecha'] ?? 'Sin fecha'))->map->count();
+                    $trazaPorDia = collect($movimientos_por_dia ?? []);
                     $trazaMaxDia = max(1, (int) $trazaPorDia->max());
                 @endphp
                 <article class="panel reportes-traza-panel">
@@ -192,7 +239,7 @@
                             <div class="reportes-resumen reportes-traza-kpis">
                                 <div class="reportes-kpi reportes-kpi-azul">
                                     <svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6M9 15h6M9 19h4"/></svg>
-                                    <div class="reportes-kpi-texto"><span>Registros mostrados</span><strong>{{ $trazaTotal }}</strong></div>
+                                    <div class="reportes-kpi-texto"><span>Movimientos del período</span><strong>{{ $trazaTotal }}</strong></div>
                                 </div>
                                 <div class="reportes-kpi reportes-kpi-violeta">
                                     <svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
@@ -200,7 +247,7 @@
                                 </div>
                                 <div class="reportes-kpi reportes-kpi-naranja">
                                     <svg class="reportes-icono reportes-kpi-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6l3 3M21 3v6h-6M21 12a9 9 0 0 1-15 6l-3-3M3 21v-6h6"/></svg>
-                                    <div class="reportes-kpi-texto"><span>Retrocesos estructurados</span><strong>—</strong><small>Pendiente de integración</small></div>
+                                    <div class="reportes-kpi-texto"><span>Retrocesos estructurados</span><strong>{{ $retrocesos_periodo }}</strong><small>Registrados durante el período</small></div>
                                 </div>
                             </div>
                             <div class="reportes-traza-serie">
@@ -227,8 +274,8 @@
                                     <div class="reportes-dona-centro"><strong>{{ $trazaTotal }}</strong><span>registros</span></div>
                                 </div>
                                 <div class="reportes-traza-leyenda">
-                                    @forelse ($trazaTipos as $tipo => $grupo)
-                                        <div><span class="reportes-punto" style="--punto-color: {{ $trazaPaleta[$loop->index % count($trazaPaleta)] }}"></span><span>{{ $tipo }}</span><strong>{{ $trazaTotal ? number_format($grupo->count() / $trazaTotal * 100, 1, ',', '.') : 0 }} %</strong></div>
+                                    @forelse ($trazaTipos as $tipo => $cantidadTipo)
+                                        <div><span class="reportes-punto" style="--punto-color: {{ $trazaPaleta[$loop->index % count($trazaPaleta)] }}"></span><span>{{ \App\Models\RegistroAuditoria::TIPOS[$tipo] ?? $tipo }}</span><strong>{{ $trazaTotal ? number_format(((int) $cantidadTipo) / $trazaTotal * 100, 1, ',', '.') : 0 }} %</strong></div>
                                     @empty
                                         <p class="reportes-nota">Sin movimientos registrados.</p>
                                     @endforelse
@@ -241,38 +288,26 @@
                 <article class="panel reportes-bloque reportes-traza-detalle">
                     <div class="reportes-traza-detalle-cabecera">
                         <svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
-                        <div><h3>Detalle de movimientos</h3><p class="reportes-nota">Vista preliminar: el controlador actual limita los movimientos a 500 registros.</p></div>
+                        <div><h3>Detalle de movimientos</h3><p class="reportes-nota">Listado paginado (15 por página). Los totales incluyen todos los movimientos del período.</p></div>
                     </div>
                     <div class="reportes-tabla reportes-traza-tabla"><table><thead><tr><th>Fecha</th><th>Hora</th><th>Usuario</th><th>Acción</th><th>Tipo</th><th>Objeto</th><th>Detalle</th></tr></thead><tbody>
                         @forelse ($movimientos as $fila)
                             <tr><td>{{ $fila['fecha'] }}</td><td>{{ $fila['hora'] }}</td><td><span class="reportes-traza-usuario"><span class="reportes-traza-avatar">{{ mb_strtoupper(mb_substr((string) ($fila['actor'] ?? '?'), 0, 1)) }}</span>{{ $fila['actor'] }}</span></td><td><span class="reportes-traza-accion">{{ $fila['accion'] }}</span></td><td>{{ $fila['tipo_etiqueta'] }}</td><td>{{ $fila['objeto'] }}</td><td>{{ $fila['detalle'] }}</td></tr>
                         @empty <tr><td colspan="7" class="reportes-vacio">No hay movimientos de auditoría para estos filtros.</td></tr> @endforelse
                     </tbody></table></div>
+                    @if (method_exists($movimientos, 'links'))
+                        <div class="reportes-paginacion">{{ $movimientos->onEachSide(1)->links('partials.paginacion-sigte') }}</div>
+                    @endif
                 </article>
             </section>
 
-            <section class="reportes-panel reportes-entregas" id="panel-entregas" role="tabpanel" aria-labelledby="tab-entregas" hidden>
+            <section class="reportes-panel reportes-entregas {{ ($tab_activo ?? 'produccion') === 'entregas' ? 'activo' : '' }}" id="panel-entregas" role="tabpanel" aria-labelledby="tab-entregas" @if (($tab_activo ?? 'produccion') !== 'entregas') hidden @endif>
                 @php
-                    $entregasListado = collect($entregas);
-                    $entregasCantidad = $entregasListado->count();
-                    $entregasServicios = $entregasListado->groupBy(fn ($fila) => trim((string) ($fila['servicio'] ?? 'Sin servicio')) ?: 'Sin servicio')
-                        ->map->count()->sortDesc();
-                    $entregasServiciosValidos = $entregasServicios->keys()->filter(fn ($nombre) => $nombre !== 'Sin servicio')->count();
+                    $entregasCantidad = (int) ($total_cajas_entregadas ?? 0);
+                    $entregasServicios = collect($entregas_por_servicio ?? []);
+                    $entregasServiciosValidos = $entregasServicios->keys()->filter(fn ($nombre) => trim((string) $nombre) !== '' && $nombre !== 'Sin servicio')->count();
                     $entregasColores = ['#398ff3', '#f5bc40', '#f48cac', '#a877ec', '#36b8a5', '#f18a51'];
-                    $entregasPorFecha = collect();
-                    foreach ($entregasListado as $registroEntrega) {
-                        $fechaTexto = trim((string) ($registroEntrega['cuando'] ?? ''));
-                        $fechaClave = null;
-                        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $fechaTexto, $coincidencia)) {
-                            $fechaClave = $coincidencia[1] . '-' . $coincidencia[2] . '-' . $coincidencia[3];
-                        } elseif (preg_match('/^(\d{2})[\/-](\d{2})[\/-](\d{4})/', $fechaTexto, $coincidencia)) {
-                            $fechaClave = $coincidencia[3] . '-' . $coincidencia[2] . '-' . $coincidencia[1];
-                        }
-                        if ($fechaClave && \Carbon\Carbon::hasFormat($fechaClave, 'Y-m-d')) {
-                            $entregasPorFecha->put($fechaClave, ($entregasPorFecha->get($fechaClave, 0)) + 1);
-                        }
-                    }
-                    $entregasPorFecha = $entregasPorFecha->sortKeys();
+                    $entregasPorFecha = collect($entregas_por_fecha ?? [])->sortKeys();
                     $entregasDiaMaximo = $entregasPorFecha->sortDesc()->first() ?? 0;
                     $entregasFechaMaxima = $entregasPorFecha->sortDesc()->keys()->first();
                     $entregasDiasConActividad = $entregasPorFecha->count();
@@ -281,20 +316,21 @@
                     $entregasFin = \Carbon\Carbon::parse($filtros['hasta'])->startOfDay();
                     $entregasTotalDias = $entregasInicio->diffInDays($entregasFin) + 1;
                     $entregasMostrarCalendario = $entregasTotalDias >= 1 && $entregasTotalDias <= 42;
+                    $entregasMostradas = method_exists($entregas, 'count') ? $entregas->count() : collect($entregas)->count();
                 @endphp
 
                 <div class="reportes-entregas-kpis">
                     <div class="reportes-entregas-kpi reportes-entregas-kpi-principal">
                         <img class="reportes-entregas-bandeja" src="{{ asset('images/Reportes/reportes_entrega_decoracion_1.png') }}" alt="Caja metálica de esterilización para instrumental quirúrgico">
-                        <div class="reportes-entregas-kpi-contenido"><span>Cajas entregadas</span><strong>{{ $entregasCantidad }}</strong><small>Registros mostrados en el período</small></div>
+                        <div class="reportes-entregas-kpi-contenido"><span>Cajas entregadas</span><strong>{{ $entregasCantidad }}</strong><small>Total del período consultado</small></div>
                     </div>
                     <div class="reportes-entregas-kpi reportes-entregas-kpi-operaciones">
                         <svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
-                        <div><span>Operaciones de entrega</span><strong>—</strong><small>Pendiente de vincular Entrega</small></div>
+                        <div><span>Operaciones de entrega</span><strong>{{ $operaciones_entrega }}</strong><small>Incluye entregas solo de material</small></div>
                     </div>
                     <div class="reportes-entregas-kpi reportes-entregas-kpi-servicios">
                         <svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6M17 14a5 5 0 0 1 4 5v1"/></svg>
-                        <div><span>Servicios identificados</span><strong>{{ $entregasServiciosValidos }}</strong><small>Según registros mostrados</small></div>
+                        <div><span>Servicios identificados</span><strong>{{ $entregasServiciosValidos }}</strong><small>Con cajas en el período</small></div>
                     </div>
                 </div>
 
@@ -302,10 +338,10 @@
                     <article class="panel reportes-entregas-card">
                         <h3><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="9" width="7" height="12"/><rect x="14" y="3" width="7" height="18"/><path d="M5 13h3M16 7h3"/></svg> Entregas por servicio</h3>
                         @forelse ($entregasServicios as $nombreServicio => $cantidadServicio)
-                            @php $porcentajeServicio = $entregasCantidad ? $cantidadServicio / $entregasCantidad * 100 : 0; $colorServicio = $entregasColores[$loop->index % count($entregasColores)]; @endphp
+                            @php $porcentajeServicio = $entregasCantidad ? ((int) $cantidadServicio) / $entregasCantidad * 100 : 0; $colorServicio = $entregasColores[$loop->index % count($entregasColores)]; @endphp
                             <div class="reportes-entregas-servicio-fila">
                                 <span class="reportes-entregas-servicio-nombre"><i style="--servicio-color: {{ $colorServicio }}"></i>{{ $nombreServicio }}</span>
-                                <span class="reportes-entregas-servicio-cantidad">{{ $cantidadServicio }} {{ $cantidadServicio === 1 ? 'caja' : 'cajas' }}</span>
+                                <span class="reportes-entregas-servicio-cantidad">{{ $cantidadServicio }} {{ (int) $cantidadServicio === 1 ? 'caja' : 'cajas' }}</span>
                                 <div class="reportes-entregas-progreso"><span style="--progreso-ancho: {{ $porcentajeServicio }}%; --servicio-color: {{ $colorServicio }}"></span></div>
                                 <strong>{{ number_format($porcentajeServicio, 0) }} %</strong>
                             </div>
@@ -329,25 +365,28 @@
                         @endif
                         <div class="reportes-entregas-datos-dia">
                             <div><span>Día con más entregas</span><strong>{{ $entregasFechaMaxima ? \Carbon\Carbon::parse($entregasFechaMaxima)->format('d/m/Y') : '—' }}</strong><small>{{ $entregasDiaMaximo }} cajas</small></div>
-                            <div><span>Promedio por día con actividad</span><strong>{{ $entregasDiasConActividad ? number_format($entregasPromedio, 1, ',', '.') : '—' }}</strong><small>Sobre registros mostrados</small></div>
+                            <div><span>Promedio por día con actividad</span><strong>{{ $entregasDiasConActividad ? number_format($entregasPromedio, 1, ',', '.') : '—' }}</strong><small>Sobre el total del período</small></div>
                         </div>
                     </article>
                 </div>
 
                 <div class="reportes-entregas-inferior">
                     <article class="panel reportes-entregas-card reportes-entregas-ultimas">
-                        <div class="reportes-entregas-card-cabecera"><h3><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Últimas entregas registradas</h3><span class="reportes-chip">{{ $entregasCantidad }} mostradas</span></div>
+                        <div class="reportes-entregas-card-cabecera"><h3><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Últimas entregas registradas</h3><span class="reportes-chip">{{ $entregasMostradas }} en esta página</span></div>
                         <div class="reportes-tabla reportes-entregas-tabla"><table><thead><tr><th>Código de caja</th><th>Servicio</th><th>Fecha de entrega</th><th>Responsable</th></tr></thead><tbody>
-                            @forelse ($entregasListado as $fila)
+                            @forelse ($entregas as $fila)
                                 <tr><td><span class="reportes-entregas-codigo">{{ $fila['codigo'] }}</span></td><td>{{ $fila['servicio'] }}</td><td>{{ $fila['cuando'] }}</td><td><span class="reportes-traza-usuario"><span class="reportes-traza-avatar">{{ mb_strtoupper(mb_substr((string) ($fila['responsable'] ?? '?'), 0, 1)) }}</span>{{ $fila['responsable'] }}</span></td></tr>
                             @empty <tr><td colspan="4" class="reportes-vacio">No hay cajas entregadas para este período.</td></tr> @endforelse
                         </tbody></table></div>
-                        <p class="reportes-nota">Vista preliminar: el controlador limita el listado a 100 cajas. Los totales representan únicamente los registros mostrados.</p>
+                        @if (method_exists($entregas, 'links'))
+                            <div class="reportes-paginacion">{{ $entregas->onEachSide(1)->links('partials.paginacion-sigte') }}</div>
+                        @endif
+                        <p class="reportes-nota">Listado paginado (15 por página). Los totales incluyen todas las cajas del período.</p>
                     </article>
                     <article class="panel reportes-entregas-card reportes-entregas-estado">
                         <div class="reportes-entregas-estado-interior">
                             <img class="reportes-entregas-bandeja-estado" src="{{ asset('images/Reportes/reportes_entrega_decoracion_2.png') }}" alt="Bandeja metálica de esterilización con instrumental quirúrgico">
-                            <div><h3>Estado del período</h3><p>{{ $entregasCantidad > 0 ? 'Se encontraron cajas de instrumental quirúrgico registradas como entregadas en el período seleccionado.' : 'No se encontraron cajas registradas como entregadas para el período seleccionado.' }}</p><small>La validación de operaciones completas estará disponible al integrar Entrega y EntregaCaja.</small></div>
+                            <div><h3>Estado del período</h3><p>{{ $entregasCantidad > 0 ? 'Se encontraron cajas de instrumental quirúrgico registradas como entregadas en el período seleccionado.' : 'No se encontraron cajas registradas como entregadas para el período seleccionado.' }}</p><small>{{ $operaciones_entrega }} operaciones de entrega en el período (pueden incluir solo material).</small></div>
                         </div>
                     </article>
                 </div>
@@ -355,7 +394,16 @@
 
             <footer class="panel reportes-pie">
                 <div><strong>Hospital San José de Melipilla</strong><p>Generado para consulta por {{ $usuario['nombre'] }} · {{ $usuario['rol'] }} — {{ $fecha }} a las {{ $hora }}</p><p>Período seleccionado: {{ $filtros['desde'] }} al {{ $filtros['hasta'] }}</p></div>
-                <div class="reportes-exportar"><button class="btn" type="button" disabled title="Se habilitará al implementar la exportación XLSX">Exportar Excel</button><button class="btn" type="button" disabled title="Se habilitará al implementar la exportación PDF">Exportar PDF</button></div>
+                <div class="reportes-exportar">
+                    <a class="btn btn-exportar-pdf" href="{{ route($reportesPdfRoute, $paramsExport) }}" data-descargar-reporte="pdf" title="Exportar PDF">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+                        <span>Exportar PDF</span>
+                    </a>
+                    <a class="btn btn-exportar-excel" href="{{ route($reportesExcelRoute, $paramsExport) }}" data-descargar-reporte="excel" title="Exportar Excel">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M10 17l4-6M14 17l-4-6"/></svg>
+                        <span>Exportar Excel</span>
+                    </a>
+                </div>
             </footer>
         @endif
 @push('scripts')

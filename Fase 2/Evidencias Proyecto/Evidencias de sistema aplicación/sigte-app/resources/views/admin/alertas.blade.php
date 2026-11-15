@@ -33,62 +33,66 @@
             </div>
         </div>
 
-        <div class="kpi-row">
-            <div class="kpi warn">
-                <div class="l">Abiertas</div>
-                <div class="n">{{ $resumen['abiertas'] }}</div>
-                <div class="h">Pendientes de acción</div>
+        <div class="panel alertas-control">
+            <div class="kpi-row alertas-kpis">
+                <div class="kpi warn alertas-kpi-abiertas">
+                    <div class="l">Abiertas</div>
+                    <div class="n">{{ $resumen['abiertas'] }}</div>
+                    <div class="h">Pendientes de acción</div>
+                </div>
+                <div class="kpi warn alertas-kpi-alta">
+                    <div class="l">Prioridad alta</div>
+                    <div class="n">{{ $resumen['alta'] }}</div>
+                    <div class="h">Requieren atención ya</div>
+                </div>
+                <div class="kpi alertas-kpi-inventario">
+                    <div class="l">Inventario</div>
+                    <div class="n">{{ $resumen['inventario'] }}</div>
+                    <div class="h">Bajo mínimo / crítico</div>
+                </div>
+                <div class="kpi ok alertas-kpi-resueltas">
+                    <div class="l">Resueltas</div>
+                    <div class="n">{{ $resumen['resueltas'] }}</div>
+                    <div class="h">En el período visible</div>
+                </div>
             </div>
-            <div class="kpi warn">
-                <div class="l">Prioridad alta</div>
-                <div class="n">{{ $resumen['alta'] }}</div>
-                <div class="h">Requieren atención ya</div>
-            </div>
-            <div class="kpi">
-                <div class="l">Inventario</div>
-                <div class="n">{{ $resumen['inventario'] }}</div>
-                <div class="h">Bajo mínimo / crítico</div>
-            </div>
-            <div class="kpi ok">
-                <div class="l">Resueltas</div>
-                <div class="n">{{ $resumen['resueltas'] }}</div>
-                <div class="h">En el período visible</div>
+
+            <div class="query-toolbar">
+                <label class="field alertas-buscar" style="margin:0; flex:1;">
+                    <span class="icon" aria-hidden="true">⌕</span>
+                    <input type="search" placeholder="Buscar por caja o texto…">
+                </label>
+                <div class="alertas-filtros">
+                    <label class="field field-select" style="margin:0; min-width:10rem;">
+                        <select>
+                            <option selected>Todas</option>
+                            <option>Abiertas</option>
+                            <option>En revisión</option>
+                            <option>Resueltas</option>
+                        </select>
+                    </label>
+                    <label class="field field-select" style="margin:0; min-width:10rem;">
+                        <select>
+                            <option selected>Cualquier nivel</option>
+                            <option>Alta</option>
+                            <option>Media</option>
+                            <option>Baja</option>
+                        </select>
+                    </label>
+                    <label class="field field-select" style="margin:0; min-width:10rem;">
+                        <select>
+                            <option selected>Todos los tipos</option>
+                            <option>Retraso</option>
+                            <option>Custodia</option>
+                            <option>Faltante</option>
+                            <option>Inventario</option>
+                        </select>
+                    </label>
+                </div>
             </div>
         </div>
 
-        <div class="query-toolbar panel">
-            <label class="field field-select" style="margin:0; min-width:10rem;">
-                <select>
-                    <option selected>Todas</option>
-                    <option>Abiertas</option>
-                    <option>En revisión</option>
-                    <option>Resueltas</option>
-                </select>
-            </label>
-            <label class="field field-select" style="margin:0; min-width:10rem;">
-                <select>
-                    <option selected>Cualquier nivel</option>
-                    <option>Alta</option>
-                    <option>Media</option>
-                    <option>Baja</option>
-                </select>
-            </label>
-            <label class="field field-select" style="margin:0; min-width:10rem;">
-                <select>
-                    <option selected>Todos los tipos</option>
-                    <option>Retraso</option>
-                    <option>Custodia</option>
-                    <option>Faltante</option>
-                    <option>Inventario</option>
-                </select>
-            </label>
-            <label class="field" style="margin:0; flex:1;">
-                <span class="icon" aria-hidden="true">⌕</span>
-                <input type="search" placeholder="Buscar por caja o texto…">
-            </label>
-        </div>
-
-        <section class="panel list">
+        <section class="panel list alertas-bandeja">
             <div class="panel-head">
                 <h2>Bandeja de alertas</h2>
                 <span class="badge">{{ count($alertas) }}</span>

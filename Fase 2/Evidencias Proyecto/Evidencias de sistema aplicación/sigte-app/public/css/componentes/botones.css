@@ -37,3 +37,43 @@ html[data-tema="oscuro"] .btn-dark {
 html[data-tema="oscuro"] .btn-dark:hover {
   background: var(--navy-mid);
 }
+
+/* Exportaciones: mismo look en Turnos y Reportes. */
+.btn-exportar-pdf,
+.btn-exportar-excel {
+  gap: var(--esp-2);
+  text-decoration: none;
+  color: var(--blanco);
+}
+.btn-exportar-pdf svg,
+.btn-exportar-excel svg {
+  width: var(--icono-sm);
+  height: var(--icono-sm);
+  flex-shrink: 0;
+}
+.btn-exportar-pdf {
+  background: var(--rojo);
+  border: 1px solid var(--rojo);
+}
+.btn-exportar-pdf:hover {
+  background: var(--rojo-texto);
+  border-color: var(--rojo-texto);
+  color: var(--blanco);
+  text-decoration: none;
+}
+.btn-exportar-excel {
+  background: var(--verde);
+  border: 1px solid var(--verde);
+}
+.btn-exportar-excel:hover {
+  background: #15803d;
+  border-color: #15803d;
+  color: var(--blanco);
+  text-decoration: none;
+}
+.btn-exportar-pdf[aria-disabled="true"],
+.btn-exportar-excel[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: progress;
+  pointer-events: none;
+}

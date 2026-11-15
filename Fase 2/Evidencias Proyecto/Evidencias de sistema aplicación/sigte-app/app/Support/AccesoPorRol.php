@@ -29,6 +29,7 @@ class AccesoPorRol
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.fichas.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.fichas.actualizar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.tipos-conjunto.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.instrumentos.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.instrumentos.actualizar' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
@@ -46,6 +47,8 @@ class AccesoPorRol
         'mockups.cierre_turno.guardar' => [Rol::ENFERMERA],
         'mockups.reportes' => [Rol::ADMINISTRADORA],
         'mockups.reportes.exportar' => [Rol::ADMINISTRADORA],
+        'mockups.reportes.excel' => [Rol::ADMINISTRADORA],
+        'mockups.reportes.pdf' => [Rol::ADMINISTRADORA],
         'mockups.custodia' => [Rol::ADMINISTRADORA],
         'mockups.historial_entregas' => [Rol::ADMINISTRADORA, Rol::ENFERMERA],
         'mockups.usuarios' => [Rol::ADMINISTRADORA],
@@ -62,6 +65,8 @@ class AccesoPorRol
         'secretaria.insumos.movimiento' => [Rol::SECRETARIA],
         'secretaria.reportes' => [Rol::SECRETARIA],
         'secretaria.reportes.exportar' => [Rol::SECRETARIA],
+        'secretaria.reportes.excel' => [Rol::SECRETARIA],
+        'secretaria.reportes.pdf' => [Rol::SECRETARIA],
     ];
 
     public static function puedeVerPanel(User $user, string $rolEnUrl): bool

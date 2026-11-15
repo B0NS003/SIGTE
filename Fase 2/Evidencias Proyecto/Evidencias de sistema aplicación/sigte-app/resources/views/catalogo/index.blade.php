@@ -42,54 +42,56 @@
             </div>
         </div>
 
-        <form class="ops-consulta" method="get" action="{{ route('mockups.catalogo') }}" role="search">
-            <div class="ops-search">
-                <label class="sr-only" for="busqueda-catalogo">Buscar en el catálogo</label>
-                <div class="ops-search-field">
-                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="11" cy="11" r="6.25" fill="none" stroke="currentColor" stroke-width="1.75"/>
-                        <path d="M16 16.5 20 20.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                    </svg>
-                    <input
-                        id="busqueda-catalogo"
-                        type="search"
-                        name="q"
-                        value="{{ $busqueda }}"
-                        placeholder="Buscar por código, nombre o número…"
-                        autocomplete="off"
-                    >
+        <div class="panel catalogo-consulta-control">
+            <form class="ops-consulta" method="get" action="{{ route('mockups.catalogo') }}" role="search">
+                <div class="ops-search">
+                    <label class="sr-only" for="busqueda-catalogo">Buscar en el catálogo</label>
+                    <div class="ops-search-field">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="6.25" fill="none" stroke="currentColor" stroke-width="1.75"/>
+                            <path d="M16 16.5 20 20.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                        </svg>
+                        <input
+                            id="busqueda-catalogo"
+                            type="search"
+                            name="q"
+                            value="{{ $busqueda }}"
+                            placeholder="Buscar por código, nombre o número…"
+                            autocomplete="off"
+                        >
+                    </div>
+                    @if ($servicio !== '')
+                        <input type="hidden" name="servicio" value="{{ $servicio }}">
+                    @endif
+                    <button class="btn btn-dark ops-search-go" type="submit">Buscar</button>
+                    @if ($hay_filtros)
+                        <a class="ops-search-clear" href="{{ route('mockups.catalogo') }}">Limpiar</a>
+                    @endif
                 </div>
-                @if ($servicio !== '')
-                    <input type="hidden" name="servicio" value="{{ $servicio }}">
-                @endif
-                <button class="btn btn-dark ops-search-go" type="submit">Buscar</button>
-                @if ($hay_filtros)
-                    <a class="ops-search-clear" href="{{ route('mockups.catalogo') }}">Limpiar</a>
-                @endif
-            </div>
-        </form>
+            </form>
 
-        <div class="ops-filters" aria-label="Filtrar por área">
-            <a
-                class="ops-filter {{ $servicio === '' ? 'is-active' : '' }}"
-                href="{{ $urlCatalogo(null) }}"
-            >
-                <span>Todos</span>
-                <em>{{ $total_servicios }}</em>
-            </a>
-            @foreach ($servicios as $opcion)
+            <div class="ops-filters" aria-label="Filtrar por área">
                 <a
-                    class="ops-filter {{ $servicio === $opcion ? 'is-active' : '' }}"
-                    href="{{ $urlCatalogo($opcion) }}"
+                    class="ops-filter {{ $servicio === '' ? 'is-active' : '' }}"
+                    href="{{ $urlCatalogo(null) }}"
                 >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="5" y="3" width="14" height="18" rx="1.5"/>
-                        <path d="M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1M10 21v-3h4v3"/>
-                    </svg>
-                    <span>{{ $opcion }}</span>
-                    <em>{{ $conteo_servicios[$opcion] ?? 0 }}</em>
+                    <span>Todos</span>
+                    <em>{{ $total_servicios }}</em>
                 </a>
-            @endforeach
+                @foreach ($servicios as $opcion)
+                    <a
+                        class="ops-filter {{ $servicio === $opcion ? 'is-active' : '' }}"
+                        href="{{ $urlCatalogo($opcion) }}"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="5" y="3" width="14" height="18" rx="1.5"/>
+                            <path d="M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1M10 21v-3h4v3"/>
+                        </svg>
+                        <span>{{ $opcion }}</span>
+                        <em>{{ $conteo_servicios[$opcion] ?? 0 }}</em>
+                    </a>
+                @endforeach
+            </div>
         </div>
 
         @if (count($items) === 0)

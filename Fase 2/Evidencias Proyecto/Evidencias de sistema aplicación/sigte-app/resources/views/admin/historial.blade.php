@@ -66,62 +66,64 @@
                 <p><a href="{{ route('mockups.historial_entregas') }}">Intentar de nuevo</a></p>
             </div>
         @else
-            @if ($servicios->isNotEmpty())
-                <div class="hist-sectores" aria-label="Filtrar por servicio">
-                    <a
-                        class="hist-sector {{ $filtros['servicio'] === '' ? 'is-on' : '' }}"
-                        href="{{ route('mockups.historial_entregas', array_filter(['q' => $filtros['q'] ?: null, 'cuando' => $filtros['cuando'] !== 'todas' ? $filtros['cuando'] : null])) }}"
-                    >
-                        <strong>Todas</strong>
-                        <span class="n">{{ $resumen['total'] ?? 0 }}</span>
-                        <small>Hoy {{ $resumen['hoy'] ?? 0 }}</small>
-                    </a>
-                    @foreach ($servicios->sortBy(function ($fila) use ($ordenSectores) {
-                        $indice = array_search($fila['servicio'], $ordenSectores, true);
-                        return $indice === false ? 99 : $indice;
-                    }) as $fila)
+            <div class="panel hist-control">
+                @if ($servicios->isNotEmpty())
+                    <div class="hist-sectores" aria-label="Filtrar por servicio">
                         <a
-                            class="hist-sector sec-{{ $slugSector($fila['servicio']) }} {{ $filtros['servicio'] === $fila['servicio'] ? 'is-on' : '' }}"
-                            href="{{ route('mockups.historial_entregas', array_filter([
-                                'q' => $filtros['q'] ?: null,
-                                'cuando' => $filtros['cuando'] !== 'todas' ? $filtros['cuando'] : null,
-                                'servicio' => $fila['servicio'],
-                            ])) }}"
+                            class="hist-sector {{ $filtros['servicio'] === '' ? 'is-on' : '' }}"
+                            href="{{ route('mockups.historial_entregas', array_filter(['q' => $filtros['q'] ?: null, 'cuando' => $filtros['cuando'] !== 'todas' ? $filtros['cuando'] : null])) }}"
                         >
-                            <strong>{{ $fila['servicio'] }}</strong>
-                            <span class="n">{{ $fila['total'] }}</span>
-                            @if ($fila['ultima_hora'])
-                                <small>{{ $fila['ultima_hora'] }} · {{ $fila['ultima_fecha'] }}</small>
-                            @endif
+                            <strong>Todas</strong>
+                            <span class="n">{{ $resumen['total'] ?? 0 }}</span>
+                            <small>Hoy {{ $resumen['hoy'] ?? 0 }}</small>
                         </a>
-                    @endforeach
-                </div>
-            @endif
-
-            <form class="users-filtros hist-filtros" method="get" action="{{ route('mockups.historial_entregas') }}">
-                <label class="field hist-buscar">
-                    <span>Buscar</span>
-                    <input type="search" name="q" value="{{ $filtros['q'] }}" placeholder="Código, persona, caja o material" autocomplete="off">
-                </label>
-                <label class="field hist-periodo">
-                    <span>Período</span>
-                    <select name="cuando">
-                        <option value="todas" @selected($filtros['cuando'] === 'todas')>Todas</option>
-                        <option value="hoy" @selected($filtros['cuando'] === 'hoy')>Hoy</option>
-                        <option value="ayer" @selected($filtros['cuando'] === 'ayer')>Ayer</option>
-                        <option value="semana" @selected($filtros['cuando'] === 'semana')>Últimos 7 días</option>
-                    </select>
-                </label>
-                @if ($filtros['servicio'] !== '')
-                    <input type="hidden" name="servicio" value="{{ $filtros['servicio'] }}">
+                        @foreach ($servicios->sortBy(function ($fila) use ($ordenSectores) {
+                            $indice = array_search($fila['servicio'], $ordenSectores, true);
+                            return $indice === false ? 99 : $indice;
+                        }) as $fila)
+                            <a
+                                class="hist-sector sec-{{ $slugSector($fila['servicio']) }} {{ $filtros['servicio'] === $fila['servicio'] ? 'is-on' : '' }}"
+                                href="{{ route('mockups.historial_entregas', array_filter([
+                                    'q' => $filtros['q'] ?: null,
+                                    'cuando' => $filtros['cuando'] !== 'todas' ? $filtros['cuando'] : null,
+                                    'servicio' => $fila['servicio'],
+                                ])) }}"
+                            >
+                                <strong>{{ $fila['servicio'] }}</strong>
+                                <span class="n">{{ $fila['total'] }}</span>
+                                @if ($fila['ultima_hora'])
+                                    <small>{{ $fila['ultima_hora'] }} · {{ $fila['ultima_fecha'] }}</small>
+                                @endif
+                            </a>
+                        @endforeach
+                    </div>
                 @endif
-                <div class="users-filtros-acciones">
-                    <button class="btn btn-dark" type="submit">Consultar</button>
-                    @if ($filtros['q'] !== '' || $filtros['cuando'] !== 'todas' || $filtros['servicio'] !== '')
-                        <a class="btn btn-ghost" href="{{ route('mockups.historial_entregas') }}">Limpiar</a>
+
+                <form class="users-filtros hist-filtros" method="get" action="{{ route('mockups.historial_entregas') }}">
+                    <label class="field hist-buscar">
+                        <span>Buscar</span>
+                        <input type="search" name="q" value="{{ $filtros['q'] }}" placeholder="Código, persona, caja o material" autocomplete="off">
+                    </label>
+                    <label class="field hist-periodo">
+                        <span>Período</span>
+                        <select name="cuando">
+                            <option value="todas" @selected($filtros['cuando'] === 'todas')>Todas</option>
+                            <option value="hoy" @selected($filtros['cuando'] === 'hoy')>Hoy</option>
+                            <option value="ayer" @selected($filtros['cuando'] === 'ayer')>Ayer</option>
+                            <option value="semana" @selected($filtros['cuando'] === 'semana')>Últimos 7 días</option>
+                        </select>
+                    </label>
+                    @if ($filtros['servicio'] !== '')
+                        <input type="hidden" name="servicio" value="{{ $filtros['servicio'] }}">
                     @endif
-                </div>
-            </form>
+                    <div class="users-filtros-acciones">
+                        <button class="btn btn-dark" type="submit">Consultar</button>
+                        @if ($filtros['q'] !== '' || $filtros['cuando'] !== 'todas' || $filtros['servicio'] !== '')
+                            <a class="btn btn-ghost" href="{{ route('mockups.historial_entregas') }}">Limpiar</a>
+                        @endif
+                    </div>
+                </form>
+            </div>
 
             <div class="mant-head">
                 <div>

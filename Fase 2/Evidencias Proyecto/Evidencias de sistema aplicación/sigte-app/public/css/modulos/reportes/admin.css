@@ -43,7 +43,15 @@
 }
 .reportes-control .reportes-tab {
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-2);
     padding: 0 var(--esp-5);
+}
+.reportes-control .reportes-tab svg {
+    width: var(--icono-sm);
+    height: var(--icono-sm);
+    flex-shrink: 0;
 }
 .reportes-periodo {
     display: flex;
@@ -152,11 +160,14 @@
 }
 .reportes-exportar {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--esp-2);
+    justify-content: flex-end;
 }
-.reportes-exportar button:disabled {
-    opacity: .55;
-    cursor: not-allowed;
+.reportes-exportar .btn {
+    width: auto;
+    min-width: 11.75rem;
+    white-space: nowrap;
 }
 .reportes-estado {
     padding: var(--esp-5);
@@ -181,8 +192,9 @@
   .reportes-exportar {
         width: 100%;
     }
-  .reportes-exportar button {
-        flex: 1;
+  .reportes-exportar .btn {
+        flex: 1 1 auto;
+        min-width: 0;
     }
   .reportes-bloque {
         padding: var(--esp-4);
@@ -1018,7 +1030,59 @@
 .reportes-entregas-inferior {
     display: grid;
     grid-template-columns: 1.55fr 1fr;
-    gap: var(--esp-3)
+    gap: var(--esp-3);
+    align-items: start;
+}
+.reportes-paginacion {
+    margin-top: var(--esp-3);
+}
+.sigte-paginacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3);
+}
+.sigte-paginacion-info {
+    margin: 0;
+    font-size: var(--fs-xs);
+    color: var(--texto-3);
+}
+.sigte-paginacion-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.sigte-paginacion-lista a,
+.sigte-paginacion-lista span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0 var(--esp-2);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    background: var(--card);
+    color: var(--texto-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-decoration: none;
+}
+.sigte-paginacion-lista li.is-activa span {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--blanco);
+}
+.sigte-paginacion-lista li.is-disabled span {
+    opacity: 0.45;
+}
+.sigte-paginacion-lista a:hover {
+    border-color: var(--navy);
+    color: var(--navy);
 }
 .reportes-entregas-card-cabecera {
     display: flex;
@@ -1049,7 +1113,8 @@
 }
 .reportes-entregas-estado {
     display: flex;
-    align-items: center
+    align-items: center;
+    align-self: start;
 }
 .reportes-entregas-estado small {
     font-size: var(--fs-2xs);
@@ -1124,20 +1189,21 @@
 .reportes-entregas-estado-interior {
     position: relative;
     display: flex;
-    align-items: center;
-    gap: var(--esp-5);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--esp-3);
     width: 100%;
-    min-height: 178px;
-    padding: var(--esp-5) var(--esp-6);
+    min-height: 0;
+    padding: var(--esp-4);
     border-radius: var(--radio-md);
     background: var(--verde-fondo);
     overflow: hidden;
 }
 .reportes-entregas-estado-interior img.reportes-entregas-bandeja-estado {
     display: block;
-    width: 175px;
-    height: 135px;
-    max-width: 42%;
+    width: 118px;
+    height: 90px;
+    max-width: 55%;
     object-fit: contain;
     flex: 0 0 auto;
     filter: drop-shadow(0 7px 6px rgba(42, 64, 58, .17));
@@ -1147,28 +1213,28 @@
     flex: 1;
 }
 .reportes-entregas-estado h3 {
-    margin: 0 0 8px;
-    font-size: var(--fs-xl);
+    margin: 0 0 6px;
+    font-size: var(--fs-lg);
     font-weight: 700;
     color: var(--texto-1);
 }
 .reportes-entregas-estado p {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     color: var(--texto-2);
-    font-size: var(--fs-base);
-    line-height: 1.5;
+    font-size: var(--fs-sm);
+    line-height: 1.45;
 }
 @media (max-width: 650px) {
   .reportes-entregas-estado-interior {
         flex-direction: row;
         align-items: center;
-        padding: var(--esp-4);
+        padding: var(--esp-3);
         gap: var(--esp-3);
     }
   .reportes-entregas-estado-interior img.reportes-entregas-bandeja-estado {
-        width: 112px;
-        height: 105px;
-        max-width: 36%;
+        width: 88px;
+        height: 72px;
+        max-width: 32%;
     }
   .reportes-entregas-estado h3 {
         font-size: var(--fs-lg);

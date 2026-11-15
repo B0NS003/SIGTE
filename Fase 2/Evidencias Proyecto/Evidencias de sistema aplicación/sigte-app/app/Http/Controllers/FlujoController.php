@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\CajaAnotacion;
 use App\Models\Caja;
-use App\Models\ConsumoServicio;
 use App\Models\Entrega;
 use App\Models\EntregaCaja;
 use App\Models\Ficha;
 use App\Models\Servicio;
 use App\Models\TipoConjunto;
-use App\Models\Insumo;
 use App\Models\Personal;
 use App\Models\Rol;
 use App\Models\User;
@@ -25,6 +23,8 @@ use App\Services\Flujo\RetrocesoEtapa;
 use App\Support\AccesoPorRol;
 use App\Support\Auditoria;
 use App\Support\ReporteAdmin;
+use App\Support\ResumenSecretaria;
+use App\Support\ResumenTurnoEnfermera;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -207,18 +207,9 @@ class FlujoController extends Controller
         }
         $usuario = $this->usuarioSesion();
         if ($rol === Rol::SECRETARIA) {
-            $inicio = now()->startOfMonth()->toDateString();
-            $delMes = ConsumoServicio::query()->whereDate('periodo', $inicio)->get();
-            $insumos = Insumo::query()->with('salaFisica')->get();
             return view('secretaria.panel', [
                 'usuario' => $usuario,
-                'resumen' => [
-                    'periodo' => ConsumoServicio::etiquetaPeriodo($inicio),
-                    'servicios' => $delMes->count(),
-                    'consumo' => (int) $delMes->sum('consumo'),
-                    'litros' => (float) $delMes->sum('litros'),
-                    'bajo_minimo' => $insumos->filter(fn (Insumo $insumo) => $insumo->estadoStock() !== 'ok')->count(),
-                ],
+                'resumen' => ResumenSecretaria::construir($request->query('periodo')),
             ]);
         }
         $roles = [
@@ -293,6 +284,9 @@ class FlujoController extends Controller
                     'hora' => now()->timezone('America/Santiago')->format('H:i'),
                 ],
                 'reporte' => $rol === Rol::ADMINISTRADORA ? ReporteAdmin::vista($request) : null,
+                'resumen_turno' => $rol === Rol::ENFERMERA
+                    ? ResumenTurnoEnfermera::construir($user, $consulta['cajas'])
+                    : null,
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');

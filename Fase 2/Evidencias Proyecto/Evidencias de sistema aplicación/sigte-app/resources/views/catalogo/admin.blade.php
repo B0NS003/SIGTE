@@ -20,8 +20,8 @@
         @include('partials.sidebar-foot')
     </aside>
 
-    <main class="main">
-        <div class="main-top">
+    <main class="main catalogo-admin-pagina">
+        <div class="main-top catalogo-admin-top">
             <div>
                 <p class="eyebrow">Gestión · solo administradora</p>
                 <h1>Administrar catálogo</h1>
@@ -29,20 +29,59 @@
             </div>
         </div>
 
-        <nav class="admin-tabs" aria-label="Secciones de administración del catálogo" role="tablist">
-            <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" data-tab="catalogo">Catálogo</button>
-            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="instrumentos">Instrumentos</button>
-            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nueva-ficha">+ Nueva ficha</button>
-            <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-instrumento">+ Nuevo instrumento</button>
-        </nav>
-        <div class="admin-panel-tab" id="tab-catalogo" role="tabpanel">
-            <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-fichas"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Buscar por código, nombre, tipo o servicio…" autocomplete="off"></label></div>
-            <div class="admin-filter-sections">
-                <section class="admin-filter-section">
-                    <button class="ops-filter-label admin-filter-toggle" type="button" aria-expanded="false" aria-controls="filtros-servicio" data-filter-toggle="servicio"><span class="admin-filter-chevron" aria-hidden="true">▸</span> Filtrar por servicio</button>
-                    <div class="ops-filters" id="filtros-servicio" aria-label="Filtrar fichas por servicio" hidden></div>
-                </section>
+        <div class="panel catalogo-control">
+            <div class="catalogo-control-cabecera">
+                <nav class="admin-tabs" aria-label="Secciones de administración del catálogo" role="tablist">
+                    <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" data-tab="catalogo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+                        <span>Catálogo</span>
+                    </button>
+                    <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="instrumentos">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="m8.12 8.12 12.02 12.02M14.8 9.2 20.14 3.86M8.12 15.88 12 12"/></svg>
+                        <span>Instrumentos</span>
+                    </button>
+                    <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nueva-ficha">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>
+                        <span>Nueva ficha</span>
+                    </button>
+                    <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-instrumento">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+                        <span>Nuevo instrumento</span>
+                    </button>
+                    <button class="admin-tab" type="button" role="tab" aria-selected="false" data-tab="nuevo-tipo-conjunto">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
+                        <span>Nuevo tipo</span>
+                    </button>
+                </nav>
+                <p class="catalogo-control-meta" id="catalogo-control-meta">{{ count($items) }} fichas vigentes</p>
             </div>
+            <div class="catalogo-herramientas" data-herramientas="catalogo">
+                <div class="catalogo-herramientas-fila">
+                    <label class="catalogo-campo catalogo-campo-buscar" for="buscar-fichas">Buscar
+                        <span class="catalogo-search-field"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Código, nombre, tipo o servicio…" autocomplete="off"></span>
+                    </label>
+                    <label class="catalogo-campo" for="filtro-servicio">Servicio
+                        <select id="filtro-servicio" aria-label="Filtrar fichas por servicio">
+                            <option value="">Todos los servicios</option>
+                        </select>
+                    </label>
+                </div>
+                <p class="catalogo-herramientas-ayuda"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Consulta y edita fichas vigentes. El filtro de servicio agrupa el mural por área clínica.</p>
+            </div>
+            <div class="catalogo-herramientas" data-herramientas="instrumentos" hidden>
+                <div class="catalogo-herramientas-fila">
+                    <label class="catalogo-campo catalogo-campo-buscar" for="buscar-instrumentos">Buscar
+                        <span class="catalogo-search-field"><span aria-hidden="true">⌕</span><input type="search" id="buscar-instrumentos" placeholder="Nombre o código…" autocomplete="off"></span>
+                    </label>
+                    <div class="admin-instrument-view" role="group" aria-label="Tipo de visualización">
+                        <button type="button" class="admin-view-btn is-active" data-instrument-view="cards" aria-pressed="true">▦ Tarjetas</button>
+                        <button type="button" class="admin-view-btn" data-instrument-view="list" aria-pressed="false">☷ Lista</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-panel-tab" id="tab-catalogo" role="tabpanel">
         <section class="mant-vitrina">
             <div class="mant-head">
                 <div>
@@ -74,15 +113,10 @@
         </div>
 
         <section class="admin-panel-tab" id="tab-instrumentos" role="tabpanel" hidden>
-            <div class="mant-head"><div><h2>Instrumentos registrados</h2><p>Consulta los instrumentos utilizados en las fichas.</p></div><span class="badge" id="instrumentos-cuenta">0</span></div>
-            <div class="ops-search admin-search"><label class="ops-search-field" for="buscar-instrumentos"><span aria-hidden="true">⌕</span><input type="search" id="buscar-instrumentos" placeholder="Buscar instrumento por nombre o código…" autocomplete="off"></label></div>
+            <div class="mant-head"><div><h2>Instrumentos registrados</h2><p id="instrumentos-meta">Instrumentos utilizados en las fichas.</p></div><span class="badge" id="instrumentos-cuenta">0</span></div>
             <section class="admin-instrument-section">
-                <div class="admin-instrument-section-head">
-                    <div><h3>Instrumentos</h3><p id="instrumentos-meta">Instrumentos registrados</p></div>
-                    <div class="admin-instrument-view" role="group" aria-label="Tipo de visualización">
-                        <button type="button" class="admin-view-btn is-active" data-instrument-view="cards" aria-pressed="true">▦ Vista de tarjetas</button>
-                        <button type="button" class="admin-view-btn" data-instrument-view="list" aria-pressed="false">☷ Vista de lista</button>
-                    </div>
+                <div class="admin-instrument-section-head" hidden>
+                    <div><h3>Instrumentos</h3></div>
                 </div>
                 <div class="admin-instrument-grid" id="instrumentos-mural"></div>
                 <p class="admin-empty" id="instrumentos-vacio" hidden>No se encontraron instrumentos.</p>
@@ -232,6 +266,37 @@
                 </aside>
             </div>
         </section>
+
+        <section class="admin-panel-tab" id="tab-nuevo-tipo-conjunto" role="tabpanel" hidden>
+            <div class="panel nuevo-conjunto-panel">
+                <h2>Registrar nuevo tipo de conjunto</h2>
+                <p>El tipo quedará disponible para registrar instrumentos y crear fichas del servicio seleccionado.</p>
+                <form id="nuevo-conjunto-form" action="{{ route('mockups.catalogo.tipos-conjunto.guardar') }}" method="post">
+                    @csrf
+                    <p id="nuevo-conjunto-mensaje" class="nuevo-conjunto-mensaje" role="status" aria-live="polite" hidden></p>
+                    <div class="nuevo-conjunto-campos">
+                        <label for="nuevo-conjunto-codigo">Código <span aria-hidden="true">*</span>
+                            <input id="nuevo-conjunto-codigo" name="codigo" type="text" maxlength="100" placeholder="Ej. RINO" required>
+                        </label>
+                        <label for="nuevo-conjunto-nombre">Nombre del conjunto <span aria-hidden="true">*</span>
+                            <input id="nuevo-conjunto-nombre" name="nombre_conjunto" type="text" maxlength="255" placeholder="Ej. Rinoplastía" required>
+                        </label>
+                        <label for="nuevo-conjunto-servicio">Servicio clínico <span aria-hidden="true">*</span>
+                            <select id="nuevo-conjunto-servicio" name="servicio_id" required>
+                                <option value="">Selecciona un servicio</option>
+                                @foreach ($serviciosFicha as $servicioFicha)
+                                    <option value="{{ $servicioFicha->id }}">{{ $servicioFicha->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button class="btn btn-ghost" type="reset">Limpiar</button>
+                        <button class="btn btn-dark" id="nuevo-conjunto-guardar" type="submit">Guardar tipo de conjunto</button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </main>
 </div>
 @php
@@ -247,6 +312,7 @@
             'instrumentoActualizar' => route('mockups.catalogo.instrumentos.actualizar', ['instrumento' => '__ID__']),
             'fichaGuardar' => route('mockups.catalogo.fichas.guardar'),
             'fichaActualizar' => route('mockups.catalogo.fichas.actualizar', ['ficha' => '__ID__']),
+            'tipoConjuntoGuardar' => route('mockups.catalogo.tipos-conjunto.guardar'),
             'admin' => route('mockups.catalogo.admin'),
         ],
     ];

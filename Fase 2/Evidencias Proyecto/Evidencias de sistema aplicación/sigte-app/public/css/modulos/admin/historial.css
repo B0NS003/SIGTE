@@ -1,4 +1,18 @@
 /* Vista historial. Se carga después de comun.css si existe. */
+/* Control unificado: tarjetas de servicio + búsqueda en la misma card. */
+.hist-control {
+    padding: 0;
+    margin-bottom: var(--esp-4);
+}
+.hist-control .hist-sectores {
+    margin: 0;
+    padding: var(--esp-4) var(--esp-5);
+}
+.hist-control .hist-filtros {
+    margin: 0;
+    padding: var(--esp-4) var(--esp-5);
+    border-top: 1px solid var(--linea);
+}
 /* Sectores: atajo visual por servicio (conteo + última entrega). */
 .hist-sectores {
     display: grid;

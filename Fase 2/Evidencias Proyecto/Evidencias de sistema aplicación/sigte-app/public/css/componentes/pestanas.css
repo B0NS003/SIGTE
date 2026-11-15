@@ -7,9 +7,13 @@
 }
 .reportes-tab, .admin-tab, .inv-pestana {
   flex: 1 1 0; min-width: 0; min-height: var(--alto-md); padding: 0 var(--esp-4);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--esp-2);
   border: 0; border-radius: var(--radio-md); background: transparent;
   color: var(--muted); font: inherit; font-size: var(--fs-base); font-weight: 700;
   cursor: pointer; transition: background-color var(--dur-rapida) ease, color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
+}
+.reportes-tab svg, .admin-tab svg, .inv-pestana svg {
+  width: var(--icono-sm); height: var(--icono-sm); flex-shrink: 0;
 }
 .reportes-tab:hover:not(.activo), .admin-tab:hover:not(.is-active), .inv-pestana:hover:not(.is-active) {
   background: var(--card-2); color: var(--ink);
