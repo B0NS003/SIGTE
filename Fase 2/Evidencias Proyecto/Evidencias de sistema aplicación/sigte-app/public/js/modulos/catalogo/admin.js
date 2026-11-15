@@ -2,14 +2,14 @@
 var datosCatalogo = JSON.parse(document.getElementById('catalogo-admin-datos').textContent);
 var fichas = datosCatalogo.fichas;
 var tabActual = 'catalogo';
+var fichasVigentesCuenta = Object.keys(fichas || {}).length;
+var instrumentosVisiblesCuenta = (datosCatalogo.instrumentos || []).length;
 function actualizarMetaControl(id) {
     var meta = document.getElementById('catalogo-control-meta');
     if (!meta) return;
     var textos = {
-        catalogo: (document.getElementById('fichas-cuenta') || {}).textContent
-            ? document.getElementById('fichas-cuenta').textContent + ' fichas vigentes'
-            : 'Catálogo de fichas',
-        instrumentos: 'Instrumentos del catálogo',
+        catalogo: fichasVigentesCuenta + ' fichas vigentes',
+        instrumentos: instrumentosVisiblesCuenta + (instrumentosVisiblesCuenta === 1 ? ' instrumento' : ' instrumentos'),
         'nueva-ficha': 'Alta de ficha',
         'nuevo-instrumento': 'Alta de instrumento',
         'nuevo-tipo-conjunto': 'Alta de tipo de conjunto'
@@ -46,6 +46,16 @@ document.querySelectorAll('.admin-tab').forEach(function (boton) {
 var servicioActivo = '';
 var serviciosDisponibles = datosCatalogo.servicios;
 function tarjetasCatalogo() { return Array.from(document.querySelectorAll('#fichas-mural .mant-card')); }
+var coloresServicioCatalogo = ['#398ff3', '#f5bc40', '#f48cac', '#a877ec', '#36b8a5', '#f18a51'];
+function colorServicioCatalogo(nombre) {
+    var clave = String(nombre || '').toLocaleLowerCase();
+    var hash = 0;
+    for (var i = 0; i < clave.length; i += 1) {
+        hash = ((hash << 5) - hash) + clave.charCodeAt(i);
+        hash |= 0;
+    }
+    return coloresServicioCatalogo[Math.abs(hash) % coloresServicioCatalogo.length];
+}
 function agruparPorArea() {
     var mural = document.getElementById('fichas-mural');
     var cards = tarjetasCatalogo();
@@ -60,6 +70,7 @@ function agruparPorArea() {
         var grupo = document.createElement('details');
         grupo.className = 'admin-area-group';
         grupo.dataset.area = area;
+        grupo.style.setProperty('--servicio-color', colorServicioCatalogo(area));
         grupo.open = true;
         var resumen = document.createElement('summary');
         resumen.className = 'admin-area-summary';
@@ -77,16 +88,26 @@ function agruparPorArea() {
 }
 function filtrarFichas() {
     var q = document.getElementById('buscar-fichas').value.trim().toLocaleLowerCase();
+    var visiblesTotal = 0;
     tarjetasCatalogo().forEach(function(card) {
         var coincide = (!servicioActivo || card.dataset.servicio === servicioActivo)
             && card.textContent.toLocaleLowerCase().includes(q);
         card.hidden = !coincide;
+        if (coincide) visiblesTotal += 1;
     });
     document.querySelectorAll('#fichas-mural .admin-area-group').forEach(function(grupo) {
         var visibles = Array.from(grupo.querySelectorAll('.mant-card')).filter(function(card) { return !card.hidden; }).length;
         grupo.hidden = visibles === 0;
         grupo.querySelector('.admin-area-count').textContent = visibles + (visibles === 1 ? ' ficha' : ' fichas');
     });
+    var vacio = document.getElementById('fichas-vacio');
+    if (vacio) {
+        vacio.hidden = visiblesTotal > 0;
+    }
+    var mural = document.getElementById('fichas-mural');
+    if (mural) {
+        mural.hidden = visiblesTotal === 0;
+    }
 }
 function construirFiltrosServicio() {
     var select = document.getElementById('filtro-servicio');
@@ -203,8 +224,10 @@ function pintarInstrumentos(filtro) {
         mural.appendChild(card);
     });
     document.getElementById('instrumentos-vacio').hidden = filtrados.length > 0;
-    document.getElementById('instrumentos-cuenta').textContent = String(filtrados.length);
-    document.getElementById('instrumentos-meta').textContent = filtrados.length + (filtrados.length === 1 ? ' instrumento mostrado' : ' instrumentos mostrados');
+    instrumentosVisiblesCuenta = filtrados.length;
+    if (tabActual === 'instrumentos') {
+        actualizarMetaControl('instrumentos');
+    }
 }
 document.querySelectorAll('[data-instrument-view]').forEach(function (boton) {
     boton.addEventListener('click', function () {
@@ -506,13 +529,18 @@ function actualizarVista() {
     var img = document.getElementById('preview-foto');
     var archivoActual = foto.files && foto.files[0] ? foto.files[0] : null;
     if (archivoActual !== previewFotoArchivo) {
-        if (previewFotoUrl) URL.revokeObjectURL(previewFotoUrl);
+        if (previewFotoUrl && previewFotoUrl.indexOf('blob:') === 0) URL.revokeObjectURL(previewFotoUrl);
         previewFotoArchivo = archivoActual;
         previewFotoUrl = archivoActual ? URL.createObjectURL(archivoActual) : null;
     }
-    img.src = previewFotoUrl || img.dataset.placeholder;
-    document.getElementById('foto-label').textContent = foto.files && foto.files[0] ? foto.files[0].name : 'Seleccionar archivo';
-    document.getElementById('preview-texto').textContent = previewFotoUrl ? 'Vista previa de la fotografía seleccionada.' : 'Si el conjunto no tiene foto, se mostrará una imagen de referencia.';
+    var fotoExistente = img.dataset.existente || '';
+    img.src = previewFotoUrl || fotoExistente || img.dataset.placeholder;
+    document.getElementById('foto-label').textContent = foto.files && foto.files[0]
+        ? foto.files[0].name
+        : (fotoExistente ? 'Mantener fotografía actual' : 'Seleccionar archivo');
+    document.getElementById('preview-texto').textContent = (previewFotoUrl || fotoExistente)
+        ? 'Vista previa de la fotografía del conjunto.'
+        : 'Si el conjunto no tiene foto, se mostrará una imagen de referencia.';
     var mosaico = document.getElementById('preview-mosaico');
     mosaico.replaceChildren();
     mosaico.hidden = true;
@@ -521,26 +549,16 @@ function actualizarVista() {
 }
 
 function resumir() {
-    var cards = document.querySelectorAll('#fichas-mural .mant-card');
     var vigentes = 0;
-    var sinGuia = 0;
-    var retiradas = 0;
-    cards.forEach(function (card) {
-        if (card.dataset.estado === 'retirada') {
-            retiradas += 1;
-            return;
-        }
-        vigentes += 1;
-        if (card.dataset.guia !== '1') {
-            sinGuia += 1;
+    tarjetasCatalogo().forEach(function (card) {
+        if (card.dataset.estado !== 'retirada') {
+            vigentes += 1;
         }
     });
-    document.getElementById('fichas-cuenta').textContent = String(cards.length);
-    var texto = vigentes + ' vigentes · ' + sinGuia + ' sin guía visual';
-    if (retiradas) {
-        texto += ' · ' + retiradas + (retiradas === 1 ? ' retirada' : ' retiradas');
+    fichasVigentesCuenta = vigentes;
+    if (tabActual === 'catalogo') {
+        actualizarMetaControl('catalogo');
     }
-    document.getElementById('fichas-meta').textContent = texto;
     construirFiltrosServicio();
 }
 
@@ -560,6 +578,14 @@ function limpiarAlta() {
     poblarTipos('');
     guia.checked = false;
     foto.value = '';
+    var preview = document.getElementById('preview-foto');
+    if (preview) {
+        preview.dataset.existente = '';
+        preview.src = preview.dataset.placeholder || preview.src;
+    }
+    previewFotoArchivo = null;
+    if (previewFotoUrl && previewFotoUrl.indexOf('blob:') === 0) URL.revokeObjectURL(previewFotoUrl);
+    previewFotoUrl = null;
     pintarPiezas([]);
     aviso('', false);
 }
@@ -605,7 +631,15 @@ document.getElementById('fichas-mural').addEventListener('click', function (even
         fichaEditandoId = ficha.id || null;
         guia.checked = !!ficha.guia;
         foto.value = '';
+        var preview = document.getElementById('preview-foto');
+        if (preview) {
+            preview.dataset.existente = ficha.imagen_url || '';
+        }
+        previewFotoArchivo = null;
+        if (previewFotoUrl && previewFotoUrl.indexOf('blob:') === 0) URL.revokeObjectURL(previewFotoUrl);
+        previewFotoUrl = null;
         pintarPiezas(ficha.instrumentos);
+        actualizarVista();
         titulo.textContent = 'Editar ficha';
         modo.textContent = 'Cambio';
         guardar.textContent = 'Guardar cambios';

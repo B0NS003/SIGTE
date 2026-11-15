@@ -74,7 +74,16 @@
                             Selecciona un elemento de la tabla
                         </p>
 
-                        <p class="inv-modal-stock" id="inv-modal-stock"></p>
+                        <div class="inv-modal-stock" id="inv-modal-stock" hidden>
+                            <div class="inv-registro-stock-celda">
+                                <span>Stock actual</span>
+                                <strong id="inv-modal-stock-valor">0</strong>
+                            </div>
+                            <div class="inv-registro-stock-celda">
+                                <span>Mínimo</span>
+                                <strong id="inv-modal-minimo-valor">0</strong>
+                            </div>
+                        </div>
 
                         <input
                             type="hidden"
@@ -143,7 +152,8 @@
                         No fue posible cargar el historial.
                     </p>
 
-                    <ol class="act-lista" id="inv-historial-lista"></ol>
+                    <div class="inv-historial-lista" id="inv-historial-lista"></div>
+                    <nav id="inv-historial-paginas" class="sigte-paginacion inv-historial-paginas" aria-label="Páginas del historial" hidden></nav>
 
                 </section>
 

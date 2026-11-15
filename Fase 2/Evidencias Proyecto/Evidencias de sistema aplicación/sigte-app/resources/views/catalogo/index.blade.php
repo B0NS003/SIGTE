@@ -96,7 +96,7 @@
 
         @if (count($items) === 0)
             <div class="ops-empty" role="status">
-                <strong>No hay cajas coincidentes</strong>
+                <strong>No se encontraron fichas que coincidan con tu búsqueda.</strong>
                 <p>
                     Prueba con otro código, nombre o área.
                     @if ($hay_filtros)
@@ -105,31 +105,25 @@
                 </p>
             </div>
         @else
-            <p class="ops-result-meta">
-                {{ count($items) }} {{ count($items) === 1 ? 'ficha' : 'fichas' }}
-                @if ($servicio !== '')
-                    en {{ $servicio }}
-                @else
-                    en el catálogo
-                @endif
-            </p>
             @foreach (collect($items)->groupBy('servicio') as $area => $cajas)
-                <section class="cat-area">
-                    <div class="cat-area-head">
-                        <h2>{{ $area }}</h2>
-                        <span>{{ $cajas->count() }} {{ $cajas->count() === 1 ? 'ficha' : 'fichas' }}</span>
-                    </div>
+                <details class="cat-area-group" open style="--servicio-color: {{ \App\Support\CatalogoColores::paraServicio((string) $area) }}">
+                    <summary class="cat-area-summary">
+                        <strong>{{ $area }}</strong>
+                        <span class="cat-area-count">{{ $cajas->count() }} {{ $cajas->count() === 1 ? 'ficha' : 'fichas' }}</span>
+                    </summary>
                     <div class="cat-grid">
                         @foreach ($cajas as $item)
+                            @php $tieneFoto = ! empty($item['imagen_url']); @endphp
                             <a class="cat-card sigte-consulta-card" href="{{ route('mockups.ficha', $item['codigo']) }}">
-                                <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
-                                    <img
-                                        class="cat-photo-placeholder"
-                                        onerror="this.style.display='none'"
-                                        src="{{ asset('images/catalogo/sin-imagen.png') }}"
-                                        alt="Imagen de la caja no disponible"
-                                        loading="lazy"
-                                    >
+                                <div class="cat-photo {{ $tieneFoto ? '' : 'is-empty' }}">
+                                    @if ($tieneFoto)
+                                        <img
+                                            class="cat-photo-img"
+                                            src="{{ $item['imagen_url'] }}"
+                                            alt=""
+                                            loading="lazy"
+                                        >
+                                    @endif
                                     <span class="sigte-card-guide"><svg class="sigte-card-icon sigte-card-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.7 5.1C11.1 5 11.5 5 12 5c5.5 0 9 7 9 7a14 14 0 0 1-3.2 4.2"/><path d="M6.2 6.2C3.9 8.1 3 12 3 12s3.5 7 9 7a9.7 9.7 0 0 0 3.4-.6"/><path d="M10.1 10.1a2.7 2.7 0 0 0 3.8 3.8"/></svg><svg class="sigte-card-icon sigte-card-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.4 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span> {{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span></span>
                                 </div>
                                 <div class="cat-body">
@@ -141,7 +135,7 @@
                             </a>
                         @endforeach
                     </div>
-                </section>
+                </details>
             @endforeach
         @endif
     </main>

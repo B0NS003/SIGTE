@@ -4,6 +4,7 @@ namespace App\Services\Flujo;
 
 use App\Models\Caja;
 use App\Support\Auditoria;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AvanceEtapa
@@ -16,7 +17,7 @@ class AvanceEtapa
      */
     public function ejecutar(string $codigo, string $destino, array $marca): array
     {
-        $caja = Caja::query()->where('codigo', $codigo)->first();
+        $caja = Caja::enFlujo($codigo);
         if ($caja === null) {
             throw ValidationException::withMessages([
                 'caja' => 'Esa caja no está en el flujo.',
@@ -41,19 +42,24 @@ class AvanceEtapa
         }
 
         $desde = $etiquetaActual;
-        $caja->etapa = $siguiente;
-        $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
-        $caja->actividad = null;
-        $caja->etapa_desde = now();
-        $caja->proceso_desde = null;
-        $caja->proceso_hasta = null;
-        $caja->responsable_id = $marca['user_id'];
-        $caja->save();
 
-        $caja->anotaciones()->create([
-            'user_id' => $marca['user_id'],
-            'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
-        ]);
+        DB::transaction(function () use ($caja, $siguiente, $marca): void {
+            $caja->etapa = $siguiente;
+            $caja->estado = 'En '.Caja::etiquetaEtapa($siguiente);
+            $caja->actividad = null;
+            $caja->etapa_desde = now();
+            $caja->proceso_desde = null;
+            $caja->proceso_hasta = null;
+            $caja->responsable_id = $marca['user_id'];
+            $caja->personal_id = $marca['personal_id'] ?? null;
+            $caja->save();
+
+            $caja->anotaciones()->create([
+                'user_id' => $marca['user_id'],
+                'personal_id' => $marca['personal_id'] ?? null,
+                'texto' => 'Pasó a '.Caja::etiquetaEtapa($siguiente),
+            ]);
+        });
 
         Auditoria::registrar(
             'Avanzó etapa',

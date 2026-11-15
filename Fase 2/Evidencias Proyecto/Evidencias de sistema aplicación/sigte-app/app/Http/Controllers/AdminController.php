@@ -72,20 +72,40 @@ class AdminController extends Controller
             'roles' => Rol::query()->orderBy('nombre')->get(),
             'editar' => $editar,
             'filtros' => $filtros,
-            'resumen' => [
-                'total' => User::query()->count(),
-                'activos' => User::query()->where('activo', true)->count(),
-                'inactivos' => User::query()->where('activo', false)->count(),
-                'admin' => User::query()->whereHas('rol', fn ($q) => $q->where('nombre', Rol::ADMINISTRADORA))->where('activo', true)->count(),
-            ],
+            'resumen' => $this->resumenCuentas(),
         ]);
     }
 
-    public function turnos(): View
+    /** @return array{total: int, activos: int, inactivos: int, admin: int} */
+    private function resumenCuentas(): array
     {
+        $fila = User::query()
+            ->leftJoin('roles', 'roles.id', '=', 'users.rol_id')
+            ->selectRaw('COUNT(*) AS total')
+            ->selectRaw('COUNT(*) FILTER (WHERE users.activo = true) AS activos')
+            ->selectRaw('COUNT(*) FILTER (WHERE users.activo = false) AS inactivos')
+            ->selectRaw('COUNT(*) FILTER (WHERE users.activo = true AND roles.nombre = ?) AS admin', [Rol::ADMINISTRADORA])
+            ->first();
+
+        return [
+            'total' => (int) ($fila->total ?? 0),
+            'activos' => (int) ($fila->activos ?? 0),
+            'inactivos' => (int) ($fila->inactivos ?? 0),
+            'admin' => (int) ($fila->admin ?? 0),
+        ];
+    }
+
+    public function turnos(Request $request): View
+    {
+        $grupo = $this->grupoTurnoDesdeRequest($request);
+        if ($grupo === Rol::ENFERMERA) {
+            $this->asegurarPersonalEnfermeras();
+        }
+
         return view('admin.turnos', [
             'usuario' => $this->usuarioSesion(),
-            'nomina' => Personal::query()->orderBy('grupo')->orderBy('nombre')->get(),
+            'grupo' => $grupo,
+            'nomina' => $this->nominaTurnosPorGrupo($grupo),
             'turnoVigente' => Personal::turnoVigente(),
         ]);
     }
@@ -100,9 +120,17 @@ class AdminController extends Controller
         $datos = $request->validate([
             'personal_id' => ['required', 'integer', 'exists:personal,id'],
             'turno' => ['nullable', Rule::in(array_keys(Personal::TURNOS))],
+            'grupo' => ['nullable', Rule::in([Rol::OPERADOR, Rol::ENFERMERA])],
         ]);
 
-        $persona = Personal::query()->findOrFail($datos['personal_id']);
+        $grupo = $datos['grupo'] ?? Rol::OPERADOR;
+        $persona = Personal::query()->with('usuario.rol')->findOrFail($datos['personal_id']);
+        if (! $this->personaPerteneceAGrupoTurno($persona, $grupo)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Esta persona no corresponde al grupo de turnos seleccionado.',
+            ], 422);
+        }
         $antes = $persona->turno;
         $persona->turno = $datos['turno'] ?? null;
         if ($antes !== $persona->turno) {
@@ -136,10 +164,11 @@ class AdminController extends Controller
         ]);
     }
 
-    public function exportarTurnosPdf(): Response
+    public function exportarTurnosPdf(Request $request): Response
     {
-        $datos = $this->datosExportacionTurnos();
-        $nombre = 'sigte-turnos-'.$datos['fecha_archivo'].'.pdf';
+        $datos = $this->datosExportacionTurnos($request);
+        $sufijo = $datos['grupo'] === Rol::ENFERMERA ? 'enfermeras' : 'operadoras';
+        $nombre = 'sigte-turnos-'.$sufijo.'-'.$datos['fecha_archivo'].'.pdf';
 
         return Pdf::loadView('admin.turnos-pdf', [
             'porTurno' => $datos['por_turno'],
@@ -149,19 +178,22 @@ class AdminController extends Controller
             'fechaAsignacion' => $datos['fecha_asignacion'],
             'horaAsignacion' => $datos['hora_asignacion'],
             'total' => $datos['total'],
+            'grupo' => $datos['grupo'],
+            'grupoEtiqueta' => $datos['grupo_etiqueta'],
         ])->setPaper('letter', 'portrait')->download($nombre);
     }
 
-    public function exportarTurnosExcel(): StreamedResponse
+    public function exportarTurnosExcel(Request $request): StreamedResponse
     {
-        $datos = $this->datosExportacionTurnos();
-        $nombre = 'sigte-turnos-'.$datos['fecha_archivo'].'.xlsx';
+        $datos = $this->datosExportacionTurnos($request);
+        $sufijo = $datos['grupo'] === Rol::ENFERMERA ? 'enfermeras' : 'operadoras';
+        $nombre = 'sigte-turnos-'.$sufijo.'-'.$datos['fecha_archivo'].'.xlsx';
 
         $libro = new Spreadsheet;
         $hoja = $libro->getActiveSheet();
         $hoja->setTitle('Turnos');
 
-        $hoja->setCellValue('A1', 'SIGTE — Asignación de turnos del puesto');
+        $hoja->setCellValue('A1', 'SIGTE — Asignación de turnos · '.$datos['grupo_etiqueta']);
         $hoja->mergeCells('A1:E1');
         $hoja->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 
@@ -186,7 +218,7 @@ class AdminController extends Controller
         };
         $hoja->setCellValue(
             'A4',
-            'Personal en nómina: '.$datos['total'].' · Turno vigente ahora: '.$etiquetaVigente
+            'Grupo: '.$datos['grupo_etiqueta'].' · Personal en nómina: '.$datos['total'].' · Turno vigente ahora: '.$etiquetaVigente
         );
         $hoja->mergeCells('A4:E4');
 
@@ -254,12 +286,19 @@ class AdminController extends Controller
      *     fecha_asignacion: ?string,
      *     hora_asignacion: ?string,
      *     fecha_archivo: string,
-     *     total: int
+     *     total: int,
+     *     grupo: string,
+     *     grupo_etiqueta: string
      * }
      */
-    private function datosExportacionTurnos(): array
+    private function datosExportacionTurnos(Request $request): array
     {
-        $nomina = Personal::query()->orderBy('nombre')->get();
+        $grupo = $this->grupoTurnoDesdeRequest($request);
+        if ($grupo === Rol::ENFERMERA) {
+            $this->asegurarPersonalEnfermeras();
+        }
+
+        $nomina = $this->nominaTurnosPorGrupo($grupo);
         $momento = now()->timezone('America/Santiago');
         $turnoVigente = Personal::turnoVigente($momento);
 
@@ -308,7 +347,56 @@ class AdminController extends Controller
             'hora_asignacion' => $ultimaAsignacion?->format('H:i'),
             'fecha_archivo' => $ultimaAsignacion?->format('Y-m-d') ?? $momento->format('Y-m-d'),
             'total' => $nomina->count(),
+            'grupo' => $grupo,
+            'grupo_etiqueta' => $grupo === Rol::ENFERMERA ? 'Enfermeras de turno' : 'Operadoras',
         ];
+    }
+
+    private function grupoTurnoDesdeRequest(Request $request): string
+    {
+        $grupo = (string) $request->query('grupo', Rol::OPERADOR);
+
+        return in_array($grupo, [Rol::OPERADOR, Rol::ENFERMERA], true) ? $grupo : Rol::OPERADOR;
+    }
+
+    /** @return Collection<int, Personal> */
+    private function nominaTurnosPorGrupo(string $grupo): Collection
+    {
+        $consulta = Personal::query()
+            ->with('usuario.rol')
+            ->where('activo', true);
+
+        if ($grupo === Rol::ENFERMERA) {
+            $consulta->whereHas('usuario.rol', fn ($q) => $q->where('nombre', Rol::ENFERMERA));
+        } else {
+            $consulta->where(function ($q) {
+                $q->whereHas('usuario.rol', fn ($r) => $r->where('nombre', Rol::OPERADOR))
+                    ->orWhereDoesntHave('usuario');
+            });
+        }
+
+        return $consulta->orderBy('grupo')->orderBy('nombre')->get();
+    }
+
+    private function personaPerteneceAGrupoTurno(Personal $persona, string $grupo): bool
+    {
+        $rol = $persona->usuario?->rol?->nombre;
+
+        if ($grupo === Rol::ENFERMERA) {
+            return $rol === Rol::ENFERMERA;
+        }
+
+        return $rol === Rol::OPERADOR || $rol === null;
+    }
+
+    private function asegurarPersonalEnfermeras(): void
+    {
+        User::query()
+            ->where('activo', true)
+            ->whereHas('rol', fn ($q) => $q->where('nombre', Rol::ENFERMERA))
+            ->orderBy('id')
+            ->get()
+            ->each(fn (User $user) => $this->sincronizarPersonalConUsuario($user));
     }
 
     public function guardarUsuario(Request $request): RedirectResponse
@@ -323,6 +411,8 @@ class AdminController extends Controller
             'rol_id' => $rol->id,
             'activo' => true,
         ]);
+        $nuevo->setRelation('rol', $rol);
+        $this->sincronizarPersonalConUsuario($nuevo);
 
         Auditoria::registrar('Creó usuario', 'usuarios', $nuevo->name, 'Rol '.$rol->etiqueta());
 
@@ -354,6 +444,8 @@ class AdminController extends Controller
             $user->password = $datos['password'];
         }
         $user->save();
+        $user->setRelation('rol', $rol);
+        $this->sincronizarPersonalConUsuario($user);
 
         Auditoria::registrar('Actualizó cuenta', 'usuarios', $user->name, 'Rol '.$rol->etiqueta());
 
@@ -376,7 +468,13 @@ class AdminController extends Controller
         }
 
         $user->activo = ! $user->activo;
+        if (! $user->activo) {
+            // Invalida “recordarme” para que no reabra sesión sin pasar por el login.
+            $user->setRememberToken(str()->random(60));
+        }
         $user->save();
+        $user->loadMissing('rol');
+        $this->sincronizarPersonalConUsuario($user);
 
         Auditoria::registrar(
             $user->activo ? 'Activó usuario' : 'Desactivó usuario',
@@ -451,18 +549,71 @@ class AdminController extends Controller
             ->whereHas('rol', fn ($consulta) => $consulta->where('nombre', Rol::ADMINISTRADORA))
             ->exists();
     }
+
+    /**
+     * Operadoras y enfermeras: crea/actualiza fila en personal para la nómina de turnos.
+     */
+    private function sincronizarPersonalConUsuario(User $user): void
+    {
+        if ($user->esCuentaDelPuesto()) {
+            return;
+        }
+
+        $personal = Personal::query()->where('user_id', $user->id)->first()
+            ?? Personal::query()->where('email', $user->email)->first();
+
+        if ($user->isOperador() || $user->isEnfermera()) {
+            if ($personal === null) {
+                Personal::query()->create([
+                    'user_id' => $user->id,
+                    'nombre' => $user->name,
+                    'email' => $user->email,
+                    'grupo' => 1,
+                    'activo' => $user->activo,
+                    'turno' => null,
+                    'turno_asignado_at' => null,
+                ]);
+
+                return;
+            }
+
+            $personal->user_id = $user->id;
+            $personal->nombre = $user->name;
+            $personal->email = $user->email;
+            $personal->activo = $user->activo;
+            $personal->save();
+
+            return;
+        }
+
+        if ($personal === null) {
+            return;
+        }
+
+        // Otros roles con personal previo: solo alinear datos.
+        if ((int) $personal->user_id === (int) $user->id
+            || mb_strtolower((string) $personal->email) === mb_strtolower($user->email)) {
+            $personal->user_id = $user->id;
+            $personal->nombre = $user->name;
+            $personal->email = $user->email;
+            $personal->activo = $user->activo;
+            $personal->save();
+        }
+    }
+
     public function reportes(Request $request): RedirectResponse
     {
         return redirect()->route('mockups.panel', array_merge(
             ['rol' => Rol::ADMINISTRADORA],
-            $request->only(['desde', 'hasta', 'tipo', 'servicio'])
+            $request->only(['desde', 'hasta', 'tipo', 'servicio', 'tab'])
         ));
     }
 
     public function exportarReportes(Request $request): StreamedResponse
     {
         $filtros = ReporteAdmin::filtros($request);
-        $datos = ReporteAdmin::datos($filtros, true);
+        // CSV histórico: trazabilidad + entregas (sin producción/flujo pesado).
+        $datos = ReporteAdmin::datos($filtros, true, 'csv');
         $nombre = 'sigte-reporte-'.$filtros['desde'].'_'.$filtros['hasta'].'.csv';
 
         return response()->streamDownload(function () use ($datos, $filtros) {
@@ -504,7 +655,7 @@ class AdminController extends Controller
     {
         $filtros = ReporteAdmin::filtros($request);
         $tab = ReporteAdmin::pestana($request);
-        $datos = ReporteAdmin::datos($filtros, true);
+        $datos = ReporteAdmin::datos($filtros, true, $tab);
         $nombre = 'sigte-'.$tab.'-'.$filtros['desde'].'_'.$filtros['hasta'].'.xlsx';
 
         $libro = new Spreadsheet;
@@ -528,6 +679,22 @@ class AdminController extends Controller
                 $totalFlujo > 0 ? round($fila['cantidad'] / $totalFlujo * 100, 2) : 0,
             ]);
             $this->escribirHojaReporteExcel($hoja, 'Procesamiento de cajas (estado actual)', ['Etapa', 'Cajas', 'Porcentaje (%)'], $filasFlujo, $filtros);
+
+            $hoja = $libro->createSheet();
+            $hoja->setTitle('Histórico por etapa');
+            $totalHistorico = collect($datos['cajas_por_etapa'])->sum('cantidad');
+            $filasHistorico = collect($datos['cajas_por_etapa'])->map(fn ($fila) => [
+                $fila['etapa'],
+                (int) $fila['cantidad'],
+                $totalHistorico > 0 ? round($fila['cantidad'] / $totalHistorico * 100, 2) : 0,
+            ]);
+            $this->escribirHojaReporteExcel(
+                $hoja,
+                'Procesamiento histórico por etapa (ciclos del período)',
+                ['Etapa', 'Ciclos', 'Porcentaje (%)'],
+                $filasHistorico,
+                $filtros
+            );
 
             $hoja = $libro->createSheet();
             $hoja->setTitle('Producción mensual');
@@ -571,7 +738,7 @@ class AdminController extends Controller
     {
         $filtros = ReporteAdmin::filtros($request);
         $tab = ReporteAdmin::pestana($request);
-        $datos = ReporteAdmin::datos($filtros, true);
+        $datos = ReporteAdmin::datos($filtros, true, $tab);
         $nombre = 'sigte-'.$tab.'-'.$filtros['desde'].'_'.$filtros['hasta'].'.pdf';
 
         return Pdf::loadView('admin.reportes-pdf', [
@@ -591,6 +758,8 @@ class AdminController extends Controller
                 ['Cajas actualmente en flujo', (int) collect($datos['en_flujo'])->sum('cantidad')],
                 ['Cajas recibidas en el período', (int) $datos['recibidas_periodo']],
                 ['Etapas con cajas', (int) collect($datos['en_flujo'])->count()],
+                ['Ingresos históricos por etapa', (int) collect($datos['cajas_por_etapa'])->sum('cantidad')],
+                ['Etapas con movimiento histórico', (int) collect($datos['cajas_por_etapa'])->where('cantidad', '>', 0)->count()],
                 ['Servicios con producción', (int) $datos['produccion']['servicios']],
                 ['Unidades procesadas', (int) $datos['produccion']['cantidad']],
                 ['Litros totales', (float) $datos['produccion']['litros']],
@@ -945,49 +1114,9 @@ class AdminController extends Controller
 
     public function alertas(): View
     {
-        $lista = [
-            [
-                'id' => 'AL-014',
-                'nivel' => 'alta',
-                'titulo' => 'SET-042 lleva 4h en esterilizacion',
-                'detalle' => 'Pabellon · Autoclave 2 · iniciado 10:12',
-                'tipo' => 'Retraso',
-                'caja' => 'SET-042',
-                'hora' => '14:12',
-                'estado' => 'abierta',
-            ],
-            [
-                'id' => 'AL-013',
-                'nivel' => 'media',
-                'titulo' => 'CAJA-118 sin custodia al salir de lavado',
-                'detalle' => 'Urgencia · avance registrado sin receptor',
-                'tipo' => 'Custodia',
-                'caja' => 'CAJA-118',
-                'hora' => '14:05',
-                'estado' => 'abierta',
-            ],
-            [
-                'id' => 'AL-012',
-                'nivel' => 'media',
-                'titulo' => 'Faltante en SET-007 (1 pinza)',
-                'detalle' => 'Detectado en preparacion · Maternidad',
-                'tipo' => 'Faltante',
-                'caja' => 'SET-007',
-                'hora' => '11:22',
-                'estado' => 'abierta',
-            ],
-            ...$this->alertasDeInventario(),
-            [
-                'id' => 'AL-008',
-                'nivel' => 'baja',
-                'titulo' => 'SET-019 demora en almacén >12h',
-                'detalle' => 'Curaciones · lista sin retiro',
-                'tipo' => 'Retraso',
-                'caja' => 'SET-019',
-                'hora' => 'Ayer',
-                'estado' => 'resuelta',
-            ],
-        ];
+        // Solo alertas reales de stock (se quitaron mockups SET-042 / CAJA-118 / etc.).
+        $lista = $this->alertasDeInventario();
+
         return view('admin.alertas', [
             'usuario' => $this->usuarioSesion(),
             'alertas' => $lista,

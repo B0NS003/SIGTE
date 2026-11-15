@@ -125,79 +125,85 @@
                 </form>
             </div>
 
-            <div class="mant-head">
-                <div>
-                    <h2>
-                        @if ($filtros['servicio'] !== '')
-                            {{ $filtros['servicio'] }}
-                        @else
-                            Entregas registradas
-                        @endif
-                    </h2>
-                    <p>
-                        @if ($entregas->total() === 0)
-                            Sin coincidencias con el criterio actual
-                        @else
-                            {{ $entregas->total() }} {{ $entregas->total() === 1 ? 'entrega' : 'entregas' }}
-                            · pág. {{ $entregas->currentPage() }}/{{ max(1, $entregas->lastPage()) }}
-                        @endif
-                    </p>
-                </div>
-            </div>
+            <section class="hist-shell {{ $filtros['servicio'] !== '' ? 'sec-'.$slugSector($filtros['servicio']) : '' }}">
+                <header class="hist-shell-head">
+                    <div>
+                        <h2>
+                            @if ($filtros['servicio'] !== '')
+                                {{ $filtros['servicio'] }}
+                            @else
+                                Entregas registradas
+                            @endif
+                        </h2>
+                        <p>
+                            @if ($entregas->total() === 0)
+                                Sin coincidencias con el criterio actual
+                            @else
+                                {{ $entregas->total() }} {{ $entregas->total() === 1 ? 'entrega' : 'entregas' }}
+                                · pág. {{ $entregas->currentPage() }}/{{ max(1, $entregas->lastPage()) }}
+                            @endif
+                        </p>
+                    </div>
+                </header>
 
-            @if ($entregas->total() === 0)
-                <div class="ops-empty">
-                    <strong>No hay entregas con ese criterio</strong>
-                    <p>Prueba con otro código, servicio, persona o período.</p>
-                    @if ($filtros['q'] !== '' || $filtros['cuando'] !== 'todas' || $filtros['servicio'] !== '')
-                        <p><a href="{{ route('mockups.historial_entregas') }}">Ver todas las entregas</a></p>
+                <div class="hist-shell-body">
+                    @if ($entregas->total() === 0)
+                        <div class="ops-empty">
+                            <strong>No hay entregas con ese criterio</strong>
+                            <p>Prueba con otro código, servicio, persona o período.</p>
+                            @if ($filtros['q'] !== '' || $filtros['cuando'] !== 'todas' || $filtros['servicio'] !== '')
+                                <p><a href="{{ route('mockups.historial_entregas') }}">Ver todas las entregas</a></p>
+                            @endif
+                        </div>
+                    @else
+                        <div class="hist-lista">
+                            @foreach ($entregas as $entrega)
+                                <article class="hist-card sec-{{ $slugSector($entrega['servicio']) }}">
+                                    <div class="hist-cuando">
+                                        <strong>{{ $entrega['hora'] }}</strong>
+                                        <span>{{ $entrega['fecha'] }}</span>
+                                        @if ($relativo = $etiquetaCuando($entrega['cuando']))
+                                            <em class="hist-relativo">{{ $relativo }}</em>
+                                        @endif
+                                        <small>{{ $entrega['id'] }}</small>
+                                    </div>
+                                    <div class="hist-cuerpo">
+                                        <div class="hist-top">
+                                            <h2>{{ $entrega['servicio'] }}</h2>
+                                            <span class="badge">{{ count($entrega['cajas']) }} {{ count($entrega['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
+                                        </div>
+                                        <div class="hist-cajas">
+                                            @forelse ($entrega['cajas'] as $caja)
+                                                <span class="hist-chip">{{ $caja['codigo'] }} <small>{{ $caja['nombre'] }}</small></span>
+                                            @empty
+                                                <span class="hist-chip is-material">Sin cajas</span>
+                                            @endforelse
+                                            @foreach ($entrega['materiales'] as $material)
+                                                <span class="hist-chip is-material">{{ $material }}</span>
+                                            @endforeach
+                                        </div>
+                                        <div class="entrega-datos">
+                                            <div class="entrega-dato">
+                                                <span>Quién entrega</span>
+                                                <strong>{{ $entrega['entrega'] }}</strong>
+                                                <small>{{ $entrega['entrega_rol'] }}</small>
+                                            </div>
+                                            <div class="entrega-dato">
+                                                <span>Quién recibe</span>
+                                                <strong>{{ $entrega['recibe'] }}</strong>
+                                                <small>{{ $entrega['recibe_rol'] }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                        <div class="hist-paginacion">
+                            {{ $entregas->onEachSide(1)->links('partials.paginacion-sigte') }}
+                        </div>
                     @endif
                 </div>
-            @else
-                <div class="hist-lista">
-                    @foreach ($entregas as $entrega)
-                        <article class="hist-card sec-{{ $slugSector($entrega['servicio']) }}">
-                            <div class="hist-cuando">
-                                <strong>{{ $entrega['hora'] }}</strong>
-                                <span>{{ $entrega['fecha'] }}</span>
-                                @if ($relativo = $etiquetaCuando($entrega['cuando']))
-                                    <em class="hist-relativo">{{ $relativo }}</em>
-                                @endif
-                                <small>{{ $entrega['id'] }}</small>
-                            </div>
-                            <div class="hist-cuerpo">
-                                <div class="hist-top">
-                                    <h2>{{ $entrega['servicio'] }}</h2>
-                                    <span class="badge">{{ count($entrega['cajas']) }} {{ count($entrega['cajas']) === 1 ? 'caja' : 'cajas' }}</span>
-                                </div>
-                                <div class="hist-cajas">
-                                    @forelse ($entrega['cajas'] as $caja)
-                                        <span class="hist-chip">{{ $caja['codigo'] }} <small>{{ $caja['nombre'] }}</small></span>
-                                    @empty
-                                        <span class="hist-chip is-material">Sin cajas</span>
-                                    @endforelse
-                                    @foreach ($entrega['materiales'] as $material)
-                                        <span class="hist-chip is-material">{{ $material }}</span>
-                                    @endforeach
-                                </div>
-                                <div class="entrega-datos">
-                                    <div class="entrega-dato">
-                                        <span>Quién entrega</span>
-                                        <strong>{{ $entrega['entrega'] }}</strong>
-                                        <small>{{ $entrega['entrega_rol'] }}</small>
-                                    </div>
-                                    <div class="entrega-dato">
-                                        <span>Quién recibe</span>
-                                        <strong>{{ $entrega['recibe'] }}</strong>
-                                        <small>{{ $entrega['recibe_rol'] }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
-                @include('admin.partials.paginas', ['paginador' => $entregas, 'etiqueta' => 'Páginas de entregas'])
-            @endif
+            </section>
         @endif
     </main>
 </div>

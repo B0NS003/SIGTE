@@ -23,9 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const fechaHora = document.getElementById('inv-registro-fecha-hora');
 
     const historialLista = document.getElementById('inv-movimiento-historial-lista');
+    const historialPaginas = document.getElementById('inv-movimiento-historial-paginas');
     const historialCargando = document.getElementById('inv-movimiento-historial-cargando');
     const historialVacio = document.getElementById('inv-movimiento-historial-vacio');
     const historialError = document.getElementById('inv-movimiento-historial-error');
+    let historialPaginaActual = 1;
 
     const nombre = document.getElementById('inv-movimiento-nombre');
     const stock = document.getElementById('inv-movimiento-stock');
@@ -150,20 +152,26 @@ document.addEventListener('DOMContentLoaded', () => {
         temporizadorFechaHora = null;
     }
 
-    async function cargarHistorial() {
+    async function cargarHistorial(pagina = 1) {
+        historialPaginaActual = pagina;
         historialLista.replaceChildren();
+        if (historialPaginas) {
+            historialPaginas.hidden = true;
+            historialPaginas.replaceChildren();
+        }
         historialCargando.hidden = false;
         historialVacio.hidden = true;
         historialError.hidden = true;
 
         const plantilla = vistaRegistro.dataset.historialUrl;
 
-        const url = plantilla
+        const urlBase = plantilla
             .replace(
                 '__SALA__',
                 encodeURIComponent(formulario.querySelector('input[name="sala"]').value)
             )
             .replace('__CODIGO__', encodeURIComponent(codigo.value));
+        const url = `${urlBase}?page=${pagina}`;
 
         try {
             const respuesta = await fetch(url, {
@@ -187,35 +195,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             datos.historial.forEach((movimiento) => {
-                const tarjeta = document.createElement('article');
-                tarjeta.className = 'inv-historial-movimiento';
-
-                const titulo = document.createElement('strong');
-                titulo.textContent = movimiento.tipo;
-
-                const detalle = document.createElement('p');
-                detalle.textContent = `${movimiento.cantidad} unidades · ${movimiento.fecha}`;
-
-                const autor = document.createElement('small');
-                autor.textContent = `Registrado por: ${movimiento.autor}`;
-
-                tarjeta.append(titulo, detalle, autor);
-
-                if (movimiento.observacion) {
-                    const observacion = document.createElement('p');
-                    observacion.textContent = movimiento.observacion;
-                    tarjeta.append(observacion);
-                }
-
-                historialLista.append(tarjeta);
+                historialLista.append(crearTarjetaHistorialInventario(movimiento));
             });
+
+            renderPaginacionHistorialInventario(
+                historialPaginas,
+                datos.paginacion,
+                (nuevaPagina) => cargarHistorial(nuevaPagina)
+            );
 
         } catch (e) {
             historialCargando.hidden = true;
             historialError.hidden = false;
 
         } finally {
-            /* ACTUALIZAR ALTURA DESPUÉS DE CARGAR EL HISTORIAL */
             if (contenedor.classList.contains('mostrar-registro')) {
                 requestAnimationFrame(() => {
                     ajustarAlturaVista(vistaRegistro);
@@ -226,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validarCantidad() {
         const movimiento = tipo.value;
-        const valor = Number(cantidad.value);
+        const texto = cantidad.value.trim();
+        const valor = Number(texto);
         const disponible = Number(stock.textContent);
         const enProceso = Number(proceso.textContent);
 
@@ -234,6 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
         guardar.disabled = true;
 
         if (!movimiento) {
+            return;
+        }
+
+        if (texto === '' || !Number.isInteger(valor) || valor < 1) {
             return;
         }
 
@@ -345,8 +343,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const datos = await respuesta.json();
 
             if (!respuesta.ok || !datos.ok) {
+                const primerError = datos.errors
+                    ? Object.values(datos.errors).flat()[0]
+                    : null;
                 throw new Error(
-                    datos.mensaje || 'No fue posible registrar el movimiento.'
+                    datos.mensaje ||
+                    primerError ||
+                    datos.message ||
+                    'No fue posible registrar el movimiento.'
                 );
             }
 
@@ -360,13 +364,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 botonSeleccionado.dataset.stock = datos.elemento.stock;
                 botonSeleccionado.dataset.enProceso = datos.elemento.en_proceso;
 
-                const fila = botonSeleccionado.closest('tr');
+                /* ACTUALIZAR LA FICHA DEL INSUMO */
+                const tarjeta = botonSeleccionado.closest('.inv-insumo-card');
 
-                if (fila) {
-                    const stockAnterior = Number(fila.dataset.stock);
-                    const procesoAnterior = Number(fila.dataset.enProceso);
-                    const estadoAnterior = fila.dataset.estado;
+                if (tarjeta) {
 
+                    const stockAnterior = Number(tarjeta.dataset.stock);
+                    const procesoAnterior = Number(tarjeta.dataset.enProceso);
+                    const estadoAnterior = tarjeta.dataset.estado;
+
+                    // Calcular el nuevo estado del insumo.
                     const nuevoEstado = datos.elemento.stock <= 0 ||
                         (datos.elemento.minimo > 0 &&
                             datos.elemento.stock <= Math.floor(datos.elemento.minimo / 2))
@@ -375,68 +382,103 @@ document.addEventListener('DOMContentLoaded', () => {
                             ? 'bajo'
                             : 'ok';
 
-                    fila.dataset.stock = datos.elemento.stock;
-                    fila.dataset.enProceso = datos.elemento.en_proceso;
-                    fila.dataset.estado = nuevoEstado;
+                    // Actualizar los datos internos de la ficha.
+                    tarjeta.dataset.stock = datos.elemento.stock;
+                    tarjeta.dataset.enProceso = datos.elemento.en_proceso;
+                    tarjeta.dataset.estado = nuevoEstado;
 
-                    fila.cells[3].textContent = datos.elemento.stock;
-                    fila.cells[5].textContent = datos.elemento.en_proceso;
+                    // Actualizar los indicadores de stock.
+                    tarjeta.querySelector('.inv-insumo-stock').textContent =
+                        datos.elemento.stock;
 
-                    fila.classList.remove('stock-ok', 'stock-bajo', 'stock-critico');
-                    fila.classList.add(`stock-${nuevoEstado}`);
+                    tarjeta.querySelector('.inv-insumo-proceso').textContent =
+                        datos.elemento.en_proceso;
 
-                    const celdaEstado = fila.cells[6];
-                    celdaEstado.replaceChildren();
+                    // Actualizar el color superior de la ficha.
+                    tarjeta.classList.remove(
+                        'stock-ok',
+                        'stock-bajo',
+                        'stock-critico'
+                    );
 
-                    const indicador = document.createElement('span');
-                    indicador.className = nuevoEstado === 'ok'
-                        ? 'pill pill-ok'
-                        : nuevoEstado === 'bajo'
-                            ? 'pill pill-warn'
-                            : 'pill pill-danger';
+                    tarjeta.classList.add(`stock-${nuevoEstado}`);
 
-                    indicador.textContent = nuevoEstado === 'ok'
-                        ? 'OK'
-                        : nuevoEstado === 'bajo'
-                            ? 'Bajo mínimo'
-                            : 'Crítico';
+                    // Actualizar la etiqueta del estado.
+                    const contenedorEstado = tarjeta.querySelector('.inv-insumo-estado');
 
-                    celdaEstado.append(indicador);
+                    if (contenedorEstado) {
 
+                        contenedorEstado.replaceChildren();
+
+                        const indicador = document.createElement('span');
+
+                        indicador.className = nuevoEstado === 'ok'
+                            ? 'pill pill-ok'
+                            : nuevoEstado === 'bajo'
+                                ? 'pill pill-warn'
+                                : 'pill pill-danger';
+
+                        indicador.textContent = nuevoEstado === 'ok'
+                            ? 'OK'
+                            : nuevoEstado === 'bajo'
+                                ? 'Bajo mínimo'
+                                : 'Crítico';
+
+                        contenedorEstado.append(indicador);
+                    }
+
+                    // Actualizar los datos de los botones de acción de la ficha.
+                    tarjeta.querySelectorAll('button').forEach((boton) => {
+                        boton.dataset.stock = datos.elemento.stock;
+                        boton.dataset.enProceso = datos.elemento.en_proceso;
+                        boton.dataset.minimo = datos.elemento.minimo;
+                    });
+
+                    // Actualizar los contadores generales del inventario.
                     const totalStock = document.getElementById('inv-total-stock');
                     const totalProceso = document.getElementById('inv-total-proceso');
                     const totalBajo = document.getElementById('inv-total-bajo');
                     const alertaResumen = document.getElementById('inv-alerta-resumen');
 
-                    totalStock.textContent =
-                        Number(totalStock.textContent) +
-                        Number(datos.elemento.stock) - stockAnterior;
+                    if (totalStock) {
+                        totalStock.textContent =
+                            Number(totalStock.textContent) +
+                            Number(datos.elemento.stock) - stockAnterior;
+                    }
 
-                    totalProceso.textContent =
-                        Number(totalProceso.textContent) +
-                        Number(datos.elemento.en_proceso) - procesoAnterior;
+                    if (totalProceso) {
+                        totalProceso.textContent =
+                            Number(totalProceso.textContent) +
+                            Number(datos.elemento.en_proceso) - procesoAnterior;
+                    }
 
-                    totalBajo.textContent =
-                        Number(totalBajo.textContent) +
-                        (nuevoEstado !== 'ok' ? 1 : 0) -
-                        (estadoAnterior !== 'ok' ? 1 : 0);
+                    if (totalBajo) {
+                        totalBajo.textContent =
+                            Number(totalBajo.textContent) +
+                            (nuevoEstado !== 'ok' ? 1 : 0) -
+                            (estadoAnterior !== 'ok' ? 1 : 0);
+                    }
 
-                    alertaResumen.classList.toggle(
-                        'is-alert',
-                        Number(totalBajo.textContent) > 0
-                    );
+                    if (alertaResumen && totalBajo) {
+                        alertaResumen.classList.toggle(
+                            'is-alert',
+                            Number(totalBajo.textContent) > 0
+                        );
+                    }
                 }
+                cantidad.value = '';
+                guardar.disabled = true;
+                cargarHistorial(1);
+
             }
 
-            cantidad.value = '';
-            guardar.disabled = true;
-            cargarHistorial();
-
         } catch (e) {
+            // Error (p. ej. sin puesto): se queda en la vista y conserva tipo/cantidad/obs.
             error.textContent = e.message;
             error.hidden = false;
         } finally {
             guardar.textContent = textoOriginal;
+            validarCantidad();
         }
     });
 

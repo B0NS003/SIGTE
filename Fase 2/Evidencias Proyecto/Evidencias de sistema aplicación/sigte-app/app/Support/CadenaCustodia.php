@@ -34,6 +34,7 @@ class CadenaCustodia
             ])
             ->where('codigo', 'ilike', '%'.$codigo.'%')
             ->orderBy('codigo')
+            ->orderByDesc('id')
             ->limit(20)
             ->get();
 
@@ -117,8 +118,12 @@ class CadenaCustodia
 
         $entregada = $caja->entregado_at !== null;
 
+        $inicio = ($caja->created_at ?? $caja->etapa_desde)?->timezone('America/Santiago');
+        $etiquetaCiclo = $inicio?->format('d/m/Y H:i') ?? ('#'.$caja->id);
+
         return [
             'caja' => $caja->codigo,
+            'ciclo' => $etiquetaCiclo,
             'servicio' => $caja->servicio,
             'estado' => $entregada ? 'Entregada' : Caja::etiquetaEtapa((string) $caja->etapa),
             'ubicacion' => (string) ($caja->ubicacion ?: '—'),

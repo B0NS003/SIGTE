@@ -18,6 +18,7 @@ class ElementoInventario extends Model
         'stock',
         'minimo',
         'en_proceso',
+        'imagen',
     ];
 
     protected function casts(): array

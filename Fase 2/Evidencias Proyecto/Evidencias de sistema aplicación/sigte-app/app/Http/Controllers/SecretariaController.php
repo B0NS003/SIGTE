@@ -194,32 +194,35 @@ class SecretariaController extends Controller
             'cantidad.min' => 'La cantidad debe ser al menos 1.',
         ]);
 
-        $insumo = Insumo::query()->findOrFail($datos['insumo_id']);
+        try {
+            $insumo = DB::transaction(function () use ($datos) {
+                $bloqueado = Insumo::query()
+                    ->whereKey($datos['insumo_id'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        if ($datos['tipo'] === MovimientoInsumo::SALIDA && $insumo->stock < $datos['cantidad']) {
+                if ($datos['tipo'] === MovimientoInsumo::SALIDA && $bloqueado->stock < $datos['cantidad']) {
+                    throw new \DomainException(
+                        'No hay stock suficiente. Disponible: '.$bloqueado->stock.'.'
+                    );
+                }
+
+                // El trigger de PostgreSQL actualiza el stock al insertar el movimiento.
+                MovimientoInsumo::query()->create([
+                    'elemento_inventario_id' => $bloqueado->id,
+                    'tipo' => $datos['tipo'],
+                    'cantidad' => $datos['cantidad'],
+                    'observacion' => $datos['observacion'] ?? null,
+                    'user_id' => Auth::id(),
+                ]);
+
+                return $bloqueado->refresh();
+            });
+        } catch (\DomainException $e) {
             return back()
                 ->withInput()
-                ->withErrors([
-                    'cantidad' => 'No hay stock suficiente. Disponible: '.$insumo->stock.'.',
-                ]);
+                ->withErrors(['cantidad' => $e->getMessage()]);
         }
-
-        DB::transaction(function () use ($datos, $insumo) {
-            $delta = $datos['tipo'] === MovimientoInsumo::ENTRADA
-                ? $datos['cantidad']
-                : -$datos['cantidad'];
-
-            $insumo->stock += $delta;
-            $insumo->save();
-
-            MovimientoInsumo::query()->create([
-                'elemento_inventario_id' => $insumo->id,
-                'tipo' => $datos['tipo'],
-                'cantidad' => $datos['cantidad'],
-                'observacion' => $datos['observacion'] ?? null,
-                'user_id' => Auth::id(),
-            ]);
-        });
 
         return redirect()
             ->route('secretaria.insumos')
@@ -229,7 +232,7 @@ class SecretariaController extends Controller
     public function reportes(Request $request): View
     {
         return view('secretaria.reportes', array_merge(
-            ReporteAdmin::vista($request),
+            ReporteAdmin::vista($request, soloProduccion: true),
             [
                 'usuario' => $this->usuarioSesion(),
                 'reportes_form_action' => route('secretaria.reportes'),
@@ -268,15 +271,19 @@ class SecretariaController extends Controller
         ]);
     }
 
-    /** Excel idéntico al de Administradora; autorización controlada por la ruta de Secretaría. */
+    /** Excel de producción; autorización controlada por la ruta de Secretaría. */
     public function exportarReportesExcel(Request $request): StreamedResponse
     {
+        $request->merge(['tab' => 'produccion']);
+
         return app(AdminController::class)->exportarReportesExcel($request);
     }
 
-    /** PDF idéntico al de Administradora, incluida la identificación del usuario autenticado. */
+    /** PDF de producción. */
     public function exportarReportesPdf(Request $request): Response
     {
+        $request->merge(['tab' => 'produccion']);
+
         return app(AdminController::class)->exportarReportesPdf($request);
     }
 

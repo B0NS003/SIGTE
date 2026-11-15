@@ -90,7 +90,7 @@
 }
 .reportes-campo input,
 .reportes-campo select,
-.reportes-campo .sigte-lista-boton {
+.reportes-campo .sigte-lista {
     box-sizing: border-box;
     width: 100%;
     min-height: var(--alto-md);
@@ -103,9 +103,17 @@
     font-weight: 400;
     transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
 }
+.reportes-campo .sigte-lista-boton {
+    min-height: calc(var(--alto-md) - 2px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 400;
+}
 .reportes-campo input:focus,
-.reportes-campo .sigte-lista-boton:focus-visible,
-.reportes-campo .sigte-lista-boton[aria-expanded="true"] {
+.reportes-campo .sigte-lista:focus-within {
     outline: none;
     border-color: var(--naranja-linea);
     box-shadow: var(--foco);
@@ -1036,54 +1044,7 @@
 .reportes-paginacion {
     margin-top: var(--esp-3);
 }
-.sigte-paginacion {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--esp-3);
-}
-.sigte-paginacion-info {
-    margin: 0;
-    font-size: var(--fs-xs);
-    color: var(--texto-3);
-}
-.sigte-paginacion-lista {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--esp-1);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-.sigte-paginacion-lista a,
-.sigte-paginacion-lista span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2rem;
-    min-height: 2rem;
-    padding: 0 var(--esp-2);
-    border: 1px solid var(--borde);
-    border-radius: var(--radio-sm);
-    background: var(--card);
-    color: var(--texto-2);
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    text-decoration: none;
-}
-.sigte-paginacion-lista li.is-activa span {
-    background: var(--navy);
-    border-color: var(--navy);
-    color: var(--blanco);
-}
-.sigte-paginacion-lista li.is-disabled span {
-    opacity: 0.45;
-}
-.sigte-paginacion-lista a:hover {
-    border-color: var(--navy);
-    color: var(--navy);
-}
+/* .sigte-paginacion vive en componentes/paginacion.css */
 .reportes-entregas-card-cabecera {
     display: flex;
     align-items: center;

@@ -4,43 +4,49 @@
             $reportesFormAction = $reportes_form_action ?? route('mockups.panel', 'administradora');
             $reportesExcelRoute = $reportes_excel_route ?? 'mockups.reportes.excel';
             $reportesPdfRoute = $reportes_pdf_route ?? 'mockups.reportes.pdf';
+            $soloProduccion = (bool) ($reportes_solo_produccion ?? false);
+            $tabActivo = $soloProduccion ? 'produccion' : ($tab_activo ?? 'produccion');
             $paramsExport = array_merge(
                 array_filter($filtros, fn ($v) => $v !== null && $v !== ''),
-                ['tab' => $tab_activo ?? 'produccion']
+                ['tab' => $tabActivo]
             );
         @endphp
         <div class="panel reportes-control">
             <div class="reportes-control-fila reportes-control-cabecera">
                 <nav class="reportes-tabs" aria-label="Tipos de reportes" role="tablist">
-                    <button class="reportes-tab {{ ($tab_activo ?? 'produccion') === 'produccion' ? 'activo' : '' }}" type="button" role="tab" id="tab-produccion" aria-selected="{{ ($tab_activo ?? 'produccion') === 'produccion' ? 'true' : 'false' }}" aria-controls="panel-produccion" data-tab="produccion">
+                    <button class="reportes-tab {{ $tabActivo === 'produccion' ? 'activo' : '' }}" type="button" role="tab" id="tab-produccion" aria-selected="{{ $tabActivo === 'produccion' ? 'true' : 'false' }}" aria-controls="panel-produccion" data-tab="produccion">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l6 4V9l6 4V5l6 4v12H3Z"/><path d="M7 17h2M12 17h2M17 17h2"/></svg>
                         <span>Producción</span>
                     </button>
-                    <button class="reportes-tab {{ ($tab_activo ?? 'produccion') === 'trazabilidad' ? 'activo' : '' }}" type="button" role="tab" id="tab-trazabilidad" aria-selected="{{ ($tab_activo ?? 'produccion') === 'trazabilidad' ? 'true' : 'false' }}" aria-controls="panel-trazabilidad" data-tab="trazabilidad">
+                    @unless ($soloProduccion)
+                    <button class="reportes-tab {{ $tabActivo === 'trazabilidad' ? 'activo' : '' }}" type="button" role="tab" id="tab-trazabilidad" aria-selected="{{ $tabActivo === 'trazabilidad' ? 'true' : 'false' }}" aria-controls="panel-trazabilidad" data-tab="trazabilidad">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 15V9a3 3 0 0 1 3-3h6"/><path d="M18 9v6a3 3 0 0 1-3 3h-6"/></svg>
                         <span>Trazabilidad</span>
                     </button>
-                    <button class="reportes-tab {{ ($tab_activo ?? 'produccion') === 'entregas' ? 'activo' : '' }}" type="button" role="tab" id="tab-entregas" aria-selected="{{ ($tab_activo ?? 'produccion') === 'entregas' ? 'true' : 'false' }}" aria-controls="panel-entregas" data-tab="entregas">
+                    <button class="reportes-tab {{ $tabActivo === 'entregas' ? 'activo' : '' }}" type="button" role="tab" id="tab-entregas" aria-selected="{{ $tabActivo === 'entregas' ? 'true' : 'false' }}" aria-controls="panel-entregas" data-tab="entregas">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5v8l-9 5-9-5V8l9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></svg>
                         <span>Entregas</span>
                     </button>
+                    @endunless
                 </nav>
                 <div class="reportes-periodo">
-                    <p>Mostrando <strong>{{ \Carbon\Carbon::parse($filtros['desde'])->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($filtros['hasta'])->format('d/m/Y') }}</strong><span data-periodo="produccion"> · {{ $servicioElegido->nombre ?? 'Todos los servicios' }}</span><span data-periodo="trazabilidad" hidden> · {{ $tipoElegido ?? 'Todos los tipos' }}</span></p>
+                    <p>Mostrando <strong>{{ \Carbon\Carbon::parse($filtros['desde'])->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($filtros['hasta'])->format('d/m/Y') }}</strong><span data-periodo="produccion"> · {{ $servicioElegido->nombre ?? 'Todos los servicios' }}</span>@unless ($soloProduccion)<span data-periodo="trazabilidad" hidden> · {{ $tipoElegido ?? 'Todos los tipos' }}</span>@endunless</p>
                 </div>
             </div>
 
             <form id="reportes-filtros-form" class="reportes-control-fila reportes-filtros" method="GET" action="{{ $reportesFormAction }}">
-                <input type="hidden" name="tab" id="reportes-tab-seleccionada" value="{{ $tab_activo ?? 'produccion' }}">
+                <input type="hidden" name="tab" id="reportes-tab-seleccionada" value="{{ $tabActivo }}">
                 <div class="reportes-campos">
                     <label class="reportes-campo">Desde<input type="date" name="desde" value="{{ $filtros['desde'] }}" required></label>
                     <label class="reportes-campo">Hasta<input type="date" name="hasta" value="{{ $filtros['hasta'] }}" required></label>
+                    @unless ($soloProduccion)
                     <label class="reportes-campo reportes-filtro-tipo">Tipo de movimiento<select name="tipo">
                         <option value="">Todos los tipos</option>
                         @foreach ($tipos_auditoria as $clave => $nombre)
                             <option value="{{ $clave }}" @selected($filtros['tipo'] === $clave)>{{ $nombre }}</option>
                         @endforeach
                     </select></label>
+                    @endunless
                     <label class="reportes-campo reportes-filtro-servicio">Servicio<select name="servicio">
                         <option value="">Todos los servicios</option>
                         @foreach ($servicios_produccion as $servicio)
@@ -49,9 +55,11 @@
                     </select></label>
                     <button class="btn btn-dark reportes-consultar" type="submit">Consultar</button>
                 </div>
-                <p class="reportes-ayuda" data-ayuda="produccion"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Flujo actual, histórico por etapa y producción mensual. Los litros salen de los registros diarios de producción.</p>
+                <p class="reportes-ayuda" data-ayuda="produccion"><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Flujo actual, histórico por etapa y producción. Los litros salen de los registros diarios. El filtro de servicio aplica a todo el bloque.</p>
+                @unless ($soloProduccion)
                 <p class="reportes-ayuda" data-ayuda="trazabilidad" hidden><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Acciones de auditoría registradas dentro del período. El tipo de movimiento filtra solo este reporte.</p>
                 <p class="reportes-ayuda" data-ayuda="entregas" hidden><svg class="sigte-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Cajas de instrumental quirúrgico entregadas a los servicios dentro del período.</p>
+                @endunless
             </form>
         </div>
 
@@ -71,7 +79,7 @@
                 }
                 $graficoFlujo = count($segmentosFlujo) ? 'conic-gradient(' . implode(', ', $segmentosFlujo) . ')' : 'conic-gradient(#e2e8f0 0% 100%)';
             @endphp
-            <section class="reportes-panel {{ ($tab_activo ?? 'produccion') === 'produccion' ? 'activo' : '' }}" id="panel-produccion" role="tabpanel" aria-labelledby="tab-produccion" @if (($tab_activo ?? 'produccion') !== 'produccion') hidden @endif>
+            <section class="reportes-panel {{ $tabActivo === 'produccion' ? 'activo' : '' }}" id="panel-produccion" role="tabpanel" aria-labelledby="tab-produccion" @if ($tabActivo !== 'produccion') hidden @endif>
                 <article class="panel reportes-bloque reportes-bloque-moderno">
                     <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg></span><div><h3>1. Procesamiento de cajas</h3><p class="reportes-banda-descripcion">Estado actual del flujo; no depende del período consultado.</p></div></div>
                     <div class="reportes-produccion-grid">
@@ -124,16 +132,16 @@
                     $coloresHistorico = ['#3998ed', '#78b9f5', '#f5c44b', '#f48aa4', '#a98add', '#9edb91'];
                 @endphp
                 <article class="panel reportes-bloque reportes-bloque-moderno">
-                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></span><div><h3>2. Procesamiento histórico por etapa</h3><p class="reportes-banda-descripcion">Cajas distintas que pasaron por cada etapa en el período consultado.</p></div></div>
+                    <div class="reportes-banda"><span class="reportes-banda-icono"><svg class="reportes-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></span><div><h3>2. Procesamiento histórico por etapa</h3><p class="reportes-banda-descripcion">Ciclos que pasaron por cada etapa en el período consultado.</p></div></div>
                     <div class="reportes-resumen reportes-resumen-compacto">
-                        <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Ingresos contabilizados</span><strong>{{ number_format($totalHistoricoEtapas, 0, ',', '.') }}</strong><small>Suma de cajas distintas por etapa (una caja puede contar en varias)</small></div></div>
+                        <div class="reportes-kpi reportes-kpi-azul"><div class="reportes-kpi-texto"><span>Ingresos contabilizados</span><strong>{{ number_format($totalHistoricoEtapas, 0, ',', '.') }}</strong><small>Suma de ciclos por etapa (un ciclo puede contar en varias)</small></div></div>
                         <div class="reportes-kpi reportes-kpi-verde"><div class="reportes-kpi-texto"><span>Etapas con movimiento</span><strong>{{ $historicoEtapas->where('cantidad', '>', 0)->count() }}</strong><small>Del período seleccionado</small></div></div>
                     </div>
                     <div class="reportes-produccion-card reportes-produccion-detalle">
                         <h4 class="reportes-titulo-detalle">Detalle de ingresos por etapa</h4>
                         <div class="reportes-tabla reportes-tabla-compacta">
                             <table>
-                                <thead><tr><th>Etapa</th><th>Cajas distintas</th><th>% del total contabilizado</th></tr></thead>
+                                <thead><tr><th>Etapa</th><th>Ciclos</th><th>% del total contabilizado</th></tr></thead>
                                 <tbody>
                                     @forelse ($historicoEtapas as $indice => $fila)
                                         <tr>
@@ -147,7 +155,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <p class="reportes-nota">Cada caja se contabiliza una vez por etapa según creación, avances, retrocesos y entregas del período.</p>
+                        <p class="reportes-nota">Cada ciclo se contabiliza una vez por etapa según creación, avances, retrocesos y entregas del período. El filtro de servicio aplica aquí.</p>
                     </div>
                 </article>
 
@@ -214,7 +222,8 @@
                 </article>
             </section>
 
-            <section class="reportes-panel {{ ($tab_activo ?? 'produccion') === 'trazabilidad' ? 'activo' : '' }}" id="panel-trazabilidad" role="tabpanel" aria-labelledby="tab-trazabilidad" @if (($tab_activo ?? 'produccion') !== 'trazabilidad') hidden @endif>
+            @unless ($soloProduccion)
+            <section class="reportes-panel {{ $tabActivo === 'trazabilidad' ? 'activo' : '' }}" id="panel-trazabilidad" role="tabpanel" aria-labelledby="tab-trazabilidad" @if ($tabActivo !== 'trazabilidad') hidden @endif>
                 @php
                     $trazaTotal = (int) ($total_movimientos ?? 0);
                     $trazaTipos = collect($por_tipo ?? []);
@@ -301,7 +310,7 @@
                 </article>
             </section>
 
-            <section class="reportes-panel reportes-entregas {{ ($tab_activo ?? 'produccion') === 'entregas' ? 'activo' : '' }}" id="panel-entregas" role="tabpanel" aria-labelledby="tab-entregas" @if (($tab_activo ?? 'produccion') !== 'entregas') hidden @endif>
+            <section class="reportes-panel reportes-entregas {{ $tabActivo === 'entregas' ? 'activo' : '' }}" id="panel-entregas" role="tabpanel" aria-labelledby="tab-entregas" @if ($tabActivo !== 'entregas') hidden @endif>
                 @php
                     $entregasCantidad = (int) ($total_cajas_entregadas ?? 0);
                     $entregasServicios = collect($entregas_por_servicio ?? []);
@@ -391,6 +400,7 @@
                     </article>
                 </div>
             </section>
+            @endunless
 
             <footer class="panel reportes-pie">
                 <div><strong>Hospital San José de Melipilla</strong><p>Generado para consulta por {{ $usuario['nombre'] }} · {{ $usuario['rol'] }} — {{ $fecha }} a las {{ $hora }}</p><p>Período seleccionado: {{ $filtros['desde'] }} al {{ $filtros['hasta'] }}</p></div>

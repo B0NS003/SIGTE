@@ -72,6 +72,7 @@
 
 /* Misma base blanca; solo la raya superior identifica el servicio (familia navy/naranja). */
 .hist-sectores,
+.hist-shell,
 .hist-lista {
     --svc-pabellon: var(--naranja);
     --svc-pabellon-ink: var(--naranja-oscuro);
@@ -87,6 +88,7 @@
     --svc-curaciones-ink: #115e59;
 }
 html[data-tema="oscuro"] .hist-sectores,
+html[data-tema="oscuro"] .hist-shell,
 html[data-tema="oscuro"] .hist-lista {
     --svc-dental: #64748b;
     --svc-dental-ink: var(--texto-3);
@@ -98,6 +100,72 @@ html[data-tema="oscuro"] .hist-lista {
     --svc-maternidad-ink: var(--naranja-texto);
     --svc-curaciones: #1aa898;
     --svc-curaciones-ink: var(--teal-texto);
+}
+
+/* Contenedor de resultados (mismo patrón shell del catálogo). */
+.hist-shell {
+    margin-bottom: var(--esp-4);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card);
+    box-shadow: var(--sombra-1);
+    overflow: hidden;
+}
+.hist-shell-head {
+    padding: var(--esp-3) var(--esp-4);
+    border-top: var(--franja) solid var(--navy);
+    border-bottom: 1px solid var(--linea);
+    background: color-mix(in srgb, var(--navy) 8%, var(--superficie-2));
+}
+.hist-shell.sec-pabellon .hist-shell-head {
+    border-top-color: var(--svc-pabellon);
+    background: color-mix(in srgb, var(--svc-pabellon) 10%, var(--superficie-2));
+}
+.hist-shell.sec-dental .hist-shell-head {
+    border-top-color: var(--svc-dental);
+    background: color-mix(in srgb, var(--svc-dental) 10%, var(--superficie-2));
+}
+.hist-shell.sec-uci .hist-shell-head {
+    border-top-color: var(--svc-uci);
+    background: color-mix(in srgb, var(--svc-uci) 10%, var(--superficie-2));
+}
+.hist-shell.sec-urgencia .hist-shell-head {
+    border-top-color: var(--svc-urgencia);
+    background: color-mix(in srgb, var(--svc-urgencia) 10%, var(--superficie-2));
+}
+.hist-shell.sec-maternidad .hist-shell-head {
+    border-top-color: var(--svc-maternidad);
+    background: color-mix(in srgb, var(--svc-maternidad) 10%, var(--superficie-2));
+}
+.hist-shell.sec-curaciones .hist-shell-head {
+    border-top-color: var(--svc-curaciones);
+    background: color-mix(in srgb, var(--svc-curaciones) 10%, var(--superficie-2));
+}
+.hist-shell-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    color: var(--ink);
+    line-height: 1.25;
+}
+.hist-shell-head p {
+    margin: 0.2rem 0 0;
+    color: var(--texto-3);
+    font-size: var(--fs-sm);
+    line-height: 1.45;
+}
+.hist-shell-body {
+    padding: var(--esp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-3);
+    background: var(--superficie-2);
+}
+.hist-shell-body .ops-empty {
+    margin: 0;
+}
+.hist-paginacion {
+    margin-top: var(--esp-1);
 }
 .hist-sector.sec-pabellon {
     border-top-color: var(--svc-pabellon);
@@ -201,7 +269,7 @@ html[data-tema="oscuro"] .hist-lista {
     display: flex;
     flex-direction: column;
     gap: var(--esp-2);
-    margin-bottom: 0.75rem;
+    margin: 0;
     width: 100%;
 }
 .hist-card {
@@ -210,26 +278,43 @@ html[data-tema="oscuro"] .hist-lista {
     grid-template-columns: 6.4rem minmax(0, 1fr);
     background: var(--card);
     border: 1px solid var(--borde);
+    border-top: var(--franja) solid var(--navy);
     border-radius: var(--radio-lg);
     overflow: hidden;
+    box-shadow: var(--sombra-1);
     transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease;
 }
 .hist-card:hover {
-    border-color: var(--linea-fuerte);
+    border-left-color: var(--linea-fuerte);
+    border-right-color: var(--linea-fuerte);
+    border-bottom-color: var(--linea-fuerte);
     box-shadow: var(--sombra-realce);
 }
+.hist-card.sec-pabellon {
+    border-top-color: var(--svc-pabellon);
+}
+.hist-card.sec-dental {
+    border-top-color: var(--svc-dental);
+}
+.hist-card.sec-uci {
+    border-top-color: var(--svc-uci);
+}
+.hist-card.sec-urgencia {
+    border-top-color: var(--svc-urgencia);
+}
+.hist-card.sec-maternidad {
+    border-top-color: var(--svc-maternidad);
+}
+.hist-card.sec-curaciones {
+    border-top-color: var(--svc-curaciones);
+}
+.hist-card.sec-otro {
+    border-top-color: var(--navy);
+}
 .hist-cuando {
-    position: relative;
-    padding: var(--esp-3) var(--esp-3) var(--esp-3) var(--esp-3);
+    padding: var(--esp-3);
     background: var(--card);
     border-right: 1px solid var(--borde);
-}
-.hist-cuando::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 3px;
-    background: var(--naranja);
 }
 .hist-cuando strong {
     display: block;
@@ -261,38 +346,20 @@ html[data-tema="oscuro"] .hist-lista {
     font-style: normal;
     font-weight: 700;
 }
-.hist-card.sec-pabellon .hist-cuando::before {
-    background: var(--svc-pabellon);
-}
 .hist-card.sec-pabellon .hist-cuando small {
     color: var(--svc-pabellon-ink);
-}
-.hist-card.sec-dental .hist-cuando::before {
-    background: var(--svc-dental);
 }
 .hist-card.sec-dental .hist-cuando small {
     color: var(--svc-dental-ink);
 }
-.hist-card.sec-uci .hist-cuando::before {
-    background: var(--svc-uci);
-}
 .hist-card.sec-uci .hist-cuando small {
     color: var(--svc-uci-ink);
-}
-.hist-card.sec-urgencia .hist-cuando::before {
-    background: var(--svc-urgencia);
 }
 .hist-card.sec-urgencia .hist-cuando small {
     color: var(--svc-urgencia-ink);
 }
-.hist-card.sec-maternidad .hist-cuando::before {
-    background: var(--svc-maternidad);
-}
 .hist-card.sec-maternidad .hist-cuando small {
     color: var(--svc-maternidad-ink);
-}
-.hist-card.sec-curaciones .hist-cuando::before {
-    background: var(--svc-curaciones);
 }
 .hist-card.sec-curaciones .hist-cuando small {
     color: var(--svc-curaciones-ink);
@@ -354,6 +421,9 @@ html[data-tema="oscuro"] .hist-lista {
     font-weight: 600;
 }
 @media (max-width: 720px) {
+    .hist-shell-body {
+        padding: var(--esp-3);
+    }
     .hist-card {
         grid-template-columns: 1fr;
     }
@@ -364,7 +434,6 @@ html[data-tema="oscuro"] .hist-lista {
         flex-wrap: wrap;
         align-items: baseline;
         gap: var(--esp-1) var(--esp-3);
-        padding-left: var(--esp-4);
     }
     .hist-cuando strong,
     .hist-cuando span,

@@ -9,6 +9,8 @@
 @section('content')
 @php
     $columnas = ['' => 'Sin asignar'] + collect(\App\Models\Personal::TURNOS)->map(fn ($t) => $t['etiqueta'])->all();
+    $esEnfermeras = $grupo === \App\Models\Rol::ENFERMERA;
+    $etiquetaGrupo = $esEnfermeras ? 'Enfermeras de turno' : 'Operadoras';
 @endphp
 <div class="shell">
     <aside class="sidebar">
@@ -28,14 +30,20 @@
             <div>
                 <p class="eyebrow">Organización del puesto</p>
                 <h1>Turnos</h1>
-                <p class="main-sub">Asigna operadoras al turno del día. En el puesto aparecen primero quienes están de turno ahora.</p>
+                <p class="main-sub" id="turno-main-sub">
+                    @if ($esEnfermeras)
+                        Asigna enfermeras de turno a Mañana, Tarde o Noche. En el cierre, el relevo prioriza a quienes quedan en el bloque siguiente.
+                    @else
+                        Asigna operadoras al turno del día. En el puesto aparecen primero quienes están de turno ahora.
+                    @endif
+                </p>
             </div>
             <div class="main-actions turno-main-actions">
-                <a class="btn btn-exportar-pdf" id="turno-export-pdf" href="{{ route('mockups.turnos.pdf') }}" data-descargar-reporte="pdf" title="Exportar PDF">
+                <a class="btn btn-exportar-pdf" id="turno-export-pdf" href="{{ route('mockups.turnos.pdf', ['grupo' => $grupo]) }}" data-descargar-reporte="pdf" title="Exportar PDF">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
                     <span>Exportar PDF</span>
                 </a>
-                <a class="btn btn-exportar-excel" id="turno-export-excel" href="{{ route('mockups.turnos.excel') }}" data-descargar-reporte="excel" title="Exportar Excel">
+                <a class="btn btn-exportar-excel" id="turno-export-excel" href="{{ route('mockups.turnos.excel', ['grupo' => $grupo]) }}" data-descargar-reporte="excel" title="Exportar Excel">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M10 17l4-6M14 17l-4-6"/></svg>
                     <span>Exportar Excel</span>
                 </a>
@@ -46,11 +54,32 @@
             <div class="panel-head">
                 <div>
                     <h2>Nómina del puesto</h2>
-                    <p class="turno-flujo">Arrastra un nombre a <strong>Mañana</strong>, <strong>Tarde</strong> o <strong>Noche</strong>. Suéltalo para asignarlo.</p>
+                    <p class="turno-flujo" id="turno-flujo">
+                        Arrastra un nombre a <strong>Mañana</strong>, <strong>Tarde</strong> o <strong>Noche</strong>. Mostrando {{ mb_strtolower($etiquetaGrupo) }}.
+                    </p>
                 </div>
             </div>
 
-            <div class="turno-tablero" data-url="{{ route('mockups.turnos.asignar') }}">
+            <nav class="inv-pestanas turno-grupo-chips" role="tablist" aria-label="Grupo de turnos">
+                <a
+                    class="inv-pestana {{ ! $esEnfermeras ? 'is-active' : '' }}"
+                    href="{{ route('mockups.turnos', ['grupo' => \App\Models\Rol::OPERADOR]) }}"
+                    role="tab"
+                    aria-selected="{{ ! $esEnfermeras ? 'true' : 'false' }}"
+                >Operadoras</a>
+                <a
+                    class="inv-pestana {{ $esEnfermeras ? 'is-active' : '' }}"
+                    href="{{ route('mockups.turnos', ['grupo' => \App\Models\Rol::ENFERMERA]) }}"
+                    role="tab"
+                    aria-selected="{{ $esEnfermeras ? 'true' : 'false' }}"
+                >Enfermeras de turno</a>
+            </nav>
+
+            <div
+                class="turno-tablero"
+                data-url="{{ route('mockups.turnos.asignar') }}"
+                data-grupo="{{ $grupo }}"
+            >
                 @foreach ($columnas as $clave => $etiqueta)
                     @php
                         $personasColumna = $nomina->where('turno', $clave === '' ? null : $clave)->sortBy('nombre');
@@ -128,144 +157,5 @@
 @endsection
 
 @push('scripts')
-<script>
-(function () {
-    var tablero = document.querySelector('.turno-tablero');
-    if (!tablero) return;
-    var estado = document.querySelector('.turno-estado');
-    var btnGuardar = document.getElementById('turno-guardar');
-    var token = document.querySelector('meta[name="csrf-token"]').content;
-    var arrastrada = null;
-    var pendientes = 0;
-
-    function normalizar(texto) {
-        return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
-
-    var busca = tablero.querySelector('.turno-busca input');
-    if (busca) {
-        var columnaLibre = busca.closest('.turno-columna');
-        var avisoVacio = document.createElement('p');
-        avisoVacio.className = 'turno-vacio';
-        avisoVacio.textContent = 'Ningún nombre coincide.';
-        avisoVacio.hidden = true;
-        columnaLibre.querySelector('.turno-lista').before(avisoVacio);
-        busca.addEventListener('input', function () {
-            var consulta = normalizar(busca.value.trim());
-            var visibles = 0;
-            columnaLibre.querySelectorAll('.turno-tarjeta').forEach(function (tarjeta) {
-                var coincide = consulta === '' || normalizar(tarjeta.textContent).indexOf(consulta) !== -1;
-                tarjeta.hidden = !coincide;
-                if (coincide) visibles += 1;
-            });
-            avisoVacio.hidden = visibles > 0;
-        });
-    }
-
-    var avisoTimer = null;
-    function avisar(texto, segundos) {
-        estado.hidden = false;
-        estado.textContent = texto;
-        if (avisoTimer) clearTimeout(avisoTimer);
-        if (segundos) {
-            avisoTimer = setTimeout(function () {
-                estado.hidden = true;
-                estado.textContent = '';
-                avisoTimer = null;
-            }, segundos * 1000);
-        }
-    }
-
-    function etiquetaGuardar(texto) {
-        var span = btnGuardar.querySelector('span');
-        if (span) span.textContent = texto;
-    }
-
-    function marcarPendiente(si) {
-        if (si) {
-            pendientes += 1;
-            btnGuardar.classList.add('is-pendiente');
-            etiquetaGuardar('Guardar cambios');
-        } else {
-            pendientes = Math.max(0, pendientes - 1);
-            if (pendientes === 0) {
-                btnGuardar.classList.remove('is-pendiente');
-            }
-        }
-    }
-
-    tablero.querySelectorAll('.turno-tarjeta').forEach(function (tarjeta) {
-        tarjeta.addEventListener('dragstart', function () {
-            arrastrada = tarjeta;
-            tarjeta.classList.add('is-arrastrando');
-        });
-        tarjeta.addEventListener('dragend', function () {
-            tarjeta.classList.remove('is-arrastrando');
-            arrastrada = null;
-        });
-    });
-
-    tablero.querySelectorAll('.turno-columna').forEach(function (columna) {
-        columna.addEventListener('dragover', function (evento) {
-            evento.preventDefault();
-            columna.classList.add('is-sobre');
-        });
-        columna.addEventListener('dragleave', function () {
-            columna.classList.remove('is-sobre');
-        });
-        columna.addEventListener('drop', function (evento) {
-            evento.preventDefault();
-            columna.classList.remove('is-sobre');
-            if (!arrastrada) return;
-            var lista = columna.querySelector('.turno-lista');
-            var turno = columna.dataset.turno || null;
-            var anterior = arrastrada.parentElement;
-            lista.appendChild(arrastrada);
-            avisar('Guardando…');
-            marcarPendiente(true);
-            fetch(tablero.dataset.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token
-                },
-                body: JSON.stringify({ personal_id: arrastrada.dataset.id, turno: turno })
-            }).then(function (respuesta) {
-                if (!respuesta.ok) throw new Error();
-                avisar('Turno actualizado.');
-                marcarPendiente(false);
-                if (busca) busca.dispatchEvent(new Event('input'));
-            }).catch(function () {
-                anterior.appendChild(arrastrada);
-                avisar('No se pudo guardar. Vuelve a soltar el nombre.');
-                marcarPendiente(false);
-            });
-        });
-    });
-
-    if (btnGuardar) {
-        btnGuardar.addEventListener('click', function () {
-            if (pendientes > 0) {
-                avisar('Todavía hay cambios guardándose…');
-                return;
-            }
-            avisar('Turno guardado.');
-            etiquetaGuardar('Turno guardado');
-            setTimeout(function () { etiquetaGuardar('Guardar cambios'); }, 1800);
-        });
-    }
-
-    // Si hay cambios guardándose, bloquea la exportación compartida (toast inferior).
-    document.querySelectorAll('[data-descargar-reporte]').forEach(function (enlace) {
-        enlace.addEventListener('click', function (evento) {
-            if (pendientes > 0) {
-                evento.preventDefault();
-                evento.stopImmediatePropagation();
-                avisar('Espera a que terminen de guardarse los cambios antes de exportar.', 3);
-            }
-        }, true);
-    });
-})();
-</script>
+<script src="{{ asset('js/modulos/admin/turnos.js') }}?v={{ @filemtime(public_path('js/modulos/admin/turnos.js')) }}"></script>
 @endpush

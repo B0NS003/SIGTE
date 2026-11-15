@@ -44,6 +44,76 @@ html[data-tema="oscuro"] .sigte-card-guide {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: var(--esp-4);
 }
+
+/* Grupo por servicio (admin y consulta): franja de color + cabecera colapsable */
+.cat-area-group,
+.admin-area-group {
+    margin: 0 0 var(--esp-4);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    background: var(--card);
+    box-shadow: var(--sombra-1);
+    overflow: hidden;
+}
+.cat-area-group[hidden],
+.admin-area-group[hidden] {
+    display: none !important;
+}
+.cat-area-summary,
+.admin-area-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    cursor: pointer;
+    list-style: none;
+    color: var(--ink);
+    padding: var(--esp-3) var(--esp-4);
+    border-top: var(--franja) solid var(--servicio-color, var(--naranja));
+    background: color-mix(in srgb, var(--servicio-color, var(--naranja)) 10%, var(--superficie-2));
+    font-size: var(--fs-lg);
+}
+.cat-area-summary::-webkit-details-marker,
+.admin-area-summary::-webkit-details-marker {
+    display: none;
+}
+.cat-area-summary::after,
+.admin-area-summary::after {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border-right: 2px solid var(--texto-3);
+    border-bottom: 2px solid var(--texto-3);
+    transform: rotate(45deg);
+    transition: transform var(--dur-rapida) ease;
+    flex: 0 0 auto;
+}
+.cat-area-group[open] > .cat-area-summary::after,
+.admin-area-group[open] > .admin-area-summary::after {
+    transform: rotate(-135deg);
+    margin-top: 0.2rem;
+}
+.cat-area-summary strong,
+.admin-area-summary strong,
+.cat-area-summary h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: inherit;
+    font-weight: 700;
+    color: var(--ink);
+}
+.cat-area-count,
+.admin-area-count {
+    margin-left: auto;
+    color: var(--texto-3);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+}
+.cat-area-group > .cat-grid,
+.admin-area-group > .cat-grid {
+    display: grid;
+    padding: var(--esp-4);
+    border-top: 1px solid var(--linea);
+}
 .cat-card {
     display: flex;
     flex-direction: column;

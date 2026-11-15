@@ -1,0 +1,162 @@
+[
+  {
+    "codigo": "PAP-GRA",
+    "nombre": "Papel grado médico",
+    "ubicacion": "Estante de empaque",
+    "stock": 40,
+    "minimo": 20,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "BOL-EST",
+    "nombre": "Bolsas para esterilización",
+    "ubicacion": "Estante de empaque",
+    "stock": 35,
+    "minimo": 15,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "ROL-EST",
+    "nombre": "Rollos para esterilización",
+    "ubicacion": "Estante de empaque",
+    "stock": 20,
+    "minimo": 10,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "IND-EXT",
+    "nombre": "Indicadores químicos externos",
+    "ubicacion": "Estante de indicadores",
+    "stock": 30,
+    "minimo": 15,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "IND-BIO",
+    "nombre": "Indicadores biológicos",
+    "ubicacion": "Refrigerador de control",
+    "stock": 12,
+    "minimo": 6,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "CINT-IND",
+    "nombre": "Cinta indicadora para esterilización",
+    "ubicacion": "Cajón de rotulado",
+    "stock": 15,
+    "minimo": 8,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "SEL-EMP",
+    "nombre": "Sellos para bolsas de esterilización",
+    "ubicacion": "Mesa de empaque",
+    "stock": 10,
+    "minimo": 5,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "PAP-ABS",
+    "nombre": "Papel absorbente para preparación",
+    "ubicacion": "Mesa de armado",
+    "stock": 25,
+    "minimo": 12,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "BAN-ORG",
+    "nombre": "Bandejas organizadoras",
+    "ubicacion": "Área de preparación",
+    "stock": 12,
+    "minimo": 6,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "SOP-INS",
+    "nombre": "Soportes para instrumental",
+    "ubicacion": "Área de preparación",
+    "stock": 10,
+    "minimo": 5,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "PRO-FIL",
+    "nombre": "Protectores para filos",
+    "ubicacion": "Mesa de armado",
+    "stock": 20,
+    "minimo": 10,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "LIG-SIL",
+    "nombre": "Ligaduras de silicona para instrumental",
+    "ubicacion": "Cajón de accesorios",
+    "stock": 15,
+    "minimo": 8,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "ETQ-EST",
+    "nombre": "Etiquetas para paquetes estériles",
+    "ubicacion": "Impresora de armado",
+    "stock": 40,
+    "minimo": 20,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "MAR-ROT",
+    "nombre": "Marcadores resistentes al proceso",
+    "ubicacion": "Cajón de rotulado",
+    "stock": 12,
+    "minimo": 6,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "TAR-IDE",
+    "nombre": "Tarjetas de identificación de sets",
+    "ubicacion": "Mesa de armado",
+    "stock": 30,
+    "minimo": 15,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "REG-ARM",
+    "nombre": "Registros de preparación de cajas",
+    "ubicacion": "Área de control",
+    "stock": 30,
+    "minimo": 15,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "VER-INS",
+    "nombre": "Lupa de inspección de instrumental",
+    "ubicacion": "Mesa de inspección",
+    "stock": 4,
+    "minimo": 2,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "LUZ-INS",
+    "nombre": "Lámpara de inspección",
+    "ubicacion": "Mesa de inspección",
+    "stock": 3,
+    "minimo": 2,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "PIN-INS",
+    "nombre": "Pinzas auxiliares de preparación",
+    "ubicacion": "Mesa de armado",
+    "stock": 8,
+    "minimo": 4,
+    "en_proceso": 0
+  },
+  {
+    "codigo": "CAR-TRA",
+    "nombre": "Carros para traslado de sets preparados",
+    "ubicacion": "Área de preparación",
+    "stock": 4,
+    "minimo": 2,
+    "en_proceso": 0
+  }
+]

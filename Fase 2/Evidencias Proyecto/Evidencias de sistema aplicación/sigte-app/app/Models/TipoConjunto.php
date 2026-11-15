@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TipoConjunto extends Model
@@ -18,8 +17,14 @@ class TipoConjunto extends Model
         return $this->belongsTo(Servicio::class, 'servicio_id');
     }
 
-    public function instrumentos(): BelongsToMany
+    /** El catálogo real une por FK directa, no por pivot. */
+    public function instrumentos(): HasMany
     {
-        return $this->belongsToMany(Instrumento::class, 'tipo_conjunto_instrumentos', 'tipo_conjunto_id', 'instrumento_id')->withTimestamps();
+        return $this->hasMany(Instrumento::class, 'tipo_conjunto_id');
+    }
+
+    public function fichas(): HasMany
+    {
+        return $this->hasMany(Ficha::class, 'tipo_conjunto_id');
     }
 }

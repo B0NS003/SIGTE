@@ -88,7 +88,30 @@
 }
 
 /* Lista desplegable que reemplaza a <select> */
-.sigte-lista { position: relative; flex: 1 1 auto; min-width: 0; }
+.sigte-lista {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-height: var(--alto-md);
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-md);
+  background: var(--card);
+}
+/* Dentro de .field / puesto el marco lo pone el contenedor; aquí solo el botón. */
+.field .sigte-lista,
+.field-select .sigte-lista,
+label.field > .sigte-lista,
+.puesto-cambiar .sigte-lista {
+  border: 0;
+  background: transparent;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+}
 .sigte-lista-nativa {
     position: absolute !important;
     width: 1px !important;

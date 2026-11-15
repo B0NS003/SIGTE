@@ -435,7 +435,7 @@ class FlujoController extends Controller
         }
         $codigo = trim((string) $request->input('caja', ''));
         $texto = trim((string) $request->input('texto', ''));
-        $caja = Caja::query()->where('codigo', $codigo)->first();
+        $caja = Caja::enFlujo($codigo);
         if ($caja === null) {
             return response()->json(['mensaje' => 'Esa caja no está en el flujo.'], 422);
         }
@@ -509,7 +509,8 @@ class FlujoController extends Controller
     {
         $grupos = [];
         CajaAnotacion::query()
-            ->with(['caja:id,codigo', 'autor:id,name'])
+            ->with(['caja:id,codigo,entregado_at', 'autor:id,name'])
+            ->whereHas('caja', fn ($q) => $q->whereNull('entregado_at'))
             ->orderBy('id')
             ->get()
             ->each(function (CajaAnotacion $nota) use (&$grupos): void {
@@ -732,7 +733,6 @@ class FlujoController extends Controller
                         'ubicacion' => 'Ventanilla de entrega',
                         'responsable_id' => $marca['user_id'],
                         'personal_id' => $marca['personal_id'] ?? null,
-                        'entrega_id' => $entrega->id,
                     ])->save();
 
                     EntregaCaja::query()->create([

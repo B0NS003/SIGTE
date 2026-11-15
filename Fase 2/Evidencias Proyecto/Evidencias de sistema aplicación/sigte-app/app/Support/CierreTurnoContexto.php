@@ -44,9 +44,14 @@ class CierreTurnoContexto
             ? Personal::query()->where('user_id', $usuario->id)->where('activo', true)->first()
             : null;
 
+        // Solo operadoras del bloque (las enfermeras también pueden estar en personal).
         $delBloque = Personal::query()
             ->where('activo', true)
             ->where('turno', $turnoClave)
+            ->where(function ($q) {
+                $q->whereHas('usuario.rol', fn ($r) => $r->where('nombre', Rol::OPERADOR))
+                    ->orWhereDoesntHave('usuario');
+            })
             ->orderBy('nombre')
             ->get();
 
@@ -62,6 +67,7 @@ class CierreTurnoContexto
             ->where('turno_clave', $turnoClave)
             ->first();
 
+        // El rol enfermera basta para cerrar (no exige personal.turno = bloque vigente).
         $puedeCerrar = true;
         $motivo = null;
         if ($yaCerrado !== null) {
@@ -70,28 +76,32 @@ class CierreTurnoContexto
         } elseif ($usuario === null || ! $usuario->isEnfermera()) {
             $puedeCerrar = false;
             $motivo = 'Solo la enfermera de turno puede registrar el cierre.';
-        } elseif ($personalUsuario !== null && $personalUsuario->turno !== $turnoClave) {
-            $puedeCerrar = false;
-            $motivo = 'Tu asignación de turno no corresponde al bloque vigente ('.
-                $turnoMeta['etiqueta'].').';
         }
 
-        $siguienteClave = self::siguienteTurno($turnoClave);
-        $sugerido = Personal::query()
-            ->where('activo', true)
-            ->where('turno', $siguienteClave)
-            ->orderBy('nombre')
-            ->first();
-
+        $siguiente = self::siguienteTurno($turnoClave);
         $relevos = User::query()
+            ->with('personal:id,user_id,turno,activo')
             ->where('activo', true)
             ->whereHas('rol', fn ($q) => $q->where('nombre', Rol::ENFERMERA))
             ->when($usuario, fn ($q) => $q->whereKeyNot($usuario->id))
             ->orderBy('name')
             ->get(['id', 'name'])
-            ->map(fn (User $u) => ['id' => $u->id, 'nombre' => $u->name])
+            ->sortBy(function (User $u) use ($siguiente): int {
+                $turno = $u->personal?->turno;
+                if ($turno === $siguiente) {
+                    return 0;
+                }
+                if ($turno !== null && $turno !== '') {
+                    return 1;
+                }
+
+                return 2;
+            })
             ->values()
+            ->map(fn (User $u) => ['id' => $u->id, 'nombre' => $u->name])
             ->all();
+
+        $sugeridoNombre = $relevos[0]['nombre'] ?? 'Sin relevo asignado';
 
         $alertas = self::alertasAbiertas();
         $pendientes = self::pendientesDesde($alertas);
@@ -124,8 +134,7 @@ class CierreTurnoContexto
                 'fecha' => $momento->format('d/m/Y'),
                 'bloque' => $turnoMeta['etiqueta'].' · '.str_replace(' a ', '–', $turnoMeta['horario']),
                 'responsable' => $usuario?->name ?? 'Sin sesión',
-                'relevo' => $sugerido?->nombre
-                    ?? ($relevos[0]['nombre'] ?? 'Sin relevo asignado'),
+                'relevo' => $sugeridoNombre,
                 'operadoras' => $operadoras->isEmpty()
                     ? 'Sin operadoras en el bloque'
                     : $operadoras->implode(', '),

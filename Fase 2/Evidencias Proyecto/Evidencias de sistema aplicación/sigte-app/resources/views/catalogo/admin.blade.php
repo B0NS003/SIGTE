@@ -58,7 +58,10 @@
             <div class="catalogo-herramientas" data-herramientas="catalogo">
                 <div class="catalogo-herramientas-fila">
                     <label class="catalogo-campo catalogo-campo-buscar" for="buscar-fichas">Buscar
-                        <span class="catalogo-search-field"><span aria-hidden="true">⌕</span><input type="search" id="buscar-fichas" placeholder="Código, nombre, tipo o servicio…" autocomplete="off"></span>
+                        <span class="catalogo-search-field">
+                            <svg class="catalogo-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                            <input type="search" id="buscar-fichas" placeholder="Código, nombre, tipo o servicio…" autocomplete="off">
+                        </span>
                     </label>
                     <label class="catalogo-campo" for="filtro-servicio">Servicio
                         <select id="filtro-servicio" aria-label="Filtrar fichas por servicio">
@@ -71,29 +74,25 @@
             <div class="catalogo-herramientas" data-herramientas="instrumentos" hidden>
                 <div class="catalogo-herramientas-fila">
                     <label class="catalogo-campo catalogo-campo-buscar" for="buscar-instrumentos">Buscar
-                        <span class="catalogo-search-field"><span aria-hidden="true">⌕</span><input type="search" id="buscar-instrumentos" placeholder="Nombre o código…" autocomplete="off"></span>
+                        <span class="catalogo-search-field">
+                            <svg class="catalogo-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                            <input type="search" id="buscar-instrumentos" placeholder="Nombre o código…" autocomplete="off">
+                        </span>
                     </label>
-                    <div class="admin-instrument-view" role="group" aria-label="Tipo de visualización">
-                        <button type="button" class="admin-view-btn is-active" data-instrument-view="cards" aria-pressed="true">▦ Tarjetas</button>
-                        <button type="button" class="admin-view-btn" data-instrument-view="list" aria-pressed="false">☷ Lista</button>
-                    </div>
                 </div>
             </div>
         </div>
 
         <div class="admin-panel-tab" id="tab-catalogo" role="tabpanel">
         <section class="mant-vitrina">
-            <div class="mant-head">
-                <div>
-                    <h2>Fichas</h2>
-                    <p id="fichas-meta">{{ count($items) }} vigentes · {{ collect($items)->where('guia', false)->count() }} sin guía visual</p>
-                </div>
-                <span class="badge" id="fichas-cuenta">{{ count($items) }}</span>
-            </div>
+            <p class="admin-empty" id="fichas-vacio" hidden>No se encontraron fichas que coincidan con tu búsqueda.</p>
             <div class="cat-grid" id="fichas-mural">
                 @foreach ($items as $item)
                     <article class="cat-card mant-card" data-estado="vigente" data-servicio="{{ $item['servicio_real'] ?? 'Sin servicio asignado' }}" data-guia="{{ $item['guia'] ? '1' : '0' }}">
-                        <div class="cat-photo {{ $item['guia'] ? '' : 'is-empty' }}">
+                        <div class="cat-photo {{ !empty($item['imagen_url']) ? '' : 'is-empty' }}">
+                            @if (!empty($item['imagen_url']))
+                                <img class="cat-photo-img" src="{{ $item['imagen_url'] }}" alt="" loading="lazy">
+                            @endif
                             <span class="js-guia-label sigte-card-guide"><svg class="sigte-card-icon sigte-card-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.7 5.1C11.1 5 11.5 5 12 5c5.5 0 9 7 9 7a14 14 0 0 1-3.2 4.2"/><path d="M6.2 6.2C3.9 8.1 3 12 3 12s3.5 7 9 7a9.7 9.7 0 0 0 3.4-.6"/><path d="M10.1 10.1a2.7 2.7 0 0 0 3.8 3.8"/></svg><svg class="sigte-card-icon sigte-card-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.4 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="sigte-guide-text">{{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span></span>
                         </div>
                         <div class="cat-body">
@@ -113,10 +112,19 @@
         </div>
 
         <section class="admin-panel-tab" id="tab-instrumentos" role="tabpanel" hidden>
-            <div class="mant-head"><div><h2>Instrumentos registrados</h2><p id="instrumentos-meta">Instrumentos utilizados en las fichas.</p></div><span class="badge" id="instrumentos-cuenta">0</span></div>
             <section class="admin-instrument-section">
-                <div class="admin-instrument-section-head" hidden>
-                    <div><h3>Instrumentos</h3></div>
+                <div class="admin-instrument-section-head">
+                    <h3>Instrumentos</h3>
+                    <div class="admin-instrument-view" role="group" aria-label="Tipo de visualización">
+                        <button type="button" class="admin-view-btn is-active" data-instrument-view="cards" aria-pressed="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg>
+                            <span>Tarjetas</span>
+                        </button>
+                        <button type="button" class="admin-view-btn" data-instrument-view="list" aria-pressed="false">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
+                            <span>Lista</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="admin-instrument-grid" id="instrumentos-mural"></div>
                 <p class="admin-empty" id="instrumentos-vacio" hidden>No se encontraron instrumentos.</p>
@@ -124,7 +132,14 @@
         </section>
 
         <div class="admin-panel-tab" id="tab-nueva-ficha" role="tabpanel" hidden>
-        <div class="mant-head"><div><h2 id="ficha-encabezado">Crear nueva ficha</h2><p>Registra los datos generales y los instrumentos del conjunto.</p></div></div>
+        <section class="catalogo-alta-shell">
+            <header class="catalogo-alta-head">
+                <div>
+                    <h2 id="ficha-encabezado">Crear nueva ficha</h2>
+                    <p>Registra los datos generales y los instrumentos del conjunto.</p>
+                </div>
+            </header>
+            <div class="catalogo-alta-body">
         <form class="mant-editor ficha-admin" id="ficha-form" action="{{ route('mockups.catalogo.fichas.guardar') }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="ficha-layout ficha-layout-redisenada">
@@ -208,16 +223,24 @@
                 <button class="btn btn-primary" id="ficha-guardar" type="submit">Crear ficha</button>
             </div>
         </form>
+            </div>
+        </section>
         </div>
 
         <section class="admin-panel-tab" id="tab-nuevo-instrumento" role="tabpanel" hidden>
+            <section class="catalogo-alta-shell">
+                <header class="catalogo-alta-head">
+                    <div>
+                        <h2 id="instrumento-form-titulo">Registrar nuevo instrumento</h2>
+                        <p>Completa la información del instrumento. Podrá utilizarse en varias fichas, sin duplicar su registro.</p>
+                    </div>
+                </header>
+                <div class="catalogo-alta-body">
             <div class="instrumento-create-layout">
                 <form class="panel admin-instrument-form" id="instrumento-form" enctype="multipart/form-data">
                     @csrf
                     <p id="instrumento-mensaje" role="status" aria-live="polite" hidden></p>
                     <div class="instrumento-form-content">
-                        <h2 id="instrumento-form-titulo">Registrar nuevo instrumento</h2>
-                        <p class="instrumento-form-sub">Completa la información del instrumento. Podrá utilizarse en varias fichas, sin duplicar su registro.</p>
                         <div class="instrumento-fields">
                             <label for="instrumento-nombre">Nombre del instrumento <span class="instrumento-required">*</span>
                                 <input id="instrumento-nombre" name="nombre" type="text" placeholder="Ej. Pinza Kocher" autocomplete="off" required maxlength="200">
@@ -265,13 +288,20 @@
                     </div>
                 </aside>
             </div>
+                </div>
+            </section>
         </section>
 
         <section class="admin-panel-tab" id="tab-nuevo-tipo-conjunto" role="tabpanel" hidden>
-            <div class="panel nuevo-conjunto-panel">
-                <h2>Registrar nuevo tipo de conjunto</h2>
-                <p>El tipo quedará disponible para registrar instrumentos y crear fichas del servicio seleccionado.</p>
-                <form id="nuevo-conjunto-form" action="{{ route('mockups.catalogo.tipos-conjunto.guardar') }}" method="post">
+            <section class="catalogo-alta-shell catalogo-alta-shell--angosto">
+                <header class="catalogo-alta-head">
+                    <div>
+                        <h2>Registrar nuevo tipo de conjunto</h2>
+                        <p>El tipo quedará disponible para registrar instrumentos y crear fichas del servicio seleccionado.</p>
+                    </div>
+                </header>
+                <div class="catalogo-alta-body">
+                <form id="nuevo-conjunto-form" class="nuevo-conjunto-panel" action="{{ route('mockups.catalogo.tipos-conjunto.guardar') }}" method="post">
                     @csrf
                     <p id="nuevo-conjunto-mensaje" class="nuevo-conjunto-mensaje" role="status" aria-live="polite" hidden></p>
                     <div class="nuevo-conjunto-campos">
@@ -295,7 +325,8 @@
                         <button class="btn btn-dark" id="nuevo-conjunto-guardar" type="submit">Guardar tipo de conjunto</button>
                     </div>
                 </form>
-            </div>
+                </div>
+            </section>
         </section>
     </main>
 </div>

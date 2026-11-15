@@ -188,6 +188,9 @@
                                     <header class="custody-head">
                                         <div>
                                             <strong>{{ $cadena['caja'] }}</strong>
+                                            @if (! empty($cadena['ciclo']))
+                                                <span>Ciclo {{ $cadena['ciclo'] }}</span>
+                                            @endif
                                             <span>{{ $cadena['servicio'] }} · {{ $cadena['ubicacion'] }}</span>
                                             <span class="custody-ahora">Ahora: {{ $cadena['estado'] }} · {{ $cadena['responsable'] }}</span>
                                         </div>

@@ -33,6 +33,7 @@ class AccesoPorRol
         'mockups.catalogo.instrumentos.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.instrumentos.actualizar' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
+        'fichas.imagen' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
 
         /** Inventario */
         'mockups.inventario' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],
@@ -134,11 +135,15 @@ class AccesoPorRol
 
     private static function badgeAlertas(): string
     {
-        $inventario = ElementoInventario::query()->get()->filter(
-            fn (ElementoInventario $elemento) => $elemento->tieneAlertaStock()
-        )->count();
+        // Misma regla que ElementoInventario::estadoStock() !== 'ok', en SQL.
+        $inventario = ElementoInventario::query()
+            ->where(function ($q) {
+                $q->where('stock', '<=', 0)
+                    ->orWhereColumn('stock', '<', 'minimo');
+            })
+            ->count();
 
-        return (string) (3 + $inventario);
+        return (string) $inventario;
     }
 
     /**

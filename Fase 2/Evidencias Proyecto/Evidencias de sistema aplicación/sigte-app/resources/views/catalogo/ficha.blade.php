@@ -76,8 +76,12 @@
             </section>
         @else
             <div class="ficha-layout ficha-operador-resumen">
-                <section class="ficha-guia ficha-operador-guia {{ $item['guia'] ? '' : 'is-empty' }}" aria-label="Guía visual">
+                @php $tieneFoto = ! empty($item['imagen_url']); @endphp
+                <section class="ficha-guia ficha-operador-guia {{ $tieneFoto || $item['guia'] ? '' : 'is-empty' }}" aria-label="Guía visual">
                     <div class="ficha-operador-guia-imagen">
+                        @if ($tieneFoto)
+                            <img class="ficha-operador-guia-foto" src="{{ $item['imagen_url'] }}" alt="Fotografía del conjunto {{ $item['codigo'] }}" loading="lazy">
+                        @endif
                         <span class="ficha-operador-guia-etiqueta">
                             @if ($item['guia'])
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -87,12 +91,14 @@
                                 Sin guía visual
                             @endif
                         </span>
-                        <svg viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="7" y="9" width="34" height="30" rx="5"/><circle cx="18" cy="19" r="3"/><path d="m10 34 11-10 7 6 5-5 8 8"/></svg>
+                        @unless ($tieneFoto)
+                            <svg viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="7" y="9" width="34" height="30" rx="5"/><circle cx="18" cy="19" r="3"/><path d="m10 34 11-10 7 6 5-5 8 8"/></svg>
+                        @endunless
                     </div>
                     <div class="ficha-operador-guia-texto">
                         <span class="ficha-kicker">{{ $item['guia'] ? 'Guía visual' : 'Sin guía visual' }}</span>
-                        <strong>{{ $item['guia'] ? 'Referencia del conjunto' : 'Sin imagen del conjunto' }}</strong>
-                        <p>{{ $item['guia'] ? 'Consulta los instrumentos que debe contener.' : 'Puedes guiarte por la lista de instrumentos y marcar cada uno mientras armas el conjunto.' }}</p>
+                        <strong>{{ $tieneFoto ? 'Fotografía del conjunto' : ($item['guia'] ? 'Referencia del conjunto' : 'Sin imagen del conjunto') }}</strong>
+                        <p>{{ $tieneFoto || $item['guia'] ? 'Consulta los instrumentos que debe contener.' : 'Puedes guiarte por la lista de instrumentos y marcar cada uno mientras armas el conjunto.' }}</p>
                     </div>
                 </section>
 

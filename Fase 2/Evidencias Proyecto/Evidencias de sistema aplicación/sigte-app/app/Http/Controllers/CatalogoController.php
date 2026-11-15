@@ -6,7 +6,9 @@ use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
 use App\Models\Ficha;
 use App\Models\Instrumento;
+use App\Support\AlmacenImagenes;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
@@ -29,12 +31,24 @@ class CatalogoController extends Controller
             return $this->catalogoItems();
         }
 
+        // Sin columna BYTEA imagen: el listado solo necesita ruta/flag para la URL.
+        $columnas = [
+            'id', 'codigo', 'nombre', 'tipo', 'servicio_id', 'guia_visual',
+        ];
+        if (Schema::hasColumn('fichas', 'imagen_ruta')) {
+            $columnas[] = 'imagen_ruta';
+        }
+
+        $idsConBytea = Schema::hasColumn('fichas', 'imagen')
+            ? DB::table('fichas')->whereNotNull('imagen')->pluck('id')->flip()
+            : collect();
+
         return Ficha::query()
-            ->with(['items.instrumento:id,nombre,codigo_fabricante', 'servicioClinico'])
+            ->with(['items.instrumento:id,nombre,codigo_fabricante', 'servicioClinico:id,nombre'])
             ->orderBy('nombre')
             ->withSum('items as piezas', 'cantidad')
-            ->get()
-            ->map(function (Ficha $ficha): array {
+            ->get($columnas)
+            ->map(function (Ficha $ficha) use ($idsConBytea): array {
                 $piezas = (int) $ficha->getAttribute('piezas');
                 $contenido = $ficha->items
                     ->map(fn ($linea) => trim(($linea->instrumento?->codigo_fabricante ?? '').' '.($linea->instrumento?->nombre ?? '')))
@@ -46,6 +60,7 @@ class CatalogoController extends Controller
                     'tipo' => $ficha->tipo === 'set' ? 'Set quirúrgico' : ($ficha->tipo === 'caja' ? 'Caja quirúrgica' : $ficha->tipo),
                     'servicio' => $ficha->servicioClinico?->nombre ?? 'Sin servicio asignado',
                     'guia' => (bool) $ficha->guia_visual,
+                    'imagen_url' => $this->urlFotoFicha($ficha, $idsConBytea->has($ficha->id)),
                     'instrumentos' => [],
                     'piezas' => $piezas,
                     'buscar' => $contenido,
@@ -61,11 +76,25 @@ class CatalogoController extends Controller
             return [];
         }
 
+        $columnas = [
+            'id', 'codigo', 'nombre', 'tipo', 'servicio_id', 'tipo_conjunto_id', 'guia_visual',
+        ];
+        if (Schema::hasColumn('fichas', 'imagen_ruta')) {
+            $columnas[] = 'imagen_ruta';
+        }
+
+        $idsConBytea = Schema::hasColumn('fichas', 'imagen')
+            ? DB::table('fichas')->whereNotNull('imagen')->pluck('id')->flip()
+            : collect();
+
         return Ficha::query()
-            ->with(['items.instrumento', 'servicioClinico'])
+            ->with([
+                'items.instrumento:id,nombre,codigo_fabricante,tamano',
+                'servicioClinico:id,nombre',
+            ])
             ->orderBy('nombre')
-            ->get()
-            ->map(function (Ficha $ficha): array {
+            ->get($columnas)
+            ->map(function (Ficha $ficha) use ($idsConBytea): array {
                 $instrumentos = $ficha->items->map(function ($linea): array {
                     $tamano = trim((string) $linea->instrumento?->tamano);
 
@@ -88,6 +117,7 @@ class CatalogoController extends Controller
                     'id' => $ficha->id,
                     'tipo_conjunto_id' => $ficha->tipo_conjunto_id,
                     'guia' => (bool) $ficha->guia_visual,
+                    'imagen_url' => $this->urlFotoFicha($ficha, $idsConBytea->has($ficha->id)),
                     'instrumentos' => $instrumentos,
                     'piezas' => array_sum(array_column($instrumentos, 'cantidad')),
                 ];
@@ -118,10 +148,12 @@ class CatalogoController extends Controller
                 fn (array $item) => $item['servicio'] === $servicio
             ));
         }
+        // Solo el ciclo activo: con reingreso B puede haber varias filas del mismo código.
         $etapas = $filtrados === []
             ? collect()
             : Caja::query()
                 ->whereIn('codigo', array_column($filtrados, 'codigo'))
+                ->whereNull('entregado_at')
                 ->pluck('etapa', 'codigo');
         $filtrados = array_map(function (array $item) use ($etapas): array {
             $etapa = $etapas[$item['codigo']] ?? null;
@@ -144,19 +176,80 @@ class CatalogoController extends Controller
             'hay_filtros' => $busqueda !== '' || $servicio !== '',
         ]);
     }
+    /** Foto de ficha (archivo en uploads/ o BYTEA legado). */
+    public function imagenFicha(int $id)
+    {
+        $columnas = ['imagen', 'imagen_formato'];
+        if (Schema::hasColumn('fichas', 'imagen_ruta')) {
+            $columnas[] = 'imagen_ruta';
+        }
+        $ficha = DB::table('fichas')->where('id', $id)->first($columnas);
+
+        abort_if(! $ficha, 404);
+
+        if (! empty($ficha->imagen_ruta)) {
+            $url = AlmacenImagenes::url($ficha->imagen_ruta);
+            abort_if($url === null, 404);
+
+            return redirect()->away($url);
+        }
+
+        abort_if(! $ficha->imagen, 404);
+
+        $bytes = $ficha->imagen;
+
+        if (is_resource($bytes)) {
+            $bytes = stream_get_contents($bytes);
+        }
+
+        if (is_string($bytes) && str_starts_with($bytes, '\\x')) {
+            $bytes = hex2bin(substr($bytes, 2));
+        }
+
+        abort_unless(is_string($bytes) && $bytes !== '', 404);
+
+        $mime = (string) ($ficha->imagen_formato ?? '');
+
+        if (! in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($bytes);
+        }
+
+        abort_unless(in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true), 404);
+
+        return response($bytes, 200, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'private, max-age=3600',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     public function catalogoAdmin(Request $request)
     {
         // Se reutiliza la ruta GET existente para entregar fotografías sin modificar web.php.
         if ($request->query('instrumento_imagen') !== null) {
             abort_unless(ctype_digit((string) $request->query('instrumento_imagen')), 404);
-            abort_unless(Schema::hasColumn('instrumentos', 'imagen'), 404);
             $id = (int) $request->query('instrumento_imagen');
-            $columnas = ['imagen'];
+            $columnas = ['id'];
+            if (Schema::hasColumn('instrumentos', 'imagen_ruta')) {
+                $columnas[] = 'imagen_ruta';
+            }
+            if (Schema::hasColumn('instrumentos', 'imagen')) {
+                $columnas[] = 'imagen';
+            }
             $campoMime = Schema::hasColumn('instrumentos', 'imagen_mime') ? 'imagen_mime'
                 : (Schema::hasColumn('instrumentos', 'imagen_formato') ? 'imagen_formato' : null);
-            if ($campoMime) $columnas[] = $campoMime;
+            if ($campoMime) {
+                $columnas[] = $campoMime;
+            }
             $registro = DB::table('instrumentos')->where('id', $id)->first($columnas);
-            abort_if(!$registro || !$registro->imagen, 404);
+            abort_if(! $registro, 404);
+            if (! empty($registro->imagen_ruta)) {
+                $url = AlmacenImagenes::url((string) $registro->imagen_ruta);
+                abort_if($url === null, 404);
+
+                return redirect()->away($url);
+            }
+            abort_unless(Schema::hasColumn('instrumentos', 'imagen') && $registro->imagen, 404);
             $bytes = $registro->imagen;
             if (is_resource($bytes)) $bytes = stream_get_contents($bytes);
             if (is_string($bytes) && str_starts_with($bytes, '\\x')) {
@@ -181,23 +274,33 @@ class CatalogoController extends Controller
         $tiposConjuntoInstrumento = DB::table('tipo_conjunto')->orderBy('nombre_conjunto')->get(['id', 'codigo', 'nombre_conjunto', 'servicio_id']);
         $serviciosFicha = DB::table('servicios')->orderBy('nombre')->get(['id', 'nombre']);
         $items = $this->catalogoItems();
-        // Solo metadatos en el listado: los BYTEA se consultan al solicitar cada foto.
         $tieneImagen = Schema::hasColumn('instrumentos', 'imagen');
-        $idsConImagen = $tieneImagen
-            ? DB::table('instrumentos')->whereNotNull('imagen')->pluck('id')->flip()
-            : collect();
-        $instrumentos = DB::table('instrumentos')
-            ->select('id', 'nombre', 'tamano', 'codigo_fabricante', 'tipo_conjunto_id')
+        $tieneRuta = Schema::hasColumn('instrumentos', 'imagen_ruta');
+        $consultaInstrumentos = DB::table('instrumentos')
+            ->select('id', 'nombre', 'tamano', 'codigo_fabricante', 'tipo_conjunto_id');
+        if ($tieneRuta) {
+            $consultaInstrumentos->addSelect('imagen_ruta');
+        }
+        if ($tieneImagen) {
+            $consultaInstrumentos->selectRaw('(imagen IS NOT NULL) AS tiene_imagen_bytea');
+        }
+        $instrumentos = $consultaInstrumentos
             ->orderBy('nombre')->get()
-            ->map(function ($inst) use ($idsConImagen) {
+            ->map(function ($inst) use ($tieneImagen, $tieneRuta) {
+                $url = null;
+                if ($tieneRuta && ! empty($inst->imagen_ruta)) {
+                    $url = AlmacenImagenes::url($inst->imagen_ruta);
+                } elseif ($tieneImagen && ! empty($inst->tiene_imagen_bytea)) {
+                    $url = url()->current().'?instrumento_imagen='.$inst->id;
+                }
+
                 return [
                     'id' => $inst->id,
                     'nombre' => $inst->nombre,
                     'tamano' => $inst->tamano,
                     'codigo' => $inst->codigo_fabricante,
                     'tipo_conjunto_id' => $inst->tipo_conjunto_id,
-                    'imagen_url' => $idsConImagen->has($inst->id)
-                        ? url()->current().'?instrumento_imagen='.$inst->id : null,
+                    'imagen_url' => $url,
                 ];
             })->all();
 
@@ -281,7 +384,8 @@ class CatalogoController extends Controller
             return response()->json(['message' => 'La tabla instrumentos no tiene la columna imagen.'], 422);
         }
 
-        $instrumento = DB::transaction(function () use ($datos, $foto) {
+        $imagenUrl = null;
+        $instrumento = DB::transaction(function () use ($datos, $foto, &$imagenUrl) {
             $registro = Instrumento::create([
                 'nombre' => trim($datos['nombre']),
                 'codigo_fabricante' => trim($datos['codigo_fabricante'] ?? '') ?: null,
@@ -289,15 +393,9 @@ class CatalogoController extends Controller
                 'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
             ]);
             if ($foto) {
-                $hex = bin2hex(file_get_contents($foto->getRealPath()));
-                $mime = $foto->getMimeType();
-                $campoFormato = Schema::hasColumn('instrumentos', 'imagen_mime') ? 'imagen_mime'
-                    : (Schema::hasColumn('instrumentos', 'imagen_formato') ? 'imagen_formato' : null);
-                DB::update("UPDATE instrumentos SET imagen = decode(?, 'hex') WHERE id = ?", [$hex, $registro->id]);
-                if ($campoFormato) {
-                    DB::table('instrumentos')->where('id', $registro->id)->update([$campoFormato => $mime]);
-                }
+                $imagenUrl = $this->guardarFotoInstrumento($registro->id, $foto, trim($datos['nombre']));
             }
+
             return $registro;
         });
 
@@ -309,7 +407,7 @@ class CatalogoController extends Controller
                 'codigo' => $instrumento->codigo_fabricante ?? '',
                 'tamano' => $instrumento->tamano ?? '',
                 'tipo_conjunto_id' => (int) $datos['tipo_conjunto_id'],
-                'imagen_url' => $foto ? route('mockups.catalogo.admin', ['instrumento_imagen' => $instrumento->id]) : null,
+                'imagen_url' => $imagenUrl,
             ],
         ], 201);
     }
@@ -331,7 +429,8 @@ class CatalogoController extends Controller
             return response()->json(['message' => 'La tabla instrumentos no tiene la columna imagen.'], 422);
         }
 
-        DB::transaction(function () use ($instrumento, $datos, $foto, $quitarFoto) {
+        $imagenUrl = null;
+        DB::transaction(function () use ($instrumento, $datos, $foto, $quitarFoto, &$imagenUrl) {
             $instrumento->update([
                 'nombre' => trim($datos['nombre']),
                 'codigo_fabricante' => trim($datos['codigo_fabricante'] ?? '') ?: null,
@@ -343,24 +442,28 @@ class CatalogoController extends Controller
                 : (Schema::hasColumn('instrumentos', 'imagen_formato') ? 'imagen_formato' : null);
 
             if ($foto) {
-                $contenido = file_get_contents($foto->getRealPath());
-                $hex = bin2hex($contenido);
-                DB::update("UPDATE instrumentos SET imagen = decode(?, 'hex') WHERE id = ?", [$hex, $instrumento->id]);
-                if ($campoFormato) {
-                    DB::table('instrumentos')->where('id', $instrumento->id)
-                        ->update([$campoFormato => $foto->getMimeType()]);
-                }
+                $rutaAnterior = Schema::hasColumn('instrumentos', 'imagen_ruta')
+                    ? DB::table('instrumentos')->where('id', $instrumento->id)->value('imagen_ruta')
+                    : null;
+                AlmacenImagenes::borrar($rutaAnterior ? (string) $rutaAnterior : null);
+                $imagenUrl = $this->guardarFotoInstrumento($instrumento->id, $foto, $instrumento->nombre);
             } elseif ($quitarFoto) {
+                $rutaAnterior = Schema::hasColumn('instrumentos', 'imagen_ruta')
+                    ? DB::table('instrumentos')->where('id', $instrumento->id)->value('imagen_ruta')
+                    : null;
+                AlmacenImagenes::borrar($rutaAnterior ? (string) $rutaAnterior : null);
                 $cambios = ['imagen' => null];
                 if ($campoFormato) {
                     $cambios[$campoFormato] = null;
                 }
+                if (Schema::hasColumn('instrumentos', 'imagen_ruta')) {
+                    $cambios['imagen_ruta'] = null;
+                }
                 DB::table('instrumentos')->where('id', $instrumento->id)->update($cambios);
+            } else {
+                $imagenUrl = $this->urlFotoInstrumento($instrumento->id);
             }
         });
-
-        $tieneImagen = Schema::hasColumn('instrumentos', 'imagen')
-            && DB::table('instrumentos')->where('id', $instrumento->id)->whereNotNull('imagen')->exists();
 
         return response()->json([
             'message' => 'Instrumento actualizado correctamente.',
@@ -370,9 +473,7 @@ class CatalogoController extends Controller
                 'codigo' => $instrumento->codigo_fabricante ?? '',
                 'tamano' => $instrumento->tamano ?? '',
                 'tipo_conjunto_id' => (int) $instrumento->tipo_conjunto_id,
-                'imagen_url' => $tieneImagen
-                    ? route('mockups.catalogo.admin', ['instrumento_imagen' => $instrumento->id, 'v' => now()->timestamp])
-                    : null,
+                'imagen_url' => $imagenUrl,
             ],
         ]);
     }
@@ -424,9 +525,18 @@ class CatalogoController extends Controller
                 $valores['created_at'] = now();
             }
             if ($requestFoto = request()->file('foto')) {
-                // BYTEA de PostgreSQL: la conversión hex evita problemas con datos binarios.
-                $valores['imagen'] = DB::raw("decode('".bin2hex(file_get_contents($requestFoto->getRealPath()))."', 'hex')");
-                $valores['imagen_formato'] = $requestFoto->getMimeType();
+                if ($ficha && Schema::hasColumn('fichas', 'imagen_ruta') && ! empty($ficha->imagen_ruta)) {
+                    AlmacenImagenes::borrar((string) $ficha->imagen_ruta);
+                }
+                $guardada = AlmacenImagenes::guardar($requestFoto, 'fichas', $codigo);
+                $valores['imagen_formato'] = $guardada['mime'];
+                if (Schema::hasColumn('fichas', 'imagen_ruta')) {
+                    $valores['imagen_ruta'] = $guardada['ruta'];
+                    $valores['imagen'] = null;
+                } else {
+                    // Fallback legado si aún no corre la migración de ruta.
+                    $valores['imagen'] = DB::raw("decode('".bin2hex(file_get_contents($requestFoto->getRealPath()))."', 'hex')");
+                }
             }
             if ($ficha) {
                 DB::table('fichas')->where('id', $ficha->id)->update($valores);
@@ -458,12 +568,15 @@ class CatalogoController extends Controller
             ->whereRaw('lower(codigo) = ?', [mb_strtolower($codigo)])
             ->first();
         if ($registro !== null) {
+            $tieneBytea = Schema::hasColumn('fichas', 'imagen')
+                && DB::table('fichas')->where('id', $registro->id)->whereNotNull('imagen')->exists();
             $item = [
                 'codigo' => $registro->codigo,
                 'nombre' => $registro->nombre,
                 'tipo' => $registro->tipo === 'set' ? 'Set quirúrgico' : ($registro->tipo === 'caja' ? 'Caja quirúrgica' : $registro->tipo),
                 'servicio' => $registro->servicioClinico?->nombre ?? 'Sin servicio asignado',
                 'guia' => (bool) $registro->guia_visual,
+                'imagen_url' => $this->urlFotoFicha($registro, $tieneBytea),
                 'instrumentos' => $registro->items->map(function ($linea): array {
                     $tamano = trim((string) $linea->instrumento?->tamano);
 
@@ -517,8 +630,65 @@ class CatalogoController extends Controller
 
     private function conEtapaActual(array $item): array
     {
-        $caja = Caja::query()->where('codigo', $item['codigo'])->first();
+        $caja = Caja::enFlujo($item['codigo']);
         $item['etapa_actual'] = $caja ? Caja::etiquetaEtapa($caja->etapa) : null;
         return $item;
+    }
+
+    private function urlFotoFicha(Ficha $ficha, bool $tieneBytea = false): ?string
+    {
+        if (Schema::hasColumn('fichas', 'imagen_ruta') && ! empty($ficha->imagen_ruta)) {
+            return AlmacenImagenes::url((string) $ficha->imagen_ruta);
+        }
+
+        return $tieneBytea
+            ? route('fichas.imagen', ['id' => $ficha->id, 'v' => time()])
+            : null;
+    }
+
+    private function urlFotoInstrumento(int $id): ?string
+    {
+        $columnas = ['id'];
+        if (Schema::hasColumn('instrumentos', 'imagen_ruta')) {
+            $columnas[] = 'imagen_ruta';
+        }
+        if (Schema::hasColumn('instrumentos', 'imagen')) {
+            $columnas[] = DB::raw('(imagen IS NOT NULL) AS tiene_imagen_bytea');
+        }
+        $inst = DB::table('instrumentos')->where('id', $id)->first($columnas);
+        if (! $inst) {
+            return null;
+        }
+        if (! empty($inst->imagen_ruta)) {
+            return AlmacenImagenes::url((string) $inst->imagen_ruta);
+        }
+        if (! empty($inst->tiene_imagen_bytea)) {
+            return route('mockups.catalogo.admin', ['instrumento_imagen' => $id, 'v' => time()]);
+        }
+
+        return null;
+    }
+
+    private function guardarFotoInstrumento(int $id, UploadedFile $foto, string $prefijo): string
+    {
+        $guardada = AlmacenImagenes::guardar($foto, 'instrumentos', $prefijo);
+        $cambios = [
+            'imagen' => null,
+            'imagen_formato' => $guardada['mime'],
+        ];
+        if (Schema::hasColumn('instrumentos', 'imagen_ruta')) {
+            $cambios['imagen_ruta'] = $guardada['ruta'];
+        } else {
+            $hex = bin2hex(file_get_contents($foto->getRealPath()));
+            DB::update("UPDATE instrumentos SET imagen = decode(?, 'hex') WHERE id = ?", [$hex, $id]);
+            unset($cambios['imagen']);
+        }
+        if (Schema::hasColumn('instrumentos', 'imagen_mime')) {
+            $cambios['imagen_mime'] = $guardada['mime'];
+            unset($cambios['imagen_formato']);
+        }
+        DB::table('instrumentos')->where('id', $id)->update($cambios);
+
+        return $guardada['url'].'?v='.time();
     }
 }

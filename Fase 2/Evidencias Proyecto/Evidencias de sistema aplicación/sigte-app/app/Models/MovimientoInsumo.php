@@ -9,8 +9,7 @@ class MovimientoInsumo extends Model
 {
     public const ENTRADA = 'entrada';
     public const SALIDA = 'salida';
-
-    // TIPOS DE ENTRADA EN INVENTARIO
+    public const REPOSICION = 'reposicion';
     public const CONSUMO = 'consumo';
     public const USO = 'uso';
     public const DEVOLUCION = 'devolucion';
@@ -50,6 +49,7 @@ class MovimientoInsumo extends Model
             self::DEVOLUCION => 'Devolución',
             self::ENTRADA => 'Entrada',
             self::SALIDA => 'Salida',
+            self::REPOSICION => 'Reposición',
             default => 'Movimiento',
         };
     }

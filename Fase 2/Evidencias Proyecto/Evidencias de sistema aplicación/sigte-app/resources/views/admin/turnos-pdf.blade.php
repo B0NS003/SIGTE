@@ -100,7 +100,7 @@
 <body>
     <div class="cabecera">
         <div class="marca">SIG<span>TE</span></div>
-        <div class="titulo">Asignación de turnos del puesto</div>
+        <div class="titulo">Asignación de turnos · {{ $grupoEtiqueta ?? 'Operadoras' }}</div>
         <div class="meta">
             @if ($fechaAsignacion)
                 Fecha de la asignación: <strong>{{ $fechaAsignacion }}{{ $horaAsignacion ? ' '.$horaAsignacion : '' }}</strong>
@@ -112,7 +112,8 @@
     </div>
 
     <div class="resumen">
-        Personal en nómina: <strong>{{ $total }}</strong>
+        Grupo: <strong>{{ $grupoEtiqueta ?? 'Operadoras' }}</strong>
+        · Personal en nómina: <strong>{{ $total }}</strong>
         · Turno vigente ahora:
         <strong>
             @if ($turnoVigente === 'manana') Mañana

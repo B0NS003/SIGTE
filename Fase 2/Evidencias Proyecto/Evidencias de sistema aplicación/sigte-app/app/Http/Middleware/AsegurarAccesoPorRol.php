@@ -23,6 +23,17 @@ class AsegurarAccesoPorRol
             ]);
         }
 
+        $rol = $user?->nombreRol();
+        if ($rol === null) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors([
+                'login' => 'Tu cuenta no tiene un rol válido. Pide ayuda a la jefatura.',
+            ]);
+        }
+
         $ruta = $request->route()?->getName();
 
         $permitido = $ruta === 'mockups.panel'
@@ -30,7 +41,7 @@ class AsegurarAccesoPorRol
             : AccesoPorRol::puedeAbrirRuta($user, $ruta);
 
         if (! $permitido) {
-            return redirect()->route('mockups.panel', $user->nombreRol());
+            return redirect()->route('mockups.panel', $rol);
         }
 
         return $next($request);

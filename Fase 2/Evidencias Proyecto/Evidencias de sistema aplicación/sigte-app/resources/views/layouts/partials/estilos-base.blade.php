@@ -10,7 +10,9 @@
     'componentes/tablas',
     'componentes/insignias',
     'componentes/mensajes',
+    'componentes/paginacion',
     'componentes/logout',
+    'componentes/puesto',
     'base/utilidades',
 ] as $hoja)
     <link rel="stylesheet" href="{{ asset('css/'.$hoja.'.css') }}?v={{ @filemtime(public_path('css/'.$hoja.'.css')) }}">

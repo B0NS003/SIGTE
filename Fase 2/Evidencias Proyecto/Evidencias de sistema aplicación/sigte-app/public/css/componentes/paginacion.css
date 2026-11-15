@@ -1,0 +1,49 @@
+/* Paginación estándar SIGTE (usada por reportes, historial y listados). */
+.sigte-paginacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3);
+}
+.sigte-paginacion-info {
+    margin: 0;
+    font-size: var(--fs-xs);
+    color: var(--texto-3);
+}
+.sigte-paginacion-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.sigte-paginacion-lista a,
+.sigte-paginacion-lista span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0 var(--esp-2);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    background: var(--card);
+    color: var(--texto-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-decoration: none;
+}
+.sigte-paginacion-lista li.is-activa span {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--blanco);
+}
+.sigte-paginacion-lista li.is-disabled span {
+    opacity: 0.45;
+}
+.sigte-paginacion-lista a:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+}

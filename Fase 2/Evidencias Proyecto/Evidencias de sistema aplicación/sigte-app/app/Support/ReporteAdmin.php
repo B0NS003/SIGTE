@@ -15,7 +15,7 @@ use Throwable;
 class ReporteAdmin
 {
     /** Datos para las pestañas de reportes del panel de Administradora. */
-    public static function vista(Request $request): array
+    public static function vista(Request $request, bool $soloProduccion = false): array
     {
         $filtros = self::filtros($request);
         $falla = $request->boolean('falla');
@@ -46,11 +46,13 @@ class ReporteAdmin
         }
 
         $momento = now()->timezone('America/Santiago');
+        $tab = $soloProduccion ? 'produccion' : self::pestana($request);
 
         return array_merge($datos, [
             'falla' => $falla,
             'filtros' => $filtros,
-            'tab_activo' => self::pestana($request),
+            'tab_activo' => $tab,
+            'reportes_solo_produccion' => $soloProduccion,
             'fecha' => $momento->format('d/m/Y'),
             'hora' => $momento->format('H:i'),
             'servicios_produccion' => DB::table('servicios')->orderBy('nombre')->get(['id', 'nombre']),
@@ -69,14 +71,21 @@ class ReporteAdmin
     public static function filtros(Request $request): array
     {
         $hoy = now()->timezone('America/Santiago')->toDateString();
-        $desde = (string) $request->input('desde', now()->timezone('America/Santiago')->subDays(13)->toDateString());
-        $hasta = (string) $request->input('hasta', $hoy);
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde) || ! self::fechaValida($desde)) {
-            $desde = now()->timezone('America/Santiago')->subDays(13)->toDateString();
+        $sinFechas = ! $request->filled('desde') && ! $request->filled('hasta');
+
+        if ($sinFechas) {
+            [$desde, $hasta] = self::rangoPorDefectoConDatos($hoy);
+        } else {
+            $desde = (string) $request->input('desde', now()->timezone('America/Santiago')->subDays(13)->toDateString());
+            $hasta = (string) $request->input('hasta', $hoy);
+            if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde) || ! self::fechaValida($desde)) {
+                $desde = now()->timezone('America/Santiago')->subDays(13)->toDateString();
+            }
+            if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta) || ! self::fechaValida($hasta)) {
+                $hasta = $hoy;
+            }
         }
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta) || ! self::fechaValida($hasta)) {
-            $hasta = $hoy;
-        }
+
         if ($desde > $hasta) {
             [$desde, $hasta] = [$hasta, $desde];
         }
@@ -95,6 +104,32 @@ class ReporteAdmin
         ];
     }
 
+    /**
+     * Últimos ~30 días con datos reales de producción (max fecha).
+     * Si no hay filas, cae a los últimos 14 días hasta hoy.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private static function rangoPorDefectoConDatos(string $hoy): array
+    {
+        $maxFecha = DB::table('registros_produccion')->max('fecha');
+        if ($maxFecha === null) {
+            return [
+                now()->timezone('America/Santiago')->subDays(13)->toDateString(),
+                $hoy,
+            ];
+        }
+
+        $hasta = Carbon::parse((string) $maxFecha)->toDateString();
+        $desde = Carbon::parse($hasta)->subDays(29)->toDateString();
+        $minFecha = DB::table('registros_produccion')->min('fecha');
+        if ($minFecha !== null && $desde < (string) $minFecha) {
+            $desde = Carbon::parse((string) $minFecha)->toDateString();
+        }
+
+        return [$desde, $hasta];
+    }
+
     private static function fechaValida(string $fecha): bool
     {
         $fechaParseada = \DateTimeImmutable::createFromFormat('!Y-m-d', $fecha);
@@ -109,124 +144,157 @@ class ReporteAdmin
      * @param array{desde: string, hasta: string, tipo: string, servicio: ?int} $filtros
      * @return array<string, mixed>
      */
-    public static function datos(array $filtros, bool $completo = false): array
+    /**
+     * @param  string|null  $solo  null = todo (panel); pestana o 'csv' = solo bloques necesarios
+     */
+    public static function datos(array $filtros, bool $completo = false, ?string $solo = null): array
     {
         $inicio = Carbon::parse($filtros['desde'], 'America/Santiago')->startOfDay()->timezone('UTC');
         $fin = Carbon::parse($filtros['hasta'], 'America/Santiago')->endOfDay()->timezone('UTC');
+        $quiereTrazabilidad = $solo === null || in_array($solo, ['trazabilidad', 'csv'], true);
+        $quiereEntregas = $solo === null || in_array($solo, ['entregas', 'csv'], true);
+        $quiereProduccion = $solo === null || $solo === 'produccion';
 
-        // Trazabilidad: los indicadores se calculan en SQL y NO sobre la página mostrada.
-        $consultaAuditoria = RegistroAuditoria::query()
-            ->whereBetween('created_at', [$inicio, $fin]);
-        if ($filtros['tipo'] !== '') {
-            $consultaAuditoria->where('tipo', $filtros['tipo']);
-        }
-        $totalMovimientos = (clone $consultaAuditoria)->count();
-        $porTipo = (clone $consultaAuditoria)
-            ->select('tipo')
-            ->selectRaw('COUNT(*) AS cantidad')
-            ->groupBy('tipo')
-            ->pluck('cantidad', 'tipo')
-            ->map(fn ($cantidad) => (int) $cantidad);
+        $movimientos = collect();
+        $porTipo = collect();
+        $movimientosPorDia = collect();
+        $totalMovimientos = 0;
+        $retrocesosPeriodo = 0;
 
-        // El cast a hora chilena permite agrupar fechas correctamente cerca de medianoche.
-        $diaAuditoria = "(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Santiago')::date";
-        $movimientosPorDia = (clone $consultaAuditoria)
-            ->selectRaw($diaAuditoria.' AS dia')
-            ->selectRaw('COUNT(*) AS cantidad')
-            ->groupByRaw($diaAuditoria)
-            ->orderBy('dia')
-            ->get()
-            ->mapWithKeys(fn ($fila) => [Carbon::parse($fila->dia)->format('d/m/Y') => (int) $fila->cantidad]);
+        if ($quiereTrazabilidad) {
+            // Trazabilidad: indicadores en SQL, no sobre la página mostrada.
+            $consultaAuditoria = RegistroAuditoria::query()
+                ->whereBetween('created_at', [$inicio, $fin]);
+            if ($filtros['tipo'] !== '') {
+                $consultaAuditoria->where('tipo', $filtros['tipo']);
+            }
+            $totalMovimientos = (clone $consultaAuditoria)->count();
+            $porTipo = (clone $consultaAuditoria)
+                ->select('tipo')
+                ->selectRaw('COUNT(*) AS cantidad')
+                ->groupBy('tipo')
+                ->pluck('cantidad', 'tipo')
+                ->map(fn ($cantidad) => (int) $cantidad);
 
-        $listaAuditoria = (clone $consultaAuditoria)
-            ->with('actor')
-            ->latest('created_at')
-            ->latest('id');
-        $transformarMovimiento = fn (RegistroAuditoria $r) => array_merge($r->paraConsulta(), [
-            'tipo_etiqueta' => RegistroAuditoria::TIPOS[$r->tipo] ?? $r->tipo,
-        ]);
-        $movimientos = $completo
-            ? $listaAuditoria->get()->map($transformarMovimiento)
-            : $listaAuditoria->paginate(15, ['*'], 'pagina_movimientos')
-                ->withQueryString()->through($transformarMovimiento);
+            $diaAuditoria = "(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Santiago')::date";
+            $movimientosPorDia = (clone $consultaAuditoria)
+                ->selectRaw($diaAuditoria.' AS dia')
+                ->selectRaw('COUNT(*) AS cantidad')
+                ->groupByRaw($diaAuditoria)
+                ->orderBy('dia')
+                ->get()
+                ->mapWithKeys(fn ($fila) => [Carbon::parse($fila->dia)->format('d/m/Y') => (int) $fila->cantidad]);
 
-        // Los retrocesos tienen una tabla propia. Este total depende solo del período.
-        $retrocesosPeriodo = CajaRetroceso::query()
-            ->whereBetween('created_at', [$inicio, $fin])
-            ->count();
-
-        // Entregas: una operación puede tener varias cajas o solamente material.
-        // Se usa EntregaCaja para que el servicio sea el DESTINO, no el origen de la caja.
-        $consultaEntregas = DB::table('entrega_cajas as ec')
-            ->join('entregas as e', 'e.id', '=', 'ec.entrega_id')
-            ->leftJoin('users as u', 'u.id', '=', 'e.user_id')
-            ->whereBetween('e.entregado_at', [$inicio, $fin]);
-        $totalCajasEntregadas = (clone $consultaEntregas)->count();
-        $operacionesEntrega = Entrega::query()
-            ->whereBetween('entregado_at', [$inicio, $fin])
-            ->count();
-        $entregasPorServicio = (clone $consultaEntregas)
-            ->select('e.servicio')
-            ->selectRaw('COUNT(*) AS cantidad')
-            ->groupBy('e.servicio')
-            ->orderByDesc('cantidad')
-            ->pluck('cantidad', 'e.servicio')
-            ->map(fn ($cantidad) => (int) $cantidad);
-
-        $diaEntrega = "(e.entregado_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Santiago')::date";
-        $entregasPorFecha = (clone $consultaEntregas)
-            ->selectRaw($diaEntrega.' AS dia')
-            ->selectRaw('COUNT(*) AS cantidad')
-            ->groupByRaw($diaEntrega)
-            ->orderBy('dia')
-            ->get()
-            ->mapWithKeys(fn ($fila) => [(string) $fila->dia => (int) $fila->cantidad]);
-
-        $listaEntregas = (clone $consultaEntregas)
-            ->select([
-                'ec.codigo',
-                'e.codigo as operacion',
-                'e.servicio',
-                'e.recibe',
-                'e.entregado_at as entregado_utc',
-            ])
-            ->selectRaw("COALESCE(u.name, 'Sin registrar') AS responsable")
-            ->orderByDesc('e.entregado_at')
-            ->orderByDesc('ec.id');
-        $transformarEntrega = fn ($fila) => [
-            'codigo' => $fila->codigo,
-            'operacion' => $fila->operacion,
-            'servicio' => $fila->servicio,
-            'cuando' => Carbon::parse($fila->entregado_utc, 'UTC')
-                ->timezone('America/Santiago')->format('d/m/Y H:i'),
-            'responsable' => $fila->responsable,
-            'recibe' => $fila->recibe,
-        ];
-        $entregas = $completo
-            ? $listaEntregas->get()->map($transformarEntrega)
-            : $listaEntregas->paginate(15, ['*'], 'pagina_entregas')
-                ->withQueryString()->through($transformarEntrega);
-
-        // Flujo actual y recepciones: solo el segundo indicador usa fechas.
-        $consultaCajas = Caja::query();
-        if ($filtros['servicio'] !== null) {
-            $consultaCajas->where('servicio_id', $filtros['servicio']);
-        }
-        $recibidasPeriodo = (clone $consultaCajas)
-            ->whereBetween('created_at', [$inicio, $fin])
-            ->count();
-        $enFlujo = (clone $consultaCajas)
-            ->whereNull('entregado_at')
-            ->select('etapa')
-            ->selectRaw('COUNT(*) AS cantidad')
-            ->groupBy('etapa')
-            ->get()
-            ->map(fn ($fila) => [
-                'etapa' => Caja::etiquetaEtapa((string) $fila->etapa),
-                'cantidad' => (int) $fila->cantidad,
+            $listaAuditoria = (clone $consultaAuditoria)
+                ->with('actor')
+                ->latest('created_at')
+                ->latest('id');
+            $transformarMovimiento = fn (RegistroAuditoria $r) => array_merge($r->paraConsulta(), [
+                'tipo_etiqueta' => RegistroAuditoria::TIPOS[$r->tipo] ?? $r->tipo,
             ]);
+            $movimientos = $completo
+                ? $listaAuditoria->get()->map($transformarMovimiento)
+                : $listaAuditoria->paginate(15, ['*'], 'pagina_movimientos')
+                    ->withQueryString()->through($transformarMovimiento);
 
-        $cajasPorEtapa = self::cajasPorEtapa($inicio, $fin);
+            $retrocesosPeriodo = CajaRetroceso::query()
+                ->whereBetween('created_at', [$inicio, $fin])
+                ->count();
+        }
+
+        $entregas = collect();
+        $totalCajasEntregadas = 0;
+        $operacionesEntrega = 0;
+        $entregasPorServicio = collect();
+        $entregasPorFecha = collect();
+
+        if ($quiereEntregas) {
+            // Entregas: servicio = DESTINO (entrega_cajas + entregas).
+            $consultaEntregas = DB::table('entrega_cajas as ec')
+                ->join('entregas as e', 'e.id', '=', 'ec.entrega_id')
+                ->leftJoin('users as u', 'u.id', '=', 'e.user_id')
+                ->whereBetween('e.entregado_at', [$inicio, $fin]);
+            $nombreServicio = self::nombreServicio($filtros['servicio']);
+            if ($nombreServicio !== null) {
+                $consultaEntregas->where('e.servicio', $nombreServicio);
+            }
+            $totalCajasEntregadas = (clone $consultaEntregas)->count();
+            $consultaOperaciones = Entrega::query()
+                ->whereBetween('entregado_at', [$inicio, $fin]);
+            if ($nombreServicio !== null) {
+                $consultaOperaciones->where('servicio', $nombreServicio);
+            }
+            $operacionesEntrega = $consultaOperaciones->count();
+            $entregasPorServicio = (clone $consultaEntregas)
+                ->select('e.servicio')
+                ->selectRaw('COUNT(*) AS cantidad')
+                ->groupBy('e.servicio')
+                ->orderByDesc('cantidad')
+                ->pluck('cantidad', 'e.servicio')
+                ->map(fn ($cantidad) => (int) $cantidad);
+
+            $diaEntrega = "(e.entregado_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Santiago')::date";
+            $entregasPorFecha = (clone $consultaEntregas)
+                ->selectRaw($diaEntrega.' AS dia')
+                ->selectRaw('COUNT(*) AS cantidad')
+                ->groupByRaw($diaEntrega)
+                ->orderBy('dia')
+                ->get()
+                ->mapWithKeys(fn ($fila) => [(string) $fila->dia => (int) $fila->cantidad]);
+
+            $listaEntregas = (clone $consultaEntregas)
+                ->select([
+                    'ec.codigo',
+                    'e.codigo as operacion',
+                    'e.servicio',
+                    'e.recibe',
+                    'e.entregado_at as entregado_utc',
+                ])
+                ->selectRaw("COALESCE(u.name, 'Sin registrar') AS responsable")
+                ->orderByDesc('e.entregado_at')
+                ->orderByDesc('ec.id');
+            $transformarEntrega = fn ($fila) => [
+                'codigo' => $fila->codigo,
+                'operacion' => $fila->operacion,
+                'servicio' => $fila->servicio,
+                'cuando' => Carbon::parse($fila->entregado_utc, 'UTC')
+                    ->timezone('America/Santiago')->format('d/m/Y H:i'),
+                'responsable' => $fila->responsable,
+                'recibe' => $fila->recibe,
+            ];
+            $entregas = $completo
+                ? $listaEntregas->get()->map($transformarEntrega)
+                : $listaEntregas->paginate(15, ['*'], 'pagina_entregas')
+                    ->withQueryString()->through($transformarEntrega);
+        }
+
+        $enFlujo = collect();
+        $cajasPorEtapa = collect();
+        $recibidasPeriodo = 0;
+        $produccion = self::produccionVacia();
+
+        if ($quiereProduccion) {
+            $consultaCajas = Caja::query();
+            if ($filtros['servicio'] !== null) {
+                $consultaCajas->where('servicio_id', $filtros['servicio']);
+            }
+            $recibidasPeriodo = (clone $consultaCajas)
+                ->whereBetween('created_at', [$inicio, $fin])
+                ->count();
+            $enFlujo = (clone $consultaCajas)
+                ->whereNull('entregado_at')
+                ->select('etapa')
+                ->selectRaw('COUNT(*) AS cantidad')
+                ->groupBy('etapa')
+                ->get()
+                ->map(fn ($fila) => [
+                    'etapa' => Caja::etiquetaEtapa((string) $fila->etapa),
+                    'cantidad' => (int) $fila->cantidad,
+                ]);
+
+            $cajasPorEtapa = self::cajasPorEtapa($inicio, $fin, $filtros['servicio']);
+            $produccion = self::produccion($filtros);
+        }
 
         return [
             'movimientos' => $movimientos,
@@ -242,11 +310,15 @@ class ReporteAdmin
             'en_flujo' => $enFlujo,
             'cajas_por_etapa' => $cajasPorEtapa,
             'recibidas_periodo' => $recibidasPeriodo,
-            'produccion' => self::produccion($filtros),
+            'produccion' => $produccion,
         ];
     }
 
-    private static function cajasPorEtapa(Carbon $inicio, Carbon $fin): Collection
+    /**
+     * Cuenta ciclos (filas de cajas), no códigos físicos.
+     * Así el mismo código que reinicia el flujo en el período suma más de una vez.
+     */
+    private static function cajasPorEtapa(Carbon $inicio, Carbon $fin, ?int $servicioId = null): Collection
     {
         $etapas = [
             'Recepción',
@@ -263,67 +335,133 @@ class ReporteAdmin
             $conteos[$etapa] = [];
         }
 
-        // INICIO RECEPCIÓN: CAJAS CREADAS DURANTE EL PERÍODO.
-        $recepciones = Caja::query()
+        $filtrarServicio = function ($consulta) use ($servicioId) {
+            if ($servicioId !== null) {
+                $consulta->where('servicio_id', $servicioId);
+            }
+
+            return $consulta;
+        };
+
+        // Recepción: cada ciclo creado en el período.
+        $recepciones = $filtrarServicio(Caja::query())
             ->whereBetween('created_at', [$inicio, $fin])
-            ->get(['codigo']);
+            ->get(['id']);
 
         foreach ($recepciones as $caja) {
-            $conteos['Recepción'][(string) $caja->codigo] = true;
+            $conteos['Recepción'][(string) $caja->id] = true;
         }
 
-        // INICIO AVANCES: CONTAR LA ETAPA DE DESTINO.
+        // Avances: etapa destino, asociando la auditoría al ciclo vigente en ese momento.
         $avances = RegistroAuditoria::query()
             ->where('tipo', 'etapa')
             ->where('accion', 'Avanzó etapa')
             ->whereBetween('created_at', [$inicio, $fin])
-            ->get(['objeto', 'detalle']);
+            ->get(['id', 'objeto', 'detalle', 'created_at']);
+
+        $ciclosPorCodigo = $filtrarServicio(Caja::query())
+            ->whereIn('codigo', $avances->pluck('objeto')->filter()->unique()->all())
+            ->get(['id', 'codigo', 'created_at', 'entregado_at'])
+            ->groupBy('codigo');
+
+        // Si hay filtro de servicio, solo contar avances de códigos con ciclo de ese servicio.
+        $codigosPermitidos = $servicioId === null
+            ? null
+            : $ciclosPorCodigo->keys()->all();
 
         foreach ($avances as $avance) {
             if (! $avance->objeto || ! str_contains((string) $avance->detalle, '→')) {
+                continue;
+            }
+            if ($codigosPermitidos !== null && ! in_array((string) $avance->objeto, $codigosPermitidos, true)) {
                 continue;
             }
 
             $partes = explode('→', (string) $avance->detalle);
             $etapaDestino = trim((string) end($partes));
 
-            if (isset($conteos[$etapaDestino])) {
-                $conteos[$etapaDestino][(string) $avance->objeto] = true;
+            if (! isset($conteos[$etapaDestino])) {
+                continue;
             }
+
+            $cicloId = self::cicloIdEnMomento(
+                $ciclosPorCodigo->get((string) $avance->objeto, collect()),
+                $avance->created_at
+            ) ?? 'a:'.$avance->id;
+
+            $conteos[$etapaDestino][$cicloId] = true;
         }
 
-        // INICIO RETROCESOS: CONTAR LA ETAPA A LA QUE REGRESÓ.
-        $retrocesos = CajaRetroceso::query()
-            ->with('caja:id,codigo')
-            ->whereBetween('created_at', [$inicio, $fin])
-            ->get(['caja_id', 'etapa_hacia']);
+        // Retrocesos: etapa a la que regresó (por caja_id = ciclo).
+        $consultaRetrocesos = CajaRetroceso::query()
+            ->whereBetween('created_at', [$inicio, $fin]);
+        if ($servicioId !== null) {
+            $consultaRetrocesos->whereHas('caja', fn ($q) => $q->where('servicio_id', $servicioId));
+        }
+        $retrocesos = $consultaRetrocesos->get(['caja_id', 'etapa_hacia']);
 
         foreach ($retrocesos as $retroceso) {
-            if (! $retroceso->caja) {
+            if ($retroceso->caja_id === null) {
                 continue;
             }
 
             $etapaDestino = Caja::etiquetaEtapa((string) $retroceso->etapa_hacia);
 
             if (isset($conteos[$etapaDestino])) {
-                $conteos[$etapaDestino][(string) $retroceso->caja->codigo] = true;
+                $conteos[$etapaDestino][(string) $retroceso->caja_id] = true;
             }
         }
 
-        // INICIO ENTREGA: CAJAS ENTREGADAS DURANTE EL PERÍODO.
-        $entregas = Caja::query()
+        // Entrega: cada ciclo cerrado en el período.
+        $entregas = $filtrarServicio(Caja::query())
             ->whereNotNull('entregado_at')
             ->whereBetween('entregado_at', [$inicio, $fin])
-            ->get(['codigo']);
+            ->get(['id']);
 
         foreach ($entregas as $caja) {
-            $conteos['Entrega'][(string) $caja->codigo] = true;
+            $conteos['Entrega'][(string) $caja->id] = true;
         }
 
         return collect($etapas)->map(fn (string $etapa) => [
             'etapa' => $etapa,
             'cantidad' => count($conteos[$etapa]),
         ]);
+    }
+
+    private static function nombreServicio(?int $servicioId): ?string
+    {
+        if ($servicioId === null) {
+            return null;
+        }
+
+        $nombre = DB::table('servicios')->where('id', $servicioId)->value('nombre');
+
+        return is_string($nombre) && $nombre !== '' ? $nombre : null;
+    }
+
+    /**
+     * @param  Collection<int, Caja>  $ciclos
+     */
+    private static function cicloIdEnMomento(Collection $ciclos, ?Carbon $momento): ?string
+    {
+        if ($momento === null || $ciclos->isEmpty()) {
+            return null;
+        }
+
+        $ciclo = $ciclos
+            ->sortByDesc(fn (Caja $caja) => $caja->created_at?->getTimestamp() ?? $caja->id)
+            ->first(function (Caja $caja) use ($momento): bool {
+                if ($caja->created_at !== null && $caja->created_at->greaterThan($momento)) {
+                    return false;
+                }
+                if ($caja->entregado_at !== null && $caja->entregado_at->lessThan($momento)) {
+                    return false;
+                }
+
+                return true;
+            });
+
+        return $ciclo !== null ? (string) $ciclo->id : null;
     }
 
     private static function produccionVacia(): array

@@ -18,7 +18,7 @@ class RetrocesoEtapa
      */
     public function ejecutar(string $codigo, string $motivo, array $marca): array
     {
-        $caja = Caja::query()->where('codigo', $codigo)->first();
+        $caja = Caja::enFlujo($codigo);
         if ($caja === null) {
             throw ValidationException::withMessages([
                 'caja' => 'Esa caja no está en el flujo.',
@@ -47,15 +47,18 @@ class RetrocesoEtapa
                 $caja->proceso_desde = null;
                 $caja->proceso_hasta = null;
                 $caja->responsable_id = $marca['user_id'];
+                $caja->personal_id = $marca['personal_id'] ?? null;
                 $caja->save();
                 $caja->retrocesos()->create([
                     'user_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'] ?? null,
                     'etapa_desde' => $origen,
                     'etapa_hacia' => $anterior,
                     'motivo' => $motivo,
                 ]);
                 $caja->anotaciones()->create([
                     'user_id' => $marca['user_id'],
+                    'personal_id' => $marca['personal_id'] ?? null,
                     'texto' => 'Volvió a '.Caja::etiquetaEtapa($anterior).'. '.$motivo,
                 ]);
             });

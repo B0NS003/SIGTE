@@ -2,17 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthController extends Controller
 {
     public function showLogin(): View|RedirectResponse
     {
-        if (Auth::check()) {
-            return redirect()->route('mockups.panel', Auth::user()->nombreRol());
+        $user = Auth::user();
+
+        if ($user instanceof User) {
+            if (! $user->isActivo()) {
+                Auth::logout();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
+
+                return view('auth.login')->withErrors([
+                    'login' => 'Esta cuenta está desactivada. Pide a la jefatura que la reactive.',
+                ]);
+            }
+
+            return redirect()->route('mockups.panel', $user->nombreRol());
         }
 
         return view('auth.login');
@@ -29,21 +43,24 @@ class AuthController extends Controller
             'password.required' => 'Escribe tu contraseña.',
         ]);
 
-        $ingreso = Auth::attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'activo' => true,
-        ], $request->boolean('remember'));
+        $user = User::query()->where('email', $credentials['email'])->first();
 
-        if ($ingreso) {
-            $request->session()->regenerate();
-
-            return redirect()->route('mockups.panel', Auth::user()->nombreRol());
+        if ($user === null || ! Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'login' => 'No pudimos iniciar sesión. El correo o la contraseña no coinciden.',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'login' => 'No pudimos iniciar sesión. El correo o la contraseña no coinciden.',
-        ])->onlyInput('email');
+        if (! $user->isActivo()) {
+            return back()->withErrors([
+                'login' => 'Esta cuenta está desactivada. Pide a la jefatura que la reactive.',
+            ])->onlyInput('email');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return redirect()->route('mockups.panel', $user->nombreRol());
     }
 
     public function logout(Request $request): RedirectResponse

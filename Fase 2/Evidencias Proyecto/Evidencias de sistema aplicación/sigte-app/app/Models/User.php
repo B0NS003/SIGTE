@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -37,6 +38,11 @@ class User extends Authenticatable
     public function rol(): BelongsTo
     {
         return $this->belongsTo(Rol::class, 'rol_id');
+    }
+
+    public function personal(): HasOne
+    {
+        return $this->hasOne(Personal::class, 'user_id');
     }
 
     public function nombreRol(): ?string

@@ -15,7 +15,7 @@
             <div>
                 <p class="eyebrow">Consolidación estadística</p>
                 <h1>Reportes</h1>
-                <p class="main-sub">Producción, trazabilidad y entregas. Consulta por período y genera Excel o PDF.</p>
+                <p class="main-sub">Producción diaria por servicio y período. Consulta cifras y genera Excel o PDF.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'secretaria') }}">Volver al inicio</a>

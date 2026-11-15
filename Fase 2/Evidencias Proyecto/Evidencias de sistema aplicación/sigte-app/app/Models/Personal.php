@@ -56,6 +56,6 @@ class Personal extends Model
 
     public function cajas(): HasMany
     {
-        return $this->hasMany(Caja::class, 'responsable_id', 'user_id');
+        return $this->hasMany(Caja::class, 'personal_id');
     }
 }

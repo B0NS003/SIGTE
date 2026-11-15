@@ -19,10 +19,10 @@
                     </p>
                     @if ($puesto)
                         <p class="puesto-nombre">{{ $puesto->name }}</p>
-                        <p class="puesto-meta">Lo que se anote o se pase en este computador queda a su nombre.</p>
+                        <p class="puesto-meta">Lo que se registre en este computador (flujo o inventario) queda a su nombre.</p>
                     @else
                         <p class="puesto-nombre">¿Quién está en el puesto?</p>
-                        <p class="puesto-meta">Elige tu cuenta antes de anotar o pasar cajas.</p>
+                        <p class="puesto-meta">Elige tu cuenta antes de registrar movimientos o avanzar cajas.</p>
                     @endif
                 </div>
                 <label class="puesto-cambiar {{ $puesto ? '' : 'is-principal' }}">
@@ -64,7 +64,7 @@
             <div class="puesto-card-texto">
                 <p class="puesto-kicker">Operadora</p>
                 <p class="puesto-nombre">{{ auth()->user()->name }}</p>
-                <p class="puesto-meta">Lo que anotes o pases queda a tu nombre.</p>
+                <p class="puesto-meta">Lo que registres (flujo o inventario) queda a tu nombre.</p>
             </div>
         </div>
     </section>

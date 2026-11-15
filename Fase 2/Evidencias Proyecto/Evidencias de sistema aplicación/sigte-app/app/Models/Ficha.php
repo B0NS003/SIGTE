@@ -19,6 +19,7 @@ class Ficha extends Model
         'guia_visual',
         'imagen',
         'imagen_formato',
+        'imagen_ruta',
     ];
 
     protected function casts(): array

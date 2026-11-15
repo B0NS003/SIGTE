@@ -1,4 +1,4 @@
-/* Badges de estado, pills y roles. Muestrario en /guia-visual.html#estados. */
+/* Badges de estado, pills y roles. Muestrario en Documentacion-tecnica-sigte-app/Guía visual SIGTE. */
 
 .badge {
   display: inline-flex; align-items: center; gap: var(--esp-1);

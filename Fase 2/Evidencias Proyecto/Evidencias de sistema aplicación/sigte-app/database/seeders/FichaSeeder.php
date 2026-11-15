@@ -73,6 +73,7 @@ class FichaSeeder extends Seeder
         unset($mapaInstrumentos['__por_clave']);
 
         $mapaFichas = [];
+        $mapaFichaTipo = [];
         foreach ($fichasJson as $ficha) {
             $tipoId = $mapaTipos[(int) ($ficha['tipo_conjunto_id'] ?? 0)] ?? null;
             $registro = Ficha::query()->create([
@@ -84,33 +85,45 @@ class FichaSeeder extends Seeder
                 'guia_visual' => (bool) ($ficha['guia_visual'] ?? false),
             ]);
             $mapaFichas[(int) $ficha['id']] = (int) $registro->id;
+            $mapaFichaTipo[(int) $ficha['id']] = $tipoId;
         }
 
+        $ordenPorFicha = [];
         foreach ($lineasJson as $linea) {
-            $fichaId = $mapaFichas[(int) $linea['ficha_id']] ?? null;
+            $fichaJsonId = (int) $linea['ficha_id'];
+            $fichaId = $mapaFichas[$fichaJsonId] ?? null;
             $instrumentoId = $mapaInstrumentos[(int) $linea['instrumento_id']] ?? null;
-            if ($fichaId === null || $instrumentoId === null) {
+            $fichaTipoId = $mapaFichaTipo[$fichaJsonId] ?? null;
+            if ($fichaId === null || $instrumentoId === null || $fichaTipoId === null) {
                 continue;
             }
+
+            // D2: no enlazar instrumento de otro tipo (UNIQUE nombre+tamaño+código puede colisionar).
+            $instTipoId = Instrumento::query()->where('id', $instrumentoId)->value('tipo_conjunto_id');
+            if ((int) $instTipoId !== (int) $fichaTipoId) {
+                continue;
+            }
+
+            $ordenPorFicha[$fichaId] = ($ordenPorFicha[$fichaId] ?? 0) + 1;
 
             FichaInstrumento::query()->create([
                 'ficha_id' => $fichaId,
                 'instrumento_id' => $instrumentoId,
-                'tipo_conjunto_id' => isset($linea['tipo_conjunto_id'])
-                    ? ($mapaTipos[(int) $linea['tipo_conjunto_id']] ?? null)
-                    : null,
+                'tipo_conjunto_id' => $fichaTipoId,
                 'cantidad' => max(1, (int) ($linea['cantidad'] ?? 1)),
-                'orden' => (int) ($linea['orden'] ?? 0),
+                'orden' => $ordenPorFicha[$fichaId],
             ]);
         }
+
+        // Fichas que solo tenían instrumentos de otro tipo (colisión UNIQUE) quedan sin ítems.
+        Ficha::query()->whereDoesntHave('items')->delete();
     }
 
     private function limpiarCatalogo(): void
     {
-        if (Schema::hasTable('cajas') && Schema::hasColumn('cajas', 'ficha_id')) {
-            DB::table('cajas')->update(['ficha_id' => null]);
-        }
-        foreach (['ficha_instrumentos', 'tipo_conjunto_instrumentos', 'catalogo_instrumentos', 'catalogo_cajas', 'instrumentos', 'fichas', 'tipo_conjunto'] as $tabla) {
+        // No tocar cajas ni ficha_id: el flujo se limpia aparte y las recepciones reales enlazan ficha.
+        // Sin pivot tipo_conjunto_instrumentos: el vínculo es instrumentos.tipo_conjunto_id.
+        foreach (['ficha_instrumentos', 'instrumentos', 'fichas', 'tipo_conjunto'] as $tabla) {
             if (Schema::hasTable($tabla)) {
                 DB::table($tabla)->delete();
             }

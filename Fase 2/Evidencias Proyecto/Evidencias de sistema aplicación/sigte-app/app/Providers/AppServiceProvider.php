@@ -35,25 +35,41 @@ class AppServiceProvider extends ServiceProvider
 
                 return;
             }
-            $porCorreo = Personal::query()->get()->keyBy('email');
+
+            $porUserId = Personal::query()
+                ->whereNotNull('user_id')
+                ->get()
+                ->keyBy('user_id');
+            $porCorreo = Personal::query()->get()->keyBy(
+                fn (Personal $p) => mb_strtolower((string) $p->email)
+            );
+
+            $turnoDe = function (User $operadora) use ($porUserId, $porCorreo): ?string {
+                $porId = $porUserId->get($operadora->id);
+                if ($porId !== null) {
+                    return $porId->turno;
+                }
+
+                return $porCorreo->get(mb_strtolower($operadora->email))?->turno;
+            };
+
             $nomina = User::query()
                 ->where('activo', true)
                 ->where('email', '!=', User::CUENTA_PUESTO)
                 ->whereHas('rol', fn ($q) => $q->where('nombre', Rol::OPERADOR))
                 ->get()
-                ->sort(function (User $a, User $b) use ($porCorreo, $turno): int {
-                    $enTurno = function (User $user) use ($porCorreo, $turno): int {
-                        return ($porCorreo->get($user->email)?->turno === $turno) ? 0 : 1;
-                    };
+                ->sort(function (User $a, User $b) use ($turnoDe, $turno): int {
+                    $enTurno = fn (User $u): int => ($turnoDe($u) === $turno) ? 0 : 1;
 
                     return [$enTurno($a), mb_strtolower($a->name)] <=> [$enTurno($b), mb_strtolower($b->name)];
                 })
                 ->values();
+
             $view->with('puesto', User::quienRegistra());
             $view->with('nomina', $nomina);
             $view->with('turnoVigente', $turno);
             $view->with('idsDelTurno', $nomina
-                ->filter(fn (User $user) => $porCorreo->get($user->email)?->turno === $turno)
+                ->filter(fn (User $operadora) => $turnoDe($operadora) === $turno)
                 ->pluck('id')
                 ->all());
         });

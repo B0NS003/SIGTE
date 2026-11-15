@@ -119,6 +119,34 @@
             @endforelse
         </tbody>
     </table>
+    @php
+        $historicoPdf = collect($datos['cajas_por_etapa'] ?? []);
+        $totalHistoricoPdf = (int) $historicoPdf->sum('cantidad');
+    @endphp
+    <h2>Procesamiento histórico por etapa</h2>
+    <p class="nota">Ciclos (no códigos físicos) que pasaron por cada etapa en el período. El filtro de servicio, si se seleccionó, sí aplica.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Etapa</th>
+                <th>Ciclos</th>
+                <th>% del total contabilizado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($historicoPdf as $fila)
+            <tr>
+                <td>{{ $fila['etapa'] }}</td>
+                <td class="numero">{{ $fila['cantidad'] }}</td>
+                <td class="numero">{{ $totalHistoricoPdf > 0 ? number_format($fila['cantidad'] / $totalHistoricoPdf * 100, 1, ',', '.') : '0' }}%</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="3">No hay movimiento histórico en el período.</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
     <h2>Producción mensual por servicio</h2>
     <table>
         <thead>

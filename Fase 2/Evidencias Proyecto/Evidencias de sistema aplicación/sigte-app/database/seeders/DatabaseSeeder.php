@@ -5,14 +5,10 @@ namespace Database\Seeders;
 use App\Models\Caja;
 use App\Models\CajaAnotacion;
 use App\Models\ConsumoServicio;
-use App\Models\ElementoInventario;
 use App\Models\Entrega;
 use App\Models\EntregaCaja;
-use App\Models\Insumo;
-use App\Models\MovimientoInsumo;
 use App\Models\Personal;
 use App\Models\RegistroAuditoria;
-use App\Models\Reposicion;
 use App\Models\Rol;
 use App\Models\Sala;
 use App\Models\Servicio;
@@ -23,12 +19,13 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Único seeder del proyecto.
- * Carga roles, cuentas, nómina, inventario (fase 3: umbrales + historial),
- * catálogo/fichas y ~2 semanas de flujo (~130 cajas).
+ * Carga roles, cuentas, nómina, inventario (JSON lavado/armado), catálogo y producción (JSON).
+ * Ya no regenera el flujo demo inventado (SET-001/CAJA-001 sin ficha).
  *
  * php artisan db:seed
- * IMPORTANTE: run() elimina y recrea el flujo de demostracion.
- * Para cargar solo litros, usar sembrarSoloProduccion() desde Tinker.
+ * El método simularDosSemanas() sigue en el archivo por si hace falta demo local puntual;
+ * no se ejecuta en run(): el flujo debe nacer por recepción con ficha.
+ * Para cargar solo litros: sembrarSoloProduccion() desde Tinker.
  */
 class DatabaseSeeder extends Seeder
 {
@@ -40,12 +37,11 @@ class DatabaseSeeder extends Seeder
         $this->sembrarRoles();
         $this->sembrarCuentasDemo();
         $this->sembrarNomina();
-        $this->sembrarInventario();
-        $this->sembrarHistorialInventario();
-        $this->sembrarInsumosSecretaria();
+        $this->call(InventarioSeeder::class);
+        $this->sembrarConsumosServicioDemo();
         $this->call(FichaSeeder::class);
         $this->limpiarFlujo();
-        $this->simularDosSemanas();
+        // Flujo demo antiguo desactivado: las cajas deben nacer por recepción real (con ficha_id).
         $this->sembrarMaterialesProduccion();
         $this->sembrarRegistrosProduccion();
     }
@@ -97,13 +93,17 @@ class DatabaseSeeder extends Seeder
 
     private function sembrarNomina(): void
     {
+        // Enfermeras de turno reales (relevo / cierre); no son operadoras del puesto.
+        $enfermerasTurno = [
+            'CYNTHIA MABEL TRANGOLAO TRANGOLAO',
+            'LISSETTE ANDREA LARA DÍAZ',
+            'GIULIANA CONSTANZA BARRERA MATTA',
+            'FELIPE IGNACIO GONZÁLEZ GAGLIANO',
+            'FELIPE ANDRES SAGREDO LISPERGUER',
+        ];
+
         $grupos = [
             1 => [
-                'CYNTHIA MABEL TRANGOLAO TRANGOLAO',
-                'LISSETTE ANDREA LARA DÍAZ',
-                'GIULIANA CONSTANZA BARRERA MATTA',
-                'FELIPE IGNACIO GONZÁLEZ GAGLIANO',
-                'FELIPE ANDRES SAGREDO LISPERGUER',
                 'KATHERINE ROSALBA PONCE QUIROZ',
             ],
             2 => [
@@ -147,145 +147,52 @@ class DatabaseSeeder extends Seeder
         ];
 
         $rolOperadora = Rol::query()->where('nombre', Rol::OPERADOR)->value('id');
+        $rolEnfermera = Rol::query()->where('nombre', Rol::ENFERMERA)->value('id');
         $usados = [];
+
+        foreach ($enfermerasTurno as $crudo) {
+            $this->sembrarPersonaNomina($crudo, 1, $rolEnfermera, $usados);
+        }
+
         foreach ($grupos as $grupo => $nombres) {
             foreach ($nombres as $crudo) {
-                $nombre = $this->nombrePropio($crudo);
-                $email = $this->correo($nombre, $usados);
-                $usados[] = $email;
-                Personal::query()->updateOrCreate(
-                    ['email' => $email],
-                    ['nombre' => $nombre, 'grupo' => $grupo, 'activo' => true]
-                );
-                User::query()->updateOrCreate(
-                    ['email' => $email],
-                    [
-                        'name' => $nombre,
-                        'password' => 'password',
-                        'rol_id' => $rolOperadora,
-                        'activo' => true,
-                    ]
-                );
+                $this->sembrarPersonaNomina($crudo, $grupo, $rolOperadora, $usados);
             }
         }
     }
 
-    private function sembrarInventario(): void
+    /** @param list<string> $usados */
+    private function sembrarPersonaNomina(string $crudo, int $grupo, int $rolId, array &$usados): void
     {
-        // stock vs minimo: ok | bajo | critico (estadoStock del modelo)
-        foreach ([
-            // Sala lavado
-            ['sala' => 'lavado', 'codigo' => 'DET-ENZ', 'nombre' => 'Detergente enzimatico', 'ubicacion' => 'Area sucia / remojo', 'stock' => 8, 'minimo' => 5, 'en_proceso' => 0],
-            ['sala' => 'lavado', 'codigo' => 'EPP-KIT', 'nombre' => 'Kit EPP (pechera/gorro/guantes)', 'ubicacion' => 'Bodega area sucia', 'stock' => 22, 'minimo' => 15, 'en_proceso' => 0],
-            ['sala' => 'lavado', 'codigo' => 'ESP-SEC', 'nombre' => 'Esponjas / material secado', 'ubicacion' => 'Puesto lavado', 'stock' => 4, 'minimo' => 6, 'en_proceso' => 0], // bajo
-            ['sala' => 'lavado', 'codigo' => 'CEP-NYL', 'nombre' => 'Cepillos nylon instrumental', 'ubicacion' => 'Meson lavado', 'stock' => 2, 'minimo' => 8, 'en_proceso' => 0], // critico
-            ['sala' => 'lavado', 'codigo' => 'LUB-INS', 'nombre' => 'Lubricante instrumental', 'ubicacion' => 'Estante quimicos', 'stock' => 14, 'minimo' => 6, 'en_proceso' => 1], // ok
-            ['sala' => 'lavado', 'codigo' => 'BOL-BIO', 'nombre' => 'Bolsas rojas biologicas', 'ubicacion' => 'Area sucia', 'stock' => 0, 'minimo' => 10, 'en_proceso' => 0], // critico
-            // Sala armado
-            ['sala' => 'armado', 'codigo' => 'WRAP-SMS', 'nombre' => 'Envoltorio SMS 60x60', 'ubicacion' => 'Mesas de armado', 'stock' => 35, 'minimo' => 25, 'en_proceso' => 0], // ok
-            ['sala' => 'armado', 'codigo' => 'IND-CLASE5', 'nombre' => 'Indicadores clase 5', 'ubicacion' => 'Estante armado', 'stock' => 12, 'minimo' => 20, 'en_proceso' => 0], // bajo
-            ['sala' => 'armado', 'codigo' => 'CNT-EST-01', 'nombre' => 'Contenedor rigido 1/1', 'ubicacion' => 'Area preparacion', 'stock' => 6, 'minimo' => 4, 'en_proceso' => 2], // ok
-            ['sala' => 'armado', 'codigo' => 'CIN-AUTO', 'nombre' => 'Cinta autoclave', 'ubicacion' => 'Cajon rotulado', 'stock' => 3, 'minimo' => 12, 'en_proceso' => 0], // critico
-            ['sala' => 'armado', 'codigo' => 'ETQ-TRAZ', 'nombre' => 'Etiquetas de trazabilidad', 'ubicacion' => 'Impresora armado', 'stock' => 18, 'minimo' => 30, 'en_proceso' => 0], // bajo
-            ['sala' => 'armado', 'codigo' => 'FIL-QUIM', 'nombre' => 'Filtros quimicos contenedor', 'ubicacion' => 'Estante filtros', 'stock' => 40, 'minimo' => 15, 'en_proceso' => 4], // ok
-            // Material esteril / almacen
-            ['sala' => 'esteril', 'codigo' => 'SET-LAP-01', 'nombre' => 'Set laparoscopia basico', 'ubicacion' => 'Almacen esteril A1', 'stock' => 4, 'minimo' => 3, 'en_proceso' => 2], // ok
-            ['sala' => 'esteril', 'codigo' => 'SET-CES-02', 'nombre' => 'Set cesarea', 'ubicacion' => 'Almacen esteril A2', 'stock' => 2, 'minimo' => 3, 'en_proceso' => 1], // bajo
-            ['sala' => 'esteril', 'codigo' => 'SET-UCI-03', 'nombre' => 'Set via aerea UCI', 'ubicacion' => 'Almacen esteril A3', 'stock' => 1, 'minimo' => 2, 'en_proceso' => 1], // bajo/critico
-            ['sala' => 'esteril', 'codigo' => 'CAJ-CUR-10', 'nombre' => 'Caja curacion general', 'ubicacion' => 'Almacen esteril B1', 'stock' => 8, 'minimo' => 5, 'en_proceso' => 3], // ok
-            ['sala' => 'esteril', 'codigo' => 'SET-ORT-04', 'nombre' => 'Set ortopedia menor', 'ubicacion' => 'Almacen esteril A4', 'stock' => 0, 'minimo' => 2, 'en_proceso' => 0], // critico
-            ['sala' => 'esteril', 'codigo' => 'PAQ-ROP-05', 'nombre' => 'Paquete ropa quirurgica', 'ubicacion' => 'Almacen esteril C1', 'stock' => 16, 'minimo' => 10, 'en_proceso' => 2], // ok
-            ['sala' => 'esteril', 'codigo' => 'CAJ-DEN-06', 'nombre' => 'Caja dental basica', 'ubicacion' => 'Almacen esteril B2', 'stock' => 5, 'minimo' => 8, 'en_proceso' => 1], // bajo
-        ] as $datos) {
-            $salaId = Sala::query()->where('codigo', $datos['sala'])->value('id');
-            unset($datos['sala']);
-            $datos['sala_id'] = $salaId;
-            ElementoInventario::query()->updateOrCreate(
-                ['sala_id' => $salaId, 'codigo' => $datos['codigo']],
-                $datos
-            );
-        }
+        $nombre = $this->nombrePropio($crudo);
+        $email = $this->correo($nombre, $usados);
+        $usados[] = $email;
+
+        $usuario = User::query()->updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => $nombre,
+                'password' => 'password',
+                'rol_id' => $rolId,
+                'activo' => true,
+            ]
+        );
+
+        Personal::query()->updateOrCreate(
+            ['email' => $email],
+            [
+                'nombre' => $nombre,
+                'grupo' => $grupo,
+                'activo' => true,
+                'user_id' => $usuario->id,
+            ]
+        );
     }
 
-    /**
-     * Historial de reposiciones para demo de fase 3 (modal / API historial).
-     * No altera el stock final: las cantidades ya están reflejadas en sembrarInventario.
-     */
-    private function sembrarHistorialInventario(): void
-    {
-        $enfermeraId = User::query()->where('email', 'enfermera@sigte.local')->value('id');
-        $adminId = User::query()->where('email', 'admin@sigte.local')->value('id')
-            ?? User::query()->where('email', 'judith.herrada@sigte.local')->value('id');
-
-        $eventos = [
-            ['codigo' => 'ESP-SEC', 'cantidad' => 4, 'hace_dias' => 6, 'hora' => [9, 15], 'user' => $enfermeraId, 'obs' => 'Pedido bodega central'],
-            ['codigo' => 'ESP-SEC', 'cantidad' => 2, 'hace_dias' => 2, 'hora' => [14, 40], 'user' => $enfermeraId, 'obs' => 'Reposición parcial turno tarde'],
-            ['codigo' => 'IND-CLASE5', 'cantidad' => 10, 'hace_dias' => 8, 'hora' => [8, 5], 'user' => $adminId, 'obs' => 'Llegada proveedor'],
-            ['codigo' => 'IND-CLASE5', 'cantidad' => 5, 'hace_dias' => 3, 'hora' => [11, 20], 'user' => $enfermeraId, 'obs' => null],
-            ['codigo' => 'DET-ENZ', 'cantidad' => 6, 'hace_dias' => 5, 'hora' => [10, 0], 'user' => $enfermeraId, 'obs' => 'Carga semanal'],
-            ['codigo' => 'CEP-NYL', 'cantidad' => 3, 'hace_dias' => 4, 'hora' => [16, 10], 'user' => $enfermeraId, 'obs' => 'Urgente: cepillos gastados'],
-            ['codigo' => 'CIN-AUTO', 'cantidad' => 8, 'hace_dias' => 7, 'hora' => [9, 45], 'user' => $adminId, 'obs' => null],
-            ['codigo' => 'SET-CES-02', 'cantidad' => 2, 'hace_dias' => 1, 'hora' => [7, 30], 'user' => $enfermeraId, 'obs' => 'Tras ingreso desde esterilización'],
-            ['codigo' => 'SET-UCI-03', 'cantidad' => 1, 'hace_dias' => 1, 'hora' => [18, 5], 'user' => $enfermeraId, 'obs' => 'Quedó 1 en stock'],
-            ['codigo' => 'WRAP-SMS', 'cantidad' => 20, 'hace_dias' => 10, 'hora' => [12, 0], 'user' => $adminId, 'obs' => 'Pedido mensual SMS'],
-            ['codigo' => 'ETQ-TRAZ', 'cantidad' => 15, 'hace_dias' => 2, 'hora' => [13, 15], 'user' => $enfermeraId, 'obs' => null],
-            ['codigo' => 'CAJ-DEN-06', 'cantidad' => 3, 'hace_dias' => 3, 'hora' => [15, 50], 'user' => $enfermeraId, 'obs' => 'Dental solicitó reposición'],
-        ];
-
-        foreach ($eventos as $evento) {
-            $elemento = ElementoInventario::query()->where('codigo', $evento['codigo'])->first();
-            if ($elemento === null || $evento['user'] === null) {
-                continue;
-            }
-
-            $cuando = now()
-                ->timezone('America/Santiago')
-                ->subDays($evento['hace_dias'])
-                ->setTime($evento['hora'][0], $evento['hora'][1]);
-
-            $yaExiste = Reposicion::query()
-                ->where('elemento_inventario_id', $elemento->id)
-                ->where('cantidad', $evento['cantidad'])
-                ->where('user_id', $evento['user'])
-                ->whereDate('created_at', $cuando->toDateString())
-                ->exists();
-
-            if ($yaExiste) {
-                continue;
-            }
-
-            $reposicion = new Reposicion([
-                'elemento_inventario_id' => $elemento->id,
-                'cantidad' => $evento['cantidad'],
-                'observacion' => $evento['obs'],
-                'user_id' => $evento['user'],
-            ]);
-            $reposicion->created_at = $cuando;
-            $reposicion->updated_at = $cuando;
-            $reposicion->save();
-        }
-    }
-
-    private function sembrarInsumosSecretaria(): void
+    /** Consumos mensuales demo de secretaría (no toca elementos de inventario). */
+    private function sembrarConsumosServicioDemo(): void
     {
         $secretariaId = User::query()->where('email', 'secretaria@sigte.local')->value('id');
-
-        foreach ([
-            ['codigo' => 'DET-ENZ', 'nombre' => 'Detergente enzimatico', 'ubicacion' => 'Bodega area sucia', 'stock' => 8, 'minimo' => 5],
-            ['codigo' => 'IND-CLASE5', 'nombre' => 'Indicadores clase 5', 'ubicacion' => 'Estante armado', 'stock' => 12, 'minimo' => 20],
-            ['codigo' => 'WRAP-SMS', 'nombre' => 'Envoltorio SMS 60x60', 'ubicacion' => 'Mesas de armado', 'stock' => 35, 'minimo' => 25],
-            ['codigo' => 'ESP-SEC', 'nombre' => 'Esponjas / material secado', 'ubicacion' => 'Puesto lavado', 'stock' => 4, 'minimo' => 6],
-        ] as $datos) {
-            Insumo::query()->updateOrCreate(['codigo' => $datos['codigo']], $datos);
-        }
-
-        $detergenteInv = ElementoInventario::query()->where('codigo', 'DET-ENZ')->first();
-        if ($detergenteInv !== null) {
-            MovimientoInsumo::query()->firstOrCreate(
-                ['elemento_inventario_id' => $detergenteInv->id, 'observacion' => 'Carga inicial de bodega'],
-                ['tipo' => MovimientoInsumo::ENTRADA, 'cantidad' => 10, 'user_id' => $secretariaId]
-            );
-        }
 
         foreach ([
             ['servicio' => 'Pabellon', 'periodo' => '2026-09-01', 'consumo' => 42, 'litros' => 520.00, 'observacion' => 'Cierre septiembre'],

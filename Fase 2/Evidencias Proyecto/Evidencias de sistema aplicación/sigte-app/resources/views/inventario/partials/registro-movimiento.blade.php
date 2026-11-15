@@ -30,12 +30,12 @@
                 <h3 id="inv-movimiento-nombre">Selecciona un elemento</h3>
 
                 <div class="inv-registro-stock">
-                    <div>
+                    <div class="inv-registro-stock-celda">
                         <span>Stock disponible</span>
                         <strong id="inv-movimiento-stock">0</strong>
                     </div>
 
-                    <div>
+                    <div class="inv-registro-stock-celda">
                         <span>En proceso</span>
                         <strong id="inv-movimiento-proceso">0</strong>
                     </div>
@@ -162,7 +162,8 @@
                 No se pudo cargar el historial.
             </p>
 
-            <div id="inv-movimiento-historial-lista"></div>
+            <div id="inv-movimiento-historial-lista" class="inv-historial-lista"></div>
+            <nav id="inv-movimiento-historial-paginas" class="sigte-paginacion inv-historial-paginas" aria-label="Páginas del historial" hidden></nav>
         </aside>
 
     </div>

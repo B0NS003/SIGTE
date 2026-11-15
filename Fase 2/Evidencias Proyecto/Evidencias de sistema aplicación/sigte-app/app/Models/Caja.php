@@ -121,6 +121,16 @@ class Caja extends Model
         return $indice === false ? 0 : $indice;
     }
 
+    /** Ciclo activo del código (aún no entregado). */
+    public static function enFlujo(string $codigo): ?self
+    {
+        return static::query()
+            ->where('codigo', $codigo)
+            ->whereNull('entregado_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
     public function tiempoEnEtapa(): string
     {
         if ($this->etapa_desde === null) {
