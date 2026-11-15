@@ -60,7 +60,7 @@
                         @foreach (collect($listas)->sortBy('servicio') as $c)
                         <label class="check">
                             <input type="checkbox" name="cajas[]" value="{{ $c['id'] }}" @checked(in_array($c['id'], old('cajas', $caja ? [$caja['id']] : [])))>
-                            <span>{{ $c['servicio'] }} · {{ $c['id'] }}@if ($c['urgente']) · requiere atención @endif</span>
+                            <span>{{ $c['servicio'] }} · {{ $c['nombre'] ?? $c['id'] }}{{ (($c['nombre'] ?? $c['id']) !== $c['id']) ? ' · '.$c['id'] : '' }}{{ ! empty($c['urgente']) ? ' · requiere atención' : '' }}</span>
                         </label>
                         @endforeach
                     </div>

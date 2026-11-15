@@ -7,6 +7,7 @@ use App\Http\Controllers\Concerns\ResuelveUsuario;
 use App\Models\Caja;
 use App\Models\ElementoInventario;
 use App\Models\Entrega;
+use App\Models\Ficha;
 use App\Models\Personal;
 use App\Models\RegistroAuditoria;
 use App\Models\Rol;
@@ -843,7 +844,7 @@ class AdminController extends Controller
         if (! $falla) {
             try {
                 $consulta = Entrega::query()
-                    ->with(['quienEntrega.rol', 'items'])
+                    ->with(['quienEntrega.rol', 'items.caja.ficha:id,nombre'])
                     ->latest('entregado_at')
                     ->latest('id');
                 $this->aplicarFiltrosHistorialEntregas($consulta, $filtros);
@@ -941,12 +942,15 @@ class AdminController extends Controller
                     ->orWhere('recibe', 'ilike', '%'.$buscar.'%')
                     ->orWhere('material', 'ilike', '%'.$buscar.'%')
                     ->orWhereHas('quienEntrega', fn ($actor) => $actor->where('name', 'ilike', '%'.$buscar.'%'))
-                    ->orWhereHas('items', fn ($item) => $item
-                        ->where('codigo', 'ilike', '%'.$buscar.'%')
-                        ->orWhere('nombre', 'ilike', '%'.$buscar.'%'));
+                    ->orWhereHas('items', function ($item) use ($buscar) {
+                        $item->where('codigo', 'ilike', '%'.$buscar.'%')
+                            ->orWhere('nombre', 'ilike', '%'.$buscar.'%')
+                            ->orWhereHas('caja.ficha', fn ($ficha) => $ficha->where('nombre', 'ilike', '%'.$buscar.'%'));
+                    });
             });
         }
     }
+
     public function custodia(Request $request): View
     {
         $falla = $request->boolean('falla');
@@ -989,6 +993,9 @@ class AdminController extends Controller
                         ->paginate(10, ['*'], 'pa')
                         ->withQueryString()
                         ->through(fn (RegistroAuditoria $registro) => $registro->paraConsulta());
+                    $auditoria->setCollection(
+                        $this->enriquecerObjetosAuditoria($auditoria->getCollection())
+                    );
                 }
 
                 $actores = User::query()
@@ -1076,14 +1083,73 @@ class AdminController extends Controller
 
         if ($filtros['q'] !== '') {
             $buscar = $filtros['q'];
-            $consulta->where(function ($q) use ($buscar) {
+            $codigosPorNombre = Ficha::query()
+                ->where('nombre', 'ilike', '%'.$buscar.'%')
+                ->pluck('codigo')
+                ->merge(
+                    ElementoInventario::query()
+                        ->where('nombre', 'ilike', '%'.$buscar.'%')
+                        ->pluck('codigo')
+                )
+                ->unique()
+                ->values()
+                ->all();
+            $consulta->where(function ($q) use ($buscar, $codigosPorNombre) {
                 $q->where('accion', 'ilike', '%'.$buscar.'%')
                     ->orWhere('objeto', 'ilike', '%'.$buscar.'%')
                     ->orWhere('detalle', 'ilike', '%'.$buscar.'%')
                     ->orWhereHas('actor', fn ($actor) => $actor->where('name', 'ilike', '%'.$buscar.'%'));
+                if ($codigosPorNombre !== []) {
+                    $q->orWhereIn('objeto', $codigosPorNombre);
+                }
             });
         }
     }
+
+    /**
+     * @param  Collection<int, array{fecha: string, hora: string, cuando: string, actor: string, accion: string, tipo: string, objeto: string, detalle: string, user_id: ?int}>  $filas
+     * @return Collection<int, array{fecha: string, hora: string, cuando: string, actor: string, accion: string, tipo: string, objeto: string, objeto_nombre: string, detalle: string, user_id: ?int}>
+     */
+    private function enriquecerObjetosAuditoria(Collection $filas): Collection
+    {
+        $codigos = $filas
+            ->pluck('objeto')
+            ->filter(fn ($codigo) => is_string($codigo) && $codigo !== '' && $codigo !== '—')
+            ->unique()
+            ->values();
+
+        if ($codigos->isEmpty()) {
+            return $filas->map(function (array $fila) {
+                $fila['objeto_nombre'] = $fila['objeto'];
+                $fila['objeto_es_caja'] = false;
+
+                return $fila;
+            });
+        }
+
+        $nombresFicha = Ficha::query()
+            ->whereIn('codigo', $codigos)
+            ->pluck('nombre', 'codigo');
+        $nombresInsumo = ElementoInventario::query()
+            ->whereIn('codigo', $codigos)
+            ->pluck('nombre', 'codigo');
+        $codigosCaja = Caja::query()
+            ->whereIn('codigo', $codigos)
+            ->pluck('codigo')
+            ->flip();
+
+        return $filas->map(function (array $fila) use ($nombresFicha, $nombresInsumo, $codigosCaja) {
+            $codigo = $fila['objeto'];
+            $nombre = trim((string) ($nombresFicha[$codigo] ?? $nombresInsumo[$codigo] ?? ''));
+            $fila['objeto_nombre'] = $nombre !== '' ? $nombre : $codigo;
+            $fila['objeto_es_caja'] = isset($codigosCaja[$codigo])
+                || $nombresFicha->has($codigo)
+                || (is_string($codigo) && (bool) preg_match('/^(SET|CAJA)-/i', $codigo));
+
+            return $fila;
+        });
+    }
+
     private function alertasDeInventario(): array
     {
         return ElementoInventario::query()
@@ -1093,16 +1159,18 @@ class AdminController extends Controller
             ->filter(fn (ElementoInventario $elemento) => $elemento->tieneAlertaStock())
             ->map(function (ElementoInventario $elemento) {
                 $critico = $elemento->estadoStock() === 'critico';
+                $nombre = trim((string) ($elemento->nombre ?: $elemento->codigo));
 
                 return [
                     'id' => 'STK-'.$elemento->codigo,
                     'nivel' => $critico ? 'alta' : 'baja',
                     'titulo' => $critico
-                        ? $elemento->codigo.' stock crítico'
-                        : $elemento->nombre.' bajo stock mínimo',
+                        ? $nombre.' · stock crítico'
+                        : $nombre.' · bajo stock mínimo',
                     'detalle' => 'Stock '.$elemento->stock.' · mínimo '.$elemento->minimo.' · '.$elemento->ubicacion,
                     'tipo' => 'Inventario',
                     'caja' => $elemento->codigo,
+                    'nombre' => $nombre,
                     'sala' => $elemento->codigoSala(),
                     'hora' => 'Ahora',
                     'estado' => 'abierta',

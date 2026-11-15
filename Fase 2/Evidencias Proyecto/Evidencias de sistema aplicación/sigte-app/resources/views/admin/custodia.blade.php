@@ -130,10 +130,23 @@
                                             <td><strong>{{ $registro['actor'] }}</strong></td>
                                             <td>{{ $registro['accion'] }}</td>
                                             <td>
-                                                @if (preg_match('/^(SET|CAJA)-/i', $registro['objeto']))
-                                                    <a class="aud-caja-link" href="{{ route('mockups.custodia', ['modo' => 'caja', 'caja' => $registro['objeto']]) }}">{{ $registro['objeto'] }}</a>
+                                                @php
+                                                    $objetoCodigo = $registro['objeto'];
+                                                    $objetoNombre = $registro['objeto_nombre'] ?? $objetoCodigo;
+                                                    $esCaja = ! empty($registro['objeto_es_caja']);
+                                                @endphp
+                                                @if ($esCaja)
+                                                    <a class="aud-caja-link" href="{{ route('mockups.custodia', ['modo' => 'caja', 'caja' => $objetoCodigo]) }}" title="{{ $objetoCodigo }}">
+                                                        <strong>{{ $objetoNombre }}</strong>
+                                                        @if ($objetoNombre !== $objetoCodigo)
+                                                            <small class="track-codigo">{{ $objetoCodigo }}</small>
+                                                        @endif
+                                                    </a>
+                                                @elseif ($objetoNombre !== $objetoCodigo)
+                                                    <strong title="{{ $objetoCodigo }}">{{ $objetoNombre }}</strong>
+                                                    <small class="track-codigo">{{ $objetoCodigo }}</small>
                                                 @else
-                                                    {{ $registro['objeto'] }}
+                                                    {{ $objetoCodigo }}
                                                 @endif
                                             </td>
                                             <td class="muted-cell">{{ $registro['detalle'] }}</td>
@@ -157,12 +170,12 @@
                     <form class="aud-busca-caja" method="get" action="{{ route('mockups.custodia') }}">
                         <input type="hidden" name="modo" value="caja">
                         <label class="field">
-                            <span>Código de caja</span>
+                            <span>Código o nombre</span>
                             <input
                                 type="search"
                                 name="caja"
                                 value="{{ $filtros['caja'] }}"
-                                placeholder="Ej. SET-061 o CAJA-118"
+                                placeholder="Ej. SET-061 o caja de laparoscopía"
                                 autofocus
                                 autocomplete="off"
                                 required
@@ -174,7 +187,7 @@
                     @if ($filtros['caja'] === '')
                         <div class="aud-espera">
                             <strong>Elige una caja</strong>
-                            <p>Escribe el código para ver en qué etapa está, quién es responsable y el historial de avances.</p>
+                            <p>Escribe el código o el nombre de la ficha para ver en qué etapa está, quién es responsable y el historial de avances.</p>
                         </div>
                     @elseif ($cadenas->total() === 0)
                         <div class="ops-empty">
@@ -187,7 +200,10 @@
                                 <article class="custody-card {{ $cadena['alerta'] ? 'is-alert' : '' }}">
                                     <header class="custody-head">
                                         <div>
-                                            <strong>{{ $cadena['caja'] }}</strong>
+                                            <strong title="{{ $cadena['nombre'] ?? $cadena['caja'] }}">{{ $cadena['nombre'] ?? $cadena['caja'] }}</strong>
+                                            @if (($cadena['nombre'] ?? $cadena['caja']) !== $cadena['caja'])
+                                                <span class="track-codigo">{{ $cadena['caja'] }}</span>
+                                            @endif
                                             @if (! empty($cadena['ciclo']))
                                                 <span>Ciclo {{ $cadena['ciclo'] }}</span>
                                             @endif

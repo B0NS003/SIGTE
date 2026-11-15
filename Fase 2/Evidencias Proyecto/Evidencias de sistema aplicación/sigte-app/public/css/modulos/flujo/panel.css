@@ -475,9 +475,18 @@ html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-lin
 }
 .track-title {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.12rem;
+    min-width: 0;
+}
+.track-title-line {
+    display: flex;
     align-items: center;
     gap: var(--esp-2);
     flex-wrap: wrap;
+    min-width: 0;
+    width: 100%;
 }
 .track-title .badge-urgent,
 .track-title .badge-listo {
@@ -485,9 +494,18 @@ html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-lin
     font-weight: 800;
     padding: var(--esp-1) var(--esp-2);
     letter-spacing: 0.01em;
+    flex: 0 0 auto;
 }
 .track-title .badge-urgent {
     box-shadow: 0 0 0 1px var(--rojo-linea);
+}
+.track-codigo {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
 }
 .badge-urgent-bell {
     display: inline-block;
@@ -713,6 +731,13 @@ html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-lin
     font-size: var(--fs-2xl);
     color: var(--ink);
     letter-spacing: -0.01em;
+    min-width: 0;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.2;
 }
 
 /* Flujo interno: siempre naranja (el color de etapa va en el contorno). */

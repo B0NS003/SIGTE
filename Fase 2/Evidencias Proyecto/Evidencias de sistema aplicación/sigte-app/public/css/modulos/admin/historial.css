@@ -387,19 +387,24 @@ html[data-tema="oscuro"] .hist-lista {
 }
 .hist-chip {
     display: inline-flex;
-    align-items: baseline;
-    gap: var(--esp-1);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.05rem;
+    max-width: 16rem;
     padding: var(--esp-1) var(--esp-2);
-    border-radius: var(--radio-pill);
+    border-radius: var(--radio-md);
     background: var(--card-2);
     border: 1px solid var(--borde);
     color: var(--ink);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: 700;
+    line-height: 1.25;
 }
 .hist-chip small {
     font-weight: 600;
+    font-size: var(--fs-2xs);
     color: var(--muted);
+    letter-spacing: 0.02em;
 }
 .hist-chip.is-material {
     background: var(--naranja-fondo);

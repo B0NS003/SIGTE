@@ -29,10 +29,14 @@ class CadenaCustodia
             ->with([
                 'responsable:id,name,email',
                 'servicioClinico:id,nombre',
+                'ficha:id,nombre',
                 'anotaciones' => fn ($q) => $q->with(['autor:id,name,email'])->orderBy('id'),
                 'retrocesos' => fn ($q) => $q->with(['autor:id,name,email'])->orderBy('id'),
             ])
-            ->where('codigo', 'ilike', '%'.$codigo.'%')
+            ->where(function ($q) use ($codigo) {
+                $q->where('codigo', 'ilike', '%'.$codigo.'%')
+                    ->orWhereHas('ficha', fn ($f) => $f->where('nombre', 'ilike', '%'.$codigo.'%'));
+            })
             ->orderBy('codigo')
             ->orderByDesc('id')
             ->limit(20)
@@ -123,6 +127,7 @@ class CadenaCustodia
 
         return [
             'caja' => $caja->codigo,
+            'nombre' => $caja->nombreMostrable(),
             'ciclo' => $etiquetaCiclo,
             'servicio' => $caja->servicio,
             'estado' => $entregada ? 'Entregada' : Caja::etiquetaEtapa((string) $caja->etapa),

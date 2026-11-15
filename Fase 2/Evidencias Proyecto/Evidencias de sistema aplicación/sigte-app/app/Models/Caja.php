@@ -49,6 +49,14 @@ class Caja extends Model
         return $this->belongsTo(Ficha::class, 'ficha_id');
     }
 
+    /** Nombre de catálogo para UI; si no hay ficha, el código. */
+    public function nombreMostrable(): string
+    {
+        $nombre = trim((string) ($this->ficha?->nombre ?? ''));
+
+        return $nombre !== '' ? $nombre : (string) $this->codigo;
+    }
+
     public function servicioClinico(): BelongsTo
     {
         return $this->belongsTo(Servicio::class, 'servicio_id');

@@ -149,6 +149,7 @@ class FlujoController extends Controller
             $filtradas = array_values(array_filter($filtradas, function (array $caja) use ($needle) {
                 $haystack = mb_strtolower(implode(' ', [
                     $caja['id'],
+                    $caja['nombre'] ?? '',
                     $caja['servicio'],
                     $caja['ubicacion'],
                     $caja['estado'],
@@ -695,6 +696,7 @@ class FlujoController extends Controller
         $cajas = collect();
         if (! empty($codigos)) {
             $cajas = Caja::query()
+                ->with('ficha:id,nombre')
                 ->whereIn('codigo', $codigos)
                 ->where('etapa', Caja::ETAPA_ENTREGA)
                 ->whereNull('entregado_at')
@@ -739,9 +741,7 @@ class FlujoController extends Controller
                         'entrega_id' => $entrega->id,
                         'caja_id' => $caja->id,
                         'codigo' => $caja->codigo,
-                        'nombre' => str_starts_with(mb_strtoupper($caja->codigo), 'SET-')
-                            ? 'Set · '.$caja->servicio
-                            : 'Caja · '.$caja->servicio,
+                        'nombre' => $caja->nombreMostrable(),
                     ]);
 
                     Auditoria::registrar(

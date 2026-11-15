@@ -16,12 +16,12 @@ trait ConsultaDeCajas
     /**
      * Cajas desde PostgreSQL, en el formato que usan las vistas del mockup.
      *
-     * @return list<array{id: string, servicio: string, fase_idx: int, estado: string, ubicacion: string, operadora: string, fecha: string, hora: string, tiempo: string, minutos: int|null, urgente: bool}>
+     * @return list<array{id: string, nombre: string, servicio: string, fase_idx: int, estado: string, ubicacion: string, operadora: string, fecha: string, hora: string, tiempo: string, minutos: int|null, urgente: bool}>
      */
     private function cajas(): array
     {
         return Caja::query()
-            ->with(['responsable', 'servicioClinico'])
+            ->with(['responsable', 'servicioClinico', 'ficha:id,nombre'])
             ->whereNull('entregado_at')
             ->orderByDesc('urgente')
             ->orderBy('etapa_desde')
@@ -29,6 +29,7 @@ trait ConsultaDeCajas
             ->map(function (Caja $caja) {
                 return [
                     'id' => $caja->codigo,
+                    'nombre' => $caja->nombreMostrable(),
                     'servicio' => $caja->servicio,
                     'fase_idx' => $caja->indiceEtapa(),
                     'estado' => $caja->estado ?? Caja::etiquetaEtapa($caja->etapa),

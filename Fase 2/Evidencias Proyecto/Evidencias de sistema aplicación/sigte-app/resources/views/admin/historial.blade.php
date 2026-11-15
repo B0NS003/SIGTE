@@ -174,7 +174,12 @@
                                         </div>
                                         <div class="hist-cajas">
                                             @forelse ($entrega['cajas'] as $caja)
-                                                <span class="hist-chip">{{ $caja['codigo'] }} <small>{{ $caja['nombre'] }}</small></span>
+                                                <span class="hist-chip" title="{{ $caja['nombre'] }} · {{ $caja['codigo'] }}">
+                                                    {{ $caja['nombre'] }}
+                                                    @if ($caja['nombre'] !== $caja['codigo'])
+                                                        <small>{{ $caja['codigo'] }}</small>
+                                                    @endif
+                                                </span>
                                             @empty
                                                 <span class="hist-chip is-material">Sin cajas</span>
                                             @endforelse

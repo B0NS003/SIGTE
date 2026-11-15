@@ -71,7 +71,7 @@
                             type="search"
                             name="q"
                             value="{{ $busqueda }}"
-                            placeholder="Código, servicio, ubicación o responsable…"
+                            placeholder="Nombre, código, servicio, ubicación o responsable…"
                             autocomplete="off"
                         >
                     </div>

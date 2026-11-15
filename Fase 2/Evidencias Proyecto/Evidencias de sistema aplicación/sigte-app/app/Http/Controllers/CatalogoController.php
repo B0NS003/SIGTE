@@ -31,29 +31,26 @@ class CatalogoController extends Controller
             return $this->catalogoItems();
         }
 
-        // Sin columna BYTEA imagen: el listado solo necesita ruta/flag para la URL.
+        // Listado liviano: sin instrumentos ni BYTEA; solo ruta/flag de imagen.
+        $tieneRuta = Schema::hasColumn('fichas', 'imagen_ruta');
+        $tieneImagen = Schema::hasColumn('fichas', 'imagen');
         $columnas = [
             'id', 'codigo', 'nombre', 'tipo', 'servicio_id', 'guia_visual',
         ];
-        if (Schema::hasColumn('fichas', 'imagen_ruta')) {
+        if ($tieneRuta) {
             $columnas[] = 'imagen_ruta';
         }
 
-        $idsConBytea = Schema::hasColumn('fichas', 'imagen')
+        $idsConBytea = $tieneImagen
             ? DB::table('fichas')->whereNotNull('imagen')->pluck('id')->flip()
             : collect();
 
         return Ficha::query()
-            ->with(['items.instrumento:id,nombre,codigo_fabricante', 'servicioClinico:id,nombre'])
+            ->with(['servicioClinico:id,nombre'])
             ->orderBy('nombre')
             ->withSum('items as piezas', 'cantidad')
             ->get($columnas)
             ->map(function (Ficha $ficha) use ($idsConBytea): array {
-                $piezas = (int) $ficha->getAttribute('piezas');
-                $contenido = $ficha->items
-                    ->map(fn ($linea) => trim(($linea->instrumento?->codigo_fabricante ?? '').' '.($linea->instrumento?->nombre ?? '')))
-                    ->implode(' ');
-
                 return [
                     'codigo' => $ficha->codigo,
                     'nombre' => $ficha->nombre,
@@ -62,8 +59,8 @@ class CatalogoController extends Controller
                     'guia' => (bool) $ficha->guia_visual,
                     'imagen_url' => $this->urlFotoFicha($ficha, $idsConBytea->has($ficha->id)),
                     'instrumentos' => [],
-                    'piezas' => $piezas,
-                    'buscar' => $contenido,
+                    'piezas' => (int) $ficha->getAttribute('piezas'),
+                    'buscar' => '',
                 ];
             })
             ->all();
@@ -637,12 +634,13 @@ class CatalogoController extends Controller
 
     private function urlFotoFicha(Ficha $ficha, bool $tieneBytea = false): ?string
     {
-        if (Schema::hasColumn('fichas', 'imagen_ruta') && ! empty($ficha->imagen_ruta)) {
+        if (! empty($ficha->imagen_ruta) && Schema::hasColumn('fichas', 'imagen_ruta')) {
             return AlmacenImagenes::url((string) $ficha->imagen_ruta);
         }
 
+        // Versión estable para no invalidar caché del navegador en cada carga.
         return $tieneBytea
-            ? route('fichas.imagen', ['id' => $ficha->id, 'v' => time()])
+            ? route('fichas.imagen', ['id' => $ficha->id, 'v' => $ficha->id])
             : null;
     }
 

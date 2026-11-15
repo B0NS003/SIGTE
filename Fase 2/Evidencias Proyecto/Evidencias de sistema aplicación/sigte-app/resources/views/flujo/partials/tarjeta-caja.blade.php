@@ -60,6 +60,7 @@
 <article
     class="track-card {{ $caja['urgente'] ? 'is-urgent' : '' }} {{ ! empty($caja['proceso_listo']) ? 'is-proceso-listo' : '' }}"
     data-caja="{{ $caja['id'] }}"
+    data-nombre="{{ $caja['nombre'] ?? $caja['id'] }}"
     data-servicio="{{ $caja['servicio'] }}"
     data-ubicacion="{{ $caja['ubicacion'] }}"
     data-tiempo="{{ $caja['tiempo'] }}"
@@ -75,22 +76,27 @@
     <header class="track-head">
         <div class="track-head-main">
             <div class="track-title">
-                <h2>{{ $caja['id'] }}</h2>
-                @if ($caja['urgente'])
-                    <span class="badge badge-urgent">
-                        <svg class="sigte-icon badge-urgent-bell" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <div class="track-title-line">
+                    <h2 title="{{ $caja['nombre'] ?? $caja['id'] }}">{{ $caja['nombre'] ?? $caja['id'] }}</h2>
+                    @if ($caja['urgente'])
+                        <span class="badge badge-urgent">
+                            <svg class="sigte-icon badge-urgent-bell" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Requiere atención
+                        </span>
+                    @endif
+                    <span class="badge badge-listo" data-proceso-listo @unless (! empty($caja['proceso_listo'])) hidden @endunless>
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        Requiere atención
+                        Listo
                     </span>
+                </div>
+                @if (($caja['nombre'] ?? $caja['id']) !== $caja['id'])
+                    <p class="track-codigo">{{ $caja['id'] }}</p>
                 @endif
-                <span class="badge badge-listo" data-proceso-listo @unless (! empty($caja['proceso_listo'])) hidden @endunless>
-                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Listo
-                </span>
             </div>
             <p class="track-meta">
                 <span>{{ $caja['servicio'] }}</span>

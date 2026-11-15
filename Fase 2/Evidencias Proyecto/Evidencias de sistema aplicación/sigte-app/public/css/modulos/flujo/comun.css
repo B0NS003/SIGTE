@@ -108,6 +108,18 @@
     color: var(--ink);
     font-size: var(--fs-4xl);
     line-height: 1.25;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+.adv-codigo,
+.track-codigo.adv-codigo {
+    margin: 0.2rem 0 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 .adv-hero .badge-urgent {
     margin-top: 0.55rem;
@@ -140,7 +152,12 @@
     align-items: start;
 }
 .entrega-cuerpo h2 {
-    margin: 0 0 0.9rem;
+    margin: 0 0 0.35rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.25;
 }
 .entrega-obs {
     margin: 0.2rem 0 1rem;

@@ -373,7 +373,8 @@
                     formEtapa.hidden = false;
                     document.getElementById('etapa-caja-input').value = card.dataset.caja;
                     document.getElementById('etapa-destino').value = card.dataset.destino || '';
-                    document.getElementById('etapa-titulo').textContent = card.dataset.caja + ' · ' + card.dataset.servicio;
+                    document.getElementById('etapa-titulo').textContent =
+                        (card.dataset.nombre || card.dataset.caja) + ' · ' + card.dataset.servicio;
                     document.getElementById('etapa-ruta-desde').textContent = card.dataset.fase;
                     document.getElementById('etapa-ruta-hacia').textContent = card.dataset.destinoNombre || 'Entrega al servicio';
                     var entrega = document.getElementById('etapa-entrega');
@@ -643,7 +644,7 @@
                     var card = tarjeta(id);
                     var boton = document.querySelector('[data-abrir="retroceso"][data-caja="' + CSS.escape(id) + '"]');
                     document.getElementById('retro-titulo').textContent = card
-                        ? card.dataset.caja + ' · ' + card.dataset.servicio
+                        ? (card.dataset.nombre || card.dataset.caja) + ' · ' + card.dataset.servicio
                         : id;
                     var volver = boton ? boton.dataset.volver : '';
                     document.getElementById('retro-movimiento').textContent = volver ? 'Vuelve a ' + volver : 'Corregir etapa';

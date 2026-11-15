@@ -107,13 +107,18 @@
                                     {{ ucfirst($a['nivel']) }}
                                 </span>
                                 <span class="alert-type">{{ $a['tipo'] }}</span>
-                                <span class="alert-id">{{ $a['id'] }}</span>
+                                <span class="alert-id" title="{{ $a['caja'] }}">{{ $a['nombre'] ?? $a['caja'] }}</span>
                                 <span class="alert-time">{{ $a['hora'] }}</span>
                             </div>
                             <strong>{{ $a['titulo'] }}</strong>
                             <p>{{ $a['detalle'] }}</p>
                             <div class="alert-meta">
-                                <span>Ref: <strong>{{ $a['caja'] }}</strong></span>
+                                <span>Ref:
+                                    <strong title="{{ $a['caja'] }}">{{ $a['nombre'] ?? $a['caja'] }}</strong>
+                                    @if (($a['nombre'] ?? $a['caja']) !== $a['caja'])
+                                        <small class="track-codigo">{{ $a['caja'] }}</small>
+                                    @endif
+                                </span>
                                 @if ($a['estado'] === 'abierta')
                                     <span class="pill pill-warn">Abierta</span>
                                 @elseif ($a['estado'] === 'en_revision')

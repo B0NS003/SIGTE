@@ -86,10 +86,22 @@ class Entrega extends Model
             'recibe' => $this->recibe,
             'recibe_rol' => $this->recibe_rol ?: 'Personal del servicio',
             'cajas' => $this->items
-                ->map(fn (EntregaCaja $item) => [
-                    'codigo' => $item->codigo,
-                    'nombre' => $item->nombre ?: (str_starts_with(mb_strtoupper($item->codigo), 'SET-') ? 'Set quirúrgico' : 'Caja'),
-                ])
+                ->map(function (EntregaCaja $item) {
+                    $desdeFicha = trim((string) ($item->caja?->ficha?->nombre ?? ''));
+                    $guardado = trim((string) ($item->nombre ?? ''));
+                    $generico = $guardado === ''
+                        || str_starts_with($guardado, 'Caja ·')
+                        || str_starts_with($guardado, 'Set ·')
+                        || in_array($guardado, ['Caja', 'Set quirúrgico'], true);
+                    $nombre = $desdeFicha !== ''
+                        ? $desdeFicha
+                        : ($generico ? ($item->codigo ?: 'Caja') : $guardado);
+
+                    return [
+                        'codigo' => $item->codigo,
+                        'nombre' => $nombre,
+                    ];
+                })
                 ->values()
                 ->all(),
             'materiales' => $materiales,

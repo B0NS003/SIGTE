@@ -40,7 +40,10 @@
             @if (session('ok'))
                 <section class="panel adv-listo" role="status">
                     <p class="eyebrow">Listo</p>
-                    <h2>{{ $caja['id'] }} está en {{ $fase_actual }}</h2>
+                    <h2>{{ $caja['nombre'] ?? $caja['id'] }} está en {{ $fase_actual }}</h2>
+                    @if (($caja['nombre'] ?? $caja['id']) !== $caja['id'])
+                        <p class="track-codigo adv-codigo">{{ $caja['id'] }}</p>
+                    @endif
                     <p class="adv-movimiento">Quedó el {{ $caja['fecha'] }} a las {{ $caja['hora'] }}, por {{ $caja['operadora'] }}.</p>
                     <div class="track-pipe adv-pipe" aria-label="Etapa actual: {{ $fase_actual }}">
                         @foreach ($fases as $i => $fase)
@@ -71,7 +74,10 @@
                     @endif
 
                     <div class="adv-hero">
-                        <h2>{{ $caja['id'] }} · {{ $caja['servicio'] }}</h2>
+                        <h2 title="{{ $caja['nombre'] ?? $caja['id'] }}">{{ $caja['nombre'] ?? $caja['id'] }} · {{ $caja['servicio'] }}</h2>
+                        @if (($caja['nombre'] ?? $caja['id']) !== $caja['id'])
+                            <p class="track-codigo adv-codigo">{{ $caja['id'] }}</p>
+                        @endif
                         @if ($caja['urgente'])
                             <span class="badge badge-urgent">Requiere atención</span>
                         @endif
@@ -112,7 +118,7 @@
                         <select id="caja" onchange="window.location='{{ url('/operador/avanzar') }}?caja='+encodeURIComponent(this.value)">
                             @foreach (collect($cajas)->sortBy('servicio') as $c)
                                 <option value="{{ $c['id'] }}" {{ $c['id'] === $caja['id'] ? 'selected' : '' }}>
-                                    {{ $c['servicio'] }} · {{ $c['id'] }} · {{ $fases[$c['fase_idx']] }}
+                                    {{ $c['servicio'] }} · {{ $c['nombre'] ?? $c['id'] }}{{ (($c['nombre'] ?? $c['id']) !== $c['id']) ? ' · '.$c['id'] : '' }} · {{ $fases[$c['fase_idx']] }}
                                 </option>
                             @endforeach
                         </select>

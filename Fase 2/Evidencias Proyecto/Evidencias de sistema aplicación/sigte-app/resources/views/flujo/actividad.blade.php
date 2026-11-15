@@ -42,7 +42,10 @@
             @elseif ($caja)
                 <div class="entrega-cuerpo">
                     <section>
-                        <h2>{{ $caja['servicio'] }} · {{ $caja['id'] }}</h2>
+                        <h2 title="{{ $caja['nombre'] ?? $caja['id'] }}">{{ $caja['servicio'] }} · {{ $caja['nombre'] ?? $caja['id'] }}</h2>
+                        @if (($caja['nombre'] ?? $caja['id']) !== $caja['id'])
+                            <p class="track-codigo adv-codigo">{{ $caja['id'] }}</p>
+                        @endif
                         <p class="adv-movimiento">Está en <strong>{{ $etapa_actual }}</strong>. {{ $caja['ubicacion'] }}.</p>
 
                         @if ($ciclo)
@@ -85,7 +88,7 @@
                             <select id="caja" onchange="window.location='{{ url('/operador/actividad') }}?caja='+encodeURIComponent(this.value)">
                                 @foreach (collect($cajas)->sortBy('servicio') as $c)
                                     <option value="{{ $c['id'] }}" @selected($c['id'] === $caja['id'])>
-                                        {{ $c['servicio'] }} · {{ $c['id'] }} · {{ $fases[$c['fase_idx']] }}
+                                        {{ $c['servicio'] }} · {{ $c['nombre'] ?? $c['id'] }}{{ (($c['nombre'] ?? $c['id']) !== $c['id']) ? ' · '.$c['id'] : '' }} · {{ $fases[$c['fase_idx']] }}
                                     </option>
                                 @endforeach
                             </select>

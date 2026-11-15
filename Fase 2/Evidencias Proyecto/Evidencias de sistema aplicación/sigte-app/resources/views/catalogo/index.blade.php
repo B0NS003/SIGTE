@@ -105,8 +105,9 @@
                 </p>
             </div>
         @else
-            @foreach (collect($items)->groupBy('servicio') as $area => $cajas)
-                <details class="cat-area-group" open style="--servicio-color: {{ \App\Support\CatalogoColores::paraServicio((string) $area) }}">
+            @foreach (collect($items)->groupBy('servicio')->values() as $indiceArea => $cajas)
+                @php $area = (string) $cajas->first()['servicio']; @endphp
+                <details class="cat-area-group" @if ($indiceArea === 0 || $servicio !== '') open @endif style="--servicio-color: {{ \App\Support\CatalogoColores::paraServicio($area) }}">
                     <summary class="cat-area-summary">
                         <strong>{{ $area }}</strong>
                         <span class="cat-area-count">{{ $cajas->count() }} {{ $cajas->count() === 1 ? 'ficha' : 'fichas' }}</span>
@@ -122,13 +123,14 @@
                                             src="{{ $item['imagen_url'] }}"
                                             alt=""
                                             loading="lazy"
+                                            decoding="async"
                                         >
                                     @endif
                                     <span class="sigte-card-guide"><svg class="sigte-card-icon sigte-card-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.7 5.1C11.1 5 11.5 5 12 5c5.5 0 9 7 9 7a14 14 0 0 1-3.2 4.2"/><path d="M6.2 6.2C3.9 8.1 3 12 3 12s3.5 7 9 7a9.7 9.7 0 0 0 3.4-.6"/><path d="M10.1 10.1a2.7 2.7 0 0 0 3.8 3.8"/></svg><svg class="sigte-card-icon sigte-card-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.4 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span> {{ $item['guia'] ? 'Con guía visual' : 'Sin guía visual' }}</span></span>
                                 </div>
                                 <div class="cat-body">
+                                    <h2 title="{{ $item['nombre'] }}">{{ $item['nombre'] }}</h2>
                                     <strong class="sigte-consulta-codigo">{{ $item['codigo'] }}@if (!empty($item['codigo_referencia'])) · {{ $item['codigo_referencia'] }}@endif</strong>
-                                    <h2>{{ $item['nombre'] }}</h2>
                                     <span class="cat-servicio"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1M10 21v-3h4v3"/></svg><span>{{ $item['servicio'] }}</span></span>
                                     <p class="sigte-consulta-piezas"><svg class="sigte-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2.8 8.5 4.6v9.2L12 21.2l-8.5-4.6V7.4L12 2.8Z"/><path d="m3.5 7.4 8.5 4.8 8.5-4.8M12 12.2v9"/></svg><span>@if (!empty($item['numero']))Nº {{ $item['numero'] }} · @endif{{ $item['piezas'] }} {{ $item['piezas'] === 1 ? 'pieza' : 'piezas' }}</span></p>
                                 </div>
