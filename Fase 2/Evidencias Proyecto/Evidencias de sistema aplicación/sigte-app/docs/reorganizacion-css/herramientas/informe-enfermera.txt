@@ -1,0 +1,9 @@
+MUERTOS (5)
+.ct-time
+.ct-body strong
+.ct-body span
+.ct-body small
+html[data-tema="oscuro"] .ct-body span
+
+PISADAS (0)
+

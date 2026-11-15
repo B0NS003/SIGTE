@@ -1,0 +1,17 @@
+.table-wrap { overflow-x: auto; }
+.list table { width: 100%; border-collapse: collapse; font-size: var(--fs-base); }
+.list table th {
+  text-align: left;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--etiqueta-espaciado);
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: var(--esp-3) var(--esp-3);
+  border-bottom: 1px solid var(--borde);
+}
+.list table td {
+  padding: var(--esp-3);
+  border-bottom: 1px solid var(--borde);
+  vertical-align: top;
+}
+.list table tbody tr:hover { background: var(--superficie-2); }

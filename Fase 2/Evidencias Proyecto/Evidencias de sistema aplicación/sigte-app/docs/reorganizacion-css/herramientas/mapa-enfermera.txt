@@ -1,0 +1,78 @@
+    3 panel                                .phases
+    6 panel                                .phase
+   10 panel                                .phase-step
+   16 panel                                .phase .n
+   17 panel                                .phase .l
+   18 panel                                .phase-sep
+   21 cierre                               .grid-2
+   22 cierre                               .adv-summary
+   33 cierre                               .adv-summary strong
+   34 cierre                               .adv-summary small
+   35 panel+cierre                         .adv-k
+   39 cierre                               .adv-arrow
+   41 NINGUNA                              .ct-time
+   42 NINGUNA                              .ct-body strong
+   43 NINGUNA                              .ct-body span
+   44 NINGUNA                              .ct-body small
+   46 panel                                .turno-banner
+   54 panel                                .turno-banner strong
+   55 panel                                .turno-banner small
+   58 cierre                               .cierre-form .field
+   62 cierre                               .recv-textarea
+   79 cierre                               .recv-textarea:focus
+   86 cierre                               .recv-textarea.cierre-nota
+   90 cierre                               .recv-textarea.is-invalido
+   90 cierre                               .recv-textarea.cierre-nota.is-invalido
+   96 cierre                               .recv-checks
+  103 cierre                               .recv-checks .check
+  111 cierre                               .recv-actions
+  121 cierre                               .recv-help
+  129 cierre                               .cierre-flash-ok
+  129 cierre                               .cierre-flash-error
+  129 cierre                               .cierre-flash-aviso
+  136 cierre                               .cierre-flash-ok
+  141 cierre                               .cierre-flash-error
+  146 cierre                               .cierre-flash-aviso
+  151 cierre                               .cierre-layout
+  155 cierre                               .cierre-form .panel-head
+  159 cierre                               .cierre-handoff
+  163 cierre                               .cierre-opcional
+  169 cierre                               .cierre-revision
+  177 cierre                               .cierre-revision-head
+  181 cierre                               .cierre-revision-head h3
+  187 cierre                               .cierre-revision-head p
+  194 cierre                               .cierre-revision-grid
+  200 cierre                               .cierre-bloque
+  207 cierre                               .cierre-bloque-head
+  215 cierre                               .cierre-bloque-head strong
+  220 cierre                               .cierre-vacio
+  226 cierre                               .cierre-lista
+  235 cierre                               .cierre-lista li
+  244 cierre                               .cierre-lista li:last-child
+  249 cierre                               .cierre-lista-plain li
+  253 cierre                               .cierre-lista-codigo
+  261 cierre                               .cierre-lista-texto
+  267 cierre                               .cierre-lista [data-cierre-item][hidden]
+  271 cierre                               .cierre-pager
+  281 cierre                               .cierre-pager-meta
+  288 cierre                               .cierre-pager-nav
+  293 cierre                               .cierre-pager-btn
+  306 cierre                               .cierre-pager-btn:hover:not(:disabled)
+  310 cierre                               .cierre-pager-btn:disabled
+  315 cierre                               .cierre-checks
+  321 cierre                               .cierre-checks legend
+  326 cierre                               .cierre-checks.is-invalido .recv-checks .check
+  331 cierre                               .cierre-acciones
+  336 cierre                               .cierre-confirmar
+  341 cierre                               .cierre-aside
+  347 cierre                               .cierre-resumen .panel-head
+  351 cierre                               .cierre-kpis
+  356 cierre                               .cierre-kpis .kpi-alerta .n
+  360 cierre                               .cierre-ops
+  365 cierre                               html[data-tema="oscuro"] .recv-textarea
+  370 cierre                               html[data-tema="oscuro"] .recv-textarea:focus
+  374 cierre                               html[data-tema="oscuro"] .recv-textarea.is-invalido
+  374 cierre                               html[data-tema="oscuro"] .cierre-checks.is-invalido .recv-checks .check
+  380 cierre                               html[data-tema="oscuro"] .cierre-lista-texto
+  380 NINGUNA                              html[data-tema="oscuro"] .ct-body span
+  386 cierre                               [@media (max-width: 960px)] .cierre-revision-grid

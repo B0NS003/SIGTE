@@ -104,7 +104,7 @@ class ReporteAdmin
 
     /**
      * Calcula los indicadores sobre TODOS los registros filtrados.
-     * Las tablas web se paginan a 25 filas; las exportaciones usan $completo=true.
+     * Las tablas web se paginan a 15 filas; las exportaciones usan $completo=true.
      *
      * @param array{desde: string, hasta: string, tipo: string, servicio: ?int} $filtros
      * @return array<string, mixed>
@@ -147,7 +147,7 @@ class ReporteAdmin
         ]);
         $movimientos = $completo
             ? $listaAuditoria->get()->map($transformarMovimiento)
-            : $listaAuditoria->paginate(25, ['*'], 'pagina_movimientos')
+            : $listaAuditoria->paginate(15, ['*'], 'pagina_movimientos')
                 ->withQueryString()->through($transformarMovimiento);
 
         // Los retrocesos tienen una tabla propia. Este total depende solo del período.
@@ -204,7 +204,7 @@ class ReporteAdmin
         ];
         $entregas = $completo
             ? $listaEntregas->get()->map($transformarEntrega)
-            : $listaEntregas->paginate(25, ['*'], 'pagina_entregas')
+            : $listaEntregas->paginate(15, ['*'], 'pagina_entregas')
                 ->withQueryString()->through($transformarEntrega);
 
         // Flujo actual y recepciones: solo el segundo indicador usa fechas.

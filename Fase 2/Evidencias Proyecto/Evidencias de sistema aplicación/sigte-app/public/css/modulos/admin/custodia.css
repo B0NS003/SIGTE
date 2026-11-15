@@ -1,0 +1,168 @@
+/* Vista custodia. Se carga después de comun.css si existe. */
+/* Filtros a todo el ancho; botón centrado con los campos, sin estirarse. */
+.aud-modos {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--esp-1);
+    padding: var(--esp-1);
+    margin: 0 0 1rem;
+    border-radius: var(--radio-pill);
+    background: var(--superficie-3);
+    border: 1px solid var(--borde);
+}
+.aud-modo {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--alto-sm);
+    padding: var(--esp-1) var(--esp-4);
+    border-radius: var(--radio-pill);
+    color: var(--muted);
+    font-size: var(--fs-base);
+    font-weight: 700;
+    text-decoration: none;
+}
+.aud-modo:hover {
+    color: var(--ink);
+    text-decoration: none;
+    background: var(--card);
+}
+.aud-modo.is-on {
+    background: var(--navy);
+    color: #fff;
+}
+.aud-panel {
+    border-top: var(--franja) solid var(--naranja);
+}
+.aud-filtros {
+    grid-template-columns: minmax(12rem, 1.5fr) minmax(10rem, 1.1fr) minmax(9rem, 0.9fr) minmax(9rem, 0.9fr) auto;
+}
+.aud-caja-link {
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.aud-caja-link:hover {
+    color: var(--naranja-texto);
+}
+.aud-busca-caja {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--esp-3);
+    align-items: stretch;
+    margin: 0 0 1.1rem;
+}
+.aud-busca-caja .field {
+    flex: 1 1 16rem;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: var(--esp-1);
+    margin: 0;
+    min-height: var(--alto-lg);
+    padding: var(--esp-2) var(--esp-3) var(--esp-2);
+}
+.aud-busca-caja .field > span {
+    font-size: var(--fs-2xs);
+    font-weight: 800;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.aud-busca-caja .btn {
+    min-height: var(--alto-lg);
+    height: auto;
+    align-self: stretch;
+    padding-inline: var(--esp-5);
+}
+.aud-espera {
+    padding: var(--esp-6) var(--esp-5);
+    border-radius: var(--radio-md);
+    border: 1px dashed var(--linea-fuerte);
+    background: linear-gradient(180deg, var(--superficie-2), var(--card));
+    text-align: center;
+}
+.aud-espera strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+}
+.aud-espera p {
+    margin: 0 auto;
+    max-width: 28rem;
+    color: var(--muted);
+    font-size: var(--fs-base);
+    line-height: 1.45;
+}
+.aud-cadenas {
+    display: grid;
+    gap: var(--esp-3);
+}
+@media (max-width: 900px) {
+    .aud-filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.custody-ahora {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: var(--fs-sm);
+    color: var(--ink);
+    font-weight: 600;
+}
+.custody-card {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-lg);
+    padding: var(--esp-3) var(--esp-4);
+    margin-bottom: 0.85rem;
+    background: var(--card);
+}
+.custody-card.is-alert {
+    border-color: var(--rojo-linea);
+    background: var(--rojo-fondo);
+}
+.custody-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--esp-3);
+    margin-bottom: 0.75rem;
+}
+.custody-head span {
+    display: block;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+}
+.custody-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 2px solid var(--linea);
+    margin-left: 0.35rem;
+}
+.custody-timeline li {
+    display: grid;
+    grid-template-columns: 3.2rem 1fr;
+    gap: var(--esp-3);
+    padding: 0 0 var(--esp-3) var(--esp-3);
+    position: relative;
+}
+.custody-timeline li::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 0.35rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--navy);
+}
+.custody-timeline li.is-alert::before {
+    background: var(--rojo);
+}
+.custody-card[hidden],
+#aud-cadenas[hidden] {
+    display: none !important;
+}

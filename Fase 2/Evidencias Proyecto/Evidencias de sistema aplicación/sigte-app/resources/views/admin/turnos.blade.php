@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/admin/comun.css') }}?v={{ @filemtime(public_path('css/modulos/admin/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/admin/turnos.css') }}?v={{ @filemtime(public_path('css/modulos/admin/turnos.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Turnos')
@@ -30,11 +31,11 @@
                 <p class="main-sub">Asigna operadoras al turno del día. En el puesto aparecen primero quienes están de turno ahora.</p>
             </div>
             <div class="main-actions turno-main-actions">
-                <a class="btn turno-btn-pdf" id="turno-export-pdf" href="{{ route('mockups.turnos.pdf') }}" title="Exportar PDF">
+                <a class="btn btn-exportar-pdf" id="turno-export-pdf" href="{{ route('mockups.turnos.pdf') }}" data-descargar-reporte="pdf" title="Exportar PDF">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
                     <span>Exportar PDF</span>
                 </a>
-                <a class="btn turno-btn-excel" id="turno-export-excel" href="{{ route('mockups.turnos.excel') }}" title="Exportar Excel">
+                <a class="btn btn-exportar-excel" id="turno-export-excel" href="{{ route('mockups.turnos.excel') }}" data-descargar-reporte="excel" title="Exportar Excel">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M10 17l4-6M14 17l-4-6"/></svg>
                     <span>Exportar Excel</span>
                 </a>
@@ -255,28 +256,16 @@
         });
     }
 
-    var btnPdf = document.getElementById('turno-export-pdf');
-    var btnExcel = document.getElementById('turno-export-excel');
-    if (btnPdf) {
-        btnPdf.addEventListener('click', function (evento) {
+    // Si hay cambios guardándose, bloquea la exportación compartida (toast inferior).
+    document.querySelectorAll('[data-descargar-reporte]').forEach(function (enlace) {
+        enlace.addEventListener('click', function (evento) {
             if (pendientes > 0) {
                 evento.preventDefault();
+                evento.stopImmediatePropagation();
                 avisar('Espera a que terminen de guardarse los cambios antes de exportar.', 3);
-                return;
             }
-            avisar('Descargando PDF…', 2);
-        });
-    }
-    if (btnExcel) {
-        btnExcel.addEventListener('click', function (evento) {
-            if (pendientes > 0) {
-                evento.preventDefault();
-                avisar('Espera a que terminen de guardarse los cambios antes de exportar.', 3);
-                return;
-            }
-            avisar('Descargando Excel…', 2);
-        });
-    }
+        }, true);
+    });
 })();
 </script>
 @endpush

@@ -1,13 +1,13 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/enfermera.css') }}?v={{ @filemtime(public_path('css/enfermera.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/enfermera/comun.css') }}?v={{ @filemtime(public_path('css/modulos/enfermera/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/enfermera/panel.css') }}?v={{ @filemtime(public_path('css/modulos/enfermera/panel.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Enfermera de turno')
 
 @section('content')
 <div class="shell">
-    {{-- Menú original: sin cambios en las opciones ni en la barra lateral. --}}
     <aside class="sidebar">
         <div class="logo-wrap">
             <img src="{{ asset('images/logo-sigte.png') }}" alt="Logo hospital">
@@ -36,12 +36,11 @@
         @if (!isset($resumen_turno) || !is_array($resumen_turno))
             <section class="panel enf-sin-datos" role="alert">
                 <h2>Falta conectar los datos del resumen</h2>
-                <p>El panel ya está instalado, pero falta agregar <code>resumen_turno</code> en el controlador, según las instrucciones de instalación.</p>
+                <p>El panel ya está instalado, pero falta agregar <code>resumen_turno</code> en el controlador.</p>
             </section>
         @else
             @php $d = $resumen_turno; @endphp
 
-            {{-- Información institucional y de la guardia (misma fuente que Cierre de turno). --}}
             <section class="panel enf-turno-meta" aria-label="Turno actual">
                 <div class="enf-meta-persona">
                     <span class="enf-icono enf-icono-naranja" aria-hidden="true">
@@ -70,7 +69,6 @@
                 </div>
             </section>
 
-            {{-- Indicadores con cifras reales: sin porcentajes de ejemplo. --}}
             <section class="enf-indicadores" aria-label="Indicadores del turno">
                 <article class="panel enf-kpi enf-kpi-alerta">
                     <span class="enf-kpi-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5M12 18h.01"/></svg></span>
@@ -199,7 +197,6 @@
 
 @push('scripts')
 <script>
-// La lista es de revisión visual; las confirmaciones oficiales están en Cierre de turno.
 (() => {
     const lista = document.getElementById('enf-checklist');
     const contador = document.getElementById('enf-pendientes-conteo');

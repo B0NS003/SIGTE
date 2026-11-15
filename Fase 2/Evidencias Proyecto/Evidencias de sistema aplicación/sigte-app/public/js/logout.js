@@ -12,17 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let elementoAnterior = null;
 
-    // ABRIR MODAL
     function abrirModal() {
         elementoAnterior = document.activeElement;
-
         modal.hidden = false;
         document.body.classList.add('logout-modal-abierto');
-
         btnCancelar.focus();
     }
 
-    // CERRAR MODAL
     function cerrarModal() {
         modal.hidden = true;
         document.body.classList.remove('logout-modal-abierto');
@@ -34,13 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnAbrir.addEventListener('click', abrirModal);
 
-    modal.querySelectorAll('[data-logout-cerrar]').forEach(elemento => {
+    modal.querySelectorAll('[data-logout-cerrar]').forEach((elemento) => {
         elemento.addEventListener('click', cerrarModal);
     });
 
-    // CERRAR CON ESCAPE
-    document.addEventListener('keydown', evento => {
-        if (modal.hidden) return;
+    document.addEventListener('keydown', (evento) => {
+        if (modal.hidden) {
+            return;
+        }
 
         if (evento.key === 'Escape') {
             evento.preventDefault();
@@ -48,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // MANTENER EL FOCO DENTRO DEL MODAL
         if (evento.key === 'Tab') {
             const elementos = [btnCancelar, btnConfirmar];
 
@@ -62,12 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // CONFIRMAR CIERRE DE SESIÓN
     form.addEventListener('submit', () => {
         try {
             sessionStorage.removeItem('sigte-carga');
-        } catch (error) {
-        }
+        } catch (error) {}
 
         btnConfirmar.disabled = true;
         btnConfirmar.textContent = 'Confirmando...';

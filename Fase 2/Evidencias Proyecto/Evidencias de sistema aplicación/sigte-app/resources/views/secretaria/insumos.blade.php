@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/secretaria.css') }}?v={{ @filemtime(public_path('css/secretaria.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/secretaria/insumos.css') }}?v={{ @filemtime(public_path('css/modulos/secretaria/insumos.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Insumos')
@@ -9,7 +9,7 @@
 <div class="shell">
     @include('secretaria.partials.sidebar')
 
-    <main class="main">
+    <main class="main si-insumos">
         <div class="main-top">
             <div>
                 <p class="eyebrow">Control de stock</p>
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <div class="recv-layout">
+        <div class="si-cuerpo">
             <section class="panel list">
                 <div class="panel-head">
                     <h2>Stock</h2>
@@ -92,7 +92,7 @@
                 </div>
             </section>
 
-            <form class="recv-form panel" method="post" action="{{ route('secretaria.insumos.movimiento') }}">
+            <form class="panel si-movimiento" method="post" action="{{ route('secretaria.insumos.movimiento') }}">
                 @csrf
                 <div class="panel-head">
                     <h2>Registrar movimiento</h2>
@@ -125,15 +125,15 @@
                 </label>
 
                 <label class="field-label" for="observacion">Observación (opcional)</label>
-                <textarea id="observacion" class="recv-textarea" name="observacion" rows="3" maxlength="255" placeholder="Ej: reposición de bodega o consumo de la semana">{{ old('observacion') }}</textarea>
+                <textarea id="observacion" class="si-textarea" name="observacion" rows="4" maxlength="255" placeholder="Ej: reposición de bodega o consumo de la semana">{{ old('observacion') }}</textarea>
 
                 <div class="recv-actions">
-                    <button class="btn btn-primary" type="submit" style="width:auto; min-width:12rem;">Guardar movimiento</button>
+                    <button class="btn btn-primary" type="submit">Guardar movimiento</button>
                 </div>
             </form>
         </div>
 
-        <section class="panel list" style="margin-top:1rem;">
+        <section class="panel list si-movimientos">
             <div class="panel-head">
                 <h2>Últimos movimientos</h2>
                 <span class="badge">{{ $movimientos->count() }}</span>

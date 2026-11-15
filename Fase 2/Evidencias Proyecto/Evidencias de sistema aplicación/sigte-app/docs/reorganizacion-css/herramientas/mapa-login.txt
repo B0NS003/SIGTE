@@ -1,0 +1,39 @@
+    1 global                               .auth
+    6 login                                .auth-form
+   19 login                                .auth-form::after
+   27 login                                .auth-header
+   27 login                                .auth-card
+   32 login                                .auth-header
+   35 login                                .auth-logo-top
+   40 login                                .auth-pill-inline
+   49 login                                .auth-product
+   54 login                                .auth-product span
+   55 login                                .auth-tagline
+   59 login                                .auth-card
+   66 login                                .auth-login-title
+   70 login                                .auth-form .hint
+   73 login                                .field-error
+   77 login                                .auth-card .btn-primary:disabled
+   80 login                                .btn-spinner
+   88 login                                .btn.is-loading .btn-spinner
+   89 at                                   @keyframes sigte-giro
+   92 login                                .auth-card .field
+   93 login                                .auth-card .field .icon
+   96 login                                .auth-card .btn-primary
+   97 NINGUNA                              .auth-card .field-select
+  100 NINGUNA                              .auth-card .field-select select
+  110 login                                .auth-visual
+  118 login                                .auth-visual-caption
+  122 login                                .auth-visual-caption strong
+  126 login                                .auth-visual-caption span
+  131 global                               [@media (max-width: 900px)] .auth
+  132 login                                [@media (max-width: 900px)] .auth-form::after
+  133 login                                [@media (max-width: 900px)] .auth-visual
+  134 login                                [@media (max-width: 900px)] .auth-visual-caption
+  137 login                                .auth-logo-oscuro
+  138 login                                html[data-tema="oscuro"] .auth-form
+  141 login                                html[data-tema="oscuro"] .auth-logo-claro
+  142 login                                html[data-tema="oscuro"] .auth-logo-oscuro
+  143 login                                html[data-tema="oscuro"] .auth-pill-inline
+  149 login                                .auth-card.is-shaking
+  153 at                                   @keyframes sigte-sacudida

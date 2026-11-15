@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +7,7 @@
     <title>@yield('title', 'SIGTE')</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v={{ @filemtime(public_path('favicon.png')) }}">
     <script>
-        (function() {
+        (function () {
             try {
                 if (localStorage.getItem('sigte-tema') === 'oscuro') {
                     document.documentElement.setAttribute('data-tema', 'oscuro');
@@ -25,13 +24,12 @@
             } catch (error) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/sigte.css') }}?v={{ @filemtime(public_path('css/sigte.css')) }}">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,900&family=Inter:wght@400;500;600;700;800&display=swap">
+    @include('layouts.partials.estilos-base')
     @stack('styles')
-    <link rel="stylesheet" href="{{ asset('css/logout.css') }}?v={{ @filemtime(public_path('css/logout.css')) }}">
-
 </head>
-
 <body>
     <div id="sigte-carga" class="sigte-carga" role="status" aria-live="polite" aria-busy="false" hidden>
         <div class="sigte-carga-panel">
@@ -40,19 +38,19 @@
                     <span class="sigte-carga-halo"></span>
                     <div class="sigte-carga-marca">
                         @foreach ([1, 2, 3] as $figura)
-                        <img
-                            class="sigte-carga-figura"
-                            src="{{ asset('images/logo-sigte-figura-'.$figura.'.png') }}"
-                            alt=""
-                            width="80"
-                            height="80">
+                            <img
+                                class="sigte-carga-figura"
+                                src="{{ asset('images/logo-sigte-figura-'.$figura.'.png') }}"
+                                alt=""
+                                width="80"
+                                height="80"
+                            >
                         @endforeach
                     </div>
                 </div>
 
                 <svg class="sigte-carga-word" viewBox="0 0 220 48" aria-hidden="true">
-                    <text class="sigte-carga-letras sigte-carga-sig" x="78" y="34" text-anchor="middle">SIG</text>
-                    <text class="sigte-carga-letras sigte-carga-te" x="148" y="34" text-anchor="middle">TE</text>
+                    <text class="sigte-carga-letras" x="110" y="36" text-anchor="middle">SIG<tspan class="sigte-carga-te">TE</tspan></text>
                 </svg>
 
                 <p class="sigte-carga-sub">Hospital San José de Melipilla</p>
@@ -64,57 +62,14 @@
     </div>
 
     @yield('content')
-
-    <!-- MODAL DE CIERRE DE SESIÓN -->
-    <div
-        class="logout-modal"
-        id="modal-logout"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="logout-titulo"
-        aria-describedby="logout-descripcion"
-        hidden>
-        <div class="logout-overlay" data-logout-cerrar></div>
-
-        <section class="logout-contenido" tabindex="-1">
-            <div class="logout-icono" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 5.5H7.2A1.7 1.7 0 0 0 5.5 7.2v9.6A1.7 1.7 0 0 0 7.2 18.5H10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-                    <path d="M10.5 12H19M15.8 8.5 19.5 12l-3.7 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </div>
-
-            <h2 id="logout-titulo">Cerrar sesión</h2>
-
-            <p id="logout-descripcion">
-                ¿Deseas salir de tu cuenta?
-            </p>
-
-            <p class="logout-ayuda">
-                Tendrás que iniciar sesión nuevamente para volver a acceder al sistema.
-            </p>
-
-            <div class="logout-acciones">
-                <button type="button" class="logout-btn-cancelar" data-logout-cerrar>
-                    Cancelar
-                </button>
-
-                <form method="POST" action="{{ route('logout') }}" id="form-logout">
-                    @csrf
-                    <button type="submit" class="logout-btn-confirmar">
-                        Confirmar
-                    </button>
-                </form>
-            </div>
-        </section>
-    </div>
-
+    @include('partials.logout-modal')
+    @include('partials.exportar-aviso')
     @stack('scripts')
     <script src="{{ asset('js/logout.js') }}?v={{ @filemtime(public_path('js/logout.js')) }}" defer></script>
-
+    <script src="{{ asset('js/exportar-descarga.js') }}?v={{ @filemtime(public_path('js/exportar-descarga.js')) }}" defer></script>
     <script src="{{ asset('js/anime.min.js') }}"></script>
     <script>
-        (function() {
+        (function () {
             var capa = document.getElementById('sigte-carga');
             var panel = capa ? capa.querySelector('.sigte-carga-panel') : null;
             var figuras = capa ? capa.querySelectorAll('.sigte-carga-figura') : [];
@@ -139,7 +94,7 @@
             }
 
             function estadoListoVisual() {
-                figuras.forEach(function(figura) {
+                figuras.forEach(function (figura) {
                     figura.style.opacity = '1';
                     figura.style.transform = 'none';
                 });
@@ -147,7 +102,7 @@
                     halo.style.opacity = '1';
                     halo.style.transform = 'none';
                 }
-                letras.forEach(function(letra) {
+                letras.forEach(function (letra) {
                     letra.style.opacity = '1';
                     letra.style.transform = 'translateY(0)';
                 });
@@ -157,7 +112,7 @@
 
             function prepararDibujo() {
                 capa.classList.remove('is-vivo');
-                figuras.forEach(function(figura) {
+                figuras.forEach(function (figura) {
                     figura.style.opacity = '0';
                     figura.style.transform = 'translateY(18px) scale(0.86)';
                 });
@@ -165,7 +120,7 @@
                     halo.style.opacity = '0';
                     halo.style.transform = 'scale(0.5)';
                 }
-                letras.forEach(function(letra) {
+                letras.forEach(function (letra) {
                     letra.style.opacity = '0';
                     letra.style.transform = 'translateY(8px)';
                 });
@@ -206,9 +161,9 @@
                 window.setTimeout(terminar, 2600);
                 anime.remove(piezas);
                 anime.timeline({
-                        easing: 'easeOutCubic',
-                        complete: terminar
-                    })
+                    easing: 'easeOutCubic',
+                    complete: terminar
+                })
                     .add({
                         targets: halo,
                         opacity: [0, 1],
@@ -242,7 +197,7 @@
                 capa.setAttribute('aria-busy', 'false');
                 capa.classList.add('is-listo');
 
-                var cerrar = function() {
+                var cerrar = function () {
                     capa.hidden = true;
                     panel.style.opacity = '1';
                 };
@@ -293,7 +248,7 @@
                 capa.hidden = true;
                 var formLogin = document.getElementById('form-login');
                 if (formLogin) {
-                    formLogin.addEventListener('submit', function(evento) {
+                    formLogin.addEventListener('submit', function (evento) {
                         if (evento.defaultPrevented) {
                             return;
                         }
@@ -312,13 +267,13 @@
                 paginaLista = true;
                 intentarSalir();
             } else {
-                window.addEventListener('load', function() {
+                window.addEventListener('load', function () {
                     paginaLista = true;
                     intentarSalir();
                 });
             }
 
-            window.addEventListener('pageshow', function(evento) {
+            window.addEventListener('pageshow', function (evento) {
                 if (evento.persisted) {
                     marcarVista();
                     capa.hidden = true;
@@ -330,5 +285,4 @@
     <script src="{{ asset('js/sigte-tema.js') }}?v={{ @filemtime(public_path('js/sigte-tema.js')) }}"></script>
     <script src="{{ asset('js/sigte-controles.js') }}?v={{ @filemtime(public_path('js/sigte-controles.js')) }}"></script>
 </body>
-
 </html>

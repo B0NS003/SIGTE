@@ -1,0 +1,293 @@
+    3 alertas                              .query-toolbar
+   10 usuarios+custodia                    .muted-cell
+   11 usuarios                             .user-actions
+   12 usuarios                             .user-actions .btn
+   13 usuarios                             .user-inactive
+   15 NINGUNA                              .alert-strip
+   20 NINGUNA                              .alert-strip-title
+   24 NINGUNA                              .alert-strip-list
+   25 NINGUNA                              .alert-item
+   28 NINGUNA                              .alert-item strong
+   29 NINGUNA                              .alert-item span
+   30 NINGUNA                              .alert-item.alert-alta
+   33 usuarios+alertas                     [@media (max-width: 1100px)] .kpi-row
+   33 NINGUNA                              [@media (max-width: 1100px)] .action-row
+   33 NINGUNA                              [@media (max-width: 1100px)] .alert-strip-list
+   34 NINGUNA                              [@media (max-width: 1100px)] .grid-2
+   35 NINGUNA                              [@media (max-width: 1100px)] .phase-sep
+   38 panel+usuarios+turnos+historial+custodia+alertas [@media (max-width: 800px)] .shell
+   39 panel+usuarios+turnos+historial+custodia+alertas [@media (max-width: 800px)] .sidebar
+   40 usuarios+alertas                     [@media (max-width: 800px)] .kpi-row
+   40 NINGUNA                              [@media (max-width: 800px)] .action-row
+   40 NINGUNA                              [@media (max-width: 800px)] .alert-strip-list
+   43 usuarios                             .users-kpis .kpi
+   43 usuarios                             .users-page .panel
+   47 usuarios                             .users-page
+   48 usuarios                             .users-page .cuenta-alta
+   49 usuarios                             .user-quien
+   50 usuarios                             .user-icono
+   54 usuarios                             .user-icono svg
+   55 usuarios                             .user-icono svg path
+   55 usuarios                             .user-icono svg circle
+   57 usuarios                             .user-inactive .user-icono
+   58 usuarios                             .users-page .user-actions form
+   59 usuarios                             .users-page .cuenta-alta .btn-primary
+   60 usuarios                             .users-page .cuenta-pie
+   61 usuarios                             .users-paginas
+   68 usuarios                             .users-pagina
+   83 usuarios                             .users-pagina:hover
+   84 usuarios                             .users-pagina.is-on
+   85 usuarios                             .users-pagina.is-off
+   86 usuarios                             .users-rango
+   87 usuarios                             .user-id
+   88 usuarios+historial+custodia          .users-filtros
+   95 usuarios+historial+custodia          .users-filtros .field
+  104 usuarios+historial+custodia          .users-filtros .field > span
+  111 usuarios+historial+custodia          .users-filtros .field input
+  111 usuarios+historial+custodia          .users-filtros .field select
+  113 usuarios+historial+custodia          .users-filtros-acciones
+  120 usuarios+historial+custodia          .users-filtros .btn
+  129 usuarios+historial+custodia          [@media (max-width: 900px)] .users-filtros
+  130 usuarios+historial+custodia          [@media (max-width: 900px)] .users-filtros .field:first-child
+  132 turnos                               .main:has(.turno-panel)
+  143 turnos                               .main:has(.turno-panel) .main-top
+  151 turnos                               .main:has(.turno-panel) .main-top > div:first-child
+  155 turnos                               .main:has(.turno-panel) .main-sub
+  159 turnos                               .turno-main-actions
+  168 turnos                               .turno-main-actions .btn
+  180 turnos                               .turno-main-actions .btn span
+  183 turnos                               .turno-main-actions .btn svg
+  188 turnos                               .turno-panel
+  197 turnos                               .turno-panel .panel-head
+  203 turnos                               .turno-flujo
+  210 turnos                               .turno-flujo strong
+  211 turnos                               .turno-tablero
+  222 turnos                               .turno-tablero > .turno-columna
+  228 turnos                               .turno-columna
+  239 turnos                               .turno-columna::before
+  246 turnos                               .turno-columna.tono-libre::before
+  247 turnos                               .turno-columna.tono-manana::before
+  250 turnos                               .turno-columna.tono-tarde::before
+  253 turnos                               .turno-columna.tono-noche::before
+  256 turnos                               .turno-columna.tono-manana
+  257 turnos                               .turno-columna.tono-tarde
+  258 turnos                               .turno-columna.tono-noche
+  259 turnos                               .turno-columna.tono-libre
+  260 turnos                               .turno-busca
+  261 turnos                               .turno-columna > header
+  262 turnos                               .turno-busca input
+  272 turnos                               .turno-busca input:focus
+  277 turnos                               .turno-vacio
+  278 turnos                               .turno-tarjeta[hidden]
+  279 turnos                               .turno-columna header
+  286 turnos                               .turno-columna-titulo
+  287 turnos                               .turno-columna h3
+  288 turnos                               .turno-columna-titulo span
+  289 turnos                               .turno-columna-meta
+  298 turnos                               .turno-columna header em
+  316 turnos                               .turno-icono
+  327 turnos                               .turno-icono svg
+  332 turnos                               .tono-manana .turno-icono
+  333 turnos                               .tono-tarde .turno-icono
+  334 turnos                               .tono-noche .turno-icono
+  335 turnos                               .tono-libre .turno-icono
+  336 turnos                               .turno-columna.is-ahora
+  340 turnos                               .turno-columna.is-sobre
+  345 turnos                               .turno-lista
+  359 turnos                               .turno-lista::-webkit-scrollbar
+  362 turnos                               .turno-lista::-webkit-scrollbar-thumb
+  366 turnos                               .turno-lista::-webkit-scrollbar-track
+  369 turnos                               .turno-tarjeta
+  381 turnos                               .turno-tarjeta:hover
+  385 turnos                               .turno-avatar
+  399 turnos                               .tono-noche .turno-avatar
+  404 turnos                               .turno-tarjeta strong
+  411 turnos                               .turno-tarjeta.is-arrastrando
+  415 turnos                               .turno-acciones
+  426 turnos                               .turno-acciones-botones .btn
+  431 turnos                               .turno-estado
+  437 turnos                               .turno-acciones-botones
+  443 turnos                               .turno-acciones-botones .btn
+  449 turnos                               .turno-acciones-botones .btn svg
+  454 turnos                               .turno-btn-pdf
+  460 turnos                               .turno-btn-pdf:hover
+  466 turnos                               .turno-btn-excel
+  472 turnos                               .turno-btn-excel:hover
+  478 turnos                               .turno-btn-guardar.is-pendiente
+  483 turnos                               [@media (max-width: 1100px)] .main:has(.turno-panel)
+  488 turnos                               [@media (max-width: 1100px)] .turno-tablero
+  495 turnos                               [@media (max-width: 720px)] .turno-tablero
+  499 turnos                               [@media (max-width: 720px)] .turno-tablero > .turno-columna
+  503 turnos                               [@media (max-width: 720px)] .turno-acciones-botones
+  504 turnos                               [@media (max-width: 720px)] .turno-acciones-botones .btn
+  506 turnos                               .nomina-panel
+  507 NINGUNA                              .nomina-grupo
+  508 NINGUNA                              .nomina-lista
+  509 NINGUNA                              .nomina-lista li
+  510 NINGUNA                              .nomina-lista span
+  512 NINGUNA                              [@media (max-width: 800px)] .nomina-lista
+  516 historial                            .hist-sectores
+  522 historial                            .hist-sector
+  539 historial                            .hist-sector:hover
+  539 historial                            .hist-sector:focus
+  546 historial                            .hist-sector.is-on
+  551 historial                            .hist-sector strong
+  558 historial                            .hist-sector .n
+  565 historial                            .hist-sector small
+  572 historial                            .hist-sectores
+  572 historial                            .hist-lista
+  587 historial                            html[data-tema="oscuro"] .hist-sectores
+  587 historial                            html[data-tema="oscuro"] .hist-lista
+  600 historial                            .hist-sector.sec-pabellon
+  601 historial                            .hist-sector.sec-dental
+  602 historial                            .hist-sector.sec-uci
+  603 historial                            .hist-sector.sec-urgencia
+  604 historial                            .hist-sector.sec-maternidad
+  605 historial                            .hist-sector.sec-curaciones
+  606 historial                            .hist-sector.sec-pabellon.is-on
+  607 historial                            .hist-sector.sec-dental.is-on
+  608 historial                            .hist-sector.sec-uci.is-on
+  609 historial                            .hist-sector.sec-urgencia.is-on
+  610 historial                            .hist-sector.sec-maternidad.is-on
+  611 historial                            .hist-sector.sec-curaciones.is-on
+  613 historial                            [@media (max-width: 1100px)] .hist-sectores
+  616 historial                            [@media (max-width: 720px)] .hist-sectores
+  620 historial                            .hist-filtros
+  628 historial                            .hist-filtros .field
+  634 historial                            .hist-buscar
+  634 historial                            .hist-periodo
+  636 historial                            .hist-filtros .users-filtros-acciones
+  641 historial                            .hist-filtros .btn
+  646 historial                            [@media (max-width: 720px)] .hist-filtros
+  647 historial                            [@media (max-width: 720px)] .hist-buscar
+  648 historial                            [@media (max-width: 720px)] .hist-filtros .users-filtros-acciones
+  651 historial                            .hist-lista
+  652 historial                            .hist-card
+  662 historial                            .hist-card:hover
+  666 historial                            .hist-cuando
+  672 historial                            .hist-cuando::before
+  679 historial                            .hist-cuando strong
+  686 historial                            .hist-cuando span
+  686 historial                            .hist-cuando small
+  687 historial                            .hist-cuando small
+  688 historial                            .hist-relativo
+  699 historial                            .hist-card.sec-pabellon .hist-cuando::before
+  700 historial                            .hist-card.sec-pabellon .hist-cuando small
+  701 historial                            .hist-card.sec-dental .hist-cuando::before
+  702 historial                            .hist-card.sec-dental .hist-cuando small
+  703 historial                            .hist-card.sec-uci .hist-cuando::before
+  704 historial                            .hist-card.sec-uci .hist-cuando small
+  705 historial                            .hist-card.sec-urgencia .hist-cuando::before
+  706 historial                            .hist-card.sec-urgencia .hist-cuando small
+  707 historial                            .hist-card.sec-maternidad .hist-cuando::before
+  708 historial                            .hist-card.sec-maternidad .hist-cuando small
+  709 historial                            .hist-card.sec-curaciones .hist-cuando::before
+  710 historial                            .hist-card.sec-curaciones .hist-cuando small
+  711 historial                            .hist-cuerpo
+  712 historial                            .hist-top
+  713 historial                            .hist-top h2
+  714 historial                            .hist-cajas
+  715 historial                            .hist-chip
+  721 historial                            .hist-chip small
+  722 historial                            .hist-chip.is-material
+  723 historial                            .hist-card .entrega-datos
+  728 historial                            .hist-card .entrega-dato strong
+  729 historial                            .hist-card .entrega-dato small
+  731 historial                            [@media (max-width: 720px)] .hist-card
+  732 historial                            [@media (max-width: 720px)] .hist-cuando
+  741 historial                            [@media (max-width: 720px)] .hist-cuando strong
+  741 historial                            [@media (max-width: 720px)] .hist-cuando span
+  741 historial                            [@media (max-width: 720px)] .hist-cuando small
+  744 custodia                             .aud-modos
+  754 custodia                             .aud-modo
+  765 custodia                             .aud-modo:hover
+  766 custodia                             .aud-modo.is-on
+  770 custodia                             .aud-panel
+  771 custodia                             .aud-filtros
+  774 historial+custodia                   .aud-pager
+  786 historial+custodia                   .aud-pager-meta
+  792 historial+custodia                   .aud-pager-nav
+  799 historial+custodia                   .aud-pager-btn
+  815 historial+custodia                   .aud-pager-btn:hover
+  820 historial+custodia                   .aud-pager-btn.is-on
+  825 historial+custodia                   .aud-pager-btn.is-off
+  830 historial+custodia                   .aud-pager-btn.is-gap
+  837 custodia                             .aud-caja-link
+  843 custodia                             .aud-caja-link:hover
+  844 custodia                             .aud-busca-caja
+  851 custodia                             .aud-busca-caja .field
+  861 custodia                             .aud-busca-caja .field > span
+  868 custodia                             .aud-busca-caja .btn
+  874 custodia                             .aud-espera
+  881 custodia                             .aud-espera strong
+  888 custodia                             .aud-espera p
+  895 custodia                             .aud-cadenas
+  899 NINGUNA                              .aud-relacionadas
+  904 NINGUNA                              .aud-relacionadas h3
+  909 NINGUNA                              .aud-relacionadas ul
+  916 NINGUNA                              .aud-relacionadas li
+  927 NINGUNA                              .aud-relacionadas li strong
+  929 custodia                             [@media (max-width: 900px)] .aud-filtros
+  932 NINGUNA                              [@media (max-width: 900px)] .aud-relacionadas li
+  936 custodia                             .custody-ahora
+  944 custodia                             .custody-card
+  951 custodia                             .custody-card.is-alert
+  955 custodia                             .custody-head
+  962 custodia                             .custody-head span
+  963 custodia                             .custody-timeline
+  970 custodia                             .custody-timeline li
+  977 custodia                             .custody-timeline li::before
+  987 custodia                             .custody-timeline li.is-alert::before
+  989 alertas                              .alerts-board
+  990 alertas                              .alert-row
+ 1001 alertas                              .alert-row.nivel-alta
+ 1002 alertas                              .alert-row.nivel-media
+ 1003 alertas                              .alert-row.nivel-baja
+ 1004 alertas                              .alert-row.estado-resuelta
+ 1005 alertas                              .alert-row-top
+ 1012 alertas                              .alert-type
+ 1012 alertas                              .alert-id
+ 1012 alertas                              .alert-time
+ 1019 alertas                              .alert-row-main strong
+ 1020 alertas                              .alert-row-main p
+ 1021 alertas                              .alert-meta
+ 1022 alertas                              .alert-row-actions
+ 1023 alertas                              .alert-row-actions .btn
+ 1025 alertas                              [@media (max-width: 800px)] .alert-row
+ 1026 alertas                              [@media (max-width: 800px)] .alert-row-actions
+ 1029 NINGUNA                              .rep-armar
+ 1033 NINGUNA                              .rep-filtros
+ 1039 NINGUNA                              .rep-filtros .field
+ 1046 NINGUNA                              .rep-filtros .field > span
+ 1053 NINGUNA                              .rep-filtros input[type="date"]
+ 1057 NINGUNA                              .rep-hoja
+ 1058 NINGUNA                              .rep-hoja .recv-help
+ 1059 NINGUNA                              .rep-incluye
+ 1066 NINGUNA                              .rep-incluye p
+ 1075 NINGUNA                              .rep-incluye label
+ 1087 custodia                             .custody-card[hidden]
+ 1087 custodia                             #aud-cadenas[hidden]
+ 1087 NINGUNA                              #aud-bitacora[hidden]
+ 1087 NINGUNA                              #aud-tabla[hidden]
+ 1087 NINGUNA                              #aud-vacio[hidden]
+ 1087 NINGUNA                              #aud-cadenas-vacio[hidden]
+ 1087 NINGUNA                              #aud-cadenas-lista[hidden]
+ 1094 NINGUNA                              .rep-hoja
+ 1095 NINGUNA                              .rep-hoja-top
+ 1104 NINGUNA                              .rep-hoja-top p
+ 1105 NINGUNA                              .rep-hoja-top h2
+ 1111 NINGUNA                              .rep-formatos
+ 1112 NINGUNA                              .rep-excel
+ 1112 NINGUNA                              .rep-pdf
+ 1118 NINGUNA                              .rep-excel
+ 1119 NINGUNA                              .rep-pdf
+ 1120 NINGUNA                              .rep-firma
+ 1126 NINGUNA                              .rep-firma div
+ 1132 NINGUNA                              .rep-firma dt
+ 1139 NINGUNA                              .rep-firma dd
+ 1140 NINGUNA                              .rep-total
+ 1151 NINGUNA                              .rep-total strong
+ 1159 NINGUNA                              .rep-hoja h3
+ 1161 NINGUNA                              [@media (max-width: 900px)] .rep-filtros
+ 1161 NINGUNA                              [@media (max-width: 900px)] .rep-firma
+ 1162 NINGUNA                              [@media (max-width: 900px)] .rep-hoja-top

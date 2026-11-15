@@ -1,0 +1,87 @@
+/* Avisos en línea: error (auth-error) y confirmación (adv-ok). */
+
+.auth-error {
+  background: var(--rojo-fondo); color: var(--rojo-texto); border: 1px solid var(--rojo-linea);
+  border-radius: var(--radio-md); padding: var(--esp-3) var(--esp-4); margin: 0 0 1rem;
+  font-size: var(--fs-md); font-weight: 600; line-height: 1.4;
+}
+.adv-ok {
+  margin: 0 0 1rem; padding: var(--esp-3) var(--esp-4); border-radius: var(--radio-md);
+  background: var(--verde-fondo); color: var(--verde-texto); border: 1px solid var(--verde-linea);
+  font-size: var(--fs-md); font-weight: 700; line-height: 1.45;
+}
+
+/* Toast fijo al exportar PDF/Excel (Reportes, Turnos, etc.). */
+.exportar-aviso[hidden] {
+  display: none !important;
+}
+.exportar-aviso {
+  position: fixed;
+  right: var(--esp-5);
+  bottom: var(--esp-5);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  width: min(430px, calc(100vw - 32px));
+  padding: var(--esp-4) var(--esp-4);
+  border-radius: var(--radio-md);
+  border: 1px solid var(--borde);
+  border-left: 4px solid var(--navy);
+  background: var(--card);
+  color: var(--texto-1);
+  box-shadow: var(--sombra-2);
+}
+.exportar-aviso[data-estado="proceso"] {
+  border-left-color: var(--azul, #2563eb);
+}
+.exportar-aviso[data-estado="exito"] {
+  border-left-color: var(--verde);
+}
+.exportar-aviso[data-estado="error"] {
+  border-left-color: var(--rojo);
+}
+.exportar-aviso-icono {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.exportar-aviso[data-estado="proceso"] .exportar-aviso-icono { color: var(--azul, #2563eb); }
+.exportar-aviso[data-estado="exito"] .exportar-aviso-icono { color: var(--verde); }
+.exportar-aviso[data-estado="error"] .exportar-aviso-icono { color: var(--rojo); }
+.exportar-aviso-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+.exportar-aviso-textos strong {
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+.exportar-aviso-textos span {
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--texto-2);
+  overflow-wrap: anywhere;
+}
+.exportar-aviso-cerrar {
+  background: transparent;
+  border: 0;
+  color: var(--texto-3);
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+  padding: 0;
+}
+.exportar-aviso-cerrar:hover {
+  color: var(--texto-1);
+}
+@media (max-width: 640px) {
+  .exportar-aviso {
+    right: var(--esp-4);
+    bottom: var(--esp-4);
+  }
+}

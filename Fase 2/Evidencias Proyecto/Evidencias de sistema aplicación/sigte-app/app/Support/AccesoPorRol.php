@@ -29,6 +29,7 @@ class AccesoPorRol
         'mockups.catalogo.admin' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.fichas.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.fichas.actualizar' => [Rol::ADMINISTRADORA],
+        'mockups.catalogo.tipos-conjunto.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.instrumentos.guardar' => [Rol::ADMINISTRADORA],
         'mockups.catalogo.instrumentos.actualizar' => [Rol::ADMINISTRADORA],
         'mockups.ficha' => [Rol::OPERADOR, Rol::ENFERMERA, Rol::ADMINISTRADORA],

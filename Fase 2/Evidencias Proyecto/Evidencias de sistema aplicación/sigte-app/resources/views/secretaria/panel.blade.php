@@ -1,13 +1,12 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/secretaria.css') }}?v={{ @filemtime(public_path('css/secretaria.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/secretaria/panel.css') }}?v={{ @filemtime(public_path('css/modulos/secretaria/panel.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Secretaría')
 
 @section('content')
 <div class="shell">
-    {{-- Se mantiene exactamente la barra lateral compartida del proyecto. --}}
     @include('secretaria.partials.sidebar')
 
     <main class="main sp-dashboard">
@@ -22,15 +21,19 @@
             </div>
         </header>
 
-        <form class="spd-periodo" method="GET" action="{{ route('mockups.panel', 'secretaria') }}" aria-label="Seleccionar el mes de consulta">
-            <label for="spd-periodo">Período de consulta</label>
-            <input type="month" id="spd-periodo" name="periodo" value="{{ $resumen['periodo'] }}" required>
-            <button type="submit">Ver período</button>
-            <span class="spd-periodo-etiqueta">{{ $resumen['periodo_etiqueta'] }}</span>
+        <form class="spd-periodo panel" method="GET" action="{{ route('mockups.panel', 'secretaria') }}" aria-label="Seleccionar el mes de consulta">
+            <div class="spd-periodo-campos">
+                <div class="spd-periodo-campo">
+                    <label for="spd-periodo">Período de consulta</label>
+                    <input type="month" id="spd-periodo" name="periodo" value="{{ $resumen['periodo'] }}" required>
+                </div>
+                <button type="submit" class="btn btn-dark">Ver período</button>
+                <span class="spd-periodo-etiqueta">{{ $resumen['periodo_etiqueta'] }}</span>
+            </div>
         </form>
 
         <section class="spd-kpis" aria-label="Indicadores de producción y stock">
-            <article class="spd-kpi spd-kpi-azul">
+            <article class="spd-kpi spd-kpi-amarillo">
                 <span class="spd-kpi-icono" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H5V5a2 2 0 0 1 2-2Z"/><path d="M14 3v5h5M9 13h6M12 10v6"/></svg>
                 </span>
@@ -38,16 +41,6 @@
                     <p>Servicios con producción</p>
                     <strong>{{ number_format($resumen['servicios'], 0, ',', '.') }}</strong>
                     <small>Registros diarios del mes</small>
-                </div>
-            </article>
-            <article class="spd-kpi spd-kpi-verde">
-                <span class="spd-kpi-icono" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z"/></svg>
-                </span>
-                <div>
-                    <p>Litros del mes</p>
-                    <strong>{{ number_format((float) $resumen['litros'], 2, ',', '.') }} <span>L</span></strong>
-                    <small>Producción diaria acumulada</small>
                 </div>
             </article>
             <article class="spd-kpi spd-kpi-celeste">
@@ -58,6 +51,16 @@
                     <p>Unidades del mes</p>
                     <strong>{{ number_format($resumen['consumo'], 0, ',', '.') }}</strong>
                     <small>{{ number_format($resumen['registros'], 0, ',', '.') }} registros diarios</small>
+                </div>
+            </article>
+            <article class="spd-kpi spd-kpi-verde">
+                <span class="spd-kpi-icono" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z"/></svg>
+                </span>
+                <div>
+                    <p>Litros del mes</p>
+                    <strong>{{ number_format((float) $resumen['litros'], 2, ',', '.') }} <span>L</span></strong>
+                    <small>Producción diaria acumulada</small>
                 </div>
             </article>
             <article class="spd-kpi spd-kpi-naranja">
@@ -73,30 +76,45 @@
         </section>
 
         <section class="spd-centro" aria-label="Herramientas y seguimiento">
-            <article class="spd-panel spd-atajos">
+            <article class="spd-panel spd-servicios">
                 <div class="spd-cabecera">
                     <span class="spd-enc-icono" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 8h6l-6 12 2-9H6l7-11Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8M9 20V13M14 20V4M19 20v-9"/></svg>
                     </span>
-                    <div><h2>Accesos rápidos</h2><p>Acciones principales de Secretaría</p></div>
+                    <div>
+                        <h2>Producción por servicio</h2>
+                        <p>Ranking del mes · {{ $resumen['periodo_etiqueta'] }}</p>
+                    </div>
                 </div>
-                <div class="spd-atajos-lista">
-                    <a href="{{ route('secretaria.produccion') }}" class="spd-atajo">
-                        <span class="spd-atajo-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z"/></svg></span>
-                        <span class="spd-atajo-texto"><strong>Producción y litros</strong><small>Ingresa materiales y consumos diarios</small></span>
-                        <span class="spd-flecha" aria-hidden="true">›</span>
-                    </a>
-                    <a href="{{ route('secretaria.insumos') }}" class="spd-atajo">
-                        <span class="spd-atajo-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m12 2 8 4.5v10L12 21l-8-4.5v-10L12 2Z"/><path d="m4 6.5 8 4.7 8-4.7M12 11.2V21"/></svg></span>
-                        <span class="spd-atajo-texto"><strong>Insumos</strong><small>Consulta stock y registra movimientos</small></span>
-                        <span class="spd-flecha" aria-hidden="true">›</span>
-                    </a>
-                    <a href="{{ route('secretaria.reportes') }}" class="spd-atajo">
-                        <span class="spd-atajo-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 20V11M10 20V6M15 20v-9M20 20V3"/></svg></span>
-                        <span class="spd-atajo-texto"><strong>Reportes</strong><small>Consulta el consolidado mensual</small></span>
-                        <span class="spd-flecha" aria-hidden="true">›</span>
-                    </a>
+                <div class="spd-servicios-lista">
+                    @forelse($resumen['produccion_por_servicio'] as $indice => $servicio)
+                        <div class="spd-servicio">
+                            <span class="spd-servicio-puesto" aria-hidden="true">{{ $indice + 1 }}</span>
+                            <div class="spd-servicio-dato">
+                                <div class="spd-servicio-linea">
+                                    <strong title="{{ $servicio['nombre'] }}">{{ $servicio['nombre'] }}</strong>
+                                    <span>{{ number_format($servicio['litros'], 2, ',', '.') }} L</span>
+                                </div>
+                                <div class="spd-servicio-barra" aria-hidden="true">
+                                    <span style="width: {{ $servicio['porcentaje'] }}%"></span>
+                                </div>
+                                <small>{{ number_format($servicio['unidades'], 0, ',', '.') }} un. · {{ number_format($servicio['registros'], 0, ',', '.') }} registros</small>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="spd-vacio">
+                            <strong>Sin producción en este período</strong>
+                            <p>Cuando registres producción diaria, verás el ranking por servicio aquí.</p>
+                        </div>
+                    @endforelse
                 </div>
+                <a class="spd-enlace-pie" href="{{ route('secretaria.produccion') }}">
+                    Ver producción
+                    @if($resumen['total_servicios_mes'] > count($resumen['produccion_por_servicio']))
+                        ({{ $resumen['total_servicios_mes'] }} servicios)
+                    @endif
+                    <span aria-hidden="true">›</span>
+                </a>
             </article>
 
             <article class="spd-panel spd-alertas">
@@ -114,7 +132,7 @@
                             <span class="spd-estado {{ $insumo['estado'] === 'critico' ? 'spd-estado-critico' : 'spd-estado-bajo' }}">{{ $insumo['estado'] === 'critico' ? 'Crítico' : 'Bajo' }}</span>
                         </div>
                     @empty
-                        <div class="spd-vacio"><strong>Sin alertas de stock</strong><p>Los insumos registrados están dentro de sus mínimos establecidos.</p></div>
+                        <div class="spd-vacio"><strong>Sin alertas de stock</strong><p>Los insumos registrados van dentro de sus mínimos establecidos.</p></div>
                     @endforelse
                 </div>
                 <a class="spd-enlace-pie" href="{{ route('secretaria.insumos') }}">Ver todos los insumos ({{ $resumen['bajo_minimo'] }}) <span aria-hidden="true">›</span></a>

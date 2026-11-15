@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/reportes.css') }}?v={{ @filemtime(public_path('css/reportes.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/admin/comun.css') }}?v={{ @filemtime(public_path('css/modulos/admin/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/reportes/comun.css') }}?v={{ @filemtime(public_path('css/modulos/reportes/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/reportes/admin.css') }}?v={{ @filemtime(public_path('css/modulos/reportes/admin.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Administradora')
@@ -26,7 +27,7 @@
             <div>
                 <p class="eyebrow">Hospital San José de Melipilla</p>
                 <h1>Resumen de gestión</h1>
-                <p class="main-sub">Consulta y supervisa la producción, trazabilidad y entregas del hospital durante el período seleccionado.</p>
+                <p class="main-sub">Producción, trazabilidad y entregas del período.</p>
             </div>
             <div class="main-actions">
                 <a class="btn btn-ghost" href="{{ route('mockups.panel', 'operador') }}">Ver vista operadora</a>

@@ -67,7 +67,7 @@ class ResumenTurnoEnfermera
             $flujo[] = [
                 'nombre' => Caja::etiquetaEtapa($etapa),
                 'cantidad' => $cantidad,
-                // Porcentaje del total: nunca un progreso ficticio del proceso.
+                // Porcentaje del total: nunca un progreso ficticio del ciclo.
                 'porcentaje' => $total > 0 ? round($cantidad / $total * 100, 1) : 0,
             ];
         }

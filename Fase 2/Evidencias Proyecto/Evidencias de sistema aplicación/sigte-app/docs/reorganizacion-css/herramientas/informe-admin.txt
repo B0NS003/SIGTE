@@ -1,0 +1,62 @@
+MUERTOS (58)
+.alert-strip
+.alert-strip-title
+.alert-strip-list
+.alert-item
+.alert-item strong
+.alert-item span
+.alert-item.alert-alta
+.action-row
+.alert-strip-list
+.grid-2
+.phase-sep
+.action-row
+.alert-strip-list
+.nomina-grupo
+.nomina-lista
+.nomina-lista li
+.nomina-lista span
+.nomina-lista
+.aud-relacionadas
+.aud-relacionadas h3
+.aud-relacionadas ul
+.aud-relacionadas li
+.aud-relacionadas li strong
+.aud-relacionadas li
+.rep-armar
+.rep-filtros
+.rep-filtros .field
+.rep-filtros .field > span
+.rep-filtros input[type="date"]
+.rep-hoja
+.rep-hoja .recv-help
+.rep-incluye
+.rep-incluye p
+.rep-incluye label
+#aud-bitacora[hidden]
+#aud-tabla[hidden]
+#aud-vacio[hidden]
+#aud-cadenas-vacio[hidden]
+#aud-cadenas-lista[hidden]
+.rep-hoja
+.rep-hoja-top
+.rep-hoja-top p
+.rep-hoja-top h2
+.rep-formatos
+.rep-excel
+.rep-pdf
+.rep-excel
+.rep-pdf
+.rep-firma
+.rep-firma div
+.rep-firma dt
+.rep-firma dd
+.rep-total
+.rep-total strong
+.rep-hoja h3
+.rep-filtros
+.rep-firma
+.rep-hoja-top
+
+PISADAS (0)
+

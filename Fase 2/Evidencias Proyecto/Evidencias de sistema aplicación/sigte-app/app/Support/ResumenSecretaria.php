@@ -6,7 +6,6 @@ use App\Models\Insumo;
 use App\Models\MovimientoInsumo;
 use App\Models\RegistroProduccion;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 
 /**
  * Datos reales de la página de inicio de Secretaría.
@@ -23,8 +22,34 @@ class ResumenSecretaria
 
         // Indicadores calculados sobre registros diarios, igual que el reporte diario.
         $produccionMes = RegistroProduccion::query()
+            ->with('servicio:id,nombre')
             ->whereBetween('fecha', [$desde, $hasta])
             ->get(['id', 'fecha', 'servicio_id', 'cantidad', 'factor_litros']);
+
+        $porServicio = $produccionMes
+            ->groupBy(fn (RegistroProduccion $r) => $r->servicio_id ?: 0)
+            ->map(function ($filas) {
+                $litros = round((float) $filas->sum(fn ($r) => (float) $r->litros), 2);
+                $unidades = (int) $filas->sum('cantidad');
+
+                return [
+                    'nombre' => $filas->first()->servicio?->nombre ?? 'Sin servicio',
+                    'litros' => $litros,
+                    'unidades' => $unidades,
+                    'registros' => $filas->count(),
+                ];
+            })
+            ->sortByDesc('litros')
+            ->values();
+
+        $maxLitrosServicio = (float) ($porServicio->max('litros') ?? 0);
+        $produccionPorServicio = $porServicio->take(6)->map(function (array $fila) use ($maxLitrosServicio) {
+            $fila['porcentaje'] = $maxLitrosServicio > 0
+                ? round(($fila['litros'] / $maxLitrosServicio) * 100, 1)
+                : 0;
+
+            return $fila;
+        })->all();
 
         $insumos = Insumo::query()
             ->orderBy('nombre')
@@ -52,7 +77,7 @@ class ResumenSecretaria
             $clave = $fecha->format('Y-m');
             $meses[$clave] = [
                 'clave' => $clave,
-                'etiqueta' => ucfirst($fecha->locale('es')->isoFormat('MMM')) . ' ' . $fecha->format('Y'),
+                'etiqueta' => ucfirst($fecha->locale('es')->isoFormat('MMM')).' '.$fecha->format('Y'),
                 'litros' => 0.0,
             ];
         }
@@ -91,9 +116,9 @@ class ResumenSecretaria
             $actividad->push([
                 'tipo' => 'produccion',
                 'titulo' => 'Producción registrada',
-                'detalle' => ($registro->servicio?->nombre ?? 'Sin servicio') . ' · '
-                    . ($registro->material?->nombre ?? 'Material') . ' · '
-                    . number_format((float) $registro->litros, 2, ',', '.') . ' L',
+                'detalle' => ($registro->servicio?->nombre ?? 'Sin servicio').' · '
+                    .($registro->material?->nombre ?? 'Material').' · '
+                    .number_format((float) $registro->litros, 2, ',', '.').' L',
                 'autor' => $registro->usuario?->name ?? 'Sin registrar',
                 'momento' => $registro->created_at?->copy()->timezone('America/Santiago'),
                 'orden' => $registro->created_at?->getTimestamp() ?? 0,
@@ -102,9 +127,9 @@ class ResumenSecretaria
         foreach ($movimientosRecientes as $movimiento) {
             $actividad->push([
                 'tipo' => 'insumo',
-                'titulo' => $movimiento->etiquetaTipo() . ' de insumo',
-                'detalle' => ($movimiento->insumo?->nombre ?? 'Insumo') . ' · '
-                    . number_format((int) $movimiento->cantidad, 0, ',', '.') . ' unidades',
+                'titulo' => $movimiento->etiquetaTipo().' de insumo',
+                'detalle' => ($movimiento->insumo?->nombre ?? 'Insumo').' · '
+                    .number_format((int) $movimiento->cantidad, 0, ',', '.').' unidades',
                 'autor' => $movimiento->autor?->name ?? 'Sin registrar',
                 'momento' => $movimiento->created_at?->copy()->timezone('America/Santiago'),
                 'orden' => $movimiento->created_at?->getTimestamp() ?? 0,
@@ -126,6 +151,8 @@ class ResumenSecretaria
                 'minimo' => $i->minimo,
                 'estado' => $i->estadoStock(),
             ])->all(),
+            'produccion_por_servicio' => $produccionPorServicio,
+            'total_servicios_mes' => $porServicio->count(),
             'actividad' => $actividad->sortByDesc('orden')->take(5)->values()->all(),
             'meses' => array_values($meses),
             'hay_datos_grafico' => $maximo > 0,

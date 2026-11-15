@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/flujo.css') }}?v={{ @filemtime(public_path('css/flujo.css')) }}-ops8">
+    <link rel="stylesheet" href="{{ asset('css/modulos/flujo/comun.css') }}?v={{ @filemtime(public_path('css/modulos/flujo/comun.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modulos/flujo/panel.css') }}?v={{ @filemtime(public_path('css/modulos/flujo/panel.css')) }}">
 @endpush
 
 @section('title', 'SIGTE — Operadora')
@@ -40,16 +41,18 @@
                 <p class="eyebrow">Operación · consulta de cajas</p>
                 <h1>Flujo de cajas</h1>
             </div>
-            <div class="main-actions">
-                <a class="btn btn-dark" href="{{ route('mockups.recepcion') }}">
-                    <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 13.2V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-4.8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-                        <path d="M4 13.2 6.3 7.2A1.6 1.6 0 0 1 7.8 6.2h8.4a1.6 1.6 0 0 1 1.5 1l2.3 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-                        <path d="M4 13.2h4.1a2 2 0 0 0 1.9 1.3h4a2 2 0 0 0 1.9-1.3H20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-                    </svg>
-                    Nueva recepción
-                </a>
-            </div>
+            @if (($usuario['rol'] ?? '') === 'Operadora')
+                <div class="main-actions">
+                    <a class="btn btn-dark" href="{{ route('mockups.recepcion') }}">
+                        <svg class="sigte-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 13.2V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-4.8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                            <path d="M4 13.2 6.3 7.2A1.6 1.6 0 0 1 7.8 6.2h8.4a1.6 1.6 0 0 1 1.5 1l2.3 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                            <path d="M4 13.2h4.1a2 2 0 0 0 1.9 1.3h4a2 2 0 0 0 1.9-1.3H20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                        </svg>
+                        Nueva recepción
+                    </a>
+                </div>
+            @endif
         </div>
 
         @include('flujo.partials.puesto')

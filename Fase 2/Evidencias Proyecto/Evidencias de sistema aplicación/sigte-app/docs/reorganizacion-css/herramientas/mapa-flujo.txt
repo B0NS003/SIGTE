@@ -1,0 +1,525 @@
+    4 legado                       .adv-hero h2
+    4 legado                       .adv-listo h2
+   11 legado                       .adv-hero .badge-urgent
+   12 legado                       .adv-movimiento
+   18 legado                       .adv-listo
+   22 legado                       .adv-listo .eyebrow
+   23 legado                       .adv-pipe
+   24 panel                        #etapa-anotar[hidden]
+   24 panel                        #etapa-chips[hidden]
+   28 entrega+legado               .entrega-panel
+   29 entrega+legado               .entrega-cuerpo
+   35 entrega+legado               .entrega-cuerpo h2
+   36 entrega                      .entrega-titulo
+   41 entrega                      .entrega-titulo .sigte-icon
+   42 entrega                      .entrega-opciones
+   43 entrega                      .entrega-opciones .check
+   50 entrega+legado               .entrega-obs
+   51 entrega+legado               .entrega-obs summary
+   60 entrega+legado               .entrega-obs textarea
+   62 entrega                      .entrega-panel .entrega-obligatorio
+   68 entrega+legado               .entrega-panel .entrega-error-campo
+   75 entrega+legado               .entrega-panel .entrega-campo-invalido
+   79 entrega                      .entrega-panel .entrega-cajas-error
+   85 entrega                      .entrega-panel .entrega-acciones
+   92 entrega                      .entrega-panel .entrega-estado
+   96 entrega                      .entrega-panel .entrega-mensaje
+  104 entrega                      .entrega-panel .entrega-mensaje-icono
+  114 entrega                      .entrega-panel .entrega-mensaje strong
+  118 entrega                      .entrega-panel .entrega-mensaje p
+  121 entrega                      .entrega-panel .entrega-mensaje-error
+  126 entrega                      .entrega-panel .entrega-mensaje-error .entrega-mensaje-icono
+  130 entrega                      .entrega-panel .entrega-mensaje-exito
+  135 entrega                      .entrega-panel .entrega-mensaje-exito .entrega-mensaje-icono
+  141 panel                        html[data-tema="oscuro"] .ops-etapa--recepcion
+  142 panel                        html[data-tema="oscuro"] .ops-etapa--lavado
+  143 panel                        html[data-tema="oscuro"] .ops-etapa--preparacion
+  144 panel                        html[data-tema="oscuro"] .ops-etapa--esterilizacion
+  145 panel                        html[data-tema="oscuro"] .ops-etapa--almacen
+  146 panel                        html[data-tema="oscuro"] .ops-etapa--entrega
+  147 panel                        html[data-tema="oscuro"] .ops-etapa
+  151 panel                        html[data-tema="oscuro"] .ops-etapa-head
+  154 panel                        html[data-tema="oscuro"] .ops-etapa[open] > .ops-etapa-head
+  158 panel                        html[data-tema="oscuro"] .track-card
+  162 panel                        html[data-tema="oscuro"] .track-card:hover
+  165 panel+recepcion+entrega      html[data-tema="oscuro"] .puesto-cambiar select
+  170 panel+recepcion+entrega      html[data-tema="oscuro"] .puesto-cambiar:focus-within
+  175 panel                        html[data-tema="oscuro"] .track-card .field
+  175 NINGUNA                      html[data-tema="oscuro"] .track-card .entrega-dato
+  179 panel+legado                 html[data-tema="oscuro"] .track-node
+  184 panel+legado                 html[data-tema="oscuro"] .track-line
+  184 panel                        html[data-tema="oscuro"] .proceso-pista
+  188 panel+legado                 html[data-tema="oscuro"] .track-step.done .track-node
+  188 panel+legado                 html[data-tema="oscuro"] .track-step.current .track-node
+  194 panel+legado                 html[data-tema="oscuro"] .track-step.current .track-node
+  197 panel+legado                 html[data-tema="oscuro"] .track-step.current .track-label
+  197 legado                       html[data-tema="oscuro"] .track-step.next .track-label
+  197 panel                        html[data-tema="oscuro"] .track-summary-label
+  197 panel                        html[data-tema="oscuro"] .track-more summary
+  203 panel+legado                 html[data-tema="oscuro"] .track-line.done
+  203 panel                        html[data-tema="oscuro"] .proceso-barra
+  210 panel                        html[data-tema="oscuro"] .track-card.is-proceso-listo
+  215 panel                        html[data-tema="oscuro"] .proceso.is-listo .proceso-barra
+  215 panel                        html[data-tema="oscuro"] .track-card.is-proceso-listo .track-line.done
+  220 panel                        html[data-tema="oscuro"] .track-card.is-proceso-listo .track-node
+  225 panel                        html[data-tema="oscuro"] .track-card.is-proceso-listo .track-step.done .track-node
+  225 panel                        html[data-tema="oscuro"] .track-card.is-proceso-listo .track-step.current .track-node
+  231 panel                        html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-node
+  236 panel                        html[data-tema="oscuro"] .track-card.is-urgent:not(.is-proceso-listo) .track-line
+  241 NINGUNA                      .ops-lane-legend
+  248 NINGUNA                      .ops-legend-item
+  261 NINGUNA                      .ops-dot
+  273 panel                        .ops-board
+  279 panel                        .ops-toolbar
+  288 panel                        .ops-consulta
+  292 panel+recepcion+entrega      .puesto-card
+  301 panel+recepcion+entrega      .puesto-card.is-empty
+  306 panel+recepcion+entrega      .puesto-card-main
+  313 panel+recepcion+entrega      .puesto-avatar
+  328 panel+recepcion+entrega      .puesto-card.is-ok .puesto-avatar::after
+  340 panel+recepcion+entrega      .puesto-card.is-empty .puesto-avatar
+  346 panel+recepcion+entrega      .puesto-card-texto
+  350 panel+recepcion+entrega      .puesto-kicker
+  359 panel+recepcion+entrega      .puesto-kicker span
+  363 panel+recepcion+entrega      .puesto-card.is-empty .puesto-kicker
+  367 panel+recepcion+entrega      .puesto-nombre
+  379 panel+recepcion+entrega      .puesto-meta
+  387 panel+recepcion+entrega      .puesto-cambiar
+  399 panel+recepcion+entrega      .puesto-cambiar:hover
+  403 panel+recepcion+entrega      .puesto-cambiar:focus-within
+  409 panel+recepcion+entrega      .puesto-cambiar.is-principal
+  415 panel+recepcion+entrega      .puesto-cambiar .sigte-lista-boton
+  415 panel+recepcion+entrega      .puesto-cambiar .sigte-lista-boton.is-vacio
+  423 panel+recepcion+entrega      .puesto-cambiar.is-principal .sigte-lista-boton
+  423 panel+recepcion+entrega      .puesto-cambiar.is-principal .sigte-lista-boton svg
+  428 panel+recepcion+entrega      .puesto-cambiar select
+  440 panel+recepcion+entrega      .puesto-cambiar select:focus
+  444 panel+recepcion+entrega      .puesto-card .sigte-error
+  449 panel+recepcion+entrega      [@media (max-width: 720px)] .puesto-card-main
+  453 panel+recepcion+entrega      [@media (max-width: 720px)] .puesto-cambiar
+  453 panel+recepcion+entrega      [@media (max-width: 720px)] .puesto-cambiar.is-principal
+  460 panel                        .ops-search
+  467 panel                        .ops-search-go
+  473 panel                        .ops-search-clear
+  482 panel                        .ops-search-clear:hover
+  488 panel                        .ops-search-field
+  503 panel                        .ops-search-field:focus-within
+  511 panel                        .ops-search input[type="search"]
+  522 panel                        .ops-search input[type="search"]:focus
+  526 panel                        .ops-filters
+  530 panel                        .ops-result-meta
+  536 panel                        .ops-etapa
+  548 panel                        .ops-etapa+.ops-etapa
+  553 panel                        .ops-etapa--recepcion
+  558 panel                        .ops-etapa--lavado
+  563 panel                        .ops-etapa--preparacion
+  568 panel                        .ops-etapa--esterilizacion
+  573 panel                        .ops-etapa--almacen
+  578 panel                        .ops-etapa--entrega
+  583 panel                        .ops-etapa[open]
+  588 panel                        .ops-etapa-head
+  603 panel                        .ops-etapa[open]>.ops-etapa-head
+  608 panel                        .ops-etapa-head::-webkit-details-marker
+  612 panel                        .ops-etapa-head h2::before
+  624 panel                        .ops-etapa[open]>.ops-etapa-head h2::before
+  629 panel                        .ops-etapa-head h2
+  636 panel                        .ops-etapa-resumen
+  644 panel                        .ops-etapa-chip
+  658 panel                        .ops-etapa-chip svg
+  664 panel                        .ops-etapa-chip em
+  671 panel                        .ops-etapa-chip-total
+  676 panel                        .ops-etapa-chip-urgent
+  680 panel                        .ops-etapa-chip-listo
+  684 panel                        .ops-etapa-chip.is-empty
+  689 panel                        .ops-etapa-panel
+  694 panel                        .ops-etapa-list
+  703 panel                        .ops-etapa-list.is-kds
+  722 panel                        .ops-etapa-list.is-kds::-webkit-scrollbar
+  726 panel                        .ops-etapa-list.is-kds::-webkit-scrollbar-thumb
+  731 panel                        .ops-etapa-list.is-kds::-webkit-scrollbar-track
+  736 panel                        .ops-etapa-foot
+  747 panel                        .ops-etapa-foot p
+  754 panel                        .ops-etapa-foot strong
+  759 panel                        .ops-etapa-next span
+  764 panel                        .ops-etapa-list>.track-card
+  770 panel                        .ops-etapa-list>.track-card .track-pipe
+  775 panel                        .ops-etapa-list>.track-card .track-step
+  779 panel                        .ops-etapa-list>.track-card .track-label
+  788 panel                        .ops-etapa-list>.track-card .track-node
+  793 panel                        .ops-etapa-list>.track-card .track-node svg
+  798 panel                        .ops-etapa-list>.track-card .track-line
+  803 panel                        .ops-etapa-list>.track-card .track-meta
+  811 panel                        .ops-etapa-list>.track-card .track-detalle
+  817 panel                        [@media (max-width: 900px)] .ops-etapa-list
+  817 panel                        [@media (max-width: 900px)] .ops-etapa-list.is-kds
+  823 panel                        .ops-empty
+  834 panel                        .ops-empty strong
+  841 panel                        .ops-empty p
+  845 panel                        .ops-empty a
+  850 at                           @keyframes track-card-in
+  862 at                           @keyframes track-node-pulse
+  874 panel                        .track-card
+  883 panel                        .track-card:hover
+  888 panel                        .track-card.is-urgent:not(.is-proceso-listo)
+  893 panel                        .track-head
+  902 panel                        .track-head-main
+  907 panel                        .track-title
+  914 panel                        .track-title .badge-urgent
+  914 panel                        .track-title .badge-listo
+  922 panel                        .track-title .badge-urgent
+  926 at                           @keyframes badge-bell-ring
+  963 panel                        .badge-urgent-bell
+  969 panel                        .ops-etapa-chip-urgent:not(.is-empty) .badge-urgent-bell
+  973 panel                        .track-title .badge-listo
+  977 panel                        .track-meta
+  988 panel                        .track-meta-sep
+  992 NINGUNA                      .track-meta-tiempo
+  997 panel                        .track-meta-sala
+ 1002 panel                        .track-meta-persona
+ 1007 NINGUNA                      .track-head-side
+ 1015 panel                        .track-foot-bar
+ 1026 panel                        .track-more
+ 1032 panel                        .track-more>summary
+ 1046 panel                        .track-more>summary:hover
+ 1051 panel                        .track-summary-label
+ 1060 panel                        .track-card.is-proceso-listo .track-more>summary
+ 1065 panel                        .track-card.is-proceso-listo .track-more>summary:hover
+ 1070 panel                        .track-card.is-proceso-listo .track-summary-label
+ 1074 panel                        .track-card.is-proceso-listo .track-more[open]>summary
+ 1079 panel                        .track-card.is-proceso-listo .track-more[open]>summary .track-summary-label
+ 1083 panel                        .track-more>summary::-webkit-details-marker
+ 1087 panel                        .track-summary-label::before
+ 1092 panel                        .track-more[open]>summary .track-summary-label::before
+ 1096 panel                        .track-more[open]>summary
+ 1102 panel                        .track-more[open]>summary .track-summary-label
+ 1106 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-more>summary:hover
+ 1110 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-summary-label
+ 1115 panel                        .track-detalle
+ 1127 panel                        .track-dato
+ 1139 panel                        .track-dato:last-child
+ 1144 panel                        .track-dato-icono
+ 1156 panel                        .track-dato-icono svg
+ 1161 panel                        .track-dato-texto
+ 1169 panel                        .track-dato-label
+ 1178 panel                        .track-dato strong
+ 1186 panel                        .track-foot-bar .track-card-actions
+ 1194 panel                        [@media (min-width: 901px)] .track-more
+ 1199 panel                        [@media (min-width: 901px)] .track-more>summary
+ 1203 panel                        [@media (min-width: 901px)] .track-foot-bar .track-card-actions
+ 1208 panel                        [@media (min-width: 901px)] .track-detalle
+ 1215 panel                        [@media (min-width: 901px)] .track-dato
+ 1215 panel                        [@media (min-width: 901px)] .track-dato:last-child
+ 1223 panel                        [@media (max-width: 900px)] .track-foot-bar
+ 1227 panel                        [@media (max-width: 900px)] .track-detalle
+ 1231 panel                        [@media (max-width: 900px)] .track-foot-bar .track-card-actions
+ 1239 NINGUNA                      .track-estado
+ 1245 panel                        .track-head h2
+ 1253 panel+legado                 .track-pipe
+ 1262 NINGUNA                      .track-pipe-compact
+ 1269 panel+legado                 .track-step
+ 1275 NINGUNA                      .track-pipe-compact .track-step
+ 1279 panel+legado                 .track-node
+ 1296 panel+legado                 .track-node svg
+ 1305 NINGUNA                      .track-pipe-compact .track-node
+ 1310 panel+legado                 .track-step.done .track-node
+ 1316 panel+legado                 .track-step.current .track-node
+ 1324 panel+legado                 .track-label
+ 1332 panel+legado                 .track-step.current .track-label
+ 1337 panel+legado                 .track-line
+ 1346 NINGUNA                      .track-pipe-compact .track-line
+ 1352 panel+legado                 .track-line.done
+ 1363 at                           @keyframes track-line-flow
+ 1374 panel+legado                 [@media (max-width: 640px)] .track-label
+ 1386 panel+legado                 [@media (max-width: 640px)] .track-step
+ 1391 panel+legado                 [@media (max-width: 640px)] .track-pipe
+ 1399 panel                        [@media (prefers-reduced-motion: reduce)] .ops-etapa-list>.track-card
+ 1399 panel                        [@media (prefers-reduced-motion: reduce)] .track-card
+ 1404 panel+legado                 [@media (prefers-reduced-motion: reduce)] .track-step.current .track-node
+ 1408 panel                        [@media (prefers-reduced-motion: reduce)] .badge-urgent-bell
+ 1412 panel+legado                 [@media (prefers-reduced-motion: reduce)] .track-line.done
+ 1412 panel                        [@media (prefers-reduced-motion: reduce)] .proceso-barra
+ 1412 panel                        [@media (prefers-reduced-motion: reduce)] .track-card.is-proceso-listo .track-line.done
+ 1419 panel+legado                 [@media (prefers-reduced-motion: reduce)] .track-line.done
+ 1419 panel+legado                 [@media (prefers-reduced-motion: reduce)] .track-node
+ 1425 NINGUNA                      .track-facts
+ 1432 NINGUNA                      .track-facts div
+ 1439 NINGUNA                      .track-facts dt
+ 1448 NINGUNA                      .track-facts dd
+ 1455 NINGUNA                      .track-facts small
+ 1463 NINGUNA                      [@media (max-width: 900px)] .track-facts
+ 1468 NINGUNA                      .track-foot
+ 1478 NINGUNA                      .track-foot>span
+ 1483 NINGUNA                      .track-actions
+ 1490 recepcion+legado             .recv-layout
+ 1497 recepcion+entrega+legado     .recv-form .field
+ 1501 recepcion+entrega+legado     .recv-textarea
+ 1514 recepcion+entrega+legado     .recv-textarea:focus
+ 1521 NINGUNA                      .sala-tabs.ops-filters
+ 1525 legado                       .act-barra
+ 1532 legado                       .act-barra span
+ 1539 legado                       .act-aviso
+ 1543 legado                       .act-suma
+ 1549 legado                       .act-suma h2
+ 1553 panel+legado                 .act-lista
+ 1561 panel+legado                 .act-lista li
+ 1572 panel+legado                 .act-lista strong
+ 1577 panel+legado                 .act-lista span
+ 1583 recepcion+entrega+legado     .recv-actions
+ 1592 recepcion+legado             .recv-side
+ 1598 panel+recepcion+entrega+legado .recv-help
+ 1606 recepcion+legado             [@media (max-width: 1000px)] .recv-layout
+ 1610 entrega+legado               [@media (max-width: 1000px)] .entrega-cuerpo
+ 1615 NINGUNA                      .act-etapa
+ 1619 legado                       .track-step.next .track-node
+ 1624 legado                       .track-step.next .track-label
+ 1628 NINGUNA                      .cuenta-alta
+ 1632 NINGUNA                      .cuenta-grid
+ 1638 NINGUNA                      .cuenta-grid .field
+ 1642 NINGUNA                      .cuenta-grid .field input
+ 1642 NINGUNA                      .cuenta-grid .field select
+ 1647 NINGUNA                      .cuenta-pie
+ 1656 NINGUNA                      .cuenta-pie .recv-actions
+ 1663 NINGUNA                      [@media (max-width: 1100px)] .cuenta-grid
+ 1668 NINGUNA                      .track-head-badges
+ 1678 NINGUNA                      .track-head-badges .badge-sala
+ 1684 panel                        .track-card-actions
+ 1691 panel                        .flujo-modal
+ 1703 panel                        .flujo-modal::backdrop
+ 1707 panel                        .flujo-modal-cuerpo
+ 1711 panel                        .flujo-modal-top
+ 1719 panel                        .flujo-modal h2
+ 1726 panel                        .flujo-paso
+ 1734 panel                        .flujo-paso-titulo
+ 1742 panel                        .flujo-paso-titulo strong
+ 1746 panel                        .flujo-paso-resumen
+ 1753 panel                        .flujo-paso .field-label
+ 1757 panel                        .flujo-paso .flujo-chips
+ 1761 panel                        .flujo-paso .flujo-modal-acciones
+ 1765 panel                        .flujo-modal #etapa-historial
+ 1769 panel                        .flujo-modal-acciones
+ 1777 panel                        .flujo-modal-acciones .btn
+ 1782 panel                        .flujo-modal-acciones .btn-primary
+ 1782 panel                        .flujo-modal-acciones a.btn-primary
+ 1787 panel                        .flujo-modal [hidden]
+ 1787 panel                        .flujo-aviso[hidden]
+ 1792 panel                        .flujo-motivo
+ 1805 panel                        .flujo-motivo:focus
+ 1811 panel                        .track-card-actions .btn-corregir
+ 1823 panel                        .track-card-actions .btn-corregir .sigte-icon
+ 1829 panel                        .track-card-actions .btn-corregir:hover
+ 1836 panel                        .track-card-actions .btn-dark
+ 1843 panel                        .track-card.is-proceso-listo .btn-corregir
+ 1848 panel                        .track-card.is-proceso-listo .btn-corregir:hover
+ 1852 panel                        .track-card.is-urgent:not(.is-proceso-listo) .btn-corregir
+ 1858 panel                        .flujo-pasar
+ 1864 panel                        .flujo-pasar.is-solo
+ 1872 panel                        .flujo-pasar .flujo-paso-titulo
+ 1876 panel                        .flujo-pasar .flujo-paso-resumen
+ 1880 panel                        .flujo-pasar .flujo-modal-acciones
+ 1884 panel                        .flujo-tiempo
+ 1891 panel                        .flujo-minutos
+ 1903 panel                        .flujo-minutos:focus
+ 1909 panel                        .flujo-chips
+ 1916 panel                        .flujo-chip
+ 1920 panel                        .flujo-detalle
+ 1931 panel                        .flujo-detalle:focus
+ 1937 panel                        .flujo-ruta
+ 1947 panel                        .flujo-ruta .sigte-icon
+ 1953 panel                        .flujo-ruta-desde
+ 1957 panel                        .flujo-ruta-hacia
+ 1961 panel                        .flujo-sin-puesto
+ 1977 panel                        .flujo-sin-puesto p
+ 1981 panel                        .flujo-sin-puesto .btn
+ 1989 panel                        .flujo-paso-cabeza
+ 1996 panel                        .flujo-opcional
+ 2004 panel                        #etapa-anotar .flujo-paso-resumen
+ 2008 panel                        .flujo-tiempo-texto
+ 2016 panel                        .flujo-tiempo-texto strong
+ 2022 panel                        .flujo-tiempo-texto small
+ 2028 panel                        .flujo-tiempo.is-hecho .flujo-tiempo-texto small
+ 2028 panel                        .flujo-chip.is-hecho
+ 2033 panel                        .flujo-tiempo.is-hecho .flujo-tiempo-texto small::before
+ 2033 panel                        .flujo-chip.is-hecho::before
+ 2038 panel                        .flujo-chip.is-hecho
+ 2043 panel                        .flujo-chip:disabled
+ 2043 panel                        .flujo-minutos:disabled
+ 2043 panel                        .flujo-modal .btn:disabled
+ 2052 panel                        .flujo-pendiente
+ 2063 panel                        .flujo-modal a.btn[aria-disabled="true"]
+ 2068 panel                        .flujo-historial
+ 2074 panel                        .flujo-historial summary
+ 2082 panel                        .flujo-historial summary::-webkit-details-marker
+ 2086 panel                        .flujo-historial summary::before
+ 2091 panel                        .flujo-historial[open] summary::before
+ 2095 panel                        .flujo-historial .act-lista
+ 2101 panel                        .flujo-historial .act-lista strong
+ 2105 panel                        .track-card-actions .btn-anotar
+ 2112 panel                        .track-card-actions .btn-anotar .sigte-icon
+ 2117 panel                        .ops-etapa-list>.track-card.is-recien
+ 2121 at                           @keyframes flujo-recien
+ 2126 panel                        .flujo-aviso
+ 2145 panel                        .flujo-aviso > .sigte-icon
+ 2152 panel                        html[data-tema="oscuro"] .flujo-aviso
+ 2158 panel                        html[data-tema="oscuro"] .flujo-aviso > .sigte-icon
+ 2162 panel                        .flujo-aviso p
+ 2169 panel                        .flujo-aviso-cerrar
+ 2181 panel                        .flujo-aviso-cerrar:hover
+ 2185 panel                        .flujo-aviso-cerrar .sigte-icon
+ 2190 at                           @keyframes flujo-aviso-entra
+ 2196 panel                        [@media (prefers-reduced-motion: reduce)] .ops-etapa-list>.track-card.is-recien
+ 2196 panel                        [@media (prefers-reduced-motion: reduce)] .flujo-aviso
+ 2201 panel                        [@media (prefers-reduced-motion: reduce)] .ops-etapa-list>.track-card.is-recien
+ 2206 panel                        .proceso
+ 2215 panel                        .proceso-etiqueta
+ 2222 panel                        .proceso.is-listo .proceso-pista
+ 2222 panel                        .proceso.is-sin-proceso .proceso-pista
+ 2227 panel                        .proceso[hidden]
+ 2227 panel                        .badge-listo[hidden]
+ 2232 panel                        .proceso-pista
+ 2242 panel                        [@media (max-width: 640px)] .proceso
+ 2249 panel                        .proceso-barra
+ 2263 panel                        .proceso.is-listo .proceso-barra
+ 2273 panel                        .proceso-texto
+ 2283 panel                        .proceso:not(.is-listo, .is-sin-proceso) .proceso-texto
+ 2287 panel                        .proceso.is-listo .proceso-etiqueta
+ 2292 panel                        .track-card.is-proceso-listo
+ 2298 panel                        .track-card.is-proceso-listo .track-head h2
+ 2302 panel                        .track-card.is-proceso-listo .track-head p
+ 2302 panel                        .track-card.is-proceso-listo .track-label
+ 2307 panel                        .track-card.is-proceso-listo .track-dato-icono
+ 2312 panel                        .track-card.is-proceso-listo .badge
+ 2312 NINGUNA                      .track-card.is-proceso-listo .badge-sala
+ 2312 NINGUNA                      .track-card.is-proceso-listo .badge-lavado
+ 2312 NINGUNA                      .track-card.is-proceso-listo .badge-armado
+ 2312 NINGUNA                      .track-card.is-proceso-listo .badge-esteril
+ 2322 panel                        .track-card.is-proceso-listo .badge-listo
+ 2328 panel                        .track-card.is-proceso-listo .track-node
+ 2334 panel                        .track-card.is-proceso-listo .track-line
+ 2338 panel                        .track-card.is-proceso-listo .track-step.done .track-node
+ 2344 panel                        .track-card.is-proceso-listo .track-line.done
+ 2355 panel                        .track-card.is-proceso-listo .track-step.current .track-node
+ 2363 panel                        .track-card.is-proceso-listo .track-step.current .track-node svg
+ 2368 at                           @keyframes track-node-pulse-listo
+ 2380 panel                        .track-card.is-proceso-listo .track-step.current .track-label
+ 2380 panel                        .track-card.is-proceso-listo .proceso-texto
+ 2380 panel                        .track-card.is-proceso-listo .track-summary-label
+ 2386 panel                        .track-card.is-proceso-listo .btn-dark
+ 2390 panel                        .track-card.is-proceso-listo .btn-anotar
+ 2396 panel                        .track-card.is-proceso-listo .btn-anotar:hover
+ 2401 NINGUNA                      .track-card.is-proceso-listo .track-facts div
+ 2406 NINGUNA                      .track-card.is-proceso-listo .track-facts dt
+ 2410 NINGUNA                      .track-card.is-proceso-listo .track-facts dd
+ 2414 panel                        .track-card.is-urgent:not(.is-proceso-listo)
+ 2420 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-head h2
+ 2424 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-head p
+ 2424 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-label
+ 2429 panel                        .track-card.is-urgent:not(.is-proceso-listo) .badge
+ 2429 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .badge-sala
+ 2429 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .badge-lavado
+ 2429 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .badge-armado
+ 2429 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .badge-esteril
+ 2429 panel                        .track-card.is-urgent:not(.is-proceso-listo) .badge-listo
+ 2440 panel                        .track-card.is-urgent .badge-urgent
+ 2446 panel                        .track-card.is-urgent:not(.is-proceso-listo) .badge:not(.badge-urgent):not(.badge-listo)
+ 2453 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-node
+ 2459 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-line
+ 2463 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-step.done .track-node
+ 2463 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-line.done
+ 2470 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-step.current .track-node
+ 2478 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-step.current .track-label
+ 2478 panel                        .track-card.is-urgent:not(.is-proceso-listo) .proceso-texto
+ 2478 panel                        .track-card.is-urgent:not(.is-proceso-listo) .track-summary-label
+ 2484 panel                        .track-card.is-urgent:not(.is-proceso-listo) .btn-dark
+ 2489 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .track-facts div
+ 2494 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .track-facts dt
+ 2498 NINGUNA                      .track-card.is-urgent:not(.is-proceso-listo) .track-facts dd
+ 2502 panel                        .track-card.is-proceso-listo:hover
+ 2507 panel                        .track-card.is-urgent:not(.is-proceso-listo):hover
+ 2512 panel                        .shell-ops .btn-dark:hover
+ 2512 panel                        .flujo-modal .btn-primary:hover
+ 2519 panel+recepcion+entrega+legado .shell-ops .btn-ghost:hover
+ 2519 panel                        .flujo-modal .btn-ghost:hover
+ 2527 panel                        .shell-ops .btn-dark:active
+ 2527 panel+recepcion+entrega+legado .shell-ops .btn-ghost:active
+ 2527 panel                        .flujo-modal .btn:active
+ 2533 panel                        .track-card.is-proceso-listo .btn-corregir:hover
+ 2539 panel                        .track-card.is-urgent:not(.is-proceso-listo) .btn-corregir:hover
+ 2547 panel                        [@media (prefers-reduced-motion: reduce)] .shell-ops .btn-dark:hover
+ 2547 panel+recepcion+entrega+legado [@media (prefers-reduced-motion: reduce)] .shell-ops .btn-ghost:hover
+ 2547 panel                        [@media (prefers-reduced-motion: reduce)] .flujo-modal .btn:hover
+ 2547 panel+recepcion+entrega+legado [@media (prefers-reduced-motion: reduce)] .shell-ops .btn:active
+ 2547 panel                        [@media (prefers-reduced-motion: reduce)] .flujo-modal .btn:active
+ 2557 recepcion                    .recv-catalogo-layout
+ 2562 recepcion                    .recv-catalogo-form
+ 2562 recepcion                    .recv-resumen
+ 2567 recepcion                    .recv-catalogo-form .panel-head
+ 2571 recepcion                    .recv-progreso
+ 2579 recepcion                    .recv-progreso span
+ 2587 recepcion                    .recv-campo
+ 2592 recepcion                    .recv-campo.is-bloqueado
+ 2596 recepcion                    .recv-campo .field-label
+ 2603 recepcion                    .recv-num
+ 2615 recepcion                    .recv-obligatorio
+ 2619 recepcion                    .recv-select
+ 2619 recepcion                    .recv-input
+ 2633 recepcion                    .recv-select:disabled
+ 2633 recepcion                    .recv-input:disabled
+ 2638 recepcion                    .recv-select:focus
+ 2638 recepcion                    .recv-input:focus
+ 2646 recepcion                    .recv-campo small
+ 2653 recepcion                    .recv-catalogo-form .recv-textarea
+ 2657 recepcion                    .recv-guardar:disabled
+ 2662 recepcion                    .recv-resumen-vacio
+ 2670 recepcion                    .recv-resumen-vacio strong
+ 2676 recepcion                    .recv-resumen-vacio p
+ 2683 recepcion                    .recv-cubo
+ 2688 recepcion                    .recv-resumen-titulo
+ 2695 recepcion                    .recv-resumen dl
+ 2701 recepcion                    .recv-resumen dl div
+ 2710 recepcion                    .recv-resumen dt
+ 2714 recepcion                    .recv-resumen dd
+ 2721 NINGUNA                      .recv-alert
+ 2730 NINGUNA                      .recv-alert ul
+ 2736 recepcion                    [@media(max-width:1000px)] .recv-catalogo-layout
+ 2741 recepcion                    .recv-notificacion
+ 2752 recepcion                    .recv-notificacion-exito
+ 2758 recepcion                    .recv-notificacion-error
+ 2764 recepcion                    .recv-notificacion-icono
+ 2776 recepcion                    .recv-notificacion-icono::first-letter
+ 2780 recepcion                    .recv-notificacion-exito .recv-notificacion-icono
+ 2786 recepcion                    .recv-notificacion-error .recv-notificacion-icono
+ 2792 recepcion                    .recv-notificacion-contenido
+ 2796 recepcion                    .recv-notificacion-contenido strong
+ 2802 recepcion                    .recv-notificacion-contenido p
+ 2807 recepcion                    .recv-notificacion-contenido ul
+ 2812 recepcion                    .recv-notificacion-contenido li
+ 2816 recepcion                    .recv-notificacion-enlace
+ 2828 entrega                      .entrega-panel .entrega-servicio-control
+ 2834 entrega                      .entrega-panel #entrega-servicio-toggle
+ 2857 entrega                      .entrega-panel #entrega-servicio-toggle.sin-seleccion
+ 2861 entrega                      .entrega-panel #entrega-servicio-toggle:hover
+ 2865 entrega                      .entrega-panel #entrega-servicio-toggle:focus-visible
+ 2865 entrega                      .entrega-panel #entrega-servicio-toggle[aria-expanded="true"]
+ 2873 entrega                      .entrega-panel #entrega-servicio-toggle.entrega-campo-invalido
+ 2877 entrega                      .entrega-panel #entrega-servicio-toggle .entrega-servicio-casa
+ 2884 entrega                      .entrega-panel #entrega-servicio-valor
+ 2892 entrega                      .entrega-panel #entrega-servicio-toggle .entrega-servicio-flecha
+ 2901 entrega                      .entrega-panel #entrega-servicio-toggle[aria-expanded="true"] .entrega-servicio-flecha
+ 2905 entrega                      .entrega-panel #entrega-servicio-lista
+ 2921 entrega                      .entrega-panel #entrega-servicio-lista[hidden]
+ 2921 entrega                      .entrega-panel #entrega-servicio-vacio[hidden]
+ 2921 entrega                      .entrega-panel #entrega-servicio-error-js[hidden]
+ 2921 entrega                      .entrega-panel .entrega-servicio-opcion[hidden]
+ 2928 entrega                      .entrega-panel #entrega-servicio-buscar
+ 2942 entrega                      .entrega-panel #entrega-servicio-buscar:focus
+ 2949 entrega                      .entrega-panel .entrega-servicio-opciones
+ 2957 entrega                      .entrega-panel .entrega-servicio-opcion
+ 2977 entrega                      .entrega-panel .entrega-servicio-opcion:hover
+ 2977 entrega                      .entrega-panel .entrega-servicio-opcion:focus-visible
+ 2977 entrega                      .entrega-panel .entrega-servicio-opcion[aria-selected="true"]
+ 2985 entrega                      .entrega-panel #entrega-servicio-vacio
+ 2992 entrega                      .entrega-panel #entrega-servicio-error-js
+ 2996 entrega+legado               .entrega-dato strong
+ 3004 panel+recepcion+entrega+legado .field-label
+ 3015 entrega                      [@media (max-width: 640px)] .entrega-panel #entrega-servicio-toggle
+ 3015 entrega                      [@media (max-width: 640px)] .entrega-panel .entrega-servicio-opcion

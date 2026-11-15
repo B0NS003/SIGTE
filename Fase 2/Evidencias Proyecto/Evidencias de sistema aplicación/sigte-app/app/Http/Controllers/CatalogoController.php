@@ -9,6 +9,7 @@ use App\Models\Instrumento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CatalogoController extends Controller
@@ -230,12 +231,12 @@ class CatalogoController extends Controller
         $codigo = mb_strtoupper(trim($datos['codigo']));
         $nombre = trim($datos['nombre_conjunto']);
         if ($codigo === '' || $nombre === '') {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'codigo' => 'El código y el nombre son obligatorios.',
             ]);
         }
         if (DB::table('tipo_conjunto')->whereRaw('UPPER(codigo) = ?', [$codigo])->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'codigo' => 'Ya existe un tipo de conjunto con ese código.',
             ]);
         }
@@ -245,8 +246,12 @@ class CatalogoController extends Controller
             'nombre_conjunto' => $nombre,
             'servicio_id' => (int) $datos['servicio_id'],
         ];
-        if (Schema::hasColumn('tipo_conjunto', 'created_at')) $valores['created_at'] = now();
-        if (Schema::hasColumn('tipo_conjunto', 'updated_at')) $valores['updated_at'] = now();
+        if (Schema::hasColumn('tipo_conjunto', 'created_at')) {
+            $valores['created_at'] = now();
+        }
+        if (Schema::hasColumn('tipo_conjunto', 'updated_at')) {
+            $valores['updated_at'] = now();
+        }
         $id = DB::table('tipo_conjunto')->insertGetId($valores);
 
         return response()->json([

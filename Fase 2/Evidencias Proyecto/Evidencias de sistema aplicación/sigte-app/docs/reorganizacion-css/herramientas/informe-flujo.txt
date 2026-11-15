@@ -1,0 +1,56 @@
+MUERTOS (48)
+html[data-tema="oscuro"] .track-card .entrega-dato
+.ops-lane-legend
+.ops-legend-item
+.ops-dot
+.track-meta-tiempo
+.track-head-side
+.track-estado
+.track-pipe-compact
+.track-pipe-compact .track-step
+.track-pipe-compact .track-node
+.track-pipe-compact .track-line
+.track-facts
+.track-facts div
+.track-facts dt
+.track-facts dd
+.track-facts small
+.track-facts
+.track-foot
+.track-foot>span
+.track-actions
+.sala-tabs.ops-filters
+.act-etapa
+.cuenta-alta
+.cuenta-grid
+.cuenta-grid .field
+.cuenta-grid .field input
+.cuenta-grid .field select
+.cuenta-pie
+.cuenta-pie .recv-actions
+.cuenta-grid
+.track-head-badges
+.track-head-badges .badge-sala
+.track-card.is-proceso-listo .badge-sala
+.track-card.is-proceso-listo .badge-lavado
+.track-card.is-proceso-listo .badge-armado
+.track-card.is-proceso-listo .badge-esteril
+.track-card.is-proceso-listo .track-facts div
+.track-card.is-proceso-listo .track-facts dt
+.track-card.is-proceso-listo .track-facts dd
+.track-card.is-urgent:not(.is-proceso-listo) .badge-sala
+.track-card.is-urgent:not(.is-proceso-listo) .badge-lavado
+.track-card.is-urgent:not(.is-proceso-listo) .badge-armado
+.track-card.is-urgent:not(.is-proceso-listo) .badge-esteril
+.track-card.is-urgent:not(.is-proceso-listo) .track-facts div
+.track-card.is-urgent:not(.is-proceso-listo) .track-facts dt
+.track-card.is-urgent:not(.is-proceso-listo) .track-facts dd
+.recv-alert
+.recv-alert ul
+
+PISADAS (5)
+.track-card.is-urgent:not(.is-proceso-listo) → border-color
+.track-card.is-urgent:not(.is-proceso-listo) → box-shadow
+.track-card.is-proceso-listo .track-summary-label → color
+.track-card.is-urgent:not(.is-proceso-listo) .track-summary-label → color
+.track-card.is-proceso-listo .btn-corregir:hover → color

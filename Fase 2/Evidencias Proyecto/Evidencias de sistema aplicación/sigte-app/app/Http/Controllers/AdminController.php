@@ -25,9 +25,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -455,7 +455,7 @@ class AdminController extends Controller
     {
         return redirect()->route('mockups.panel', array_merge(
             ['rol' => Rol::ADMINISTRADORA],
-            $request->only(['desde', 'hasta', 'tipo', 'servicio', 'tab'])
+            $request->only(['desde', 'hasta', 'tipo', 'servicio'])
         ));
     }
 
@@ -574,8 +574,7 @@ class AdminController extends Controller
         $datos = ReporteAdmin::datos($filtros, true);
         $nombre = 'sigte-'.$tab.'-'.$filtros['desde'].'_'.$filtros['hasta'].'.pdf';
 
-        return Pdf::loadView('admin.partials.reportes', [
-            'modo_pdf' => true,
+        return Pdf::loadView('admin.reportes-pdf', [
             'tab' => $tab,
             'filtros' => $filtros,
             'datos' => $datos,
@@ -617,7 +616,7 @@ class AdminController extends Controller
      * Escribe texto como texto, no como fórmula. Esto también protege el XLSX de
      * valores ingresados por usuarios que comiencen con =, +, - o @.
      *
-     * @param iterable<array<int, mixed>> $filas
+     * @param  iterable<array<int, mixed>>  $filas
      */
     private function escribirHojaReporteExcel($hoja, string $titulo, array $encabezados, iterable $filas, array $filtros): void
     {

@@ -1,0 +1,201 @@
+/* Campos, etiquetas, casillas, errores y la lista desplegable de sigte-controles.js. */
+
+.field {
+  display: flex; align-items: center; gap: var(--esp-3);
+  background: var(--card-2); border: 1px solid var(--borde);
+  border-radius: var(--radio-md); min-height: var(--alto-lg); padding: 0 var(--esp-4); margin-bottom: 0.85rem;
+  transition: border-color var(--dur-rapida) ease, box-shadow var(--dur-rapida) ease, background var(--dur-rapida) ease;
+}
+.field:focus-within {
+  background: var(--card);
+  border-color: var(--naranja-linea);
+  box-shadow: var(--foco);
+}
+.field input {
+  border: none; outline: none; background: transparent;
+  width: 100%; font-size: var(--fs-md); color: var(--texto); font-family: var(--font-body);
+}
+.field .icon { color: var(--muted); width: 1.2rem; text-align: center; font-size: var(--fs-xs); }
+.field .sigte-icon { color: var(--muted); }
+.field.is-invalid {
+  border-color: #f87171; background: var(--rojo-fondo);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+.field.is-invalid .icon { color: var(--rojo-texto); }
+.field-label {
+  display: block; font-size: var(--fs-sm); font-weight: 700;
+  color: var(--ink); margin: 0 0 0.35rem; letter-spacing: 0.02em;
+}
+.field-select select {
+  width: 100%; border: none; outline: none; background: transparent;
+  font: inherit; color: var(--texto);
+}
+.check {
+  display: flex; align-items: center; gap: var(--esp-2);
+  font-size: var(--fs-base); color: var(--ink); font-weight: 600;
+}
+.check input { width: 1.05rem; height: 1.05rem; accent-color: var(--naranja); }
+
+.sigte-error,
+.entrega-error-campo {
+    color: var(--rojo-texto);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.35;
+    margin: -0.55rem 0 0.75rem;
+}
+.field.is-invalido {
+    margin-bottom: 0.35rem;
+    border-color: var(--rojo) !important;
+    background: var(--rojo-fondo);
+}
+.field.is-invalido,
+.sigte-lista.is-invalido .sigte-lista-boton {
+    color: inherit;
+}
+
+/* Botón para mostrar u ocultar la contraseña */
+.btn-ver-clave {
+    display: grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--texto-4);
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+.btn-ver-clave:hover { color: var(--ink); }
+.btn-ver-clave .icono-ojo { transform-origin: center; overflow: visible; }
+.btn-ver-clave .pupila,
+.btn-ver-clave .cerrado {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity var(--dur-rapida) ease, transform var(--dur-rapida) ease;
+}
+.btn-ver-clave .pupila { opacity: 0; transform: scale(0.2); }
+.btn-ver-clave.is-abierto { color: var(--naranja); }
+.btn-ver-clave.is-abierto .pupila { opacity: 1; transform: scale(1); }
+.btn-ver-clave.is-abierto .cerrado { opacity: 0; }
+.btn-ver-clave.is-parpadeo .icono-ojo { animation: sigte-parpadeo 0.35s ease; }
+@keyframes sigte-parpadeo {
+    0% { transform: scaleY(1); }
+    40% { transform: scaleY(0.15); }
+    100% { transform: scaleY(1); }
+}
+
+/* Lista desplegable que reemplaza a <select> */
+.sigte-lista { position: relative; flex: 1 1 auto; min-width: 0; }
+.sigte-lista-nativa {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.sigte-lista-boton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--texto);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.sigte-lista-boton.is-vacio { color: var(--muted); }
+.sigte-lista-boton svg { width: var(--icono-xs); height: var(--icono-xs); flex: 0 0 auto; color: var(--ink); }
+.sigte-lista-panel {
+    position: fixed;
+    z-index: 40;
+    margin: 0;
+    padding: var(--esp-1);
+    list-style: none;
+    background: var(--superficie-1);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    box-shadow: var(--sombra-2);
+    max-height: 18rem;
+    overflow: auto;
+}
+.sigte-lista-busca {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0 0 0.25rem;
+    padding: 0.15rem 0.15rem var(--esp-2);
+    background: var(--superficie-1);
+    list-style: none;
+}
+.sigte-lista-busca-input {
+    width: 100%;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-md);
+    min-height: var(--alto-md);
+    padding: 0 var(--esp-3);
+    font: inherit;
+    color: var(--ink);
+    background: var(--superficie-1);
+}
+.sigte-lista-busca-input:focus {
+    outline: none;
+    border-color: var(--naranja-linea);
+    box-shadow: var(--foco);
+}
+.sigte-lista-vacio {
+    padding: var(--esp-2) var(--esp-3);
+    color: var(--muted);
+    font-size: var(--fs-base);
+}
+.sigte-lista-opcion[hidden] { display: none; }
+.sigte-lista-opcion {
+    padding: var(--esp-2) var(--esp-3);
+    border-radius: var(--radio-sm);
+    color: var(--ink);
+    cursor: pointer;
+}
+.sigte-lista-opcion:hover,
+.sigte-lista-opcion.is-activa {
+    background: var(--naranja-fondo);
+    color: var(--naranja-texto);
+}
+.sigte-lista-opcion[aria-disabled="true"] {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    cursor: default;
+}
+
+/* Modo oscuro: el relleno del campo queda un nivel sobre la superficie que lo contiene */
+html[data-tema="oscuro"] :where(select, textarea, input:not([type="checkbox"], [type="radio"], [type="range"])) {
+  background-color: var(--card-2);
+  color: var(--texto);
+  border-color: var(--linea);
+}
+html[data-tema="oscuro"] ::placeholder {
+  color: var(--texto-4);
+  opacity: 1;
+}
+html[data-tema="oscuro"] .field input,
+html[data-tema="oscuro"] .field select,
+html[data-tema="oscuro"] .entrega-dato input,
+html[data-tema="oscuro"] .entrega-dato select {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--ink);
+}
+html[data-tema="oscuro"] .field:focus-within {
+  background: var(--superficie-3);
+  border-color: var(--naranja-linea);
+  box-shadow: 0 0 0 3px rgba(240, 112, 47, 0.22);
+}
